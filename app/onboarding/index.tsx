@@ -1,8 +1,38 @@
 import { useState } from 'react';
-import { View } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
-import { YStack, Button, Text, XStack, Select } from 'tamagui';
+import { 
+  Box, 
+  VStack, 
+  Text, 
+  Radio, 
+  Button, 
+  Center, 
+  useColorModeValue,
+  Heading,
+  IconButton,
+  Icon,
+  Progress,
+  Flex,
+  Pressable
+} from 'native-base';
+import { useRouter } from 'expo-router';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useOnboardingStore } from '../../store/onboarding';
+
+const options = [
+  "Almost never",
+  "Rarely",
+  "Sometimes",
+  "Usually",
+  "Almost always"
+];
+
+const questions = [
+  "How often do you feel stressed?",
+  "How often do you practice mindfulness?",
+  "How often do you exercise?",
+  "How often do you feel anxious?",
+  "How often do you meditate?"
+];
 
 export default function OnboardingScreen() {
   const router = useRouter();
@@ -10,130 +40,125 @@ export default function OnboardingScreen() {
     (state) => state.setOnboardingComplete
   );
   const [currentStep, setCurrentStep] = useState(0);
-  const [meditationLevel, setMeditationLevel] = useState('');
-  const [stressLevel, setStressLevel] = useState('');
+  const [selectedOption, setSelectedOption] = useState('');
+  const [answers, setAnswers] = useState<string[]>([]);
 
-  const steps = [
-    {
-      title: 'Welcome to Mental Health App',
-      description: 'Let\'s get to know you better to personalize your experience.',
-      isLastStep: false,
-    },
-    {
-      title: 'Your Meditation Experience',
-      description: 'How familiar are you with meditation?',
-      isLastStep: false,
-    },
-    {
-      title: 'Current Stress Level',
-      description: 'How would you describe your current stress level?',
-      isLastStep: true,
-    },
-  ];
+  const bgColor = useColorModeValue('warmGray.50', 'coolGray.800');
+  const textColor = useColorModeValue('coolGray.800', 'warmGray.50');
+  const cardBg = useColorModeValue('white', 'coolGray.700');
 
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
+    const newAnswers = [...answers];
+    newAnswers[currentStep] = selectedOption;
+    setAnswers(newAnswers);
+
+    if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
+      setSelectedOption('');
     } else {
-      // Save onboarding data and redirect to main app
-      setOnboardingComplete(meditationLevel, stressLevel);
-      router.replace('/');
+      handleComplete();
     }
   };
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0:
-        return (
-          <YStack space="$4">
-            <Text fontSize="$6" textAlign="center">
-              We'll help you manage stress and anxiety through guided meditation and mindfulness exercises.
-            </Text>
-          </YStack>
-        );
-      case 1:
-        return (
-          <YStack space="$4">
-            <Select
-              value={meditationLevel}
-              onValueChange={setMeditationLevel}
-              placeholder="Select your experience level"
-            >
-              <Select.Item label="Beginner - Never meditated" value="beginner" />
-              <Select.Item label="Intermediate - Some experience" value="intermediate" />
-              <Select.Item label="Advanced - Regular practice" value="advanced" />
-            </Select>
-          </YStack>
-        );
-      case 2:
-        return (
-          <YStack space="$4">
-            <Select
-              value={stressLevel}
-              onValueChange={setStressLevel}
-              placeholder="Select your stress level"
-            >
-              <Select.Item label="Low - Feeling calm" value="low" />
-              <Select.Item label="Medium - Some stress" value="medium" />
-              <Select.Item label="High - Very stressed" value="high" />
-            </Select>
-          </YStack>
-        );
-      default:
-        return null;
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+      setSelectedOption(answers[currentStep - 1] || '');
     }
   };
 
-  const currentStepData = steps[currentStep];
+  const handleComplete = () => {
+    setOnboardingComplete(true);
+    router.push('/');
+  };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <Stack.Screen 
-        options={{ 
-          headerShown: false,
-        }} 
-      />
-      
-      <YStack 
-        flex={1} 
-        padding="$4" 
-        space="$4"
-        justifyContent="space-between"
-      >
-        <YStack space="$4" paddingTop="$8">
-          <Text 
-            fontSize="$8" 
-            fontWeight="bold"
-            textAlign="center"
-          >
-            {currentStepData.title}
-          </Text>
-          
-          <Text 
-            fontSize="$4" 
-            color="$gray11"
-            textAlign="center"
-          >
-            {currentStepData.description}
-          </Text>
+    <Box flex={1} bg={bgColor} safeArea>
+      <VStack space={6} flex={1} px={4} py={6}>
+        <Flex direction="row" justify="space-between" align="center">
+          <IconButton
+            icon={<Icon as={MaterialIcons} name="arrow-back" size="md" />}
+            onPress={handleBack}
+            variant="ghost"
+            isDisabled={currentStep === 0}
+            _icon={{
+              color: textColor,
+              _dark: { color: 'warmGray.50' }
+            }}
+          />
+          <Pressable onPress={() => router.push('/')}>
+            <Text color="primary.500" fontWeight="medium">
+              Skip
+            </Text>
+          </Pressable>
+        </Flex>
 
-          {renderStepContent()}
-        </YStack>
+        <VStack space={4} flex={1}>
+          <Progress
+            value={(currentStep + 1) * (100 / questions.length)}
+            size="sm"
+            colorScheme="primary"
+            bg="coolGray.200"
+            _dark={{ bg: 'coolGray.600' }}
+          />
 
-        <YStack space="$4" paddingBottom="$4">
-          <Button
-            theme="active"
-            size="$4"
-            onPress={handleNext}
-            disabled={
-              (currentStep === 1 && !meditationLevel) ||
-              (currentStep === 2 && !stressLevel)
-            }
+          <Heading
+            size="lg"
+            color={textColor}
+            _dark={{ color: 'warmGray.50' }}
           >
-            {currentStepData.isLastStep ? 'Get Started' : 'Continue'}
-          </Button>
-        </YStack>
-      </YStack>
-    </View>
+            {questions[currentStep]}
+          </Heading>
+
+          <Radio.Group
+            name="options"
+            value={selectedOption}
+            onChange={value => setSelectedOption(value)}
+          >
+            <VStack space={3}>
+              {options.map((option) => (
+                <Pressable
+                  key={option}
+                  onPress={() => setSelectedOption(option)}
+                >
+                  <Box
+                    bg={cardBg}
+                    p={4}
+                    rounded="lg"
+                    borderWidth={1}
+                    borderColor={selectedOption === option ? 'primary.500' : 'coolGray.200'}
+                    _dark={{
+                      borderColor: selectedOption === option ? 'primary.500' : 'coolGray.600'
+                    }}
+                  >
+                    <Radio
+                      value={option}
+                      size="sm"
+                      colorScheme="primary"
+                      _text={{
+                        fontSize: 'md',
+                        color: textColor,
+                        _dark: { color: 'warmGray.50' }
+                      }}
+                    >
+                      {option}
+                    </Radio>
+                  </Box>
+                </Pressable>
+              ))}
+            </VStack>
+          </Radio.Group>
+        </VStack>
+
+        <Button
+          size="lg"
+          onPress={handleNext}
+          isDisabled={!selectedOption}
+          _text={{ fontSize: 'md' }}
+        >
+          {currentStep === questions.length - 1 ? 'Complete' : 'Next'}
+        </Button>
+      </VStack>
+    </Box>
   );
 }
