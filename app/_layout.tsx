@@ -2,7 +2,6 @@ import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { NativeBaseProvider, extendTheme } from 'native-base';
-import { useColorScheme } from 'react-native';
 import { AuthProvider } from '../context/auth';
 
 // Keep the splash screen visible while we fetch resources
@@ -25,7 +24,6 @@ const theme = extendTheme({
     },
   },
   config: {
-    // Changing initial color mode to 'dark'
     initialColorMode: 'light',
   },
 });
@@ -36,27 +34,20 @@ export default function RootLayout() {
     SplashScreen.hideAsync();
   }, []);
 
-  const colorScheme = useColorScheme();
-
   return (
     <NativeBaseProvider theme={theme}>
       <AuthProvider>
         <Stack
           screenOptions={{
             headerStyle: {
-              backgroundColor: colorScheme === 'dark' ? '#1A1B1E' : '#FFFFFF',
+              backgroundColor: '#FFFFFF',
             },
-            headerTintColor: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+            headerTintColor: '#000000',
             headerTitleStyle: {
               fontWeight: 'bold',
             },
-            headerShown: false,
-            animation: 'fade',
           }}
-        >
-          <Stack.Screen name="index" />
-          <Stack.Screen name="onboarding/index" />
-        </Stack>
+        />
       </AuthProvider>
     </NativeBaseProvider>
   );
