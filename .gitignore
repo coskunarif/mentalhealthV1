@@ -40,3 +40,10 @@ yarn-error.*
 app-example
 
 config/firebase.ts
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store

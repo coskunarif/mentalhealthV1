@@ -3,13 +3,16 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
+      'react-native-reanimated/plugin',
       [
-        'transform-inline-environment-variables',
+        'module-resolver',
         {
-          include: ['EXPO_ROUTER_APP_ROOT'],
+          root: ['.'],
+          alias: {
+            '@': './',
+          },
         },
       ],
-      'react-native-reanimated/plugin',
     ],
   };
 };
