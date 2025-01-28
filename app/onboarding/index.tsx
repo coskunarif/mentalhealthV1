@@ -68,7 +68,7 @@ export default function OnboardingScreen() {
   };
 
   const handleComplete = () => {
-    setOnboardingComplete(true);
+    setOnboardingComplete('beginner', 'low');
     router.push('/');
   };
 
