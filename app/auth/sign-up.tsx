@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Image } from 'react-native';
 import { 
   Box, 
   VStack, 
@@ -10,22 +9,22 @@ import {
   useColorModeValue,
   Pressable,
   Icon,
-  FormControl
+  FormControl,
+  useToast
 } from 'native-base';
-import { useRouter } from 'expo-router';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useAuth } from '../../context/auth';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const router = useRouter();
+  const toast = useToast();
+  const { signUp } = useAuth();
 
   const bgColor = useColorModeValue('warmGray.50', 'coolGray.800');
   const textColor = useColorModeValue('coolGray.800', 'warmGray.50');
@@ -34,137 +33,142 @@ export default function SignUp() {
   const handleSignUp = async () => {
     if (loading) return;
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      toast.show({
+        description: 'Passwords do not match',
+        placement: 'top'
+      });
+      return;
+    }
+
+    if (!email || !password) {
+      toast.show({
+        description: 'Please fill in all fields',
+        placement: 'top'
+      });
       return;
     }
 
     setLoading(true);
-    setError('');
-
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      router.replace('/onboarding');
-    } catch (err) {
-      setError('Failed to create account');
-      console.error(err);
+      await signUp(email, password);
+      // The index page will handle navigation
+    } catch (error: any) {
+      toast.show({
+        description: error.message || 'Failed to create account',
+        placement: 'top'
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Center flex={1} bg={bgColor} px="4">
-      <Box safeArea w="100%" maxW="400">
-        <VStack space={4} alignItems="center">
-          <Image
-            source={require('../../assets/images/adaptive-icon.png')}
-            style={{
-              width: 80,
-              height: 80,
-              marginBottom: 20,
-              resizeMode: 'contain',
-            }}
-          />
-          
-          <Text
-            fontSize="3xl"
-            fontWeight="bold"
-            color={textColor}
-            _dark={{ color: 'warmGray.50' }}
-          >
+    <Center flex={1} bg={bgColor}>
+      <Box w="90%" maxW="290" py="8">
+        <VStack space={3}>
+          <Text fontSize="2xl" fontWeight="bold" color={textColor}>
             Create Account
           </Text>
-
-          <FormControl isInvalid={!!error}>
-            <VStack space={4} w="100%">
-              <Input
-                placeholder="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                size="lg"
-                bg={inputBg}
-                _focus={{
-                  borderColor: 'primary.500',
-                  bg: inputBg,
-                }}
-              />
-
-              <Input
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                type={showPassword ? 'text' : 'password'}
-                size="lg"
-                bg={inputBg}
-                _focus={{
-                  borderColor: 'primary.500',
-                  bg: inputBg,
-                }}
-                InputRightElement={
-                  <Pressable onPress={() => setShowPassword(!showPassword)}>
-                    <Icon
-                      as={MaterialIcons}
-                      name={showPassword ? 'visibility' : 'visibility-off'}
-                      size={5}
-                      mr="2"
-                      color="muted.400"
-                    />
-                  </Pressable>
-                }
-              />
-
-              <Input
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                type={showConfirmPassword ? 'text' : 'password'}
-                size="lg"
-                bg={inputBg}
-                _focus={{
-                  borderColor: 'primary.500',
-                  bg: inputBg,
-                }}
-                InputRightElement={
-                  <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    <Icon
-                      as={MaterialIcons}
-                      name={showConfirmPassword ? 'visibility' : 'visibility-off'}
-                      size={5}
-                      mr="2"
-                      color="muted.400"
-                    />
-                  </Pressable>
-                }
-              />
-
-              {error && (
-                <Text color="error.500" fontSize="sm">
-                  {error}
-                </Text>
-              )}
-
-              <Button
-                size="lg"
-                onPress={handleSignUp}
-                isLoading={loading}
-                isLoadingText="Creating Account"
-                _loading={{
-                  bg: 'primary.600',
-                }}
-              >
-                Sign Up
-              </Button>
-
-              <Button
-                variant="ghost"
-                onPress={() => router.push('/auth/sign-in')}
-              >
-                Already have an account? Sign In
-              </Button>
-            </VStack>
+          
+          <FormControl>
+            <FormControl.Label>Email</FormControl.Label>
+            <Input
+              bg={inputBg}
+              placeholder="Enter your email"
+              size="lg"
+              value={email}
+              onChangeText={setEmail}
+              InputLeftElement={
+                <Icon
+                  as={<MaterialIcons name="person" />}
+                  size={5}
+                  ml="2"
+                  color="muted.400"
+                />
+              }
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
           </FormControl>
+
+          <FormControl>
+            <FormControl.Label>Password</FormControl.Label>
+            <Input
+              bg={inputBg}
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter password"
+              size="lg"
+              value={password}
+              onChangeText={setPassword}
+              InputLeftElement={
+                <Icon
+                  as={<MaterialIcons name="lock" />}
+                  size={5}
+                  ml="2"
+                  color="muted.400"
+                />
+              }
+              InputRightElement={
+                <Pressable onPress={() => setShowPassword(!showPassword)}>
+                  <Icon
+                    as={<MaterialIcons name={showPassword ? "visibility" : "visibility-off"} />}
+                    size={5}
+                    mr="2"
+                    color="muted.400"
+                  />
+                </Pressable>
+              }
+            />
+          </FormControl>
+
+          <FormControl>
+            <FormControl.Label>Confirm Password</FormControl.Label>
+            <Input
+              bg={inputBg}
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm password"
+              size="lg"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              InputLeftElement={
+                <Icon
+                  as={<MaterialIcons name="lock" />}
+                  size={5}
+                  ml="2"
+                  color="muted.400"
+                />
+              }
+              InputRightElement={
+                <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  <Icon
+                    as={<MaterialIcons name={showConfirmPassword ? "visibility" : "visibility-off"} />}
+                    size={5}
+                    mr="2"
+                    color="muted.400"
+                  />
+                </Pressable>
+              }
+            />
+          </FormControl>
+
+          <Button
+            mt="2"
+            size="lg"
+            bg="blue.500"
+            _pressed={{ bg: "blue.600" }}
+            onPress={handleSignUp}
+            isLoading={loading}
+          >
+            Sign Up
+          </Button>
+
+          <Button
+            variant="ghost"
+            _text={{ color: "blue.500" }}
+            onPress={() => router.back()}
+          >
+            Already have an account? Sign In
+          </Button>
         </VStack>
       </Box>
     </Center>

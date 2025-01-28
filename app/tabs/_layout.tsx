@@ -1,42 +1,39 @@
 import { Tabs } from 'expo-router';
-import { Icon, useColorModeValue } from 'native-base';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Icon } from 'native-base';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
-export default function TabLayout() {
-  const tabBgColor = useColorModeValue('white', 'coolGray.800');
-  const activeColor = useColorModeValue('primary.600', 'primary.400');
-  const inactiveColor = useColorModeValue('coolGray.400', 'coolGray.500');
-
+export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#22C55E',
+        tabBarInactiveTintColor: '#94A3B8',
         tabBarStyle: {
-          backgroundColor: tabBgColor,
-          borderTopColor: useColorModeValue('coolGray.200', 'coolGray.700'),
+          borderTopWidth: 1,
+          borderTopColor: '#E2E8F0',
+          elevation: 0,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
         },
-        tabBarActiveTintColor: activeColor,
-        tabBarInactiveTintColor: inactiveColor,
-        headerStyle: {
-          backgroundColor: tabBgColor,
-        },
-        headerTintColor: useColorModeValue('coolGray.800', 'warmGray.50'),
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => (
-            <Icon as={MaterialIcons} name="home" color={color} size="md" />
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={MaterialIcons} name="home" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="profile"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => (
-            <Icon as={MaterialIcons} name="explore" color={color} size="md" />
+          title: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <Icon as={MaterialCommunityIcons} name="account" size={size} color={color} />
           ),
         }}
       />

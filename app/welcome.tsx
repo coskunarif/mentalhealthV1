@@ -1,7 +1,7 @@
 import { Box, Button, Text, VStack } from 'native-base';
 import { useRouter } from 'expo-router';
 
-export default function WelcomeScreen() {
+export default function Page() {
   const router = useRouter();
 
   return (
