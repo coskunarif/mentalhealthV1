@@ -168,3 +168,33 @@ Build a secure, scalable, and user-friendly mental health mobile app (iOS and An
 2. Group meditation sessions for real-time community engagement.
 3. Integration with Apple Health/Google Fit for syncing meditation data.
 4. Advanced analytics dashboards showing detailed mood trends over time.
+
+
+
+
+mentalhealthV1/
+├── 📁 app/                      # Main application code
+│   ├── 📁 auth/                 # Authentication related components
+│   ├── 📁 config/               # Configuration files
+│   ├── 📁 lib/                  # Library files (Firebase, etc.)
+│   ├── 📁 onboarding/          # Onboarding flow components
+│   ├── 📁 tabs/                 # Tab navigation components
+│   ├── 📄 _layout.tsx          # Root layout component
+│   ├── 📄 index.tsx            # Main entry point
+│   ├── 📄 mood.tsx             # Mood tracking screen
+│   ├── 📄 player.tsx           # Media player screen
+│   ├── 📄 survey.tsx           # Survey screen
+│   └── 📄 welcome.tsx          # Welcome screen
+│
+├── 📁 assets/                   # Static assets (images, fonts)
+├── 📁 context/                  # React Context providers
+├── 📁 store/                    # State management
+├── 📁 types/                    # TypeScript type definitions
+│
+├── 📄 .env                      # Environment variables
+├── 📄 app.json                  # Expo configuration
+├── 📄 babel.config.js           # Babel configuration
+├── 📄 eslint.config.mjs         # ESLint configuration
+├── 📄 package.json              # Project dependencies
+├── 📄 tsconfig.json             # TypeScript configuration
+└── 📄 README.md                 # Project documentation

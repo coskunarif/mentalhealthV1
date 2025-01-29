@@ -1,21 +1,27 @@
 import { Tabs } from 'expo-router';
-import { Icon } from 'native-base';
+import { useTheme } from 'react-native-paper';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function TabsLayout() {
+  const theme = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#22C55E',
-        tabBarInactiveTintColor: '#94A3B8',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.onSurfaceDisabled,
         tabBarStyle: {
           borderTopWidth: 1,
-          borderTopColor: '#E2E8F0',
+          borderTopColor: theme.colors.surfaceVariant,
           elevation: 0,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontFamily: theme.fonts.labelMedium.fontFamily,
+          fontSize: 12,
         },
       }}
     >
@@ -24,7 +30,7 @@ export default function TabsLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size }) => (
-            <Icon as={MaterialIcons} name="home" size={size} color={color} />
+            <MaterialIcons name="home" size={size} color={color} />
           ),
         }}
       />
@@ -33,7 +39,7 @@ export default function TabsLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => (
-            <Icon as={MaterialCommunityIcons} name="account" size={size} color={color} />
+            <MaterialCommunityIcons name="account" size={size} color={color} />
           ),
         }}
       />
