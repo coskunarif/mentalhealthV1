@@ -1,21 +1,7 @@
 import { useState } from 'react';
-import { 
-  Box, 
-  VStack, 
-  Text, 
-  Radio, 
-  Button, 
-  Center, 
-  useColorModeValue,
-  Heading,
-  IconButton,
-  Icon,
-  Progress,
-  Flex,
-  Pressable
-} from 'native-base';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { Text, Surface, Button, useTheme, IconButton, ProgressBar, RadioButton } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
 import { useOnboardingStore } from '../../store/onboarding';
 
 const options = [
@@ -36,16 +22,13 @@ const questions = [
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const theme = useTheme();
   const setOnboardingComplete = useOnboardingStore(
     (state) => state.setOnboardingComplete
   );
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedOption, setSelectedOption] = useState('');
   const [answers, setAnswers] = useState<string[]>([]);
-
-  const bgColor = useColorModeValue('warmGray.50', 'coolGray.800');
-  const textColor = useColorModeValue('coolGray.800', 'warmGray.50');
-  const cardBg = useColorModeValue('white', 'coolGray.700');
 
   const handleNext = () => {
     const newAnswers = [...answers];
@@ -73,92 +56,144 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <Box flex={1} bg={bgColor} safeArea>
-      <VStack space={6} flex={1} px={4} py={6}>
-        <Flex direction="row" justify="space-between" align="center">
+    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.content}>
+        <View style={styles.header}>
           <IconButton
-            icon={<Icon as={MaterialIcons} name="arrow-back" size="md" />}
+            icon="arrow-back"
             onPress={handleBack}
-            variant="ghost"
-            isDisabled={currentStep === 0}
-            _icon={{
-              color: textColor,
-              _dark: { color: 'warmGray.50' }
-            }}
+            disabled={currentStep === 0}
           />
           <Pressable onPress={() => router.push('/')}>
-            <Text color="primary.500" fontWeight="medium">
+            <Text
+              variant="labelLarge"
+              style={{ color: theme.colors.primary }}
+            >
               Skip
             </Text>
           </Pressable>
-        </Flex>
+        </View>
 
-        <VStack space={4} flex={1}>
-          <Progress
-            value={(currentStep + 1) * (100 / questions.length)}
-            size="sm"
-            colorScheme="primary"
-            bg="coolGray.200"
-            _dark={{ bg: 'coolGray.600' }}
+        <View style={styles.mainContent}>
+          <ProgressBar
+            progress={(currentStep + 1) / questions.length}
+            style={styles.progressBar}
           />
 
-          <Heading
-            size="lg"
-            color={textColor}
-            _dark={{ color: 'warmGray.50' }}
+          <Text
+            variant="headlineMedium"
+            style={[
+              styles.question,
+              { color: theme.colors.onSurface }
+            ]}
           >
             {questions[currentStep]}
-          </Heading>
+          </Text>
 
-          <Radio.Group
-            name="options"
+          <RadioButton.Group
+            onValueChange={value => setSelectedOption(value)}
             value={selectedOption}
-            onChange={value => setSelectedOption(value)}
           >
-            <VStack space={3}>
+            <View style={styles.optionsContainer}>
               {options.map((option) => (
                 <Pressable
                   key={option}
                   onPress={() => setSelectedOption(option)}
+                  style={styles.optionWrapper}
                 >
-                  <Box
-                    bg={cardBg}
-                    p={4}
-                    rounded="lg"
-                    borderWidth={1}
-                    borderColor={selectedOption === option ? 'primary.500' : 'coolGray.200'}
-                    _dark={{
-                      borderColor: selectedOption === option ? 'primary.500' : 'coolGray.600'
-                    }}
+                  <Surface
+                    style={[
+                      styles.optionCard,
+                      {
+                        backgroundColor: theme.colors.surface,
+                        borderColor: selectedOption === option
+                          ? theme.colors.primary
+                          : theme.colors.surfaceVariant,
+                      }
+                    ]}
                   >
-                    <Radio
-                      value={option}
-                      size="sm"
-                      colorScheme="primary"
-                      _text={{
-                        fontSize: 'md',
-                        color: textColor,
-                        _dark: { color: 'warmGray.50' }
-                      }}
-                    >
-                      {option}
-                    </Radio>
-                  </Box>
+                    <View style={styles.optionContent}>
+                      <RadioButton value={option} />
+                      <Text
+                        variant="bodyLarge"
+                        style={[
+                          styles.optionText,
+                          { color: theme.colors.onSurface }
+                        ]}
+                      >
+                        {option}
+                      </Text>
+                    </View>
+                  </Surface>
                 </Pressable>
               ))}
-            </VStack>
-          </Radio.Group>
-        </VStack>
+            </View>
+          </RadioButton.Group>
+        </View>
 
         <Button
-          size="lg"
+          mode="contained"
           onPress={handleNext}
-          isDisabled={!selectedOption}
-          _text={{ fontSize: 'md' }}
+          disabled={!selectedOption}
+          style={styles.button}
+          contentStyle={styles.buttonContent}
         >
           {currentStep === questions.length - 1 ? 'Complete' : 'Next'}
         </Button>
-      </VStack>
-    </Box>
+      </View>
+    </Surface>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  mainContent: {
+    flex: 1,
+    gap: 24,
+  },
+  progressBar: {
+    height: 4,
+    borderRadius: 2,
+  },
+  question: {
+    marginBottom: 16,
+  },
+  optionsContainer: {
+    gap: 12,
+  },
+  optionWrapper: {
+    width: '100%',
+  },
+  optionCard: {
+    borderWidth: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  optionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  },
+  optionText: {
+    marginLeft: 8,
+  },
+  button: {
+    marginTop: 24,
+    borderRadius: 28,
+  },
+  buttonContent: {
+    height: 48,
+  },
+});

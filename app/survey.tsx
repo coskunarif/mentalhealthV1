@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Box, VStack, Text, Pressable, Progress, Center, Button, HStack } from 'native-base';
+import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { Text, Button, Surface, TouchableRipple, ProgressBar, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { globalStyles } from './config/styles';
 
 const questions = [
   {
@@ -28,6 +30,7 @@ const questions = [
 
 export default function SurveyScreen() {
   const router = useRouter();
+  const theme = useTheme();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{[key: number]: number}>({});
 
@@ -52,90 +55,144 @@ export default function SurveyScreen() {
     }
   };
 
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
-
   return (
-    <Box flex={1} bg="white" safeArea p={4}>
-      {/* Progress Bar */}
-      <Progress
-        value={progress}
-        mb={8}
-        bg="coolGray.100"
-        _filledTrack={{
-          bg: "green.500"
-        }}
-      />
-
-      {/* Question */}
-      <Text
-        fontSize="xl"
-        color="green.600"
-        textAlign="center"
-        mb={8}
-        fontWeight="medium"
-      >
-        {questions[currentQuestion].text}
-      </Text>
-
-      {/* Options */}
-      <VStack space={4} flex={1}>
-        {questions[currentQuestion].options.map((option, index) => (
-          <Pressable
-            key={index}
-            onPress={() => handleSelect(currentQuestion, index)}
-          >
-            <Box
-              bg={selectedAnswers[currentQuestion] === index ? 'green.100' : 'coolGray.100'}
-              p={4}
-              rounded="lg"
-              borderWidth={selectedAnswers[currentQuestion] === index ? 1 : 0}
-              borderColor="green.500"
+    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <SafeAreaView style={styles.safeArea}>
+        {/* Progress Section */}
+        <View style={styles.progressSection}>
+          <View style={styles.progressInfo}>
+            <Text 
+              variant="labelLarge" 
+              style={[
+                globalStyles.text,
+                { color: theme.colors.primary }
+              ]}
             >
-              <Text
-                color={selectedAnswers[currentQuestion] === index ? 'green.700' : 'coolGray.700'}
-                fontSize="md"
-              >
-                {option}
-              </Text>
-            </Box>
-          </Pressable>
-        ))}
-      </VStack>
-
-      {/* Navigation Buttons */}
-      <HStack space={4} justifyContent="space-between" mt={6}>
-        <Button
-          flex={1}
-          variant="ghost"
-          colorScheme="green"
-          onPress={handlePrevious}
-          isDisabled={currentQuestion === 0}
-        >
-          Previous
-        </Button>
-        <Button
-          flex={1}
-          colorScheme="green"
-          onPress={handleNext}
-          isDisabled={selectedAnswers[currentQuestion] === undefined}
-        >
-          {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
-        </Button>
-      </HStack>
-
-      {/* Navigation Dots */}
-      <Center mt={4} flexDir="row">
-        {questions.map((_, index) => (
-          <Box
-            key={index}
-            w={2}
-            h={2}
-            rounded="full"
-            bg={index === currentQuestion ? 'green.500' : 'coolGray.200'}
-            mx={1}
+              Question {currentQuestion + 1} of {questions.length}
+            </Text>
+          </View>
+          <ProgressBar
+            progress={(currentQuestion + 1) / questions.length}
+            color={theme.colors.primary}
+            style={styles.progressBar}
           />
-        ))}
-      </Center>
-    </Box>
+        </View>
+
+        {/* Content Section */}
+        <View style={styles.contentSection}>
+          {/* Question */}
+          <Text
+            variant="headlineSmall"
+            style={[
+              styles.questionText,
+              globalStyles.textBold,
+              { color: theme.colors.primary }
+            ]}
+          >
+            {questions[currentQuestion].text}
+          </Text>
+
+          {/* Options */}
+          <View style={styles.optionsContainer}>
+            {questions[currentQuestion].options.map((option, index) => {
+              const isSelected = selectedAnswers[currentQuestion] === index;
+              return (
+                <TouchableRipple
+                  key={index}
+                  onPress={() => handleSelect(currentQuestion, index)}
+                  style={[
+                    styles.optionButton,
+                    {
+                      backgroundColor: isSelected ? theme.colors.primaryContainer : theme.colors.surface,
+                      borderColor: isSelected ? theme.colors.primary : theme.colors.outline,
+                    }
+                  ]}
+                >
+                  <Text
+                    variant="bodyLarge"
+                    style={[
+                      globalStyles.text,
+                      { color: isSelected ? theme.colors.primary : theme.colors.onSurface }
+                    ]}
+                  >
+                    {option}
+                  </Text>
+                </TouchableRipple>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Navigation Section */}
+        <View style={styles.navigationSection}>
+          <Button
+            mode="outlined"
+            onPress={handlePrevious}
+            disabled={currentQuestion === 0}
+          >
+            Previous
+          </Button>
+          <Button
+            mode="contained"
+            onPress={handleNext}
+            disabled={selectedAnswers[currentQuestion] === undefined}
+          >
+            {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
+          </Button>
+        </View>
+      </SafeAreaView>
+    </Surface>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  progressSection: {
+    paddingTop: 32,
+    paddingBottom: 16,
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(93, 164, 122, 0.05)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(93, 164, 122, 0.1)',
+  },
+  progressInfo: {
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  progressBar: {
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(93, 164, 122, 0.2)',
+  },
+  contentSection: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+  },
+  questionText: {
+    textAlign: 'center',
+    marginBottom: 32,
+    paddingHorizontal: 16,
+  },
+  optionsContainer: {
+    gap: 16,
+  },
+  optionButton: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    elevation: 1,
+  },
+  navigationSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 24,
+    paddingBottom: 32,
+  },
+});

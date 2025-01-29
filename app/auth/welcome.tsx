@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
-import { Box, Text, VStack, Input, Button, Icon, Pressable, Center, useToast } from 'native-base';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, StyleSheet } from 'react-native';
+import { Text, Surface, TextInput, Button, useTheme, Snackbar } from 'react-native-paper';
 import { router } from 'expo-router';
 import { useAuth } from '../../context/auth';
 
 export default function Welcome() {
-  const [show, setShow] = React.useState(false);
+  const theme = useTheme();
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const { signIn } = useAuth();
-  const toast = useToast();
   
+  const showMessage = (message: string) => {
+    setSnackbarMessage(message);
+    setSnackbarVisible(true);
+  };
+
   const handleSignIn = async () => {
     if (!email || !password) {
-      toast.show({
-        description: "Please enter both email and password",
-        placement: "top"
-      });
+      showMessage("Please enter both email and password");
       return;
     }
 
@@ -26,111 +30,165 @@ export default function Welcome() {
       await signIn(email, password);
       // No need to navigate, the index page will handle navigation based on auth state
     } catch (error: any) {
-      toast.show({
-        description: error.message || "Sign in failed",
-        placement: "top"
-      });
+      showMessage(error.message || "Sign in failed");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Center flex={1} bg="white" px="4">
-      <VStack space={4} w="100%">
+    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.content}>
         {/* App Logo */}
-        <Box alignItems="center" mb="6">
-          <Box 
-            bg="blue.500" 
-            p="4" 
-            rounded="2xl"
-            shadow={3}
+        <View style={styles.logoContainer}>
+          <Surface
+            style={[
+              styles.logo,
+              { backgroundColor: theme.colors.primary }
+            ]}
           >
-            <Text fontSize="4xl" color="white" fontWeight="bold">
+            <Text
+              variant="displayMedium"
+              style={[
+                styles.logoText,
+                { color: theme.colors.onPrimary }
+              ]}
+            >
               MH
             </Text>
-          </Box>
-          <Text fontSize="2xl" fontWeight="bold" color="darkBlue.900" mt="2">
+          </Surface>
+          <Text
+            variant="headlineSmall"
+            style={[
+              styles.appTitle,
+              { color: theme.colors.onSurface }
+            ]}
+          >
             Mental Health App
           </Text>
-        </Box>
+        </View>
 
         {/* Email Input */}
-        <Input
-          InputLeftElement={
-            <Icon
-              as={<MaterialIcons name="person" />}
-              size={5}
-              ml="2"
-              color="muted.400"
-            />
-          }
-          placeholder="Email"
-          size="lg"
+        <TextInput
+          label="Email"
           value={email}
           onChangeText={setEmail}
-          autoCapitalize="none"
+          mode="outlined"
+          left={<TextInput.Icon icon="email" />}
           keyboardType="email-address"
+          autoCapitalize="none"
+          style={[
+            styles.input,
+            { backgroundColor: theme.colors.background }
+          ]}
         />
 
         {/* Password Input */}
-        <Input
-          type={show ? "text" : "password"}
-          InputLeftElement={
-            <Icon
-              as={<MaterialIcons name="lock" />}
-              size={5}
-              ml="2"
-              color="muted.400"
-            />
-          }
-          InputRightElement={
-            <Pressable onPress={() => setShow(!show)}>
-              <Icon
-                as={<MaterialIcons name={show ? "visibility" : "visibility-off"} />}
-                size={5}
-                mr="2"
-                color="muted.400"
-              />
-            </Pressable>
-          }
-          placeholder="Password"
-          size="lg"
+        <TextInput
+          label="Password"
           value={password}
           onChangeText={setPassword}
+          mode="outlined"
+          secureTextEntry={!showPassword}
+          left={<TextInput.Icon icon="lock" />}
+          right={
+            <TextInput.Icon
+              icon={showPassword ? "eye-off" : "eye"}
+              onPress={() => setShowPassword(!showPassword)}
+            />
+          }
+          style={[
+            styles.input,
+            { backgroundColor: theme.colors.background }
+          ]}
         />
 
         {/* Sign In Button */}
         <Button
-          size="lg"
-          bg="blue.500"
-          _pressed={{ bg: "blue.600" }}
-          mt="2"
+          mode="contained"
           onPress={handleSignIn}
-          isLoading={isLoading}
+          loading={isLoading}
+          style={styles.signInButton}
+          contentStyle={styles.buttonContent}
         >
           Sign In
         </Button>
 
         {/* Forgot Password */}
         <Button
-          variant="ghost"
-          _text={{ color: "blue.500" }}
+          mode="text"
           onPress={() => router.push('/auth/forgot-password' as any)}
+          style={styles.textButton}
         >
           Forgot Password?
         </Button>
 
         {/* Create Account Link */}
         <Button
-          variant="ghost"
-          _text={{ color: "blue.500" }}
-          mt="4"
+          mode="text"
           onPress={() => router.push('/auth/sign-up' as any)}
+          style={styles.textButton}
         >
           Don't have an account? Create here
         </Button>
-      </VStack>
-    </Center>
+
+        {/* Snackbar for error messages */}
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={() => setSnackbarVisible(false)}
+          duration={3000}
+          style={styles.snackbar}
+        >
+          {snackbarMessage}
+        </Snackbar>
+      </View>
+    </Surface>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+    gap: 16,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  logo: {
+    padding: 16,
+    borderRadius: 16,
+    elevation: 4,
+  },
+  logoText: {
+    fontWeight: 'bold',
+  },
+  appTitle: {
+    marginTop: 8,
+    fontWeight: 'bold',
+  },
+  input: {
+    marginBottom: 8,
+  },
+  signInButton: {
+    marginTop: 8,
+    borderRadius: 28,
+  },
+  buttonContent: {
+    height: 48,
+  },
+  textButton: {
+    marginTop: 8,
+  },
+  snackbar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+});

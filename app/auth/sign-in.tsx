@@ -1,21 +1,9 @@
 import { useState } from 'react';
-import { Image } from 'react-native';
-import { 
-  Box, 
-  VStack, 
-  Input, 
-  Button, 
-  Text, 
-  Center, 
-  useColorModeValue,
-  Pressable,
-  Icon,
-  FormControl
-} from 'native-base';
+import { View, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Text, Surface, TextInput, Button, useTheme, HelperText } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
-import { MaterialIcons } from '@expo/vector-icons';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -24,10 +12,7 @@ export default function SignIn() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-
-  const bgColor = useColorModeValue('warmGray.50', 'coolGray.800');
-  const textColor = useColorModeValue('coolGray.800', 'warmGray.50');
-  const inputBg = useColorModeValue('white', 'coolGray.700');
+  const theme = useTheme();
 
   const handleSignIn = async () => {
     if (loading) return;
@@ -46,96 +31,98 @@ export default function SignIn() {
   };
 
   return (
-    <Center flex={1} bg={bgColor} px="4">
-      <Box safeArea w="100%" maxW="400">
-        <VStack space={4} alignItems="center">
-          <Image
-            source={require('../../assets/images/adaptive-icon.png')}
-            style={{
-              width: 80,
-              height: 80,
-              marginBottom: 20,
-              resizeMode: 'contain',
-            }}
-          />
-          
-          <Text
-            fontSize="3xl"
-            fontWeight="bold"
-            color={textColor}
-            _dark={{ color: 'warmGray.50' }}
-          >
-            Welcome Back
-          </Text>
+    <Surface style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView 
+          contentContainerStyle={{ 
+            flexGrow: 1,
+            justifyContent: 'center',
+            padding: 16
+          }}
+        >
+          <View style={{ 
+            width: '100%',
+            maxWidth: 400,
+            alignSelf: 'center',
+            alignItems: 'center',
+            gap: 24
+          }}>
+            <Image
+              source={require('../../assets/images/adaptive-icon.png')}
+              style={{
+                width: 80,
+                height: 80,
+                marginBottom: 20,
+                resizeMode: 'contain',
+              }}
+            />
+            
+            <Text
+              variant="headlineMedium"
+              style={{
+                color: theme.colors.onBackground,
+                fontWeight: 'bold'
+              }}
+            >
+              Welcome Back
+            </Text>
 
-          <FormControl isInvalid={!!error}>
-            <VStack space={4} w="100%">
-              <Input
-                placeholder="Email"
+            <View style={{ width: '100%', gap: 16 }}>
+              <TextInput
+                label="Email"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                size="lg"
-                bg={inputBg}
-                _focus={{
-                  borderColor: 'primary.500',
-                  bg: inputBg,
-                }}
+                mode="outlined"
+                error={!!error}
+                style={{ backgroundColor: theme.colors.background }}
               />
 
-              <Input
-                placeholder="Password"
+              <TextInput
+                label="Password"
                 value={password}
                 onChangeText={setPassword}
-                type={showPassword ? 'text' : 'password'}
-                size="lg"
-                bg={inputBg}
-                _focus={{
-                  borderColor: 'primary.500',
-                  bg: inputBg,
-                }}
-                InputRightElement={
-                  <Pressable onPress={() => setShowPassword(!showPassword)}>
-                    <Icon
-                      as={MaterialIcons}
-                      name={showPassword ? 'visibility' : 'visibility-off'}
-                      size={5}
-                      mr="2"
-                      color="muted.400"
-                    />
-                  </Pressable>
+                secureTextEntry={!showPassword}
+                mode="outlined"
+                error={!!error}
+                style={{ backgroundColor: theme.colors.background }}
+                right={
+                  <TextInput.Icon
+                    icon={showPassword ? 'eye-off' : 'eye'}
+                    onPress={() => setShowPassword(!showPassword)}
+                  />
                 }
               />
 
-              {error && (
-                <Text color="error.500" fontSize="sm">
-                  {error}
-                </Text>
-              )}
+              <HelperText type="error" visible={!!error}>
+                {error}
+              </HelperText>
 
               <Button
-                size="lg"
+                mode="contained"
                 onPress={handleSignIn}
-                isLoading={loading}
-                isLoadingText="Signing in"
-                _loading={{
-                  bg: 'primary.600',
-                }}
+                loading={loading}
+                disabled={loading}
+                contentStyle={{ height: 48 }}
               >
-                Sign In
+                {loading ? 'Signing in...' : 'Sign In'}
               </Button>
 
               <Button
-                variant="ghost"
+                mode="text"
                 onPress={() => router.push('/auth/sign-up')}
+                style={{ marginTop: 8 }}
               >
                 Don't have an account? Sign Up
               </Button>
-            </VStack>
-          </FormControl>
-        </VStack>
-      </Box>
-    </Center>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </Surface>
   );
 }

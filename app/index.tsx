@@ -1,41 +1,50 @@
-import { Box, Button, Text, VStack } from 'native-base';
+import { View } from 'react-native';
+import { Button, Text, Surface, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const theme = useTheme();
 
   return (
-    <Box flex={1} bg="white" safeArea>
-      <Box flex={1} justifyContent="center" alignItems="center">
-        <VStack space={6} alignItems="center">
-          <Text
-            fontSize="4xl"
-            fontWeight="bold"
-            textAlign="center"
-            color="primary.500"
+    <Surface style={{ flex: 1, backgroundColor: 'white' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}>
+        <View style={{ alignItems: 'center', gap: 24 }}>
+          <Text 
+            variant="headlineLarge" 
+            style={{ 
+              textAlign: 'center',
+              color: theme.colors.primary,
+              fontWeight: 'bold'
+            }}
           >
             Welcome to Mental Health
           </Text>
           <Text
-            fontSize="md"
-            textAlign="center"
-            color="coolGray.600"
-            px={6}
+            variant="bodyLarge"
+            style={{
+              textAlign: 'center',
+              color: theme.colors.onSurfaceVariant,
+              paddingHorizontal: 24
+            }}
           >
             Calm yourself for your mental health{'\n'}and also your mind from the problems{'\n'}that exist in this world
           </Text>
           <Button
-            size="lg"
+            mode="contained"
             onPress={() => router.push('/survey')}
-            bg="primary.500"
-            _pressed={{ bg: 'primary.600' }}
-            rounded="full"
-            px={8}
+            style={{
+              borderRadius: 28,
+              paddingHorizontal: 32
+            }}
+            contentStyle={{
+              height: 56
+            }}
           >
             Get Started
           </Button>
-        </VStack>
-      </Box>
-    </Box>
+        </View>
+      </View>
+    </Surface>
   );
 }

@@ -1,54 +1,106 @@
 import React from 'react';
-import { Box, Text, VStack, Input, Button, Icon, Center } from 'native-base';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, StyleSheet } from 'react-native';
+import { Text, Surface, TextInput, Button, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
 
 export default function ForgotPassword() {
+  const theme = useTheme();
+  const [email, setEmail] = React.useState('');
+
   return (
-    <Center flex={1} bg="white" px="4">
-      <VStack space={4} w="100%">
-        <Box alignItems="center" mb="6">
-          <Text fontSize="2xl" fontWeight="bold" color="darkBlue.900">
+    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text
+            variant="headlineSmall"
+            style={[
+              styles.title,
+              { color: theme.colors.onSurface }
+            ]}
+          >
             Reset Password
           </Text>
-          <Text fontSize="sm" color="muted.500" textAlign="center" mt="2">
+          <Text
+            variant="bodyMedium"
+            style={[
+              styles.subtitle,
+              { color: theme.colors.onSurfaceVariant }
+            ]}
+          >
             Enter your email address and we'll send you instructions to reset your password.
           </Text>
-        </Box>
+        </View>
 
         {/* Email Input */}
-        <Input
-          InputLeftElement={
-            <Icon
-              as={<MaterialIcons name="email" />}
-              size={5}
-              ml="2"
-              color="muted.400"
-            />
-          }
-          placeholder="Email"
-          size="lg"
+        <TextInput
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          mode="outlined"
+          left={<TextInput.Icon icon="email" />}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          style={[
+            styles.input,
+            { backgroundColor: theme.colors.background }
+          ]}
         />
 
         {/* Reset Password Button */}
         <Button
-          size="lg"
-          bg="blue.500"
-          _pressed={{ bg: "blue.600" }}
-          mt="2"
+          mode="contained"
+          onPress={() => {}}
+          style={styles.resetButton}
+          contentStyle={styles.buttonContent}
         >
           Send Reset Instructions
         </Button>
 
         {/* Back to Login */}
         <Button
-          variant="ghost"
-          _text={{ color: "blue.500" }}
+          mode="text"
           onPress={() => router.back()}
+          style={styles.backButton}
         >
           Back to Login
         </Button>
-      </VStack>
-    </Center>
+      </View>
+    </Surface>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+    gap: 24,
+  },
+  header: {
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  title: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  subtitle: {
+    textAlign: 'center',
+  },
+  input: {
+    marginBottom: 8,
+  },
+  resetButton: {
+    borderRadius: 28,
+  },
+  buttonContent: {
+    height: 48,
+  },
+  backButton: {
+    marginTop: 8,
+  },
+});
