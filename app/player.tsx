@@ -1,38 +1,46 @@
 import React, { useState } from 'react';
-import { Box, VStack, Text, Pressable, Icon, Center, IconButton } from 'native-base';
-import { MaterialIcons } from '@expo/vector-icons';
-import { Dimensions, Animated } from 'react-native';
+import { View, Animated } from 'react-native';
+import { Text, Surface, IconButton, FAB, ProgressBar, useTheme } from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
 
 // Star burst component
-const StarBurst = () => {
-  const stars = Array(6).fill(0); // Create 6 star points
-  const size = Dimensions.get('window').width * 0.6;
+function StarBurst() {
+  const size = 200;
+  const points = 12;
+  const centerX = size / 2;
+  const centerY = size / 2;
+  const innerRadius = 30;
+  const outerRadius = 100;
+
+  const createStarPath = () => {
+    let path = '';
+    for (let i = 0; i < points * 2; i++) {
+      const radius = i % 2 === 0 ? outerRadius : innerRadius;
+      const angle = (i * Math.PI) / points;
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
+      path += i === 0 ? `M ${x},${y} ` : `L ${x},${y} `;
+    }
+    path += 'Z';
+    return path;
+  };
 
   return (
-    <Box w={size} h={size}>
-      <Svg width={size} height={size} viewBox="0 0 100 100">
-        {stars.map((_, i) => {
-          const rotation = (i * 60) % 360;
-          const opacity = 0.2 + (i * 0.1);
-          return (
-            <Path
-              key={i}
-              d="M50 0 L60 40 L100 50 L60 60 L50 100 L40 60 L0 50 L40 40 Z"
-              fill="#4169E1"
-              opacity={opacity}
-              transform={`rotate(${rotation} 50 50)`}
-            />
-          );
-        })}
-      </Svg>
-    </Box>
+    <Svg height={size} width={size}>
+      <Path
+        d={createStarPath()}
+        fill="#5DA47A"
+        opacity={0.2}
+      />
+    </Svg>
   );
-};
+}
 
 export default function PlayerScreen() {
   const router = useRouter();
+  const theme = useTheme();
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0.38); // 7:28 out of 19:00
 
@@ -47,98 +55,112 @@ export default function PlayerScreen() {
   const totalTime = 1140; // 19:00 in seconds
 
   return (
-    <Box flex={1} bg="#F0F5F0" safeArea>
+    <Surface style={{ 
+      flex: 1, 
+      backgroundColor: theme.colors.primaryContainer
+    }}>
       {/* Back Button */}
-      <Box position="absolute" top={4} left={4} zIndex={1}>
+      <View style={{ 
+        position: 'absolute', 
+        top: 16, 
+        left: 16, 
+        zIndex: 1 
+      }}>
         <IconButton
-          icon={<Icon as={MaterialIcons} name="arrow-back" size={6} color="gray.500" />}
-          variant="ghost"
-          rounded="full"
-          _pressed={{ bg: 'gray.100' }}
+          icon="arrow-left"
+          mode="outlined"
+          size={24}
           onPress={() => router.back()}
+          iconColor={theme.colors.primary}
         />
-      </Box>
+      </View>
 
-      <VStack flex={1} space={8} alignItems="center" justifyContent="center" p={6}>
+      <View style={{ 
+        flex: 1, 
+        padding: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 24
+      }}>
         {/* Star Burst Animation */}
-        <Center mb={8}>
+        <View style={{ 
+          position: 'absolute',
+          opacity: 0.5
+        }}>
           <StarBurst />
-        </Center>
+        </View>
 
-        {/* Title and Subtitle */}
-        <VStack space={2} alignItems="center">
-          <Text
-            fontSize="3xl"
-            color="green.600"
-            fontWeight="medium"
-            textAlign="center"
+        {/* Title */}
+        <View style={{ 
+          alignItems: 'center',
+          gap: 4
+        }}>
+          <Text 
+            variant="headlineSmall"
+            style={{ 
+              color: theme.colors.primary,
+              fontWeight: 'bold'
+            }}
           >
             Caotic Breath
           </Text>
           <Text
-            fontSize="lg"
-            color="gray.600"
-            textAlign="center"
+            variant="titleMedium"
+            style={{ color: theme.colors.onSurfaceVariant }}
           >
             Breath up
           </Text>
           <Text
-            fontSize="md"
-            color="gray.500"
-            textAlign="center"
+            variant="bodySmall"
+            style={{ color: theme.colors.outline }}
           >
             exersize 13
           </Text>
-        </VStack>
+        </View>
 
         {/* Progress Bar */}
-        <VStack w="full" space={2}>
-          <Box
-            w="full"
-            h={1}
-            bg="gray.200"
-            rounded="full"
-            overflow="hidden"
-          >
-            <Box
-              w={`${progress * 100}%`}
-              h="full"
-              bg="green.500"
-            />
-          </Box>
-          <Box w="full" flexDirection="row" justifyContent="space-between">
-            <Text color="gray.500" fontSize="sm">
+        <View style={{ width: '100%', gap: 8 }}>
+          <ProgressBar
+            progress={progress}
+            color={theme.colors.primary}
+            style={{
+              backgroundColor: theme.colors.surfaceVariant,
+              height: 4,
+              borderRadius: 2
+            }}
+          />
+          <View style={{ 
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}>
+            <Text
+              variant="labelMedium"
+              style={{ color: theme.colors.onSurfaceVariant }}
+            >
               {formatTime(currentTime)}
             </Text>
-            <Text color="gray.500" fontSize="sm">
+            <Text
+              variant="labelMedium"
+              style={{ color: theme.colors.onSurfaceVariant }}
+            >
               {formatTime(totalTime)}
             </Text>
-          </Box>
-        </VStack>
+          </View>
+        </View>
 
-        {/* Play Button */}
-        <Pressable
+        {/* Play/Pause Button */}
+        <FAB
+          icon={isPlaying ? "pause" : "play"}
           onPress={() => setIsPlaying(!isPlaying)}
-          w={20}
-          h={20}
-          rounded="full"
-          bg="green.500"
-          shadow={3}
-          alignItems="center"
-          justifyContent="center"
-          _pressed={{
-            bg: "green.600",
-            transform: [{ scale: 0.98 }]
+          mode="elevated"
+          size="large"
+          style={{
+            backgroundColor: theme.colors.primary
           }}
-        >
-          <Icon
-            as={MaterialIcons}
-            name={isPlaying ? "pause" : "play-arrow"}
-            size={12}
-            color="white"
-          />
-        </Pressable>
-      </VStack>
-    </Box>
+          color={theme.colors.onPrimary}
+        />
+      </View>
+    </Surface>
   );
 }

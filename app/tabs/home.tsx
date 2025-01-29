@@ -1,9 +1,8 @@
 import React from 'react';
-import { Box, VStack, Text, HStack, Pressable, Icon, ScrollView } from 'native-base';
+import { View, ScrollView as RNScrollView, Dimensions, StyleSheet } from 'react-native';
+import { Text, Surface, useTheme, TouchableRipple, IconButton } from 'react-native-paper';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Dimensions } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
 import Svg, { Polygon } from 'react-native-svg';
 
 const radarPoints = [
@@ -23,6 +22,7 @@ const recentPlayed = [
 
 export default function HomePage() {
   const router = useRouter();
+  const theme = useTheme();
   const screenWidth = Dimensions.get('window').width;
   const centerX = 150;
   const centerY = 150;
@@ -41,133 +41,237 @@ export default function HomePage() {
   };
 
   return (
-    <ScrollView bg="white" flex={1}>
-      <VStack space={6} p={4}>
+    <RNScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.content}>
         {/* Week Header */}
-        <Text fontSize="2xl" color="green.600" fontWeight="medium">
+        <Text variant="headlineSmall" style={{ color: theme.colors.primary }}>
           Week 1
         </Text>
 
         {/* Radar Chart */}
-        <Box h="300" alignItems="center" justifyContent="center">
+        <Surface style={styles.chartContainer} elevation={0}>
           <Svg height="300" width="300">
             <Polygon
               points={getPolygonPoints()}
-              fill="rgba(255, 223, 0, 0.3)"
-              stroke="green"
+              fill={`${theme.colors.primary}40`}
+              stroke={theme.colors.primary}
               strokeWidth="2"
             />
           </Svg>
           {radarPoints.map((point, index) => (
             <Text
               key={index}
-              position="absolute"
-              fontSize="xs"
-              color="green.600"
-              textAlign="center"
-              style={{
-                top: centerY + radius * 1.2 * Math.sin((index / radarPoints.length) * 2 * Math.PI - Math.PI / 2),
-                left: centerX + radius * 1.2 * Math.cos((index / radarPoints.length) * 2 * Math.PI - Math.PI / 2),
-              }}
+              variant="labelSmall"
+              style={[
+                styles.radarLabel,
+                {
+                  color: theme.colors.primary,
+                  top: centerY + radius * 1.2 * Math.sin((index / radarPoints.length) * 2 * Math.PI - Math.PI / 2),
+                  left: centerX + radius * 1.2 * Math.cos((index / radarPoints.length) * 2 * Math.PI - Math.PI / 2),
+                },
+              ]}
             >
               {point.label}
             </Text>
           ))}
-        </Box>
+        </Surface>
 
         {/* Day Progress */}
-        <HStack space={2} justifyContent="center">
+        <View style={styles.dayProgress}>
           {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-            <Box
+            <Surface
               key={day}
-              w="40px"
-              h="40px"
-              rounded="full"
-              borderWidth={1}
-              borderColor="green.500"
-              alignItems="center"
-              justifyContent="center"
+              style={[
+                styles.dayCircle,
+                {
+                  borderColor: theme.colors.primary,
+                },
+              ]}
+              elevation={0}
             >
-              <Text color="green.600" fontSize="xs">
+              <Text
+                variant="labelSmall"
+                style={{ color: theme.colors.primary }}
+              >
                 Day {day}
               </Text>
-            </Box>
+            </Surface>
           ))}
-        </HStack>
+        </View>
 
         {/* Next Session */}
-        <Pressable
-          bg="green.500"
-          rounded="full"
-          p={4}
-          flexDirection="row"
-          alignItems="center"
-          justifyContent="space-between"
+        <TouchableRipple
           onPress={() => router.push('/player')}
+          style={[styles.nextSession, { backgroundColor: theme.colors.primary }]}
         >
-          <VStack>
-            <Text color="white" fontSize="sm">
-              Next session
-            </Text>
-            <Text color="white" fontSize="lg" fontWeight="bold">
-              Exotic Breath
-            </Text>
-          </VStack>
-          <Icon as={MaterialIcons} name="play-circle-filled" size="xl" color="white" />
-        </Pressable>
+          <View style={styles.nextSessionContent}>
+            <View>
+              <Text variant="labelMedium" style={{ color: theme.colors.onPrimary }}>
+                Next session
+              </Text>
+              <Text variant="titleLarge" style={{ color: theme.colors.onPrimary }}>
+                Exotic Breath
+              </Text>
+            </View>
+            <IconButton
+              icon="play-circle"
+              iconColor={theme.colors.onPrimary}
+              size={32}
+            />
+          </View>
+        </TouchableRipple>
 
         {/* Action Buttons */}
-        <HStack space={4}>
-          <Pressable
-            flex={1}
-            bg="green.500"
-            rounded="lg"
-            p={4}
-            alignItems="center"
+        <View style={styles.actionButtons}>
+          <TouchableRipple
             onPress={() => router.push('/mood')}
+            style={[
+              styles.actionButton,
+              { backgroundColor: theme.colors.primary },
+            ]}
           >
-            <Icon as={MaterialCommunityIcons} name="emoticon-outline" size="xl" color="white" mb={2} />
-            <Text color="white" textAlign="center">
-              Talk about{'\n'}your mood
-            </Text>
-          </Pressable>
-          <Pressable
-            flex={1}
-            bg="green.500"
-            rounded="lg"
-            p={4}
-            alignItems="center"
+            <View style={styles.actionButtonContent}>
+              <MaterialCommunityIcons
+                name="emoticon-outline"
+                size={36}
+                color={theme.colors.onPrimary}
+              />
+              <Text
+                variant="titleMedium"
+                style={[styles.actionButtonText, { color: theme.colors.onPrimary }]}
+              >
+                Talk about{'\n'}your mood
+              </Text>
+            </View>
+          </TouchableRipple>
+
+          <TouchableRipple
             onPress={() => router.push('/survey')}
+            style={[
+              styles.actionButton,
+              { backgroundColor: theme.colors.primary },
+            ]}
           >
-            <Icon as={MaterialIcons} name="person-outline" size="xl" color="white" mb={2} />
-            <Text color="white" textAlign="center">
-              Keep introducing{'\n'}yourself
-            </Text>
-          </Pressable>
-        </HStack>
+            <View style={styles.actionButtonContent}>
+              <MaterialCommunityIcons
+                name="account-outline"
+                size={36}
+                color={theme.colors.onPrimary}
+              />
+              <Text
+                variant="titleMedium"
+                style={[styles.actionButtonText, { color: theme.colors.onPrimary }]}
+              >
+                Keep introducing{'\n'}yourself
+              </Text>
+            </View>
+          </TouchableRipple>
+        </View>
 
         {/* Recent Played */}
-        <VStack space={4}>
-          <Text fontSize="lg" color="green.600" fontWeight="medium">
+        <View style={styles.recentPlayed}>
+          <Text
+            variant="titleMedium"
+            style={{ color: theme.colors.primary }}
+          >
             Recent Played
           </Text>
           {recentPlayed.map((item, index) => (
-            <HStack key={index} justifyContent="space-between" alignItems="center">
-              <VStack>
-                <Text fontSize="md" color="green.600">
+            <View key={index} style={styles.recentItem}>
+              <View>
+                <Text
+                  variant="bodyLarge"
+                  style={{ color: theme.colors.primary }}
+                >
                   {item.title}
                 </Text>
-                <Text fontSize="sm" color="gray.500">
+                <Text
+                  variant="bodyMedium"
+                  style={{ color: theme.colors.onSurfaceVariant }}
+                >
                   {item.subtitle}
                 </Text>
-              </VStack>
-              <Text fontSize="sm" color="gray.500">
+              </View>
+              <Text
+                variant="bodyMedium"
+                style={{ color: theme.colors.onSurfaceVariant }}
+              >
                 {item.duration}
               </Text>
-            </HStack>
+            </View>
           ))}
-        </VStack>
-      </VStack>
-    </ScrollView>
+        </View>
+      </View>
+    </RNScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+    gap: 24,
+  },
+  chartContainer: {
+    height: 300,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radarLabel: {
+    position: 'absolute',
+    textAlign: 'center',
+  },
+  dayProgress: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  dayCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nextSession: {
+    borderRadius: 28,
+    overflow: 'hidden',
+  },
+  nextSessionContent: {
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 16,
+    height: 160,
+  },
+  actionButton: {
+    flex: 1,
+    borderRadius: 24,
+    overflow: 'hidden',
+  },
+  actionButtonContent: {
+    padding: 24,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  actionButtonText: {
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  recentPlayed: {
+    gap: 16,
+  },
+  recentItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+});

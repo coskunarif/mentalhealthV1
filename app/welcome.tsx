@@ -1,41 +1,76 @@
-import { Box, Button, Text, VStack } from 'native-base';
+import { View, StyleSheet } from 'react-native';
+import { Text, Surface, Button, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { globalStyles } from './config/styles';
 
 export default function Page() {
   const router = useRouter();
+  const theme = useTheme();
 
   return (
-    <Box flex={1} bg="white" safeArea>
-      <Box flex={1} justifyContent="center" alignItems="center">
-        <VStack space={6} alignItems="center">
+    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.content}>
+        <View style={styles.textContainer}>
           <Text
-            fontSize="4xl"
-            fontWeight="bold"
-            textAlign="center"
-            color="primary.500"
+            variant="displaySmall"
+            style={[
+              styles.title,
+              globalStyles.textBold,
+              { color: theme.colors.primary }
+            ]}
           >
             Welcome to Mental Health
           </Text>
           <Text
-            fontSize="md"
-            textAlign="center"
-            color="coolGray.600"
-            px={6}
+            variant="bodyLarge"
+            style={[
+              styles.subtitle,
+              globalStyles.text,
+              { color: theme.colors.onSurfaceVariant }
+            ]}
           >
             Calm yourself for your mental health{'\n'}and also your mind from the problems{'\n'}that exist in this world
           </Text>
           <Button
-            size="lg"
+            mode="contained"
             onPress={() => router.push('/survey')}
-            bg="primary.500"
-            _pressed={{ bg: 'primary.600' }}
-            rounded="full"
-            px={8}
+            style={styles.button}
+            contentStyle={styles.buttonContent}
           >
             Get Started
           </Button>
-        </VStack>
-      </Box>
-    </Box>
+        </View>
+      </View>
+    </Surface>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textContainer: {
+    alignItems: 'center',
+    gap: 24,
+    paddingHorizontal: 24,
+  },
+  title: {
+    textAlign: 'center',
+  },
+  subtitle: {
+    textAlign: 'center',
+  },
+  button: {
+    borderRadius: 28,
+    marginTop: 8,
+  },
+  buttonContent: {
+    height: 48,
+    paddingHorizontal: 32,
+  },
+});
