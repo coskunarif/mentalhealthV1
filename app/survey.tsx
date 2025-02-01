@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import { Text, Button, Surface, TouchableRipple, ProgressBar, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { globalStyles } from './config/styles';
@@ -57,18 +57,14 @@ export default function SurveyScreen() {
   };
 
   return (
-    <Surface style={[styles.container, globalStyles.container]}>
-      <SafeAreaView style={globalStyles.safeArea}>
+    <View style={[globalStyles.screen, { backgroundColor: colors.surfaceVariant }]}>
+      <StatusBar barStyle="dark-content" backgroundColor={colors.surface} />
+      <SafeAreaView style={[globalStyles.safeArea, { backgroundColor: colors.surface }]}>
         {/* Progress Section */}
         <View style={globalStyles.progressSection}>
-          <View style={styles.progressInfo}>
-            <Text 
-              variant="titleMedium" 
-              style={[globalStyles.text, { color: colors.primary700 }]}
-            >
-              Question {currentQuestion + 1} of {questions.length}
-            </Text>
-          </View>
+          <Text style={globalStyles.progressText}>
+            Question {currentQuestion + 1} of {questions.length}
+          </Text>
           <ProgressBar
             progress={(currentQuestion + 1) / questions.length}
             color={colors.primary}
@@ -77,17 +73,19 @@ export default function SurveyScreen() {
         </View>
 
         {/* Content Section */}
-        <View style={globalStyles.contentSection}>
+        <View style={[globalStyles.contentSection, { paddingTop: 24 }]}>
           {/* Question */}
-          <Text
-            variant="headlineMedium"
-            style={[globalStyles.heading5, styles.questionText]}
-          >
-            {questions[currentQuestion].text}
-          </Text>
+          <View style={globalStyles.questionSection}>
+            <Text
+              variant="titleLarge"
+              style={[globalStyles.heading6, { color: colors.primary800 }]}
+            >
+              {questions[currentQuestion].text}
+            </Text>
+          </View>
 
           {/* Options */}
-          <View style={styles.optionsContainer}>
+          <View style={{ gap: 8 }}>
             {questions[currentQuestion].options.map((option, index) => {
               const isSelected = selectedAnswers[currentQuestion] === index;
               return (
@@ -96,14 +94,18 @@ export default function SurveyScreen() {
                   onPress={() => handleSelect(currentQuestion, index)}
                   style={[
                     globalStyles.optionButton,
-                    isSelected && globalStyles.optionButtonSelected
+                    isSelected && globalStyles.optionButtonSelected,
                   ]}
                 >
                   <Text
                     variant="bodyLarge"
                     style={[
                       globalStyles.bodyLarge,
-                      { color: isSelected ? colors.primary800 : colors.onSurfaceVariant }
+                      { 
+                        color: isSelected ? colors.primary800 : colors.onSurfaceVariant,
+                        textAlign: 'left',
+                        width: '100%'
+                      }
                     ]}
                   >
                     {option}
@@ -120,8 +122,12 @@ export default function SurveyScreen() {
             mode="outlined"
             onPress={handlePrevious}
             disabled={currentQuestion === 0}
-            style={[globalStyles.button, { borderColor: colors.primary }]}
-            labelStyle={[globalStyles.buttonLabel, { color: colors.primary700 }]}
+            style={[
+              globalStyles.navButton,
+              globalStyles.buttonSecondary,
+              { marginRight: 8 }
+            ]}
+            labelStyle={[globalStyles.buttonLabel, { color: colors.primary }]}
           >
             Previous
           </Button>
@@ -129,28 +135,17 @@ export default function SurveyScreen() {
             mode="contained"
             onPress={handleNext}
             disabled={selectedAnswers[currentQuestion] === undefined}
-            style={[globalStyles.button, { backgroundColor: colors.primary }]}
+            style={[
+              globalStyles.navButton,
+              globalStyles.buttonPrimary,
+              { marginLeft: 8 }
+            ]}
             labelStyle={[globalStyles.buttonLabel, { color: colors.onPrimary }]}
           >
             {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
           </Button>
         </View>
       </SafeAreaView>
-    </Surface>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  progressInfo: {
-    marginBottom: 12,
-  },
-  questionText: {
-    marginBottom: 32,
-  },
-  optionsContainer: {
-    gap: 16,
-  },
-});
