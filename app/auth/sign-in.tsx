@@ -31,7 +31,7 @@ export default function SignIn() {
   };
 
   return (
-    <Surface style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <Surface style={{ flex: 1, backgroundColor: theme.colors.primaryContainer }}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}

@@ -34,7 +34,7 @@ export default function MoodScreen() {
   };
 
   return (
-    <Surface style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <Surface style={{ flex: 1, backgroundColor: theme.colors.primaryContainer }}>
       {/* Back Button */}
       <View style={{ position: 'absolute', top: 16, left: 16, zIndex: 1 }}>
         <IconButton

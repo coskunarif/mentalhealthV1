@@ -3,6 +3,7 @@ import { View, StyleSheet, SafeAreaView } from 'react-native';
 import { Text, Button, Surface, TouchableRipple, ProgressBar, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { globalStyles } from './config/styles';
+import { colors, withOpacity } from './config/colors';
 
 const questions = [
   {
@@ -56,38 +57,31 @@ export default function SurveyScreen() {
   };
 
   return (
-    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <SafeAreaView style={styles.safeArea}>
+    <Surface style={[styles.container, globalStyles.container]}>
+      <SafeAreaView style={globalStyles.safeArea}>
         {/* Progress Section */}
-        <View style={styles.progressSection}>
+        <View style={globalStyles.progressSection}>
           <View style={styles.progressInfo}>
             <Text 
-              variant="labelLarge" 
-              style={[
-                globalStyles.text,
-                { color: theme.colors.primary }
-              ]}
+              variant="titleMedium" 
+              style={[globalStyles.text, { color: colors.primary700 }]}
             >
               Question {currentQuestion + 1} of {questions.length}
             </Text>
           </View>
           <ProgressBar
             progress={(currentQuestion + 1) / questions.length}
-            color={theme.colors.primary}
-            style={styles.progressBar}
+            color={colors.primary}
+            style={globalStyles.progressBar}
           />
         </View>
 
         {/* Content Section */}
-        <View style={styles.contentSection}>
+        <View style={globalStyles.contentSection}>
           {/* Question */}
           <Text
-            variant="headlineSmall"
-            style={[
-              styles.questionText,
-              globalStyles.textBold,
-              { color: theme.colors.primary }
-            ]}
+            variant="headlineMedium"
+            style={[globalStyles.heading5, styles.questionText]}
           >
             {questions[currentQuestion].text}
           </Text>
@@ -101,18 +95,15 @@ export default function SurveyScreen() {
                   key={index}
                   onPress={() => handleSelect(currentQuestion, index)}
                   style={[
-                    styles.optionButton,
-                    {
-                      backgroundColor: isSelected ? theme.colors.primaryContainer : theme.colors.surface,
-                      borderColor: isSelected ? theme.colors.primary : theme.colors.outline,
-                    }
+                    globalStyles.optionButton,
+                    isSelected && globalStyles.optionButtonSelected
                   ]}
                 >
                   <Text
                     variant="bodyLarge"
                     style={[
-                      globalStyles.text,
-                      { color: isSelected ? theme.colors.primary : theme.colors.onSurface }
+                      globalStyles.bodyLarge,
+                      { color: isSelected ? colors.primary800 : colors.onSurfaceVariant }
                     ]}
                   >
                     {option}
@@ -124,11 +115,13 @@ export default function SurveyScreen() {
         </View>
 
         {/* Navigation Section */}
-        <View style={styles.navigationSection}>
+        <View style={globalStyles.navigationSection}>
           <Button
             mode="outlined"
             onPress={handlePrevious}
             disabled={currentQuestion === 0}
+            style={[globalStyles.button, { borderColor: colors.primary }]}
+            labelStyle={[globalStyles.buttonLabel, { color: colors.primary700 }]}
           >
             Previous
           </Button>
@@ -136,6 +129,8 @@ export default function SurveyScreen() {
             mode="contained"
             onPress={handleNext}
             disabled={selectedAnswers[currentQuestion] === undefined}
+            style={[globalStyles.button, { backgroundColor: colors.primary }]}
+            labelStyle={[globalStyles.buttonLabel, { color: colors.onPrimary }]}
           >
             {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
           </Button>
@@ -149,50 +144,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  safeArea: {
-    flex: 1,
-  },
-  progressSection: {
-    paddingTop: 32,
-    paddingBottom: 16,
-    paddingHorizontal: 24,
-    backgroundColor: 'rgba(93, 164, 122, 0.05)',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(93, 164, 122, 0.1)',
-  },
   progressInfo: {
-    marginBottom: 8,
-    alignItems: 'center',
-  },
-  progressBar: {
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(93, 164, 122, 0.2)',
-  },
-  contentSection: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 32,
+    marginBottom: 12,
   },
   questionText: {
-    textAlign: 'center',
     marginBottom: 32,
-    paddingHorizontal: 16,
   },
   optionsContainer: {
     gap: 16,
-  },
-  optionButton: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    elevation: 1,
-  },
-  navigationSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 24,
-    paddingBottom: 32,
   },
 });

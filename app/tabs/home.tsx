@@ -1,9 +1,11 @@
 import React from 'react';
-import { View, ScrollView as RNScrollView, Dimensions, StyleSheet } from 'react-native';
+import { View, ScrollView as RNScrollView, Dimensions, StyleSheet, Animated } from 'react-native';
 import { Text, Surface, useTheme, TouchableRipple, IconButton } from 'react-native-paper';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Svg, { Polygon } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
+import { enhanceShadow, createPressAnimation, createGradientConfig } from '../utils/styleEnhancements';
 
 const radarPoints = [
   { label: 'Balance past\nmemories', value: 0.8 },
@@ -40,11 +42,148 @@ export default function HomePage() {
       .join(' ');
   };
 
+  // Animation values for various components
+  const nextSessionScale = new Animated.Value(1);
+  const actionButtonsScale = new Animated.Value(1);
+  const recentItemsOpacity = new Animated.Value(0);
+  const dayProgressScale = new Animated.Value(0.95);
+
+  React.useEffect(() => {
+    // Breathing animation for next session
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(nextSessionScale, {
+          toValue: 1.03,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(nextSessionScale, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Fade in animation for recent items
+    Animated.timing(recentItemsOpacity, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+
+    // Subtle pulse animation for day progress
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(dayProgressScale, {
+          toValue: 1.02,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(dayProgressScale, {
+          toValue: 0.95,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    content: {
+      padding: 16,
+      gap: 24,
+    },
+    chartContainer: {
+      height: 300,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.surface,
+      borderRadius: 20,
+      ...enhanceShadow('medium'),
+    },
+    radarLabel: {
+      position: 'absolute',
+      textAlign: 'center',
+    },
+    dayProgress: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: 8,
+      padding: 16,
+      backgroundColor: theme.colors.surface,
+      borderRadius: 16,
+      ...enhanceShadow('soft'),
+    },
+    dayCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      borderWidth: 1.5,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.colors.background,
+    },
+    nextSession: {
+      borderRadius: 28,
+      overflow: 'hidden',
+      ...enhanceShadow('medium'),
+      backgroundColor: theme.colors.surface,
+    },
+    nextSessionContent: {
+      padding: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    actionButtons: {
+      flexDirection: 'row',
+      gap: 16,
+      height: 160,
+    },
+    actionButtonWrapper: {
+      flex: 1,
+      ...enhanceShadow('medium'),
+      backgroundColor: theme.colors.surface,
+      borderRadius: 24,
+    },
+    actionButton: {
+      flex: 1,
+      borderRadius: 24,
+      overflow: 'hidden',
+    },
+    actionButtonContent: {
+      padding: 24,
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    actionButtonText: {
+      textAlign: 'center',
+      lineHeight: 24,
+    },
+    recentPlayed: {
+      gap: 16,
+    },
+    recentItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 16,
+      borderRadius: 16,
+      marginBottom: 12,
+      ...enhanceShadow('soft'),
+    },
+  });
+
   return (
-    <RNScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <RNScrollView style={[styles.container, { backgroundColor: theme.colors.primaryContainer }]}>
       <View style={styles.content}>
         {/* Week Header */}
-        <Text variant="headlineSmall" style={{ color: theme.colors.primary }}>
+        <Text variant="headlineSmall" style={{ color: theme.colors.primary, marginBottom: 8 }}>
           Week 1
         </Text>
 
@@ -77,95 +216,97 @@ export default function HomePage() {
         </Surface>
 
         {/* Day Progress */}
-        <View style={styles.dayProgress}>
-          {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-            <Surface
-              key={day}
-              style={[
-                styles.dayCircle,
-                {
-                  borderColor: theme.colors.primary,
-                },
-              ]}
-              elevation={0}
-            >
-              <Text
-                variant="labelSmall"
-                style={{ color: theme.colors.primary }}
+        <Animated.View style={{ transform: [{ scale: dayProgressScale }] }}>
+          <View style={styles.dayProgress}>
+            {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+              <Surface
+                key={day}
+                style={[
+                  styles.dayCircle,
+                  {
+                    borderColor: theme.colors.primary,
+                  },
+                ]}
+                elevation={0}
               >
-                Day {day}
-              </Text>
-            </Surface>
-          ))}
-        </View>
-
-        {/* Next Session */}
-        <TouchableRipple
-          onPress={() => router.push('/player')}
-          style={[styles.nextSession, { backgroundColor: theme.colors.primary }]}
-        >
-          <View style={styles.nextSessionContent}>
-            <View>
-              <Text variant="labelMedium" style={{ color: theme.colors.onPrimary }}>
-                Next session
-              </Text>
-              <Text variant="titleLarge" style={{ color: theme.colors.onPrimary }}>
-                Exotic Breath
-              </Text>
-            </View>
-            <IconButton
-              icon="play-circle"
-              iconColor={theme.colors.onPrimary}
-              size={32}
-            />
+                <Text
+                  variant="labelSmall"
+                  style={{ color: theme.colors.primary }}
+                >
+                  Day {day}
+                </Text>
+              </Surface>
+            ))}
           </View>
-        </TouchableRipple>
+        </Animated.View>
 
-        {/* Action Buttons */}
+        {/* Next Session with animation and gradient */}
+        <Animated.View style={{ transform: [{ scale: nextSessionScale }] }}>
+          <TouchableRipple
+            onPress={() => router.push('/player')}
+            style={[styles.nextSession]}
+          >
+            <LinearGradient
+              colors={[theme.colors.primary, `${theme.colors.primary}E6`] as [string, string]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.nextSessionContent]}
+            >
+              <View>
+                <Text variant="labelMedium" style={{ color: theme.colors.onPrimary }}>
+                  Next session
+                </Text>
+                <Text variant="titleLarge" style={{ color: theme.colors.onPrimary }}>
+                  Exotic Breath
+                </Text>
+              </View>
+              <IconButton
+                icon="play-circle"
+                iconColor={theme.colors.onPrimary}
+                size={32}
+              />
+            </LinearGradient>
+          </TouchableRipple>
+        </Animated.View>
+
+        {/* Action Buttons with enhanced visuals */}
         <View style={styles.actionButtons}>
-          <TouchableRipple
-            onPress={() => router.push('/mood')}
-            style={[
-              styles.actionButton,
-              { backgroundColor: theme.colors.primary },
-            ]}
-          >
-            <View style={styles.actionButtonContent}>
-              <MaterialCommunityIcons
-                name="emoticon-outline"
-                size={36}
-                color={theme.colors.onPrimary}
-              />
-              <Text
-                variant="titleMedium"
-                style={[styles.actionButtonText, { color: theme.colors.onPrimary }]}
+          {['mood', 'survey'].map((route, index) => {
+            const isFirst = route === 'mood';
+            return (
+              <Animated.View
+                key={route}
+                style={[
+                  { transform: [{ scale: actionButtonsScale }] },
+                  styles.actionButtonWrapper,
+                ]}
               >
-                Talk about{'\n'}your mood
-              </Text>
-            </View>
-          </TouchableRipple>
-
-          <TouchableRipple
-            onPress={() => router.push('/survey')}
-            style={[
-              styles.actionButton,
-              { backgroundColor: theme.colors.primary },
-            ]}
-          >
-            <View style={styles.actionButtonContent}>
-              <MaterialCommunityIcons
-                name="account-outline"
-                size={36}
-                color={theme.colors.onPrimary}
-              />
-              <Text
-                variant="titleMedium"
-                style={[styles.actionButtonText, { color: theme.colors.onPrimary }]}
-              >
-                Keep introducing{'\n'}yourself
-              </Text>
-            </View>
-          </TouchableRipple>
+                <TouchableRipple
+                  onPress={() => router.push(`/${route}`)}
+                  style={[styles.actionButton]}
+                >
+                  <LinearGradient
+                    colors={[theme.colors.primary, `${theme.colors.primary}E6`] as [string, string]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.actionButtonContent}
+                  >
+                    <MaterialCommunityIcons
+                      name={isFirst ? "emoticon-outline" : "account-outline"}
+                      size={36}
+                      color={theme.colors.onPrimary}
+                    />
+                    <Text
+                      variant="titleMedium"
+                      style={[styles.actionButtonText, { color: theme.colors.onPrimary }]}
+                    >
+                      {isFirst ? 'Talk about\nyour mood' : 'Keep introducing\nyourself'}
+                    </Text>
+                  </LinearGradient>
+                </TouchableRipple>
+              </Animated.View>
+            );
+          })}
         </View>
 
         {/* Recent Played */}
@@ -177,101 +318,51 @@ export default function HomePage() {
             Recent Played
           </Text>
           {recentPlayed.map((item, index) => (
-            <View key={index} style={styles.recentItem}>
-              <View>
-                <Text
-                  variant="bodyLarge"
-                  style={{ color: theme.colors.primary }}
-                >
-                  {item.title}
-                </Text>
-                <Text
-                  variant="bodyMedium"
-                  style={{ color: theme.colors.onSurfaceVariant }}
-                >
-                  {item.subtitle}
-                </Text>
-              </View>
-              <Text
-                variant="bodyMedium"
-                style={{ color: theme.colors.onSurfaceVariant }}
+            <Animated.View 
+              key={index} 
+              style={{ 
+                opacity: recentItemsOpacity,
+                transform: [{ 
+                  translateY: recentItemsOpacity.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [20, 0],
+                  })
+                }]
+              }}
+            >
+              <TouchableRipple
+                onPress={() => router.push('/player')}
               >
-                {item.duration}
-              </Text>
-            </View>
+                <View style={[
+                  styles.recentItem,
+                  { backgroundColor: theme.colors.surface }
+                ]}>
+                  <View>
+                    <Text
+                      variant="bodyLarge"
+                      style={{ color: theme.colors.primary }}
+                    >
+                      {item.title}
+                    </Text>
+                    <Text
+                      variant="bodyMedium"
+                      style={{ color: theme.colors.onSurfaceVariant }}
+                    >
+                      {item.subtitle}
+                    </Text>
+                  </View>
+                  <Text
+                    variant="bodyMedium"
+                    style={{ color: theme.colors.onSurfaceVariant }}
+                  >
+                    {item.duration}
+                  </Text>
+                </View>
+              </TouchableRipple>
+            </Animated.View>
           ))}
         </View>
       </View>
     </RNScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-    gap: 24,
-  },
-  chartContainer: {
-    height: 300,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radarLabel: {
-    position: 'absolute',
-    textAlign: 'center',
-  },
-  dayProgress: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  dayCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  nextSession: {
-    borderRadius: 28,
-    overflow: 'hidden',
-  },
-  nextSessionContent: {
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 16,
-    height: 160,
-  },
-  actionButton: {
-    flex: 1,
-    borderRadius: 24,
-    overflow: 'hidden',
-  },
-  actionButtonContent: {
-    padding: 24,
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  actionButtonText: {
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  recentPlayed: {
-    gap: 16,
-  },
-  recentItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-});
