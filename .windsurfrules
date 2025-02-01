@@ -1,0 +1,8 @@
+1. For absolutely every proposed code operation, the AI Editor MUST:
+    * **Analyze the codebase very carefully to fully understand the structure and context before proposing any changes, in order to avoid redundant or incorrect adjustments.**
+    * Avoid jumping to conclusions or applying any code changes prematurely.
+    * Generate a minimum of two detailed paragraphs of reasoning that:
+        * Argue for and against different potential approaches and ideas.
+        * Thoroughly explain the AI's thought process and analysis to the user.
+    * Explicitly ASK for user confirmation and approval BEFORE initiating ANY code modifications.
+    * This rule is NON-NEGOTIABLE and MUST be strictly adhered to for all operations.

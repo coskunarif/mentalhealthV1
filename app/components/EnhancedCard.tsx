@@ -6,7 +6,8 @@ import {
   Animated,
   TouchableOpacity,
 } from 'react-native';
-import { enhancedStyles, shadows, colors } from '../config/enhanced-styles';
+import { globalStyles } from '../config/styles';
+import { colors } from '../config/colors';
 
 interface CardProps {
   children: React.ReactNode;
@@ -44,7 +45,7 @@ export const EnhancedCard: React.FC<CardProps> = ({
   const content = (
     <Animated.View
       style={[
-        styles.card,
+        globalStyles.card,
         style,
         { transform: [{ scale: animatedScale }] },
       ]}
@@ -53,13 +54,13 @@ export const EnhancedCard: React.FC<CardProps> = ({
     </Animated.View>
   );
 
-  if (onPress) {
+  if (onPress || interactive) {
     return (
       <TouchableOpacity
-        activeOpacity={0.9}
         onPress={onPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        activeOpacity={0.8}
       >
         {content}
       </TouchableOpacity>
@@ -68,10 +69,3 @@ export const EnhancedCard: React.FC<CardProps> = ({
 
   return content;
 };
-
-const styles = StyleSheet.create({
-  card: {
-    ...enhancedStyles.card,
-    backgroundColor: colors.white,
-  },
-});
