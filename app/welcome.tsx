@@ -8,14 +8,14 @@ export default function Page() {
   const theme = useTheme();
 
   return (
-    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <Surface style={[styles.container, { backgroundColor: theme.colors.primaryContainer }]}>
       <View style={styles.content}>
         <View style={styles.textContainer}>
           <Text
             variant="displaySmall"
             style={[
+              globalStyles.heading3,
               styles.title,
-              globalStyles.textBold,
               { color: theme.colors.primary }
             ]}
           >
@@ -24,8 +24,8 @@ export default function Page() {
           <Text
             variant="bodyLarge"
             style={[
+              globalStyles.bodyLarge,
               styles.subtitle,
-              globalStyles.text,
               { color: theme.colors.onSurfaceVariant }
             ]}
           >
@@ -36,6 +36,7 @@ export default function Page() {
             onPress={() => router.push('/survey')}
             style={styles.button}
             contentStyle={styles.buttonContent}
+            labelStyle={globalStyles.labelLarge}
           >
             Get Started
           </Button>
@@ -53,24 +54,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 24,
   },
   textContainer: {
     alignItems: 'center',
     gap: 24,
-    paddingHorizontal: 24,
   },
   title: {
     textAlign: 'center',
+    marginBottom: 8,
   },
   subtitle: {
     textAlign: 'center',
+    marginBottom: 32,
   },
   button: {
-    borderRadius: 28,
-    marginTop: 8,
+    width: '100%',
+    maxWidth: 280,
   },
   buttonContent: {
     height: 48,
-    paddingHorizontal: 32,
   },
 });

@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Text, Surface, TextInput, Button, useTheme, Snackbar } from 'react-native-paper';
 import { router } from 'expo-router';
 import { useAuth } from '../../context/auth';
+import { globalStyles } from '../config/styles';
 
 export default function Welcome() {
   const theme = useTheme();
@@ -37,7 +38,7 @@ export default function Welcome() {
   };
 
   return (
-    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <Surface style={[styles.container, { backgroundColor: theme.colors.primaryContainer }]}>
       <View style={styles.content}>
         {/* App Logo */}
         <View style={styles.logoContainer}>
@@ -50,7 +51,7 @@ export default function Welcome() {
             <Text
               variant="displayMedium"
               style={[
-                styles.logoText,
+                globalStyles.heading2,
                 { color: theme.colors.onPrimary }
               ]}
             >
@@ -60,13 +61,33 @@ export default function Welcome() {
           <Text
             variant="headlineSmall"
             style={[
-              styles.appTitle,
+              globalStyles.heading4,
               { color: theme.colors.onSurface }
             ]}
           >
             Mental Health App
           </Text>
         </View>
+
+        {/* Welcome Text */}
+        <Text
+          variant="headlineLarge"
+          style={[
+            globalStyles.heading4,
+            { color: theme.colors.primary, marginBottom: 8 }
+          ]}
+        >
+          Welcome Back
+        </Text>
+        <Text
+          variant="bodyLarge"
+          style={[
+            globalStyles.bodyLarge,
+            { color: theme.colors.onSurfaceVariant, marginBottom: 32, textAlign: 'center' }
+          ]}
+        >
+          Sign in to continue your journey to mental wellness
+        </Text>
 
         {/* Email Input */}
         <TextInput
@@ -81,6 +102,7 @@ export default function Welcome() {
             styles.input,
             { backgroundColor: theme.colors.background }
           ]}
+          contentStyle={globalStyles.bodyMedium}
         />
 
         {/* Password Input */}
@@ -101,45 +123,49 @@ export default function Welcome() {
             styles.input,
             { backgroundColor: theme.colors.background }
           ]}
+          contentStyle={globalStyles.bodyMedium}
         />
 
-        {/* Sign In Button */}
-        <Button
-          mode="contained"
-          onPress={handleSignIn}
-          loading={isLoading}
-          style={styles.signInButton}
-          contentStyle={styles.buttonContent}
-        >
-          Sign In
-        </Button>
+        {/* Action Buttons */}
+        <View style={styles.actions}>
+          <Button
+            mode="contained"
+            onPress={handleSignIn}
+            loading={isLoading}
+            style={styles.signInButton}
+            contentStyle={styles.buttonContent}
+            labelStyle={globalStyles.labelLarge}
+          >
+            Sign In
+          </Button>
+          <Button
+            mode="text"
+            onPress={() => router.push('/auth/sign-up' as any)}
+            style={styles.textButton}
+            labelStyle={[globalStyles.labelLarge, { color: theme.colors.primary }]}
+          >
+            Don't have an account? Create here
+          </Button>
+          <Button
+            mode="text"
+            onPress={() => router.push('/auth/forgot-password' as any)}
+            style={styles.textButton}
+            labelStyle={[globalStyles.labelLarge, { color: theme.colors.primary }]}
+          >
+            Forgot Password?
+          </Button>
+        </View>
 
-        {/* Forgot Password */}
-        <Button
-          mode="text"
-          onPress={() => router.push('/auth/forgot-password' as any)}
-          style={styles.textButton}
-        >
-          Forgot Password?
-        </Button>
-
-        {/* Create Account Link */}
-        <Button
-          mode="text"
-          onPress={() => router.push('/auth/sign-up' as any)}
-          style={styles.textButton}
-        >
-          Don't have an account? Create here
-        </Button>
-
-        {/* Snackbar for error messages */}
+        {/* Snackbar */}
         <Snackbar
           visible={snackbarVisible}
           onDismiss={() => setSnackbarVisible(false)}
           duration={3000}
           style={styles.snackbar}
         >
-          {snackbarMessage}
+          <Text style={[globalStyles.bodyMedium, { color: theme.colors.onError }]}>
+            {snackbarMessage}
+          </Text>
         </Snackbar>
       </View>
     </Surface>
@@ -184,6 +210,9 @@ const styles = StyleSheet.create({
   },
   textButton: {
     marginTop: 8,
+  },
+  actions: {
+    marginTop: 16,
   },
   snackbar: {
     position: 'absolute',
