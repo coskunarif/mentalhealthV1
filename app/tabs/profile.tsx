@@ -84,7 +84,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <Surface style={[styles.container, { backgroundColor: theme.colors.primaryContainer }]}>
       <View style={styles.content}>
         {/* Profile Header */}
         <View style={styles.header}>
