@@ -9,14 +9,15 @@ import {
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { enhancedStyles, colors, animations } from '../config/enhanced-styles';
+import { globalStyles } from '../config/styles';
+import { colors } from '../config/colors';
 
 interface ButtonProps {
   onPress: () => void;
   title: string;
   style?: ViewStyle;
   textStyle?: TextStyle;
-  gradient?: boolean;
+  variant?: 'primary' | 'secondary';
 }
 
 export const EnhancedButton: React.FC<ButtonProps> = ({
@@ -24,73 +25,49 @@ export const EnhancedButton: React.FC<ButtonProps> = ({
   title,
   style,
   textStyle,
-  gradient = true,
+  variant = 'primary',
 }) => {
   const animatedScale = new Animated.Value(1);
 
   const handlePressIn = () => {
     Animated.spring(animatedScale, {
-      toValue: animations.scale.pressed,
+      toValue: 0.98,
       useNativeDriver: true,
     }).start();
   };
 
   const handlePressOut = () => {
     Animated.spring(animatedScale, {
-      toValue: animations.scale.default,
+      toValue: 1,
       useNativeDriver: true,
     }).start();
   };
 
-  const buttonContent = (
-    <Text style={[styles.buttonText, textStyle]}>
-      {title}
-    </Text>
-  );
-
   return (
-    <Animated.View style={{ transform: [{ scale: animatedScale }] }}>
-      <TouchableOpacity
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        activeOpacity={0.8}
-        style={[styles.container, style]}
+    <TouchableOpacity
+      onPress={onPress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      activeOpacity={0.8}
+    >
+      <Animated.View
+        style={[
+          globalStyles.button,
+          variant === 'primary' ? globalStyles.buttonPrimary : globalStyles.buttonSecondary,
+          style,
+          { transform: [{ scale: animatedScale }] },
+        ]}
       >
-        {gradient ? (
-          <LinearGradient
-            colors={[colors.primary, '#8B85FF']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.gradient}
-          >
-            {buttonContent}
-          </LinearGradient>
-        ) : (
-          buttonContent
-        )}
-      </TouchableOpacity>
-    </Animated.View>
+        <Text
+          style={[
+            globalStyles.buttonLabel,
+            { color: variant === 'primary' ? colors.onPrimary : colors.primary },
+            textStyle,
+          ]}
+        >
+          {title}
+        </Text>
+      </Animated.View>
+    </TouchableOpacity>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    ...enhancedStyles.button,
-    overflow: 'hidden',
-  },
-  gradient: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 25,
-  },
-  buttonText: {
-    color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-  },
-});

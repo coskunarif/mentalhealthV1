@@ -7,7 +7,8 @@ import {
   TextInputProps,
   ViewStyle,
 } from 'react-native';
-import { enhancedStyles, colors } from '../config/enhanced-styles';
+import { globalStyles } from '../config/styles';
+import { colors } from '../config/colors';
 
 interface EnhancedInputProps extends TextInputProps {
   containerStyle?: ViewStyle;
@@ -47,12 +48,13 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
       <TextInput
         {...props}
         style={[
+          globalStyles.input,
           styles.input,
           isFocused && styles.inputFocused,
         ]}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholderTextColor={colors.lightText}
+        placeholderTextColor={colors.primary400}
       />
     </Animated.View>
   );
@@ -60,15 +62,13 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    ...enhancedStyles.input,
-    backgroundColor: 'transparent',
+    width: '100%',
   },
   input: {
-    color: colors.text,
-    fontSize: 16,
-    padding: 0,
+    backgroundColor: colors.surface,
   },
   inputFocused: {
-    color: colors.primary,
+    borderColor: colors.primary,
+    backgroundColor: colors.surfaceVariant,
   },
 });
