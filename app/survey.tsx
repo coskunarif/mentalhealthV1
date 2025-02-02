@@ -31,7 +31,6 @@ const questions = [
 
 export default function SurveyScreen() {
   const router = useRouter();
-  const theme = useTheme();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{[key: number]: number}>({});
 
@@ -57,9 +56,9 @@ export default function SurveyScreen() {
   };
 
   return (
-    <View style={[globalStyles.screen, { backgroundColor: colors.surfaceVariant }]}>
+    <View style={globalStyles.surveyScreen}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.surface} />
-      <SafeAreaView style={[globalStyles.safeArea, { backgroundColor: colors.surface }]}>
+      <SafeAreaView style={globalStyles.surveySafeArea}>
         {/* Progress Section */}
         <View style={globalStyles.progressSection}>
           <Text style={globalStyles.progressText}>
@@ -73,19 +72,16 @@ export default function SurveyScreen() {
         </View>
 
         {/* Content Section */}
-        <View style={[globalStyles.contentSection, { paddingTop: 24 }]}>
+        <View style={globalStyles.contentSection}>
           {/* Question */}
           <View style={globalStyles.questionSection}>
-            <Text
-              variant="titleLarge"
-              style={[globalStyles.heading6, { color: colors.primary800 }]}
-            >
+            <Text style={globalStyles.questionText}>
               {questions[currentQuestion].text}
             </Text>
           </View>
 
           {/* Options */}
-          <View style={{ gap: 8 }}>
+          <View style={globalStyles.optionsContainer}>
             {questions[currentQuestion].options.map((option, index) => {
               const isSelected = selectedAnswers[currentQuestion] === index;
               return (
@@ -98,14 +94,9 @@ export default function SurveyScreen() {
                   ]}
                 >
                   <Text
-                    variant="bodyLarge"
                     style={[
-                      globalStyles.bodyLarge,
-                      { 
-                        color: isSelected ? colors.primary800 : colors.onSurfaceVariant,
-                        textAlign: 'left',
-                        width: '100%'
-                      }
+                      globalStyles.optionText,
+                      isSelected && globalStyles.optionTextSelected
                     ]}
                   >
                     {option}
@@ -123,11 +114,11 @@ export default function SurveyScreen() {
             onPress={handlePrevious}
             disabled={currentQuestion === 0}
             style={[
-              globalStyles.navButton,
+              globalStyles.navigationButton,
               globalStyles.buttonSecondary,
-              { marginRight: 8 }
+              globalStyles.navigationButtonLeft
             ]}
-            labelStyle={[globalStyles.buttonLabel, { color: colors.primary }]}
+            labelStyle={globalStyles.buttonLabelSecondary}
           >
             Previous
           </Button>
@@ -136,11 +127,11 @@ export default function SurveyScreen() {
             onPress={handleNext}
             disabled={selectedAnswers[currentQuestion] === undefined}
             style={[
-              globalStyles.navButton,
+              globalStyles.navigationButton,
               globalStyles.buttonPrimary,
-              { marginLeft: 8 }
+              globalStyles.navigationButtonRight
             ]}
-            labelStyle={[globalStyles.buttonLabel, { color: colors.onPrimary }]}
+            labelStyle={globalStyles.buttonLabelPrimary}
           >
             {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
           </Button>

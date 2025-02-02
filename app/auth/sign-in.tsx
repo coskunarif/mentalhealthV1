@@ -4,6 +4,7 @@ import { Text, Surface, TextInput, Button, useTheme, HelperText } from 'react-na
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
+import { globalStyles } from '../config/styles';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
@@ -31,83 +32,77 @@ export default function SignIn() {
   };
 
   return (
-    <Surface style={{ flex: 1, backgroundColor: theme.colors.primaryContainer }}>
+    <Surface style={globalStyles.authContainer}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+        style={globalStyles.fill}
       >
         <ScrollView 
-          contentContainerStyle={{ 
-            flexGrow: 1,
-            justifyContent: 'center',
-            padding: 16
-          }}
+          contentContainerStyle={[
+            globalStyles.authContent,
+            globalStyles.centerContent
+          ]}
         >
-          <View style={{ 
-            width: '100%',
-            maxWidth: 400,
-            alignSelf: 'center',
-            alignItems: 'center',
-            gap: 24
-          }}>
+          <View style={[globalStyles.authLogoContainer, { maxWidth: 400 }]}>
             <Image
               source={require('../../assets/images/adaptive-icon.png')}
-              style={{
-                width: 80,
-                height: 80,
-                marginBottom: 20,
-                resizeMode: 'contain',
-              }}
+              style={globalStyles.authAppIcon}
             />
             
-            <Text
-              variant="headlineMedium"
-              style={{
-                color: theme.colors.onBackground,
-                fontWeight: 'bold'
-              }}
-            >
+            <Text style={globalStyles.authHeading}>
               Welcome Back
             </Text>
+          </View>
 
-            <View style={{ width: '100%', gap: 16 }}>
-              <TextInput
-                label="Email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                mode="outlined"
-                error={!!error}
-                style={{ backgroundColor: theme.colors.background }}
-              />
+          <View style={globalStyles.authFormContainer}>
+            <TextInput
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              mode="outlined"
+              error={!!error}
+              style={globalStyles.authInput}
+              contentStyle={globalStyles.bodyMedium}
+              left={<TextInput.Icon icon="email" />}
+            />
 
-              <TextInput
-                label="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                mode="outlined"
-                error={!!error}
-                style={{ backgroundColor: theme.colors.background }}
-                right={
-                  <TextInput.Icon
-                    icon={showPassword ? 'eye-off' : 'eye'}
-                    onPress={() => setShowPassword(!showPassword)}
-                  />
-                }
-              />
+            <TextInput
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              mode="outlined"
+              error={!!error}
+              style={globalStyles.authInput}
+              contentStyle={globalStyles.bodyMedium}
+              left={<TextInput.Icon icon="lock" />}
+              right={
+                <TextInput.Icon
+                  icon={showPassword ? 'eye-off' : 'eye'}
+                  onPress={() => setShowPassword(!showPassword)}
+                />
+              }
+            />
 
-              <HelperText type="error" visible={!!error}>
-                {error}
-              </HelperText>
+            <HelperText 
+              type="error" 
+              visible={!!error}
+              style={globalStyles.authErrorText}
+            >
+              {error}
+            </HelperText>
 
+            <View style={globalStyles.authActions}>
               <Button
                 mode="contained"
                 onPress={handleSignIn}
                 loading={loading}
                 disabled={loading}
-                contentStyle={{ height: 48 }}
+                style={globalStyles.authPrimaryButton}
+                contentStyle={globalStyles.buttonContent}
+                labelStyle={globalStyles.labelLarge}
               >
                 {loading ? 'Signing in...' : 'Sign In'}
               </Button>
@@ -115,7 +110,8 @@ export default function SignIn() {
               <Button
                 mode="text"
                 onPress={() => router.push('/auth/sign-up')}
-                style={{ marginTop: 8 }}
+                style={globalStyles.authTextButton}
+                labelStyle={globalStyles.labelLarge}
               >
                 Don't have an account? Sign Up
               </Button>
