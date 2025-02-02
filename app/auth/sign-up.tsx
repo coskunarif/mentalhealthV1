@@ -3,6 +3,7 @@ import { View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Text, Surface, TextInput, Button, useTheme, Snackbar } from 'react-native-paper';
 import { router } from 'expo-router';
 import { useAuth } from '../../context/auth';
+import { globalStyles } from '../config/styles';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
@@ -45,35 +46,27 @@ export default function SignUp() {
   };
 
   return (
-    <Surface style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <Surface style={globalStyles.authContainer}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
+        style={globalStyles.fill}
       >
         <ScrollView 
-          contentContainerStyle={{ 
-            flexGrow: 1,
-            justifyContent: 'center',
-            padding: 24
-          }}
+          contentContainerStyle={[
+            globalStyles.authContent,
+            globalStyles.centerContent
+          ]}
         >
-          <View style={{ 
-            width: '100%',
-            maxWidth: 400,
-            alignSelf: 'center',
-            gap: 24
-          }}>
-            <Text
-              variant="headlineMedium"
-              style={{
-                color: theme.colors.onBackground,
-                fontWeight: 'bold'
-              }}
-            >
+          <View style={globalStyles.authFormContainer}>
+            <Text style={globalStyles.authHeading}>
               Create Account
             </Text>
             
-            <View style={{ gap: 16 }}>
+            <Text style={globalStyles.authSubheading}>
+              Join us on your journey to mental wellness
+            </Text>
+            
+            <View style={globalStyles.authFormFields}>
               <TextInput
                 label="Email"
                 value={email}
@@ -81,8 +74,9 @@ export default function SignUp() {
                 mode="outlined"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                left={<TextInput.Icon icon="account" />}
-                style={{ backgroundColor: theme.colors.background }}
+                left={<TextInput.Icon icon="email" />}
+                style={globalStyles.authInput}
+                contentStyle={globalStyles.bodyMedium}
               />
 
               <TextInput
@@ -98,7 +92,8 @@ export default function SignUp() {
                     onPress={() => setShowPassword(!showPassword)}
                   />
                 }
-                style={{ backgroundColor: theme.colors.background }}
+                style={globalStyles.authInput}
+                contentStyle={globalStyles.bodyMedium}
               />
 
               <TextInput
@@ -107,34 +102,39 @@ export default function SignUp() {
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!showConfirmPassword}
                 mode="outlined"
-                left={<TextInput.Icon icon="lock" />}
+                left={<TextInput.Icon icon="lock-check" />}
                 right={
                   <TextInput.Icon
                     icon={showConfirmPassword ? 'eye-off' : 'eye'}
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                   />
                 }
-                style={{ backgroundColor: theme.colors.background }}
+                style={globalStyles.authInput}
+                contentStyle={globalStyles.bodyMedium}
               />
 
-              <Button
-                mode="contained"
-                onPress={handleSignUp}
-                loading={loading}
-                disabled={loading}
-                contentStyle={{ height: 48 }}
-                style={{ marginTop: 8 }}
-              >
-                {loading ? 'Creating Account...' : 'Sign Up'}
-              </Button>
+              <View style={globalStyles.authActions}>
+                <Button
+                  mode="contained"
+                  onPress={handleSignUp}
+                  loading={loading}
+                  disabled={loading}
+                  style={globalStyles.authPrimaryButton}
+                  contentStyle={globalStyles.buttonContent}
+                  labelStyle={globalStyles.labelLarge}
+                >
+                  {loading ? 'Creating Account...' : 'Sign Up'}
+                </Button>
 
-              <Button
-                mode="text"
-                onPress={() => router.back()}
-                style={{ marginTop: 8 }}
-              >
-                Already have an account? Sign In
-              </Button>
+                <Button
+                  mode="text"
+                  onPress={() => router.back()}
+                  style={globalStyles.authTextButton}
+                  labelStyle={globalStyles.labelLarge}
+                >
+                  Already have an account? Sign In
+                </Button>
+              </View>
             </View>
           </View>
         </ScrollView>
@@ -143,12 +143,15 @@ export default function SignUp() {
           visible={snackbarVisible}
           onDismiss={() => setSnackbarVisible(false)}
           duration={3000}
+          style={globalStyles.authSnackbar}
           action={{
             label: 'Close',
             onPress: () => setSnackbarVisible(false),
           }}
         >
-          {snackbarMessage}
+          <Text style={[globalStyles.bodyMedium, { color: theme.colors.onError }]}>
+            {snackbarMessage}
+          </Text>
         </Snackbar>
       </KeyboardAvoidingView>
     </Surface>
