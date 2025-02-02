@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { Text, Surface, TextInput, Button, useTheme, Snackbar } from 'react-native-paper';
 import { router } from 'expo-router';
 import { useAuth } from '../../context/auth';
@@ -38,54 +38,23 @@ export default function Welcome() {
   };
 
   return (
-    <Surface style={[styles.container, { backgroundColor: theme.colors.primaryContainer }]}>
-      <View style={styles.content}>
+    <Surface style={globalStyles.authContainer}>
+      <View style={globalStyles.authContent}>
         {/* App Logo */}
-        <View style={styles.logoContainer}>
-          <Surface
-            style={[
-              styles.logo,
-              { backgroundColor: theme.colors.primary }
-            ]}
-          >
-            <Text
-              variant="displayMedium"
-              style={[
-                globalStyles.heading2,
-                { color: theme.colors.onPrimary }
-              ]}
-            >
-              MH
-            </Text>
+        <View style={globalStyles.authLogoContainer}>
+          <Surface style={globalStyles.authLogo}>
+            <Text style={globalStyles.authLogoText}>MH</Text>
           </Surface>
-          <Text
-            variant="headlineSmall"
-            style={[
-              globalStyles.heading4,
-              { color: theme.colors.onSurface }
-            ]}
-          >
+          <Text style={globalStyles.authAppTitle}>
             Mental Health App
           </Text>
         </View>
 
         {/* Welcome Text */}
-        <Text
-          variant="headlineLarge"
-          style={[
-            globalStyles.heading4,
-            { color: theme.colors.primary, marginBottom: 8 }
-          ]}
-        >
+        <Text style={globalStyles.authHeading}>
           Welcome Back
         </Text>
-        <Text
-          variant="bodyLarge"
-          style={[
-            globalStyles.bodyLarge,
-            { color: theme.colors.onSurfaceVariant, marginBottom: 32, textAlign: 'center' }
-          ]}
-        >
+        <Text style={globalStyles.authSubheading}>
           Sign in to continue your journey to mental wellness
         </Text>
 
@@ -98,10 +67,7 @@ export default function Welcome() {
           left={<TextInput.Icon icon="email" />}
           keyboardType="email-address"
           autoCapitalize="none"
-          style={[
-            styles.input,
-            { backgroundColor: theme.colors.background }
-          ]}
+          style={globalStyles.authInput}
           contentStyle={globalStyles.bodyMedium}
         />
 
@@ -119,21 +85,18 @@ export default function Welcome() {
               onPress={() => setShowPassword(!showPassword)}
             />
           }
-          style={[
-            styles.input,
-            { backgroundColor: theme.colors.background }
-          ]}
+          style={globalStyles.authInput}
           contentStyle={globalStyles.bodyMedium}
         />
 
         {/* Action Buttons */}
-        <View style={styles.actions}>
+        <View style={globalStyles.authActions}>
           <Button
             mode="contained"
             onPress={handleSignIn}
             loading={isLoading}
-            style={styles.signInButton}
-            contentStyle={styles.buttonContent}
+            style={globalStyles.authPrimaryButton}
+            contentStyle={globalStyles.buttonContent}
             labelStyle={globalStyles.labelLarge}
           >
             Sign In
@@ -141,16 +104,16 @@ export default function Welcome() {
           <Button
             mode="text"
             onPress={() => router.push('/auth/sign-up' as any)}
-            style={styles.textButton}
-            labelStyle={[globalStyles.labelLarge, { color: theme.colors.primary }]}
+            style={globalStyles.authTextButton}
+            labelStyle={globalStyles.labelLarge}
           >
             Don't have an account? Create here
           </Button>
           <Button
             mode="text"
             onPress={() => router.push('/auth/forgot-password' as any)}
-            style={styles.textButton}
-            labelStyle={[globalStyles.labelLarge, { color: theme.colors.primary }]}
+            style={globalStyles.authTextButton}
+            labelStyle={globalStyles.labelLarge}
           >
             Forgot Password?
           </Button>
@@ -161,7 +124,7 @@ export default function Welcome() {
           visible={snackbarVisible}
           onDismiss={() => setSnackbarVisible(false)}
           duration={3000}
-          style={styles.snackbar}
+          style={globalStyles.authSnackbar}
         >
           <Text style={[globalStyles.bodyMedium, { color: theme.colors.onError }]}>
             {snackbarMessage}
@@ -171,53 +134,3 @@ export default function Welcome() {
     </Surface>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    gap: 16,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  logo: {
-    padding: 16,
-    borderRadius: 16,
-    elevation: 4,
-  },
-  logoText: {
-    fontWeight: 'bold',
-  },
-  appTitle: {
-    marginTop: 8,
-    fontWeight: 'bold',
-  },
-  input: {
-    marginBottom: 8,
-  },
-  signInButton: {
-    marginTop: 8,
-    borderRadius: 28,
-  },
-  buttonContent: {
-    height: 48,
-  },
-  textButton: {
-    marginTop: 8,
-  },
-  actions: {
-    marginTop: 16,
-  },
-  snackbar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-});

@@ -21,6 +21,9 @@ export const colors = {
   onPrimary: '#FFFFFF',
   onSurface: '#1A1A1A',
   onSurfaceVariant: '#2D2D2D',
+  
+  // Status Colors
+  error: '#B00020',
 } as const;
 
 // Helper function to create opacity variants
