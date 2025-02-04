@@ -1,53 +1,27 @@
-import { View, StyleSheet } from 'react-native';
-import { Link, Stack } from 'expo-router';
-import { Text, Surface, TouchableRipple, useTheme } from 'react-native-paper';
+import { View } from 'react-native';
+import { Text, Button } from 'react-native-paper';
+import { Link } from 'expo-router';
+import { styles } from './config/styles';
 
 export default function NotFoundScreen() {
-  const theme = useTheme();
-
   return (
-    <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <Surface style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.content}>
-          <Text
-            variant="headlineSmall"
-            style={[
-              styles.title,
-              { color: theme.colors.onSurface }
-            ]}
+    <View style={styles.layout.container}>
+      <View style={styles.layout.content}>
+        <Text style={styles.text.heading1}>Page Not Found</Text>
+        
+        <Text style={[styles.text.body, { marginTop: 16 }]}>
+          We couldn't find the page you're looking for. Please check the URL or return to home.
+        </Text>
+
+        <Link href="/tabs/home" asChild>
+          <Button
+            mode="contained"
+            style={[styles.button.primary, { marginTop: 24 }]}
           >
-            This screen doesn't exist.
-          </Text>
-          <Link href="/" asChild>
-            <TouchableRipple>
-              <Text
-                variant="labelLarge"
-                style={{ color: theme.colors.primary }}
-              >
-                Go to home screen!
-              </Text>
-            </TouchableRipple>
-          </Link>
-        </View>
-      </Surface>
-    </>
+            Return to Home
+          </Button>
+        </Link>
+      </View>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    gap: 16,
-  },
-  title: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-});

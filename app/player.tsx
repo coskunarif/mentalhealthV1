@@ -1,166 +1,131 @@
-import React, { useState } from 'react';
-import { View, Animated } from 'react-native';
-import { Text, Surface, IconButton, FAB, ProgressBar, useTheme } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import Svg, { Path } from 'react-native-svg';
-import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { Text, Surface, IconButton } from 'react-native-paper';
+import { Audio } from 'expo-av';
+import { styles } from './config/styles';
+import { PlayerControls } from './components/PlayerControls';
+import { WaveformVisualizer } from './components/WaveformVisualizer';
+import { router, useLocalSearchParams } from 'expo-router';
+import type { RootStackParamList } from './types/navigation';
 
-// Star burst component
-function StarBurst() {
-  const size = 200;
-  const points = 12;
-  const centerX = size / 2;
-  const centerY = size / 2;
-  const innerRadius = 30;
-  const outerRadius = 100;
-
-  const createStarPath = () => {
-    let path = '';
-    for (let i = 0; i < points * 2; i++) {
-      const radius = i % 2 === 0 ? outerRadius : innerRadius;
-      const angle = (i * Math.PI) / points;
-      const x = centerX + radius * Math.cos(angle);
-      const y = centerY + radius * Math.sin(angle);
-      path += i === 0 ? `M ${x},${y} ` : `L ${x},${y} `;
-    }
-    path += 'Z';
-    return path;
-  };
-
-  return (
-    <Svg height={size} width={size}>
-      <Path
-        d={createStarPath()}
-        fill="#5DA47A"
-        opacity={0.2}
-      />
-    </Svg>
-  );
+interface PlayerProps {
+  audioUrl: string;
+  title: string;
+  duration: string;
 }
 
 export default function PlayerScreen() {
-  const router = useRouter();
-  const theme = useTheme();
+  const [sound, setSound] = useState<Audio.Sound>();
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0.38); // 7:28 out of 19:00
+  const [duration, setDuration] = useState(0);
+  const [position, setPosition] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const { meditationId, returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['player']>();
 
-  // Format time function
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  useEffect(() => {
+    loadAudio();
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
+
+  const loadAudio = async () => {
+    try {
+      const { sound: audioSound } = await Audio.Sound.createAsync(
+        // TODO: Replace with actual meditation audio URL
+        require('../assets/meditations/sample.mp3'),
+        { shouldPlay: false }
+      );
+
+      const status = await audioSound.getStatusAsync();
+      if (status.isLoaded) {
+        setSound(audioSound);
+        setDuration(status.durationMillis || 0);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Error loading audio:', error);
+      setIsLoading(false);
+    }
   };
 
-  const currentTime = 448; // 7:28 in seconds
-  const totalTime = 1140; // 19:00 in seconds
+  const handlePlayPause = async () => {
+    if (!sound) return;
+
+    if (isPlaying) {
+      await sound.pauseAsync();
+    } else {
+      await sound.playAsync();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleSkipBack = async () => {
+    if (!sound) return;
+    await sound.setPositionAsync(0);
+  };
+
+  const handleSkipForward = async () => {
+    if (!sound) return;
+    const status = await sound.getStatusAsync();
+    if (!status.isLoaded) return;
+    
+    const position = status.positionMillis;
+    const duration = status.durationMillis || 0;
+    const newPosition = Math.min(position + 10000, duration);
+    await sound.setPositionAsync(newPosition);
+  };
+
+  useEffect(() => {
+    if (sound) {
+      const interval = setInterval(async () => {
+        if (isPlaying) {
+          const status = await sound.getStatusAsync();
+          if (status.isLoaded) {
+            setPosition(status.positionMillis);
+            if (status.didJustFinish) {
+              setIsPlaying(false);
+              setPosition(0);
+              await sound.setPositionAsync(0);
+            }
+          }
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [sound, isPlaying]);
 
   return (
-    <Surface style={{ 
-      flex: 1, 
-      backgroundColor: theme.colors.primaryContainer
-    }}>
-      {/* Back Button */}
-      <View style={{ 
-        position: 'absolute', 
-        top: 16, 
-        left: 16, 
-        zIndex: 1 
-      }}>
-        <IconButton
-          icon="arrow-left"
-          mode="outlined"
-          size={24}
-          onPress={() => router.back()}
-          iconColor={theme.colors.primary}
-        />
-      </View>
-
-      <View style={{ 
-        flex: 1, 
-        padding: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 24
-      }}>
-        {/* Star Burst Animation */}
-        <View style={{ 
-          position: 'absolute',
-          opacity: 0.5
-        }}>
-          <StarBurst />
-        </View>
-
-        {/* Title */}
-        <View style={{ 
-          alignItems: 'center',
-          gap: 4
-        }}>
-          <Text 
-            variant="headlineSmall"
-            style={{ 
-              color: theme.colors.primary,
-              fontWeight: 'bold'
-            }}
-          >
-            Caotic Breath
-          </Text>
-          <Text
-            variant="titleMedium"
-            style={{ color: theme.colors.onSurfaceVariant }}
-          >
-            Breath up
-          </Text>
-          <Text
-            variant="bodySmall"
-            style={{ color: theme.colors.outline }}
-          >
-            exersize 13
-          </Text>
-        </View>
-
-        {/* Progress Bar */}
-        <View style={{ width: '100%', gap: 8 }}>
-          <ProgressBar
-            progress={progress}
-            color={theme.colors.primary}
-            style={{
-              backgroundColor: theme.colors.surfaceVariant,
-              height: 4,
-              borderRadius: 2
-            }}
+    <View style={styles.layout.container}>
+      <View style={styles.layout.header}>
+        <Surface style={[styles.component.card.elevated, { marginBottom: 24 }]}>
+          <IconButton
+            icon="arrow-left"
+            onPress={() => router.replace(returnTo)}
+            style={styles.button.secondary}
           />
-          <View style={{ 
-            width: '100%',
-            flexDirection: 'row',
-            justifyContent: 'space-between'
-          }}>
-            <Text
-              variant="labelMedium"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              {formatTime(currentTime)}
-            </Text>
-            <Text
-              variant="labelMedium"
-              style={{ color: theme.colors.onSurfaceVariant }}
-            >
-              {formatTime(totalTime)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Play/Pause Button */}
-        <FAB
-          icon={isPlaying ? "pause" : "play"}
-          onPress={() => setIsPlaying(!isPlaying)}
-          mode="elevated"
-          size="large"
-          style={{
-            backgroundColor: theme.colors.primary
-          }}
-          color={theme.colors.onPrimary}
-        />
+          <Text style={styles.text.heading2}>Meditation Player</Text>
+        </Surface>
       </View>
-    </Surface>
+
+      <View style={styles.layout.content}>
+        <Surface style={[styles.component.card.elevated, { marginBottom: 24 }]}>
+          <Text style={styles.text.heading2}>Sample Meditation</Text>
+          <Text style={[styles.text.caption, { marginTop: 4 }]}>10:00</Text>
+
+          <WaveformVisualizer isPlaying={isPlaying} />
+
+          <PlayerControls
+            isPlaying={isPlaying}
+            onPlayPause={handlePlayPause}
+            onSkipBack={handleSkipBack}
+            onSkipForward={handleSkipForward}
+          />
+        </Surface>
+      </View>
+    </View>
   );
 }

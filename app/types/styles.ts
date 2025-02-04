@@ -1,165 +1,157 @@
-import { TextStyle, ViewStyle, ImageStyle } from 'react-native';
+import { ViewStyle, TextStyle } from 'react-native';
 
+// Core Layout Styles
 export interface LayoutStyles {
-  fill: ViewStyle;
-  screen: ViewStyle;
-  safeArea: ViewStyle;
   container: ViewStyle;
-  contentContainer: ViewStyle;
-  centerContent: ViewStyle;
-  centerContentContainer: ViewStyle;
-  row: ViewStyle;
-  column: ViewStyle;
-  card: ViewStyle;
-  spaceBetween: ViewStyle;
-  list: ViewStyle;
-  listItem: ViewStyle;
-  listItemContent: ViewStyle;
+  content: ViewStyle;
+  header: ViewStyle;
+  footer: ViewStyle;
+  grid: ViewStyle;
+  scrollView: ViewStyle;
+  form: ViewStyle;
 }
 
-export interface ButtonStyles {
-  button: ViewStyle;
-  buttonContent: ViewStyle;
-  buttonLabel: TextStyle;
-  buttonIcon: ViewStyle;
-  buttonPrimary: ViewStyle;
-  buttonSecondary: ViewStyle;
-  buttonLabelPrimary: TextStyle;
-  buttonLabelSecondary: TextStyle;
-  navigationButton: ViewStyle;
-  navigationButtonLeft: ViewStyle;
-  navigationButtonRight: ViewStyle;
-  navigationButtonLabel: TextStyle;
-  iconButton: ViewStyle;
-}
-
-export interface AuthStyles {
-  authContainer: ViewStyle;
-  authContent: ViewStyle;
-  authHeader: ViewStyle;
-  authTitle: TextStyle;
-  authSubtitle: TextStyle;
-  authForm: ViewStyle;
-  authInput: ViewStyle;
-  authActions: ViewStyle;
-  authLink: TextStyle;
-  authLogoContainer: ViewStyle;
-  authLogo: ViewStyle;
-  authLogoText: TextStyle;
-  authAppTitle: TextStyle;
-  authHeading: TextStyle;
-  authSubheading: TextStyle;
-  authFormContainer: ViewStyle;
-  authFormFields: ViewStyle;
-  authPrimaryButton: ViewStyle;
-  authTextButton: ViewStyle;
-  authSnackbar: ViewStyle;
-  authErrorText: TextStyle;
-  authAppIcon: ImageStyle;
-}
-
-export interface SurveyStyles {
-  surveyScreen: ViewStyle;
-  surveySafeArea: ViewStyle;
-  progressSection: ViewStyle;
-  progressText: TextStyle;
-  progressBar: ViewStyle;
-  progress: ViewStyle;
-  contentSection: ViewStyle;
-  questionSection: ViewStyle;
-  questionText: TextStyle;
-  optionsContainer: ViewStyle;
-  optionButton: ViewStyle;
-  optionButtonSelected: ViewStyle;
-  optionText: TextStyle;
-  optionTextSelected: TextStyle;
-  navigationSection: ViewStyle;
-}
-
-export interface HomeStyles {
-  homeContainer: ViewStyle;
-  homeContent: ViewStyle;
-  homeScreenHeader: TextStyle;
-  exerciseCard: ViewStyle;
-  progressCard: ViewStyle;
-  radarChartContainer: ViewStyle;
-  radarLabel: TextStyle;
-  dayProgressContainer: ViewStyle;
-  dayCircle: ViewStyle;
-  nextSessionCard: ViewStyle;
-  nextSessionContent: ViewStyle;
-  actionButtonsContainer: ViewStyle;
-  actionButtonWrapper: ViewStyle;
-  actionButtonContent: ViewStyle;
-  actionButtonText: TextStyle;
-  recentActivitiesContainer: ViewStyle;
-  recentActivityItem: ViewStyle;
-  recentActivityTitle: TextStyle;
-  recentActivitySubtitle: TextStyle;
-  recentActivityDuration: TextStyle;
-  statsGrid: ViewStyle;
-  statCard: ViewStyle;
-}
-
-export interface ProfileStyles {
-  profileContainer: ViewStyle;
-  profileContent: ViewStyle;
-  profileHeader: ViewStyle;
-  profilePhoneNumber: TextStyle;
-  profileName: TextStyle;
-  profileStats: ViewStyle;
-  profileStatItem: ViewStyle;
-  profileStatValue: TextStyle;
-  profileStatLabel: TextStyle;
-  profileSettings: ViewStyle;
-  profileSettingItem: ViewStyle;
-  profileSettingContent: ViewStyle;
-  profileSettingIcon: ViewStyle;
-  profileSettingLabel: TextStyle;
-}
-
-export interface PlayerStyles {
-  playerContainer: ViewStyle;
-  playerControls: ViewStyle;
-  playerProgress: ViewStyle;
-  playerTime: TextStyle;
-}
-
-export interface GlobalTypography {
-  text: TextStyle;
-  textBold: TextStyle;
+// Typography Styles
+export interface TextStyles {
   heading1: TextStyle;
   heading2: TextStyle;
   heading3: TextStyle;
-  bodyLarge: TextStyle;
-  bodyMedium: TextStyle;
-  bodySmall: TextStyle;
-  labelLarge: TextStyle;
-  labelMedium: TextStyle;
-  titleLarge: TextStyle;
-  titleMedium: TextStyle;
-  headlineLarge: TextStyle;
-  headlineMedium: TextStyle;
-  headlineSmall: TextStyle;
-  displaySmall: TextStyle;
+  body: TextStyle;
+  caption: TextStyle;
+  label: TextStyle;
+  link: TextStyle;
+  cardTitle: TextStyle;
+  emoji: TextStyle;
 }
 
-export interface FormStyles {
+// Button Styles
+export interface ButtonStyles {
+  primary: ViewStyle;
+  secondary: ViewStyle;
+  text: TextStyle;
+  outlined: ViewStyle;
+  contained: ViewStyle;
+}
+
+// Input Styles
+export interface InputStyles {
+  container: ViewStyle;
+  outline: ViewStyle;
+  content: TextStyle;
+  label: TextStyle;
+  helper: TextStyle;
+  error: TextStyle;
+}
+
+// Card Styles
+export interface CardStyles {
+  container: ViewStyle;
+  content: ViewStyle;
+  interactive: ViewStyle;
+  elevated: ViewStyle;
+  outlined: ViewStyle;
+}
+
+// Progress Styles
+export interface ProgressStyles {
+  container: ViewStyle;
+  grid: ViewStyle;
+  card: ViewStyle;
+  label: TextStyle;
+  value: TextStyle;
+}
+
+// Screen-specific Styles
+export interface AuthStyles {
+  container: ViewStyle;
   form: ViewStyle;
-  formContainer: ViewStyle;
-  input: ViewStyle;
-  inputError: ViewStyle;
-  errorText: TextStyle;
-  searchInput: ViewStyle;
+  header: ViewStyle;
+  footer: ViewStyle;
+  social: ViewStyle;
 }
 
-export interface GlobalStyles extends 
-  GlobalTypography,
-  LayoutStyles,
-  ButtonStyles,
-  AuthStyles,
-  HomeStyles,
-  ProfileStyles,
-  SurveyStyles,
-  FormStyles,
-  PlayerStyles {}
+export interface ProfileStyles {
+  container: ViewStyle;
+  header: ViewStyle;
+  section: ViewStyle;
+  card: ViewStyle;
+  settingItem: ViewStyle;
+  settingContent: ViewStyle;
+  signOutCard: ViewStyle;
+}
+
+export interface MoodStyles {
+  container: ViewStyle;
+  grid: ViewStyle;
+  card: ViewStyle;
+  cardSelected: ViewStyle;
+  actions: ViewStyle;
+}
+
+export interface HomeStyles {
+  container: ViewStyle;
+  header: ViewStyle;
+  section: ViewStyle;
+  grid: ViewStyle;
+  card: ViewStyle;
+  activityCard: ViewStyle;
+}
+
+export interface LegalStyles {
+  container: ViewStyle;
+  header: ViewStyle;
+  content: ViewStyle;
+  section: ViewStyle;
+}
+
+// Component-specific Styles
+export interface ComponentStyles {
+  card: CardStyles;
+  input: InputStyles;
+  progress: ProgressStyles;
+  recommendations: {
+    container: ViewStyle;
+    scrollView: ViewStyle;
+    card: ViewStyle;
+  };
+  footer: {
+    container: ViewStyle;
+    content: ViewStyle;
+    link: TextStyle;
+  };
+}
+
+// Theme Colors
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  background: string;
+  surface: string;
+  error: string;
+  text: string;
+  disabled: string;
+}
+
+// Complete Style System
+export interface StyleSystem {
+  // Core styles
+  layout: LayoutStyles;
+  text: TextStyles;
+  button: ButtonStyles;
+  input: InputStyles;
+  
+  // Screen styles
+  screen: {
+    auth: AuthStyles;
+    profile: ProfileStyles;
+    mood: MoodStyles;
+    home: HomeStyles;
+    legal: LegalStyles;
+  };
+  
+  // Component styles
+  component: ComponentStyles;
+  
+  // Theme
+  colors: ThemeColors;
+}
