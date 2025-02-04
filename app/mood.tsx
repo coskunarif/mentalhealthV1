@@ -1,89 +1,109 @@
 import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Surface, TouchableRipple, IconButton, useTheme } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { globalStyles } from './config/styles';
+import { Text, Button } from 'react-native-paper';
+import { router, useLocalSearchParams } from 'expo-router';
+import { styles } from './config/styles';
+import { EnhancedCard } from './components/EnhancedCard';
+import { RadarChart } from './components/RadarChart';
+import type { RootStackParamList } from './types/navigation';
 
-const emotions = [
-  { name: 'Enlightenment', color: '#8A2BE2' }, // Purple
-  { name: 'Peace', color: '#9370DB' },
-  { name: 'Joy', color: '#9B59B6' },
-  { name: 'Love', color: '#87CEEB' }, // Light blue
-  { name: 'Reason', color: '#48D1CC' },
-  { name: 'Acceptance', color: '#98FB98' },
-  { name: 'Willingness', color: '#90EE90' },
-  { name: 'Neutrality', color: '#8FBC8F' },
-  { name: 'Courage', color: '#9ACD32' },
-  { name: 'Pride', color: '#FFEB3B' },
-  { name: 'Anger', color: '#FFA07A' },
-  { name: 'Desire', color: '#FFA500' },
-  { name: 'Grief', color: '#FF7F50' },
-  { name: 'Apathy', color: '#FF6347' },
-  { name: 'Guilt', color: '#FF4500' },
-  { name: 'Shame', color: '#FF8C00' },
+const moods = [
+  { emoji: '😊', label: 'Happy' },
+  { emoji: '😌', label: 'Calm' },
+  { emoji: '😔', label: 'Sad' },
+  { emoji: '😤', label: 'Angry' },
+  { emoji: '😰', label: 'Anxious' },
+  { emoji: '😴', label: 'Tired' },
 ];
 
 export default function MoodScreen() {
-  const router = useRouter();
-  const theme = useTheme();
-  const [selectedEmotion, setSelectedEmotion] = useState<string>('');
+  const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const { returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['mood']>();
 
-  const handleEmotionSelect = (emotion: string) => {
-    setSelectedEmotion(emotion);
+  const handleMoodSelect = (index: number) => {
+    setSelectedMood(index);
+  };
+
+  const handleSubmit = async () => {
+    if (selectedMood === null) return;
+
+    try {
+      // TODO: Save mood to backend
+      router.replace(returnTo as keyof RootStackParamList);
+    } catch (error) {
+      console.error('Error saving mood:', error);
+    }
+  };
+
+  const handleSkip = () => {
+    router.replace(returnTo as keyof RootStackParamList);
   };
 
   return (
-    <Surface style={{ flex: 1, backgroundColor: theme.colors.primaryContainer }}>
-      {/* Back Button */}
-      <View style={{ position: 'absolute', top: 16, left: 16, zIndex: 1 }}>
-        <IconButton
-          icon="arrow-left"
-          mode="contained"
-          size={24}
-          onPress={() => router.back()}
-          containerColor={theme.colors.primary}
-          iconColor={theme.colors.onPrimary}
-        />
-      </View>
-
-      {/* Main Content */}
+    <View style={styles.layout.container}>
       <ScrollView
-        style={{ flex: 1, paddingHorizontal: 24, paddingTop: 80 }}
-        showsVerticalScrollIndicator={false}
+        style={styles.layout.scrollView}
+        contentContainerStyle={styles.layout.content}
       >
-        <View style={{ gap: 12, paddingBottom: 24 }}>
-          {emotions.map((emotion, index) => {
-            const isSelected = selectedEmotion === emotion.name;
-            return (
-              <TouchableRipple
-                key={index}
-                onPress={() => handleEmotionSelect(emotion.name)}
-                style={{
-                  backgroundColor: isSelected ? emotion.color : `${emotion.color}40`,
-                  borderRadius: 12,
-                  overflow: 'hidden',
-                }}
-              >
-                <View style={{ 
-                  padding: 16,
-                  alignItems: 'center',
-                }}>
-                  <Text
-                    variant="titleMedium"
-                    style={[
-                      globalStyles.text,
-                      { color: isSelected ? 'white' : '#000000' }
-                    ]}
-                  >
-                    {emotion.name}
-                  </Text>
-                </View>
-              </TouchableRipple>
-            );
-          })}
+        <View style={styles.layout.header}>
+          <Text style={styles.text.heading1}>How are you feeling?</Text>
+          <Text style={[styles.text.body, { marginTop: 8 }]}>
+            Select the emoji that best matches your current mood
+          </Text>
+        </View>
+
+        <View style={styles.component.recommendations.grid}>
+          {moods.map((mood, index) => (
+            <EnhancedCard
+              key={index}
+              style={[
+                styles.component.card.elevated,
+                selectedMood === index && styles.component.card.selected,
+              ]}
+              onPress={() => handleMoodSelect(index)}
+            >
+              <Text style={styles.text.heading1}>{mood.emoji}</Text>
+              <Text style={styles.text.caption}>{mood.label}</Text>
+            </EnhancedCard>
+          ))}
+        </View>
+
+        {selectedMood !== null && (
+          <View style={{ marginTop: 24 }}>
+            <Text style={[styles.text.heading2, { marginBottom: 16 }]}>
+              Your Mood Pattern
+            </Text>
+            <RadarChart
+              data={[
+                { value: 0.8, label: 'Mon' },
+                { value: 0.6, label: 'Tue' },
+                { value: 0.9, label: 'Wed' },
+                { value: 0.7, label: 'Thu' },
+                { value: 0.5, label: 'Today' },
+              ]}
+            />
+          </View>
+        )}
+
+        <View style={styles.layout.footer}>
+          <Button
+            mode="contained"
+            onPress={handleSubmit}
+            disabled={selectedMood === null}
+            style={styles.button.contained}
+          >
+            Save Mood
+          </Button>
+
+          <Button
+            mode="outlined"
+            onPress={handleSkip}
+            style={[styles.button.outlined, { marginTop: 8 }]}
+          >
+            Skip
+          </Button>
         </View>
       </ScrollView>
-    </Surface>
+    </View>
   );
 }

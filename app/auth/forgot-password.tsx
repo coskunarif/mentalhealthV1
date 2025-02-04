@@ -1,118 +1,83 @@
 import React, { useState } from 'react';
-import { View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { Text, Surface, TextInput, Button, useTheme, Snackbar } from 'react-native-paper';
-import { router } from 'expo-router';
-import { globalStyles } from '../config/styles';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { View } from 'react-native';
+import { Text, TextInput, Button } from 'react-native-paper';
+import { Link, useRouter } from 'expo-router';
+import { styles } from '../config/styles';
 import { auth } from '../lib/firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
-export default function ForgotPassword() {
-  const theme = useTheme();
+export default function ForgotPasswordScreen() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-
-  const showMessage = (message: string) => {
-    setSnackbarMessage(message);
-    setSnackbarVisible(true);
-  };
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleResetPassword = async () => {
-    if (!email) {
-      showMessage('Please enter your email address');
-      return;
-    }
-
+    if (loading || !email) return;
+    
     setLoading(true);
+    setError('');
+    setSuccess(false);
+
     try {
       await sendPasswordResetEmail(auth, email);
-      showMessage('Password reset instructions sent to your email');
-      setEmail('');
-    } catch (error: any) {
-      showMessage(error.message || 'Failed to send reset instructions');
+      setSuccess(true);
+    } catch (err) {
+      setError('Failed to send reset email. Please try again.');
+      console.error('Password reset error:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleBackToSignIn = () => {
+    router.back();
+  };
+
   return (
-    <Surface style={globalStyles.authContainer}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={globalStyles.fill}
-      >
-        <ScrollView 
-          contentContainerStyle={[
-            globalStyles.authContent,
-            globalStyles.centerContent
-          ]}
-        >
-          <View style={globalStyles.authFormContainer}>
-            <Text style={globalStyles.authHeading}>
-              Reset Password
-            </Text>
-            
-            <Text style={globalStyles.authSubheading}>
-              Enter your email address and we'll send you instructions to reset your password.
-            </Text>
-
-            <View style={globalStyles.authFormFields}>
-              <TextInput
-                label="Email"
-                value={email}
-                onChangeText={setEmail}
-                mode="outlined"
-                left={<TextInput.Icon icon="email" />}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                style={globalStyles.authInput}
-                contentStyle={globalStyles.bodyMedium}
-                disabled={loading}
-              />
-
-              <View style={globalStyles.authActions}>
-                <Button
-                  mode="contained"
-                  onPress={handleResetPassword}
-                  loading={loading}
-                  disabled={loading}
-                  style={globalStyles.authPrimaryButton}
-                  contentStyle={globalStyles.buttonContent}
-                  labelStyle={globalStyles.labelLarge}
-                >
-                  {loading ? 'Sending...' : 'Send Reset Instructions'}
-                </Button>
-
-                <Button
-                  mode="text"
-                  onPress={() => router.back()}
-                  style={globalStyles.authTextButton}
-                  labelStyle={globalStyles.labelLarge}
-                  disabled={loading}
-                >
-                  Back to Login
-                </Button>
-              </View>
-            </View>
-          </View>
-        </ScrollView>
-
-        <Snackbar
-          visible={snackbarVisible}
-          onDismiss={() => setSnackbarVisible(false)}
-          duration={3000}
-          style={globalStyles.authSnackbar}
-          action={{
-            label: 'Close',
-            onPress: () => setSnackbarVisible(false),
-          }}
-        >
-          <Text style={[globalStyles.bodyMedium, { color: theme.colors.onError }]}>
-            {snackbarMessage}
+    <View style={styles.layout.container}>
+      <View style={styles.layout.content}>
+        <View style={styles.screen.auth.header}>
+          <Text style={styles.text.heading1}>Reset Password</Text>
+          <Text style={styles.text.body}>
+            Enter your email to receive a password reset link
           </Text>
-        </Snackbar>
-      </KeyboardAvoidingView>
-    </Surface>
+        </View>
+
+        <View style={styles.screen.auth.form}>
+          <View style={styles.component.input.container}>
+            <Text style={styles.component.input.label}>Email</Text>
+            <TextInput
+              mode="outlined"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              style={styles.component.input.container}
+            />
+            {error ? (
+              <Text style={styles.component.input.error}>{error}</Text>
+            ) : null}
+          </View>
+
+          <Button
+            mode="contained"
+            onPress={handleResetPassword}
+            loading={loading}
+            style={styles.button.primary}
+          >
+            Send Reset Link
+          </Button>
+
+          <View style={styles.screen.auth.footer}>
+            <Text style={styles.text.body}>Remember your password? </Text>
+            <Link href="/auth/sign-in" style={styles.text.link as any}>
+              Sign In
+            </Link>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 }

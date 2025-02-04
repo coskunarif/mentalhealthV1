@@ -1,27 +1,25 @@
+import React from 'react';
 import { Tabs } from 'expo-router';
-import { useTheme } from 'react-native-paper';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { styles } from '../config/styles';
+import { IconButton } from 'react-native-paper';
 
-export default function TabsLayout() {
-  const theme = useTheme();
-
+export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.onSurfaceDisabled,
         tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: theme.colors.surfaceVariant,
-          elevation: 0,
+          backgroundColor: styles.colors.surface,
+          borderTopColor: styles.colors.disabled,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
         },
+        tabBarActiveTintColor: styles.colors.primary,
+        tabBarInactiveTintColor: styles.colors.textSecondary,
         tabBarLabelStyle: {
-          fontFamily: theme.fonts.labelMedium.fontFamily,
           fontSize: 12,
+          fontFamily: 'Kameron',
         },
       }}
     >
@@ -30,7 +28,29 @@ export default function TabsLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="home" size={size} color={color} />
+            <IconButton 
+              icon="home" 
+              size={24} 
+              iconColor={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="mood"
+        options={{
+          title: 'Mood',
+          tabBarIcon: ({ color, size }) => (
+            <IconButton icon="emoticon" size={24} iconColor={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="meditate"
+        options={{
+          title: 'Meditate',
+          tabBarIcon: ({ color, size }) => (
+            <IconButton icon="meditation" size={24} iconColor={color} />
           ),
         }}
       />
@@ -39,7 +59,11 @@ export default function TabsLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account" size={size} color={color} />
+            <IconButton 
+              icon="account" 
+              size={24} 
+              iconColor={color}
+            />
           ),
         }}
       />
