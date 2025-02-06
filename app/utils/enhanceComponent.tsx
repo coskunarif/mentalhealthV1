@@ -1,7 +1,7 @@
-import React from 'react';
-import { Animated, TouchableOpacity, ViewStyle } from 'react-native';
+import React, { Animated, TouchableOpacity, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { enhanceShadow, createPressAnimation, createGradientConfig } from './styleEnhancements';
+import styleEnhancements from './styleEnhancements';
+import type { ComponentType } from 'react';
 
 type WithPressAnimationProps = {
   style?: ViewStyle;
@@ -21,9 +21,9 @@ type WithGradientProps = {
 };
 
 // Helper to enhance any existing component with animations
-export const withPressAnimation = (WrappedComponent: React.ComponentType<any>) => {
+export const withPressAnimation = (WrappedComponent: ComponentType<any>) => {
   return ({ style, ...props }: WithPressAnimationProps) => {
-    const { pressIn, pressOut, transform } = createPressAnimation();
+    const { pressIn, pressOut, transform } = styleEnhancements.createPressAnimation();
 
     return (
       <Animated.View style={[style, { transform }]}>
@@ -40,11 +40,11 @@ export const withPressAnimation = (WrappedComponent: React.ComponentType<any>) =
 };
 
 // Helper to add shadow to existing components
-export const withShadow = (WrappedComponent: React.ComponentType<any>) => {
+export const withShadow = (WrappedComponent: ComponentType<any>) => {
   return ({ style, shadowLevel = 'soft', ...props }: WithShadowProps) => {
     return (
       <WrappedComponent
-        style={[style, enhanceShadow(shadowLevel)]}
+        style={[style, styleEnhancements.enhanceShadow(shadowLevel)]}
         {...props}
       />
     );
@@ -52,7 +52,7 @@ export const withShadow = (WrappedComponent: React.ComponentType<any>) => {
 };
 
 // Helper to add gradient background to existing components
-export const withGradient = (WrappedComponent: React.ComponentType<any>) => {
+export const withGradient = (WrappedComponent: ComponentType<any>) => {
   return ({ style, baseColor, ...props }: WithGradientProps) => {
     const gradientColors: [string, string] = [baseColor, `${baseColor}E6`];
     
@@ -68,3 +68,9 @@ export const withGradient = (WrappedComponent: React.ComponentType<any>) => {
     );
   };
 };
+
+export default {
+    withPressAnimation,
+    withShadow,
+    withGradient
+}

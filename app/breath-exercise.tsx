@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Text, Surface } from 'react-native-paper';
 import { useLocalSearchParams, router } from 'expo-router';
-import { styles } from './config/styles';
+import styles from './config/styles';
 import PlayerControls from './components/PlayerControls';
 import WaveformVisualizer from './components/WaveformVisualizer';
 
@@ -57,11 +57,11 @@ export default function BreathExercise() {
   };
 
   return (
-    <View style={[styles.screen.home.container, { padding: 16 }]}>
-      <Surface style={[styles.component.card.container, { flex: 1 }]}>
+    <View style={[styles.styles.screen.home.container, { padding: 16 }]}>
+      <Surface style={[styles.styles.component.card.container, { flex: 1 }]}>
         <View style={{ alignItems: 'center', marginBottom: 24 }}>
-          <Text style={styles.text.heading2}>Breath Exercise {id}</Text>
-          <Text style={[styles.text.heading1, { marginTop: 16 }]}>
+          <Text style={styles.styles.text.heading2}>Breath Exercise {id}</Text>
+          <Text style={[styles.styles.text.heading1, { marginTop: 16 }]}>
             {formatTime(timeRemaining)}
           </Text>
         </View>
@@ -81,7 +81,7 @@ export default function BreathExercise() {
         />
 
         <View style={{ marginTop: 'auto' }}>
-          <Text style={[styles.text.body, { textAlign: 'center', marginBottom: 16 }]}>
+          <Text style={[styles.styles.text.body, { textAlign: 'center', marginBottom: 16 }]}>
             {isPlaying ? 'Breathe in... and out...' : 'Press play to start the exercise'}
           </Text>
         </View>

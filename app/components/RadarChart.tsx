@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ViewStyle } from 'react-native';
 import { Text } from 'react-native-paper';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 import Svg, { Path, Circle } from 'react-native-svg';
 
 interface DataPoint {
@@ -50,7 +50,7 @@ export default function RadarChart({ data, style }: RadarChartProps) {
           <Path
             key={`grid-${index}`}
             d={`${path} Z`}
-            stroke={styles.colors.disabled}
+            stroke={styles.styles.colors.disabled}
             strokeWidth={1}
             fill="none"
           />
@@ -59,9 +59,9 @@ export default function RadarChart({ data, style }: RadarChartProps) {
         {/* Data Lines */}
         <Path
           d={`${path} Z`}
-          stroke={styles.colors.primary}
+          stroke={styles.styles.colors.primary}
           strokeWidth={2}
-          fill={styles.colors.primary}
+          fill={styles.styles.colors.primary}
           fillOpacity={0.2}
         />
 
@@ -72,7 +72,7 @@ export default function RadarChart({ data, style }: RadarChartProps) {
             cx={point.x}
             cy={point.y}
             r={4}
-            fill={styles.colors.primary}
+            fill={styles.styles.colors.primary}
           />
         ))}
       </Svg>
@@ -89,11 +89,11 @@ export default function RadarChart({ data, style }: RadarChartProps) {
                 width: 8,
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: styles.colors.primary,
+                backgroundColor: styles.styles.colors.primary,
                 marginRight: 8,
               }}
             />
-            <Text style={styles.text.caption}>{point.label}</Text>
+            <Text style={styles.styles.text.caption}>{point.label}</Text>
           </View>
         ))}
       </View>

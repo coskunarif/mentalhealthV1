@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { Link } from 'expo-router';
-import { styles } from './config/styles';
+import styles from './config/styles';
 import QuestionCard from './components/QuestionCard';
 
 const questions = [
@@ -56,9 +56,9 @@ export default function SurveyScreen() {
   const progress = (currentQuestion + 1) / questions.length;
 
   return (
-    <View style={styles.layout.container}>
-      <View style={styles.layout.content}>
-        <Text style={[styles.text.heading1, { marginBottom: 24 }]}>
+    <View style={styles.styles.layout.container}>
+      <View style={styles.styles.layout.content}>
+        <Text style={[styles.styles.text.heading1, { marginBottom: 24 }]}>
           Daily Survey
         </Text>
 
@@ -71,10 +71,10 @@ export default function SurveyScreen() {
           progress={progress}
         />
 
-        <View style={[styles.layout.footer, { gap: 16 }]}>
+        <View style={[styles.styles.layout.footer, { gap: 16 }]}>
           {currentQuestion === questions.length - 1 && (
             <Link href="/tabs" asChild>
-              <Button mode="contained" style={styles.button.primary}>
+              <Button mode="contained" style={styles.styles.button.primary}>
                 Submit
               </Button>
             </Link>

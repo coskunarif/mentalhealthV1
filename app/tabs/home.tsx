@@ -2,7 +2,7 @@ import React from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { Link, router } from 'expo-router';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 import RadarChart from '../components/RadarChart';
 import RecentActivities from '../components/RecentActivities';
 
@@ -56,17 +56,17 @@ export default function Home() {
   };
 
   return (
-    <ScrollView style={styles.screen.home.container}>
-      <View style={styles.screen.home.content}>
+    <ScrollView style={styles.styles.screen.home.container}>
+      <View style={styles.styles.screen.home.content}>
         {/* Progress Chart */}
         <View style={{ marginBottom: 24 }}>
-          <Text style={styles.text.heading2}>Your Progress</Text>
+          <Text style={styles.styles.text.heading2}>Your Progress</Text>
           <RadarChart data={radarData} />
         </View>
 
         {/* Exercise Progress */}
         <View style={{ marginBottom: 24 }}>
-          <Text style={[styles.text.heading3, { marginBottom: 16 }]}>Exercise Progress</Text>
+          <Text style={[styles.styles.text.heading3, { marginBottom: 16 }]}>Exercise Progress</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
             {breathExercises.map(exercise => (
               <View
@@ -75,12 +75,12 @@ export default function Home() {
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: exercise.isCompleted ? styles.colors.primary : styles.colors.surfaceVariant,
+                  backgroundColor: exercise.isCompleted ? styles.styles.colors.primary : styles.styles.colors.surfaceVariant,
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
               >
-                <Text style={[styles.text.body, { color: exercise.isCompleted ? styles.colors.surface : styles.colors.text }]}>
+                <Text style={[styles.styles.text.body, { color: exercise.isCompleted ? styles.styles.colors.surface : styles.styles.colors.text }]}>
                   {exercise.id}
                 </Text>
               </View>
@@ -91,7 +91,7 @@ export default function Home() {
               mode="contained"
               onPress={handleStartExercise}
               style={{ marginTop: 16 }}
-              labelStyle={styles.text.button}
+              labelStyle={styles.styles.text.button}
             >
               Start Exercise {nextExercise.id}
             </Button>
@@ -105,7 +105,7 @@ export default function Home() {
               mode="outlined"
               icon="clipboard-text"
               contentStyle={{ height: 80 }}
-              labelStyle={[styles.text.button, { color: styles.colors.primary }]}
+              labelStyle={[styles.styles.text.button, { color: styles.styles.colors.primary }]}
             >
               Take Survey
             </Button>
@@ -116,7 +116,7 @@ export default function Home() {
               mode="outlined"
               icon="emoticon"
               contentStyle={{ height: 80 }}
-              labelStyle={[styles.text.button, { color: styles.colors.primary }]}
+              labelStyle={[styles.styles.text.button, { color: styles.styles.colors.primary }]}
             >
               Track Mood
             </Button>

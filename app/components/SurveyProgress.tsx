@@ -1,8 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Text, ProgressBar } from 'react-native-paper';
-import { styles } from '../config/styles';
-import { colors } from '../config/theme';
+import styles from '../config/styles';
+import theme from '../config/theme';
 
 interface SurveyProgressProps {
   current: number;
@@ -13,14 +13,14 @@ export default function SurveyProgress({ current, total }: SurveyProgressProps) 
   const progress = (current + 1) / total;
 
   return (
-    <View style={styles.component.card.container}>
-      <View style={styles.component.card.content}>
-        <Text style={styles.text.body}>
+    <View style={styles.styles.component.card.container}>
+      <View style={styles.styles.component.card.content}>
+        <Text style={styles.styles.text.body}>
           Question {current + 1} of {total}
         </Text>
         <ProgressBar
           progress={progress}
-          color={colors.primary}
+          color={theme.colors.primary}
           style={{ marginTop: 8, height: 8, borderRadius: 4 }}
         />
       </View>

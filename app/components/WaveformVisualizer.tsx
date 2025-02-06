@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, ViewStyle, Animated } from 'react-native';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 
 interface WaveformVisualizerProps {
   isPlaying?: boolean;
@@ -81,7 +81,7 @@ export default function WaveformVisualizer({
             {
               flex: 1,
               marginHorizontal: 2,
-              backgroundColor: styles.colors.primary,
+              backgroundColor: styles.styles.colors.primary,
               height: MAX_BAR_HEIGHT,
               transform: [
                 {

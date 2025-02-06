@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from 'react-native-paper';
 import { StyleProp, ViewStyle } from 'react-native';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 
 type CardStyle = StyleProp<ViewStyle>;
 
@@ -36,11 +36,11 @@ const EnhancedCardComponent = ({
   ...props 
 }: EnhancedCardProps): JSX.Element => {
   const baseStyle: CardStyle = mode === 'elevated' 
-    ? styles.component.card.elevated 
-    : styles.component.card.listItem;
+    ? styles.styles.component.card.elevated 
+    : styles.styles.component.card.listItem;
 
   const selectedStyle: CardStyle = selected 
-    ? styles.component.card.selected 
+    ? styles.styles.component.card.selected 
     : undefined;
 
   const cardStyle: CardStyle = [

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Animated } from 'react-native';
 import { Button } from 'react-native-paper';
 import { Link } from 'expo-router';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 
 interface WelcomeActionsProps {
   fadeAnim: Animated.Value;
@@ -13,7 +13,7 @@ export default function WelcomeActions({ fadeAnim, slideAnim }: WelcomeActionsPr
   return (
     <Animated.View
       style={[
-        styles.layout.content,
+        styles.styles.layout.content,
         {
           opacity: fadeAnim,
           transform: [{
@@ -28,7 +28,7 @@ export default function WelcomeActions({ fadeAnim, slideAnim }: WelcomeActionsPr
       <Link href="/auth/sign-in" asChild>
         <Button
           mode="contained"
-          style={styles.button.primary}
+          style={styles.styles.button.primary}
         >
           Sign In
         </Button>
@@ -37,7 +37,7 @@ export default function WelcomeActions({ fadeAnim, slideAnim }: WelcomeActionsPr
       <Link href="/auth/sign-up" asChild>
         <Button
           mode="outlined"
-          style={styles.button.secondary}
+          style={styles.styles.button.secondary}
         >
           Create Account
         </Button>

@@ -1,9 +1,9 @@
 import { StyleSheet } from 'react-native';
 
 // Typography Scale
-export const typography = StyleSheet.create({
-  // Display
-  displayLarge: {
+const typography = StyleSheet.create({
+    // Display
+    displayLarge: {
     fontFamily: 'Kameron-Bold',
     fontSize: 57,
     lineHeight: 64,
@@ -99,11 +99,16 @@ export const typography = StyleSheet.create({
     fontFamily: 'Kameron',
     fontSize: 12,
     lineHeight: 16,
-    letterSpacing: 0.4,
-  },
+        letterSpacing: 0.4,
+    },
 });
 
 // Helper function to combine typography styles with additional styles
-export const combineTypography = (variant: keyof typeof typography, additionalStyles?: any) => {
-  return [typography[variant], additionalStyles];
-};
+const combineTypography = (variant: keyof typeof typography, additionalStyles?: any) => {
+    return [typography[variant], additionalStyles];
+}
+
+export default {
+    typography,
+    combineTypography
+}
