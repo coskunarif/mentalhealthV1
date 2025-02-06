@@ -85,6 +85,14 @@ export default function RootLayout() {
                 title: 'Meditation',
               }}
             />
+
+            <Stack.Screen
+              name="breath-exercise"
+              options={{
+                ...modalScreenOptions,
+                title: 'Breath Exercise',
+              }}
+            />
             
             {/* Error Screen */}
             <Stack.Screen

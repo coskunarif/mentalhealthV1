@@ -10,30 +10,30 @@ export default function ProfileScreen() {
   const { signOut } = useAuth();
 
   return (
-    <View style={styles.styles.layout.container}>
-      <View style={styles.styles.layout.header}>
-        <Text style={styles.styles.text.heading1}>Profile</Text>
-        <Text style={[styles.styles.text.body, { marginTop: 8 }]}>
+    <View style={styles.layout_container}>
+      <View style={styles.screen_profile_header}>
+        <Text style={styles.text_heading1}>Profile</Text>
+        <Text style={[styles.text_body, styles.profile_subtitle]}>
           Manage your account settings
         </Text>
       </View>
 
       <ScrollView
-        style={styles.styles.layout.scrollView}
-        contentContainerStyle={styles.styles.layout.content}
+        style={styles.layout_scrollView}
+        contentContainerStyle={styles.screen_profile_content}
       >
         <Surface
           elevation={1}
-          style={[styles.styles.component.card.elevated, { marginBottom: 24 }]}
+          style={[styles.component_card_elevated, styles.profile_section]}
         >
-          <Text style={styles.styles.text.heading2}>Account</Text>
-          <Text style={[styles.styles.text.body, { marginTop: 8 }]}>
+          <Text style={styles.text_heading2}>Account</Text>
+          <Text style={[styles.text_body, styles.profile_sectionSubtitle]}>
             Update your account information
           </Text>
           <Button
             mode="outlined"
             onPress={() => router.push('/account/settings')}
-            style={[styles.styles.button.secondary, { marginTop: 16 }]}
+            style={[styles.button_secondary, styles.profile_button]}
           >
             Account Settings
           </Button>
@@ -41,16 +41,16 @@ export default function ProfileScreen() {
 
         <Surface
           elevation={1}
-          style={[styles.styles.component.card.elevated, { marginBottom: 24 }]}
+          style={[styles.component_card_elevated, styles.profile_section]}
         >
-          <Text style={styles.styles.text.heading2}>Notifications</Text>
-          <Text style={[styles.styles.text.body, { marginTop: 8 }]}>
+          <Text style={styles.text_heading2}>Notifications</Text>
+          <Text style={[styles.text_body, styles.profile_sectionSubtitle]}>
             Manage your notification preferences
           </Text>
           <Button
             mode="outlined"
             onPress={() => router.push('/notifications/settings')}
-            style={[styles.styles.button.secondary, { marginTop: 16 }]}
+            style={[styles.button_secondary, styles.profile_button]}
           >
             Notification Settings
           </Button>
@@ -58,16 +58,16 @@ export default function ProfileScreen() {
 
         <Surface
           elevation={1}
-          style={styles.styles.component.card.elevated}
+          style={styles.component_card_elevated}
         >
-          <Text style={styles.styles.text.heading2}>Sign Out</Text>
-          <Text style={[styles.styles.text.body, { marginTop: 8 }]}>
+          <Text style={styles.text_heading2}>Sign Out</Text>
+          <Text style={[styles.text_body, styles.profile_sectionSubtitle]}>
             Sign out of your account
           </Text>
           <Button
             mode="outlined"
             onPress={signOut}
-            style={[styles.styles.button.secondary, { marginTop: 16 }]}
+            style={[styles.button_secondary, styles.profile_button]}
           >
             Sign Out
           </Button>

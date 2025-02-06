@@ -1,7 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { IconButton } from 'react-native-paper';
+import { IconButton, useTheme } from 'react-native-paper';
 import styles from '../config/styles';
+import type { AppTheme } from '../types/theme';
 
 interface PlayerControlsProps {
   isPlaying: boolean;
@@ -19,31 +20,32 @@ export default function PlayerControls({
   disabled = false,
 }: PlayerControlsProps) {
   const iconSize = 24; // Base icon size
+  const theme = useTheme<AppTheme>();
   return (
-    <View style={[styles.styles.layout.row, { justifyContent: 'center', gap: 16 }]}>
+    <View style={[styles.layout_row, styles.playerControls_container]}>
       <IconButton
         icon="skip-previous"
         onPress={onSkipBack}
         size={iconSize}
-        iconColor={styles.styles.colors.primary}
+        iconColor={theme.colors.primary}
         disabled={disabled}
-        style={styles.styles.component.iconButton.container}
+        style={styles.component_iconButton_container}
       />
       <IconButton
         icon={isPlaying ? 'pause' : 'play'}
         onPress={onPlayPause}
         size={iconSize * 1.5}
-        iconColor={styles.styles.colors.primary}
+        iconColor={theme.colors.primary}
         disabled={disabled}
-        style={styles.styles.component.iconButton.container}
+        style={styles.component_iconButton_container}
       />
       <IconButton
         icon="skip-next"
         onPress={onSkipForward}
         size={iconSize}
-        iconColor={styles.styles.colors.primary}
+        iconColor={theme.colors.primary}
         disabled={disabled}
-        style={styles.styles.component.iconButton.container}
+        style={styles.component_iconButton_container}
       />
     </View>
   );

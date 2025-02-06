@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Pressable } from 'react-native';
-import { Text, Surface } from 'react-native-paper';
+import { Text, Surface, useTheme } from 'react-native-paper';
 import { Link } from 'expo-router';
 import styles from '../config/styles';
+import type { AppTheme } from '../types/theme';
 
 interface Activity {
   id: string;
@@ -17,10 +18,11 @@ interface RecentActivitiesProps {
 }
 
 export default function RecentActivities({ activities }: RecentActivitiesProps) {
+  const theme = useTheme<AppTheme>();
   return (
-    <View style={{ marginBottom: 24 }}>
-      <Text style={[styles.styles.text.heading3, { marginBottom: 16 }]}>Recent Activities</Text>
-      <Surface style={[styles.styles.component.card.container, { padding: 0 }]}>
+    <View style={styles.recentActivities_container}>
+      <Text style={[styles.text_heading3, styles.recentActivities_title]}>Recent Activities</Text>
+      <Surface style={[styles.component_card_container, styles.recentActivities_surface]}>
         {activities.map((activity, index) => (
           <Link
             key={activity.id}
@@ -30,23 +32,17 @@ export default function RecentActivities({ activities }: RecentActivitiesProps) 
             <Pressable>
               <View
                 style={[
-                  {
-                    padding: 16,
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    borderBottomWidth: index < activities.length - 1 ? 1 : 0,
-                    borderBottomColor: styles.styles.colors.surfaceVariant,
-                  },
+                  styles.recentActivities_item,
+                  index < activities.length - 1 && styles.recentActivities_itemBorder
                 ]}
               >
                 <View>
-                  <Text style={styles.styles.text.body}>{activity.title}</Text>
-                  <Text style={[styles.styles.text.caption, { color: styles.styles.colors.secondary }]}>
+                  <Text style={styles.text_body}>{activity.title}</Text>
+                  <Text style={[styles.text_caption, { color: theme.colors.secondary }]}>
                     {activity.subtitle}
                   </Text>
                 </View>
-                <Text style={[styles.styles.text.caption, { color: styles.styles.colors.secondary }]}>
+                <Text style={[styles.text_caption, { color: theme.colors.secondary }]}>
                   {activity.duration.toFixed(1)} min
                 </Text>
               </View>

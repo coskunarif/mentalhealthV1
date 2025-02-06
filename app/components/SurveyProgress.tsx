@@ -13,9 +13,9 @@ export default function SurveyProgress({ current, total }: SurveyProgressProps) 
   const progress = (current + 1) / total;
 
   return (
-    <View style={styles.styles.component.card.container}>
-      <View style={styles.styles.component.card.content}>
-        <Text style={styles.styles.text.body}>
+    <View style={styles.component_card_container}>
+      <View style={styles.component_card_content}>
+        <Text style={styles.text_body}>
           Question {current + 1} of {total}
         </Text>
         <ProgressBar

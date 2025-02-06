@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text, Button, useTheme } from 'react-native-paper';
 import { Link, router } from 'expo-router';
 import styles from '../config/styles';
 import RadarChart from '../components/RadarChart';
 import RecentActivities from '../components/RecentActivities';
+import type { AppTheme } from '../types/theme';
 
 const radarData = [
   { label: 'Balance past memories', value: 0.8 },
@@ -48,6 +49,7 @@ const breathExercises = [
 
 export default function Home() {
   const nextExercise = breathExercises.find(exercise => !exercise.isCompleted);
+  const theme = useTheme<AppTheme>();
 
   const handleStartExercise = () => {
     if (nextExercise) {
@@ -56,31 +58,29 @@ export default function Home() {
   };
 
   return (
-    <ScrollView style={styles.styles.screen.home.container}>
-      <View style={styles.styles.screen.home.content}>
+    <ScrollView style={styles.screen_home_container}>
+      <View style={styles.screen_home_content}>
         {/* Progress Chart */}
-        <View style={{ marginBottom: 24 }}>
-          <Text style={styles.styles.text.heading2}>Your Progress</Text>
+        <View style={styles.home_progressChartContainer}>
+          <Text style={styles.text_heading2}>Your Progress</Text>
           <RadarChart data={radarData} />
         </View>
 
         {/* Exercise Progress */}
-        <View style={{ marginBottom: 24 }}>
-          <Text style={[styles.styles.text.heading3, { marginBottom: 16 }]}>Exercise Progress</Text>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+        <View style={styles.home_exerciseProgressContainer}>
+          <Text style={[styles.text_heading3, styles.home_exerciseProgressTitle]}>Exercise Progress</Text>
+          <View style={styles.home_exerciseProgressGrid}>
             {breathExercises.map(exercise => (
               <View
                 key={exercise.id}
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: exercise.isCompleted ? styles.styles.colors.primary : styles.styles.colors.surfaceVariant,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
+                style={[
+                  styles.home_exerciseProgressItem,
+                  {
+                    backgroundColor: exercise.isCompleted ? theme.colors.primary : theme.colors.surfaceVariant,
+                  }
+                ]}
               >
-                <Text style={[styles.styles.text.body, { color: exercise.isCompleted ? styles.styles.colors.surface : styles.styles.colors.text }]}>
+                <Text style={[styles.text_body, { color: exercise.isCompleted ? theme.colors.surface : theme.colors.onSurface }]}>
                   {exercise.id}
                 </Text>
               </View>
@@ -90,8 +90,8 @@ export default function Home() {
             <Button
               mode="contained"
               onPress={handleStartExercise}
-              style={{ marginTop: 16 }}
-              labelStyle={styles.styles.text.button}
+              style={styles.home_startButton}
+              labelStyle={styles.text_button}
             >
               Start Exercise {nextExercise.id}
             </Button>
@@ -99,24 +99,24 @@ export default function Home() {
         </View>
 
         {/* Quick Actions */}
-        <View style={{ flexDirection: 'row', gap: 16, marginBottom: 24 }}>
-          <Link href="/survey" asChild style={{ flex: 1 }}>
+        <View style={styles.home_quickActionsContainer}>
+          <Link href="/survey" asChild style={styles.home_quickActionItem}>
             <Button
               mode="outlined"
               icon="clipboard-text"
-              contentStyle={{ height: 80 }}
-              labelStyle={[styles.styles.text.button, { color: styles.styles.colors.primary }]}
+              contentStyle={styles.home_quickActionButton}
+              labelStyle={[styles.text_button, { color: theme.colors.primary }]}
             >
               Take Survey
             </Button>
           </Link>
 
-          <Link href="/mood" asChild style={{ flex: 1 }}>
+          <Link href="/mood" asChild style={styles.home_quickActionItem}>
             <Button
               mode="outlined"
               icon="emoticon"
-              contentStyle={{ height: 80 }}
-              labelStyle={[styles.styles.text.button, { color: styles.styles.colors.primary }]}
+              contentStyle={styles.home_quickActionButton}
+              labelStyle={[styles.text_button, { color: theme.colors.primary }]}
             >
               Track Mood
             </Button>

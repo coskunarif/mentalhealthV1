@@ -57,11 +57,11 @@ export default function BreathExercise() {
   };
 
   return (
-    <View style={[styles.styles.screen.home.container, { padding: 16 }]}>
-      <Surface style={[styles.styles.component.card.container, { flex: 1 }]}>
-        <View style={{ alignItems: 'center', marginBottom: 24 }}>
-          <Text style={styles.styles.text.heading2}>Breath Exercise {id}</Text>
-          <Text style={[styles.styles.text.heading1, { marginTop: 16 }]}>
+    <View style={[styles.screen_home_container, styles.breathExercise_container]}>
+      <Surface style={[styles.component_card_container, styles.breathExercise_surface]}>
+        <View style={styles.breathExercise_header}>
+          <Text style={styles.text_heading2}>Breath Exercise {id}</Text>
+          <Text style={[styles.text_heading1, styles.breathExercise_timer]}>
             {formatTime(timeRemaining)}
           </Text>
         </View>
@@ -69,7 +69,7 @@ export default function BreathExercise() {
         <WaveformVisualizer
           isPlaying={isPlaying}
           amplitudes={waveformData}
-          style={{ height: 120, marginBottom: 24 }}
+          style={styles.breathExercise_visualizer}
         />
 
         <PlayerControls
@@ -80,8 +80,8 @@ export default function BreathExercise() {
           disabled={timeRemaining === 0}
         />
 
-        <View style={{ marginTop: 'auto' }}>
-          <Text style={[styles.styles.text.body, { textAlign: 'center', marginBottom: 16 }]}>
+        <View style={styles.breathExercise_footer}>
+          <Text style={[styles.text_body, styles.breathExercise_instruction]}>
             {isPlaying ? 'Breathe in... and out...' : 'Press play to start the exercise'}
           </Text>
         </View>

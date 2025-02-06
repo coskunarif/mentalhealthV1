@@ -18,15 +18,15 @@ interface RecommendedMeditationsProps {
 
 export default function RecommendedMeditations({ meditations }: RecommendedMeditationsProps) {
   return (
-    <View style={styles.styles.component.recommendations.container}>
-      <Text style={[styles.styles.text.heading2, { marginBottom: 16 }]}>
+    <View style={styles.component_recommendations_container}>
+      <Text style={[styles.text_heading2, styles.recommendedMeditations_title]}>
         Recommended for You
       </Text>
 
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={styles.styles.component.recommendations.scrollView}
+        style={styles.component_recommendations_scrollView}
       >
         {meditations.map((meditation) => (
           <Link
@@ -40,12 +40,12 @@ export default function RecommendedMeditations({ meditations }: RecommendedMedit
             }}
             asChild
           >
-            <EnhancedCard style={styles.styles.component.recommendations.card as any}>
-              <Text style={styles.styles.text.heading3}>{meditation.title}</Text>
-              <Text style={[styles.styles.text.body, { marginTop: 4 }]}>
+            <EnhancedCard style={styles.component_recommendations_card}>
+              <Text style={styles.text_heading3}>{meditation.title}</Text>
+              <Text style={[styles.text_body, styles.recommendedMeditations_duration]}>
                 {meditation.duration}
               </Text>
-              <Text style={[styles.styles.text.caption, { marginTop: 4 }]}>
+              <Text style={[styles.text_caption, styles.recommendedMeditations_category]}>
                 {meditation.category}
               </Text>
             </EnhancedCard>

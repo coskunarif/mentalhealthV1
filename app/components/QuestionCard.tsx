@@ -1,7 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Text, Button, Surface } from 'react-native-paper';
+import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import styles from '../config/styles';
+import type { AppTheme } from '../types/theme';
 
 interface QuestionCardProps {
   question: string;
@@ -20,16 +21,17 @@ export default function QuestionCard({
   totalQuestions,
   progress,
 }: QuestionCardProps) {
+  const theme = useTheme<AppTheme>();
   return (
-    <Surface style={[styles.styles.component.card.elevated, { marginBottom: 24 }]}>
+    <Surface style={[styles.component_card_elevated, { marginBottom: 24 }]}>
       <View style={{ marginBottom: 16 }}>
-        <Text style={styles.styles.text.caption}>
+        <Text style={styles.text_caption}>
           Question {currentIndex + 1} of {totalQuestions}
         </Text>
         <View
           style={{
             height: 4,
-            backgroundColor: styles.styles.colors.surfaceVariant,
+            backgroundColor: theme.colors.surfaceVariant,
             borderRadius: 2,
             marginTop: 8,
           }}
@@ -38,14 +40,14 @@ export default function QuestionCard({
             style={{
               height: '100%',
               width: `${progress * 100}%`,
-              backgroundColor: styles.styles.colors.primary,
+              backgroundColor: theme.colors.primary,
               borderRadius: 2,
             }}
           />
         </View>
       </View>
 
-      <Text style={styles.styles.text.heading2}>{question}</Text>
+      <Text style={styles.text_heading2}>{question}</Text>
 
       <View style={{ marginTop: 16 }}>
         {options.map((option, index) => (
@@ -53,7 +55,7 @@ export default function QuestionCard({
             key={index}
             mode="outlined"
             onPress={() => onSelect(index)}
-            style={[styles.styles.button.secondary, { marginBottom: 8 }]}
+            style={[styles.button_secondary, { marginBottom: 8 }]}
           >
             {option}
           </Button>

@@ -10,10 +10,10 @@ interface WelcomeHeaderProps {
 
 export default function WelcomeHeader({ title, subtitle }: WelcomeHeaderProps) {
   return (
-    <View style={styles.styles.layout.header}>
-      <Text style={styles.styles.text.heading1}>{title}</Text>
+    <View style={styles.layout_header}>
+      <Text style={styles.text_heading1}>{title}</Text>
       {subtitle && (
-        <Text style={[styles.styles.text.body, { marginTop: 8 }]}>
+        <Text style={[styles.text_body, styles.welcome_subtitle]}>
           {subtitle}
         </Text>
       )}

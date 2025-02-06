@@ -99,22 +99,22 @@ export default function PlayerScreen() {
   }, [sound, isPlaying]);
 
   return (
-    <View style={styles.styles.layout.container}>
-      <View style={styles.styles.layout.header}>
-        <Surface style={[styles.styles.component.card.elevated, { marginBottom: 24 }]}>
+    <View style={styles.layout_container}>
+      <View style={styles.layout_header}>
+        <Surface style={[styles.component_card_elevated, styles.player_headerSurface]}>
           <IconButton
             icon="arrow-left"
             onPress={() => router.replace(returnTo)}
-            style={styles.styles.button.secondary}
+            style={styles.button_secondary}
           />
-          <Text style={styles.styles.text.heading2}>Meditation Player</Text>
+          <Text style={styles.text_heading2}>Meditation Player</Text>
         </Surface>
       </View>
 
-      <View style={styles.styles.layout.content}>
-        <Surface style={[styles.styles.component.card.elevated, { marginBottom: 24 }]}>
-          <Text style={styles.styles.text.heading2}>Sample Meditation</Text>
-          <Text style={[styles.styles.text.caption, { marginTop: 4 }]}>10:00</Text>
+      <View style={styles.layout_content}>
+        <Surface style={[styles.component_card_elevated, styles.player_contentSurface]}>
+          <Text style={styles.text_heading2}>Sample Meditation</Text>
+          <Text style={[styles.text_caption, styles.player_duration]}>10:00</Text>
 
           <WaveformVisualizer isPlaying={isPlaying} />
 
