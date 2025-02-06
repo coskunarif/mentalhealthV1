@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   component_input_field: {
     padding: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: theme.colors.outline,
     borderRadius: 4,
   } as ViewStyle,
   component_link: {
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   component_progress_container: {
     height: 4,
-    backgroundColor: '#e7e0ec', // TODO: Define a color for this in theme
+    backgroundColor: theme.colors.surfaceVariant,
     borderRadius: 2,
   } as ViewStyle,
   component_progress_bar: {

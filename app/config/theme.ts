@@ -1,5 +1,6 @@
 import { MD3LightTheme, configureFonts } from 'react-native-paper';
 import type { AppTheme, ChartColors } from '../types/theme';
+import appColors from './colors';
 
 const baseFont = {
   fontFamily: 'Kameron',
@@ -28,54 +29,54 @@ const fontConfig = {
 };
 
 const chartColors: ChartColors = {
-  grid: '#E8F5EE',
-  area: '#5DA47A',
-  point: '#FFB74D',
+  grid: appColors.colors.dominant,
+  area: appColors.colors.secondary,
+  point: appColors.colors.accent,
   progress: {
-    active: '#5DA47A',
-    inactive: '#E8F5EE'
-  }
+    active: appColors.colors.secondary,
+    inactive: appColors.colors.dominant,
+  },
 };
 
 const customTheme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
-    primary: '#5DA47A',
-    primaryContainer: '#E9F2EE',
-    secondary: '#4A8362',
-    secondaryContainer: '#C8DCD2',
-    tertiary: '#4A8362',
-    tertiaryContainer: '#C8DCD2',
-    surface: '#FFFFFF',
-    surfaceVariant: '#F3F4F6',
-    surfaceDisabled: '#F3F4F6',
-    background: '#FFFFFF',
-    error: '#B00020',
-    errorContainer: '#FDECEA',
-    onPrimary: '#FFFFFF',
-    onPrimaryContainer: '#002116',
-    onSecondary: '#FFFFFF',
-    onSecondaryContainer: '#002116',
-    onTertiary: '#FFFFFF',
-    onTertiaryContainer: '#002116',
-    onSurface: '#000000',
-    onSurfaceVariant: '#6B7280',
-    onSurfaceDisabled: '#6B7280',
-    onError: '#FFFFFF',
-    onErrorContainer: '#410E0B',
-    onBackground: '#000000',
-    outline: '#E5E7EB',
-    outlineVariant: '#C4C7CC',
-    inverseSurface: '#000000',
-    inverseOnSurface: '#FFFFFF',
-    inversePrimary: '#7DC69F',
+    primary: appColors.colors.secondary,
+    primaryContainer: appColors.colors.dominant,
+    secondary: appColors.colors.secondary,
+    secondaryContainer: appColors.colors.dominant,
+    tertiary: appColors.colors.accent,
+    tertiaryContainer: appColors.colors.dominant,
+    surface: appColors.colors.surface,
+    surfaceVariant: appColors.colors.surfaceVariant,
+    surfaceDisabled: appColors.colors.surfaceVariant, // Assuming you want disabled surfaces to be the same as the variant
+    background: appColors.colors.dominant,
+    error: appColors.colors.error,
+    errorContainer: '#FDECEA', // You might want to define this in colors.ts as well
+    onPrimary: appColors.colors.onSecondary,
+    onPrimaryContainer: appColors.colors.onDominant,
+    onSecondary: appColors.colors.onSecondary,
+    onSecondaryContainer: appColors.colors.onDominant,
+    onTertiary: appColors.colors.onAccent,
+    onTertiaryContainer: appColors.colors.onDominant,
+    onSurface: appColors.colors.onSurface,
+    onSurfaceVariant: appColors.colors.onSurfaceVariant,
+    onSurfaceDisabled: appColors.colors.onSurfaceVariant, // Assuming you want disabled text to be the same as variant
+    onError: '#FFFFFF', // Standard on error color
+    onErrorContainer: '#410E0B', // Standard on error container color
+    onBackground: appColors.colors.onDominant,
+    outline: '#E5E7EB', // Keep this as is, or define in colors.ts
+    outlineVariant: '#C4C7CC', // Keep this as is, or define in colors.ts
+    inverseSurface: '#000000', // Keep
+    inverseOnSurface: '#FFFFFF', // Keep
+    inversePrimary: '#7DC69F', // Keep
     shadow: 'rgba(0, 0, 0, 0.1)',
     scrim: 'rgba(0, 0, 0, 0.3)',
     backdrop: 'rgba(0, 0, 0, 0.5)',
     elevation: {
       level0: 'transparent',
-      level1: '#F3F4F6',
+      level1: '#F3F4F6', // You might want to use surfaceVariant or dominant here
       level2: '#E5E7EB',
       level3: '#D1D5DB',
       level4: '#9CA3AF',
@@ -93,6 +94,6 @@ export const theme: AppTheme = {
 };
 
 export default {
-    theme,
-    colors
-}
+  theme,
+  colors,
+};
