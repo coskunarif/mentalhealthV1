@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, ScrollView, Dimensions, ViewStyle } from 'react-native';
 import { Text } from 'react-native-paper';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 
 const { width } = Dimensions.get('window');
 
@@ -35,35 +35,35 @@ export default function WelcomeCarousel({ style }: WelcomeCarouselProps) {
   };
 
   return (
-    <View style={[styles.layout.container, style]}>
+    <View style={[styles.styles.layout.container, style]}>
       <ScrollView
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleScroll}
-        style={styles.layout.scrollView}
+        style={styles.styles.layout.scrollView}
       >
         {features.map((feature, index) => (
           <View
             key={index}
-            style={[styles.layout.content, { width, alignItems: 'center' }]}
+            style={[styles.styles.layout.content, { width, alignItems: 'center' }]}
           >
-            <Text style={styles.text.heading2}>{feature.title}</Text>
-            <Text style={[styles.text.body, { marginTop: 16, textAlign: 'center' }]}>
+            <Text style={styles.styles.text.heading2}>{feature.title}</Text>
+            <Text style={[styles.styles.text.body, { marginTop: 16, textAlign: 'center' }]}>
               {feature.description}
             </Text>
           </View>
         ))}
       </ScrollView>
 
-      <View style={[styles.layout.footer, { flexDirection: 'row', justifyContent: 'center' }]}>
+      <View style={[styles.styles.layout.footer, { flexDirection: 'row', justifyContent: 'center' }]}>
         {features.map((_, index) => (
           <View
             key={index}
             style={[
               { width: 8, height: 8, borderRadius: 4, marginHorizontal: 4 },
               {
-                backgroundColor: index === activeIndex ? styles.colors.primary : styles.colors.disabled,
+                backgroundColor: index === activeIndex ? styles.styles.colors.primary : styles.styles.colors.disabled,
               },
             ]}
           />

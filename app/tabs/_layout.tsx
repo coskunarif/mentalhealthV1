@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 import { IconButton } from 'react-native-paper';
 
 export default function TabLayout() {
@@ -9,14 +9,14 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: styles.colors.surface,
-          borderTopColor: styles.colors.disabled,
+          backgroundColor: styles.styles.colors.surface,
+          borderTopColor: styles.styles.colors.disabled,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: styles.colors.primary,
-        tabBarInactiveTintColor: styles.colors.textSecondary,
+        tabBarActiveTintColor: styles.styles.colors.primary,
+        tabBarInactiveTintColor: styles.styles.colors.textSecondary,
         tabBarLabelStyle: {
           fontSize: 12,
           fontFamily: 'Kameron',
@@ -27,7 +27,7 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <IconButton 
               icon="home" 
               size={24} 
@@ -40,7 +40,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <IconButton 
               icon="account" 
               size={24} 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Text, Button, Surface } from 'react-native-paper';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 
 interface QuestionCardProps {
   question: string;
@@ -21,15 +21,15 @@ export default function QuestionCard({
   progress,
 }: QuestionCardProps) {
   return (
-    <Surface style={[styles.component.card.elevated, { marginBottom: 24 }]}>
+    <Surface style={[styles.styles.component.card.elevated, { marginBottom: 24 }]}>
       <View style={{ marginBottom: 16 }}>
-        <Text style={styles.text.caption}>
+        <Text style={styles.styles.text.caption}>
           Question {currentIndex + 1} of {totalQuestions}
         </Text>
         <View
           style={{
             height: 4,
-            backgroundColor: styles.colors.surfaceVariant,
+            backgroundColor: styles.styles.colors.surfaceVariant,
             borderRadius: 2,
             marginTop: 8,
           }}
@@ -38,14 +38,14 @@ export default function QuestionCard({
             style={{
               height: '100%',
               width: `${progress * 100}%`,
-              backgroundColor: styles.colors.primary,
+              backgroundColor: styles.styles.colors.primary,
               borderRadius: 2,
             }}
           />
         </View>
       </View>
 
-      <Text style={styles.text.heading2}>{question}</Text>
+      <Text style={styles.styles.text.heading2}>{question}</Text>
 
       <View style={{ marginTop: 16 }}>
         {options.map((option, index) => (
@@ -53,7 +53,7 @@ export default function QuestionCard({
             key={index}
             mode="outlined"
             onPress={() => onSelect(index)}
-            style={[styles.button.secondary, { marginBottom: 8 }]}
+            style={[styles.styles.button.secondary, { marginBottom: 8 }]}
           >
             {option}
           </Button>

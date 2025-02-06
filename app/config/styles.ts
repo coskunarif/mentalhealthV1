@@ -129,7 +129,7 @@ const colors = {
   surfaceVariant: '#E0E0E0',
 };
 
-export const styles = {
+const styles = {
   colors,
   layout: {
     container: {
@@ -452,3 +452,7 @@ export const styles = {
     },
   },
 };
+
+export default {
+  styles
+}

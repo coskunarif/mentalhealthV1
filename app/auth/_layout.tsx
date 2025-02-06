@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import { View } from 'react-native';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
 const screenOptions: NativeStackNavigationOptions = {
@@ -12,7 +12,7 @@ const screenOptions: NativeStackNavigationOptions = {
 
 export default function AuthLayout() {
   return (
-    <View style={styles.layout.container}>
+    <View style={styles.styles.layout.container}>
       <Stack screenOptions={screenOptions}>
         <Stack.Screen
           name="sign-in"

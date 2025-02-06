@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, Text } from 'react-native';
 import { TextInput, TextInputProps, useTheme } from 'react-native-paper';
 import type { AppTheme } from '../types/theme';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 
 interface EnhancedInputProps extends Omit<TextInputProps, 'theme'> {
   label?: string;
@@ -20,15 +20,15 @@ export default function EnhancedInput({
   const theme = useTheme<AppTheme>();
   const inputStyles = StyleSheet.create({
     input: {
-      ...(styles.component.input.container as any),
+      ...(styles.styles.component.input.container as any),
       backgroundColor: theme.colors.surface,
     },
     outline: {
-      ...(styles.component.input.outline as any),
+      ...(styles.styles.component.input.outline as any),
       borderColor: error ? theme.colors.error : theme.colors.outline,
     },
     content: {
-      ...(styles.component.input.content as any),
+      ...(styles.styles.component.input.content as any),
       color: theme.colors.onSurface,
     },
   });

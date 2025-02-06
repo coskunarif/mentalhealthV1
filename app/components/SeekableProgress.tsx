@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, ViewStyle } from 'react-native';
 import { Text } from 'react-native-paper';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 
 interface SeekableProgressProps {
   duration: number;
@@ -19,14 +19,14 @@ export default function SeekableProgress({ duration, position, onSeek, style }: 
   };
 
   return (
-    <View style={[styles.layout.container, style]}>
-      <View style={[styles.layout.content, { flexDirection: 'row', alignItems: 'center' }]}>
-        <Text style={styles.text.caption}>{formatTime(position)}</Text>
+    <View style={[styles.styles.layout.container, style]}>
+      <View style={[styles.styles.layout.content, { flexDirection: 'row', alignItems: 'center' }]}>
+        <Text style={styles.styles.text.caption}>{formatTime(position)}</Text>
         <View
           style={{
             flex: 1,
             height: 4,
-            backgroundColor: styles.colors.disabled,
+            backgroundColor: styles.styles.colors.disabled,
             marginHorizontal: 8,
             borderRadius: 2,
           }}
@@ -35,12 +35,12 @@ export default function SeekableProgress({ duration, position, onSeek, style }: 
             style={{
               width: `${(position / duration) * 100}%`,
               height: '100%',
-              backgroundColor: styles.colors.primary,
+              backgroundColor: styles.styles.colors.primary,
               borderRadius: 2,
             }}
           />
         </View>
-        <Text style={styles.text.caption}>{formatTime(duration)}</Text>
+        <Text style={styles.styles.text.caption}>{formatTime(duration)}</Text>
       </View>
     </View>
   );

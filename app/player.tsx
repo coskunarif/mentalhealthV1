@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Text, Surface, IconButton } from 'react-native-paper';
 import { Audio } from 'expo-av';
-import { styles } from './config/styles';
+import styles from './config/styles';
 import PlayerControls from './components/PlayerControls';
 import WaveformVisualizer from './components/WaveformVisualizer';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -99,22 +99,22 @@ export default function PlayerScreen() {
   }, [sound, isPlaying]);
 
   return (
-    <View style={styles.layout.container}>
-      <View style={styles.layout.header}>
-        <Surface style={[styles.component.card.elevated, { marginBottom: 24 }]}>
+    <View style={styles.styles.layout.container}>
+      <View style={styles.styles.layout.header}>
+        <Surface style={[styles.styles.component.card.elevated, { marginBottom: 24 }]}>
           <IconButton
             icon="arrow-left"
             onPress={() => router.replace(returnTo)}
-            style={styles.button.secondary}
+            style={styles.styles.button.secondary}
           />
-          <Text style={styles.text.heading2}>Meditation Player</Text>
+          <Text style={styles.styles.text.heading2}>Meditation Player</Text>
         </Surface>
       </View>
 
-      <View style={styles.layout.content}>
-        <Surface style={[styles.component.card.elevated, { marginBottom: 24 }]}>
-          <Text style={styles.text.heading2}>Sample Meditation</Text>
-          <Text style={[styles.text.caption, { marginTop: 4 }]}>10:00</Text>
+      <View style={styles.styles.layout.content}>
+        <Surface style={[styles.styles.component.card.elevated, { marginBottom: 24 }]}>
+          <Text style={styles.styles.text.heading2}>Sample Meditation</Text>
+          <Text style={[styles.styles.text.caption, { marginTop: 4 }]}>10:00</Text>
 
           <WaveformVisualizer isPlaying={isPlaying} />
 

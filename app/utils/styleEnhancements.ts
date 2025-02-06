@@ -1,7 +1,7 @@
 import { Platform, ViewStyle, Animated } from 'react-native';
 
 // Shadow enhancements that can be spread into existing styles
-export const enhanceShadow = (level: 'soft' | 'medium' = 'soft'): ViewStyle => ({
+const enhanceShadow = (level: 'soft' | 'medium' = 'soft'): ViewStyle => ({
   ...Platform.select({
     ios: {
       shadowColor: '#000',
@@ -19,7 +19,7 @@ export const enhanceShadow = (level: 'soft' | 'medium' = 'soft'): ViewStyle => (
 });
 
 // Animation configurations that preserve existing styles
-export const createPressAnimation = (initialValue = new Animated.Value(1)) => {
+const createPressAnimation = (initialValue = new Animated.Value(1)) => {
   const pressIn = () => {
     Animated.spring(initialValue, {
       toValue: 0.98,
@@ -48,7 +48,7 @@ export const createPressAnimation = (initialValue = new Animated.Value(1)) => {
 };
 
 // Gradient configuration helper (for use with expo-linear-gradient)
-export const createGradientConfig = (baseColor: string) => ({
+const createGradientConfig = (baseColor: string) => ({
   colors: [
     baseColor,
     Platform.select({
@@ -61,7 +61,7 @@ export const createGradientConfig = (baseColor: string) => ({
 });
 
 // Subtle background animation for elements
-export const createBackgroundAnimation = (duration = 3000) => {
+const createBackgroundAnimation = (duration = 3000) => {
   const animation = new Animated.Value(0);
 
   const startAnimation = () => {
@@ -91,3 +91,10 @@ export const createBackgroundAnimation = (duration = 3000) => {
     },
   };
 };
+
+export default {
+    enhanceShadow,
+    createPressAnimation,
+    createGradientConfig,
+    createBackgroundAnimation
+}

@@ -91,3 +91,8 @@ export const theme: AppTheme = {
   ...customTheme,
   chartColors,
 };
+
+export default {
+    theme,
+    colors
+}

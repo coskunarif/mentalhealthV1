@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { Link, useRouter } from 'expo-router';
-import { styles } from '../config/styles';
+import styles from '../config/styles';
 import { auth } from '../lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 
@@ -36,48 +36,48 @@ export default function SignUpScreen() {
   };
 
   return (
-    <View style={styles.layout.container}>
-      <View style={styles.layout.content}>
-        <View style={styles.screen.auth.header}>
-          <Text style={styles.text.heading1}>Create Account</Text>
-          <Text style={styles.text.body}>Sign up to start your journey</Text>
+    <View style={styles.styles.layout.container}>
+      <View style={styles.styles.layout.content}>
+        <View style={styles.styles.screen.auth.header}>
+          <Text style={styles.styles.text.heading1}>Create Account</Text>
+          <Text style={styles.styles.text.body}>Sign up to start your journey</Text>
         </View>
 
-        <View style={styles.screen.auth.form}>
-          <View style={styles.component.input.container}>
-            <Text style={styles.component.input.label}>Email</Text>
+        <View style={styles.styles.screen.auth.form}>
+          <View style={styles.styles.component.input.container}>
+            <Text style={styles.styles.component.input.label}>Email</Text>
             <TextInput
               mode="outlined"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              style={styles.component.input.field}
+              style={styles.styles.component.input.field}
             />
           </View>
 
-          <View style={styles.component.input.container}>
-            <Text style={styles.component.input.label}>Password</Text>
+          <View style={styles.styles.component.input.container}>
+            <Text style={styles.styles.component.input.label}>Password</Text>
             <TextInput
               mode="outlined"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              style={styles.component.input.field}
+              style={styles.styles.component.input.field}
             />
           </View>
 
-          <View style={styles.component.input.container}>
-            <Text style={styles.component.input.label}>Confirm Password</Text>
+          <View style={styles.styles.component.input.container}>
+            <Text style={styles.styles.component.input.label}>Confirm Password</Text>
             <TextInput
               mode="outlined"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
-              style={styles.component.input.field}
+              style={styles.styles.component.input.field}
             />
             {error ? (
-              <Text style={styles.component.input.error}>{error}</Text>
+              <Text style={styles.styles.component.input.error}>{error}</Text>
             ) : null}
           </View>
 
@@ -85,14 +85,14 @@ export default function SignUpScreen() {
             mode="contained"
             onPress={handleSignUp}
             loading={loading}
-            style={styles.button.primary}
+            style={styles.styles.button.primary}
           >
             Sign Up
           </Button>
 
-          <View style={styles.screen.auth.footer}>
-            <Text style={styles.text.body}>Already have an account? </Text>
-            <Link href="/auth/sign-in" style={styles.text.link as any}>
+          <View style={styles.styles.screen.auth.footer}>
+            <Text style={styles.styles.text.body}>Already have an account? </Text>
+            <Link href="/auth/sign-in" style={styles.styles.text.link as any}>
               Sign In
             </Link>
           </View>
