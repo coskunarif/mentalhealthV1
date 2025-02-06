@@ -1,22 +1,24 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import styles from '../config/styles';
-import { IconButton } from 'react-native-paper';
+import { IconButton, useTheme } from 'react-native-paper';
+import type { AppTheme } from '../types/theme';
 
 export default function TabLayout() {
+  const theme = useTheme<AppTheme>();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: styles.styles.colors.surface,
-          borderTopColor: styles.styles.colors.disabled,
+          backgroundColor: theme.colors.surface,
+          borderTopColor: theme.colors.outlineVariant,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: styles.styles.colors.primary,
-        tabBarInactiveTintColor: styles.styles.colors.textSecondary,
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
         tabBarLabelStyle: {
           fontSize: 12,
           fontFamily: 'Kameron',

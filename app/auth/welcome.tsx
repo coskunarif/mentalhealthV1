@@ -19,16 +19,16 @@ export default function Welcome() {
   };
 
   return (
-    <View style={styles.styles.layout.container}>
-      <View style={styles.styles.layout.content}>
-        <View style={styles.styles.layout.header}>
-          <Text style={styles.styles.text.heading1}>Welcome Back</Text>
-          <Text style={[styles.styles.text.body, { marginTop: 8 }]}>
+    <View style={styles.layout_container}>
+      <View style={styles.layout_content}>
+        <View style={styles.screen_auth_header}>
+          <Text style={styles.text_heading1}>Welcome Back</Text>
+          <Text style={[styles.text_body, styles.signIn_subtitle]}>
             Sign in to continue your journey
           </Text>
         </View>
 
-        <View style={styles.styles.layout.form}>
+        <View style={styles.screen_auth_form}>
           <EnhancedButton
             mode="contained"
             onPress={handleSignIn}
@@ -44,16 +44,16 @@ export default function Welcome() {
               console.log('Google sign in');
             }}
             fullWidth
-            style={{ marginTop: 16 }}
+            style={styles.welcome_button}
           >
             Sign In with Google
           </EnhancedButton>
         </View>
 
-        <View style={styles.styles.layout.footer}>
-          <Text style={styles.styles.text.body}>Don't have an account?</Text>
-          <Link href="/auth/sign-up" style={styles.styles.text.link}>
-            <Text style={[styles.styles.text.body, { textDecorationLine: 'underline' }]}>
+        <View style={styles.screen_auth_footer}>
+          <Text style={styles.text_body}>Don't have an account? </Text>
+          <Link href="/auth/sign-up" style={styles.text_link}>
+            <Text style={[styles.text_body, styles.text_link]}>
               Sign Up
             </Text>
           </Link>

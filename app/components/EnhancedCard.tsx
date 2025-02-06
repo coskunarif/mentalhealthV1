@@ -26,21 +26,21 @@ const CardContent = ({ style, children }: CardContentProps): JSX.Element => (
   <Card.Content style={style}>{children}</Card.Content>
 );
 
-const EnhancedCardComponent = ({ 
-  style, 
+const EnhancedCardComponent = ({
+  style,
   mode = 'elevated',
   onPress,
   selected,
   children,
   contentStyle,
-  ...props 
+  ...props
 }: EnhancedCardProps): JSX.Element => {
-  const baseStyle: CardStyle = mode === 'elevated' 
-    ? styles.styles.component.card.elevated 
-    : styles.styles.component.card.listItem;
+  const baseStyle: CardStyle = mode === 'elevated'
+    ? styles.component_card_elevated
+    : styles.component_card_listItem;
 
-  const selectedStyle: CardStyle = selected 
-    ? styles.styles.component.card.selected 
+  const selectedStyle: CardStyle = selected
+    ? styles.component_card_selected
     : undefined;
 
   const cardStyle: CardStyle = [

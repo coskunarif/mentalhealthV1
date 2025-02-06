@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, ViewStyle } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, useTheme } from 'react-native-paper';
 import styles from '../config/styles';
+import type { AppTheme } from '../types/theme';
 
 interface SeekableProgressProps {
   duration: number;
@@ -11,6 +12,7 @@ interface SeekableProgressProps {
 }
 
 export default function SeekableProgress({ duration, position, onSeek, style }: SeekableProgressProps) {
+  const theme = useTheme<AppTheme>();
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -19,28 +21,22 @@ export default function SeekableProgress({ duration, position, onSeek, style }: 
   };
 
   return (
-    <View style={[styles.styles.layout.container, style]}>
-      <View style={[styles.styles.layout.content, { flexDirection: 'row', alignItems: 'center' }]}>
-        <Text style={styles.styles.text.caption}>{formatTime(position)}</Text>
+    <View style={[styles.layout_container, style]}>
+      <View style={[styles.layout_content, styles.seekableProgress_container]}>
+        <Text style={styles.text_caption}>{formatTime(position)}</Text>
         <View
-          style={{
-            flex: 1,
-            height: 4,
-            backgroundColor: styles.styles.colors.disabled,
-            marginHorizontal: 8,
-            borderRadius: 2,
-          }}
+          style={[styles.seekableProgress_bar, { backgroundColor: theme.colors.outlineVariant }]}
         >
           <View
             style={{
               width: `${(position / duration) * 100}%`,
               height: '100%',
-              backgroundColor: styles.styles.colors.primary,
+              backgroundColor: theme.colors.primary,
               borderRadius: 2,
             }}
           />
         </View>
-        <Text style={styles.styles.text.caption}>{formatTime(duration)}</Text>
+        <Text style={styles.text_caption}>{formatTime(duration)}</Text>
       </View>
     </View>
   );

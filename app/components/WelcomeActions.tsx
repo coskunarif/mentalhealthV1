@@ -13,7 +13,7 @@ export default function WelcomeActions({ fadeAnim, slideAnim }: WelcomeActionsPr
   return (
     <Animated.View
       style={[
-        styles.styles.layout.content,
+        styles.layout_content,
         {
           opacity: fadeAnim,
           transform: [{
@@ -28,7 +28,7 @@ export default function WelcomeActions({ fadeAnim, slideAnim }: WelcomeActionsPr
       <Link href="/auth/sign-in" asChild>
         <Button
           mode="contained"
-          style={styles.styles.button.primary}
+          style={styles.button_primary}
         >
           Sign In
         </Button>
@@ -37,7 +37,7 @@ export default function WelcomeActions({ fadeAnim, slideAnim }: WelcomeActionsPr
       <Link href="/auth/sign-up" asChild>
         <Button
           mode="outlined"
-          style={styles.styles.button.secondary}
+          style={styles.button_secondary}
         >
           Create Account
         </Button>

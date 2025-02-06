@@ -17,12 +17,12 @@ export default function SupportFooter({
   const currentYear = new Date().getFullYear();
 
   return (
-    <View style={styles.styles.component.footer.container}>
-      <View style={styles.styles.component.footer.content}>
+    <View style={styles.component_footer_container}>
+      <View style={styles.component_footer_content}>
         {showPrivacyPolicy && (
           <Link href="/legal/privacy" asChild>
             <Pressable>
-              <Text style={styles.styles.component.footer.link}>Privacy Policy</Text>
+              <Text style={styles.component_footer_link}>Privacy Policy</Text>
             </Pressable>
           </Link>
         )}
@@ -30,7 +30,7 @@ export default function SupportFooter({
         {showTerms && (
           <Link href="/legal/terms" asChild>
             <Pressable>
-              <Text style={styles.styles.component.footer.link}>Terms of Service</Text>
+              <Text style={styles.component_footer_link}>Terms of Service</Text>
             </Pressable>
           </Link>
         )}
@@ -38,13 +38,13 @@ export default function SupportFooter({
         {showSupport && (
           <Link href="/support" asChild>
             <Pressable>
-              <Text style={styles.styles.component.footer.link}>Support</Text>
+              <Text style={styles.component_footer_link}>Support</Text>
             </Pressable>
           </Link>
         )}
       </View>
       
-      <Text style={styles.styles.component.footer.copyright}>
+      <Text style={styles.component_footer_copyright}>
         {currentYear} Mindful App. All rights reserved.
       </Text>
     </View>

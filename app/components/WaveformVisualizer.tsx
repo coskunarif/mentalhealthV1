@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { View, ViewStyle, Animated } from 'react-native';
 import styles from '../config/styles';
+import { useTheme } from 'react-native-paper';
+import type { AppTheme } from '../types/theme';
 
 interface WaveformVisualizerProps {
   isPlaying?: boolean;
@@ -11,11 +13,12 @@ interface WaveformVisualizerProps {
 const BAR_COUNT = 20;
 const MAX_BAR_HEIGHT = 40;
 
-export default function WaveformVisualizer({ 
-  isPlaying = false, 
+export default function WaveformVisualizer({
+  isPlaying = false,
   amplitudes,
-  style 
+  style
 }: WaveformVisualizerProps) {
+  const theme = useTheme<AppTheme>();
   const barHeights = useRef(
     Array.from({ length: BAR_COUNT }, () => new Animated.Value(0.3))
   ).current;
@@ -73,16 +76,14 @@ export default function WaveformVisualizer({
   }, [isPlaying, amplitudes]);
 
   return (
-    <View style={[{ flexDirection: 'row', alignItems: 'center', height: MAX_BAR_HEIGHT }, style]}>
+    <View style={[styles.waveformVisualizer_container, style]}>
       {barHeights.map((height, index) => (
         <Animated.View
           key={index}
           style={[
+            styles.waveformVisualizer_bar,
             {
-              flex: 1,
-              marginHorizontal: 2,
-              backgroundColor: styles.styles.colors.primary,
-              height: MAX_BAR_HEIGHT,
+              backgroundColor: theme.colors.primary,
               transform: [
                 {
                   scaleY: height,

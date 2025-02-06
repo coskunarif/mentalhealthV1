@@ -40,37 +40,37 @@ export default function MoodScreen() {
   };
 
   return (
-    <View style={styles.styles.layout.container}>
+    <View style={styles.layout_container}>
       <ScrollView
-        style={styles.styles.layout.scrollView}
-        contentContainerStyle={styles.styles.layout.content}
+        style={styles.layout_scrollView}
+        contentContainerStyle={styles.layout_content}
       >
-        <View style={styles.styles.layout.header}>
-          <Text style={styles.styles.text.heading1}>How are you feeling?</Text>
-          <Text style={[styles.styles.text.body, { marginTop: 8 }]}>
+        <View style={styles.layout_header}>
+          <Text style={styles.text_heading1}>How are you feeling?</Text>
+          <Text style={[styles.text_body, styles.mood_subtitle]}>
             Select the emoji that best matches your current mood
           </Text>
         </View>
 
-        <View style={styles.styles.component.recommendations.grid}>
+        <View style={styles.component_recommendations_grid}>
           {moods.map((mood, index) => (
             <EnhancedCard
               key={index}
               style={[
-                styles.styles.component.card.elevated,
-                selectedMood === index && styles.styles.component.card.selected,
+                styles.component_card_elevated,
+                selectedMood === index && styles.component_card_selected,
               ]}
               onPress={() => handleMoodSelect(index)}
             >
-              <Text style={styles.styles.text.heading1}>{mood.emoji}</Text>
-              <Text style={styles.styles.text.caption}>{mood.label}</Text>
+              <Text style={styles.text_heading1}>{mood.emoji}</Text>
+              <Text style={styles.text_caption}>{mood.label}</Text>
             </EnhancedCard>
           ))}
         </View>
 
         {selectedMood !== null && (
-          <View style={{ marginTop: 24 }}>
-            <Text style={[styles.styles.text.heading2, { marginBottom: 16 }]}>
+          <View style={styles.mood_chartContainer}>
+            <Text style={[styles.text_heading2, styles.mood_chartTitle]}>
               Your Mood Pattern
             </Text>
             <RadarChart
@@ -85,12 +85,12 @@ export default function MoodScreen() {
           </View>
         )}
 
-        <View style={styles.styles.layout.footer}>
+        <View style={styles.layout_footer}>
           <Button
             mode="contained"
             onPress={handleSubmit}
             disabled={selectedMood === null}
-            style={styles.styles.button.contained}
+            style={styles.button_contained}
           >
             Save Mood
           </Button>
@@ -98,7 +98,7 @@ export default function MoodScreen() {
           <Button
             mode="outlined"
             onPress={handleSkip}
-            style={[styles.styles.button.outlined, { marginTop: 8 }]}
+            style={[styles.button_outlined, styles.mood_skipButton]}
           >
             Skip
           </Button>

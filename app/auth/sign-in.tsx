@@ -29,39 +29,39 @@ export default function SignInScreen() {
   };
 
   return (
-    <View style={styles.styles.layout.container}>
-      <View style={styles.styles.layout.content}>
-        <View style={styles.styles.screen.auth.header}>
-          <Text style={styles.styles.text.heading1}>Welcome Back</Text>
-          <Text style={[styles.styles.text.body, { marginTop: 8 }]}>
+    <View style={styles.layout_container}>
+      <View style={styles.layout_content}>
+        <View style={styles.screen_auth_header}>
+          <Text style={styles.text_heading1}>Welcome Back</Text>
+          <Text style={[styles.text_body, styles.signIn_subtitle]}>
             Sign in to continue your journey
           </Text>
         </View>
 
-        <View style={styles.styles.screen.auth.form}>
-          <View style={styles.styles.component.input.container}>
-            <Text style={styles.styles.component.input.label}>Email</Text>
+        <View style={styles.screen_auth_form}>
+          <View style={styles.component_input_container}>
+            <Text style={styles.component_input_label}>Email</Text>
             <TextInput
               mode="outlined"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              style={styles.styles.component.input.field}
+              style={styles.component_input_field}
             />
           </View>
 
-          <View style={styles.styles.component.input.container}>
-            <Text style={styles.styles.component.input.label}>Password</Text>
+          <View style={styles.component_input_container}>
+            <Text style={styles.component_input_label}>Password</Text>
             <TextInput
               mode="outlined"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              style={styles.styles.component.input.field}
+              style={styles.component_input_field}
             />
             {error ? (
-              <Text style={styles.styles.component.input.error}>{error}</Text>
+              <Text style={styles.component_input_error}>{error}</Text>
             ) : null}
           </View>
 
@@ -69,20 +69,20 @@ export default function SignInScreen() {
             mode="contained"
             onPress={handleSignIn}
             loading={loading}
-            style={styles.styles.button.primary}
+            style={styles.button_primary}
           >
             Sign In
           </Button>
 
-          <View style={styles.styles.screen.auth.footer}>
-            <Text style={styles.styles.text.body}>Don't have an account? </Text>
-            <Link href="/auth/sign-up" style={styles.styles.text.link as any}>
+          <View style={styles.screen_auth_footer}>
+            <Text style={styles.text_body}>Don't have an account? </Text>
+            <Link href="/auth/sign-up" style={styles.text_link}>
               Sign Up
             </Link>
           </View>
 
-          <View style={styles.styles.screen.auth.footer}>
-            <Link href="/auth/forgot-password" style={styles.styles.text.link as any}>
+          <View style={styles.screen_auth_footer}>
+            <Link href="/auth/forgot-password" style={styles.text_link}>
               Forgot Password?
             </Link>
           </View>

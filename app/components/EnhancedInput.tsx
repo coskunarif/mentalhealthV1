@@ -10,25 +10,25 @@ interface EnhancedInputProps extends Omit<TextInputProps, 'theme'> {
   helperText?: string;
 }
 
-export default function EnhancedInput({ 
+export default function EnhancedInput({
   label,
   error,
   helperText,
   style,
-  ...props 
+  ...props
 }: EnhancedInputProps): JSX.Element {
   const theme = useTheme<AppTheme>();
   const inputStyles = StyleSheet.create({
     input: {
-      ...(styles.styles.component.input.container as any),
+      ...styles.component_input_container,
       backgroundColor: theme.colors.surface,
     },
     outline: {
-      ...(styles.styles.component.input.outline as any),
+      ...styles.component_input_outline,
       borderColor: error ? theme.colors.error : theme.colors.outline,
     },
     content: {
-      ...(styles.styles.component.input.content as any),
+      ...styles.component_input_content,
       color: theme.colors.onSurface,
     },
   });
@@ -39,13 +39,13 @@ export default function EnhancedInput({
         mode="outlined"
         label={label}
         error={error}
-        style={[inputStyles.input, style as any]}
+        style={[inputStyles.input, style]}
         outlineStyle={inputStyles.outline}
         contentStyle={inputStyles.content}
         {...props}
       />
       {helperText ? (
-        <Text style={{ marginTop: 4, color: error ? 'red' : '#49454f', fontSize: 12 }}>
+        <Text style={{ marginTop: 4, color: error ? theme.colors.error : theme.colors.onSurfaceVariant, fontSize: 12 }}>
           {helperText}
         </Text>
       ) : null}

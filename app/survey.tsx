@@ -56,9 +56,9 @@ export default function SurveyScreen() {
   const progress = (currentQuestion + 1) / questions.length;
 
   return (
-    <View style={styles.styles.layout.container}>
-      <View style={styles.styles.layout.content}>
-        <Text style={[styles.styles.text.heading1, { marginBottom: 24 }]}>
+    <View style={styles.layout_container}>
+      <View style={styles.layout_content}>
+        <Text style={[styles.text_heading1, styles.survey_title]}>
           Daily Survey
         </Text>
 
@@ -71,10 +71,10 @@ export default function SurveyScreen() {
           progress={progress}
         />
 
-        <View style={[styles.styles.layout.footer, { gap: 16 }]}>
+        <View style={[styles.layout_footer, styles.survey_footer]}>
           {currentQuestion === questions.length - 1 && (
             <Link href="/tabs" asChild>
-              <Button mode="contained" style={styles.styles.button.primary}>
+              <Button mode="contained" style={styles.button_primary}>
                 Submit
               </Button>
             </Link>

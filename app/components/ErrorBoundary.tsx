@@ -41,16 +41,16 @@ export default class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <View style={styles.styles.layout.container}>
-          <View style={styles.styles.layout.content}>
-            <Text style={styles.styles.text.heading1}>Something went wrong</Text>
-            <Text style={[styles.styles.text.body, { marginTop: 8, marginBottom: 24 }]}>
+        <View style={styles.layout_container}>
+          <View style={styles.layout_content}>
+            <Text style={styles.text_heading1}>Something went wrong</Text>
+            <Text style={[styles.text_body, styles.errorBoundary_message]}>
               {this.state.error?.message || 'An unexpected error occurred'}
             </Text>
             <Button
               mode="contained"
               onPress={this.handleReset}
-              style={styles.styles.button.primary}
+              style={styles.button_primary}
             >
               Try Again
             </Button>

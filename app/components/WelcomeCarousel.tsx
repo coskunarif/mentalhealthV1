@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, ScrollView, Dimensions, ViewStyle } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, useTheme } from 'react-native-paper';
 import styles from '../config/styles';
+import type { AppTheme } from '../types/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ const features = [
 
 export default function WelcomeCarousel({ style }: WelcomeCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const theme = useTheme<AppTheme>();
 
   const handleScroll = (event: any) => {
     const slideSize = event.nativeEvent.layoutMeasurement.width;
@@ -35,35 +37,35 @@ export default function WelcomeCarousel({ style }: WelcomeCarouselProps) {
   };
 
   return (
-    <View style={[styles.styles.layout.container, style]}>
+    <View style={[styles.layout_container, style]}>
       <ScrollView
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleScroll}
-        style={styles.styles.layout.scrollView}
+        style={styles.layout_scrollView}
       >
         {features.map((feature, index) => (
           <View
             key={index}
-            style={[styles.styles.layout.content, { width, alignItems: 'center' }]}
+            style={[styles.layout_content, { width }, styles.welcomeCarousel_item]}
           >
-            <Text style={styles.styles.text.heading2}>{feature.title}</Text>
-            <Text style={[styles.styles.text.body, { marginTop: 16, textAlign: 'center' }]}>
+            <Text style={styles.text_heading2}>{feature.title}</Text>
+            <Text style={[styles.text_body, styles.welcomeCarousel_description]}>
               {feature.description}
             </Text>
           </View>
         ))}
       </ScrollView>
 
-      <View style={[styles.styles.layout.footer, { flexDirection: 'row', justifyContent: 'center' }]}>
+      <View style={[styles.layout_footer, styles.welcomeCarousel_footer]}>
         {features.map((_, index) => (
           <View
             key={index}
             style={[
-              { width: 8, height: 8, borderRadius: 4, marginHorizontal: 4 },
+              styles.welcomeCarousel_indicator,
               {
-                backgroundColor: index === activeIndex ? styles.styles.colors.primary : styles.styles.colors.disabled,
+                backgroundColor: index === activeIndex ? theme.colors.primary : theme.colors.outlineVariant,
               },
             ]}
           />

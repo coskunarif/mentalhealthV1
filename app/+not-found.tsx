@@ -5,18 +5,17 @@ import styles from './config/styles';
 
 export default function NotFoundScreen() {
   return (
-    <View style={styles.styles.layout.container}>
-      <View style={styles.styles.layout.content}>
-        <Text style={styles.styles.text.heading1}>Page Not Found</Text>
-        
-        <Text style={[styles.styles.text.body, { marginTop: 16 }]}>
+    <View style={styles.layout_container}>
+      <View style={styles.layout_content}>
+        <Text style={styles.text_heading1}>Page Not Found</Text>
+        <Text style={[styles.text_body, styles.notFound_text]}>
           We couldn't find the page you're looking for. Please check the URL or return to home.
         </Text>
 
         <Link href="/tabs/home" asChild>
           <Button
             mode="contained"
-            style={[styles.styles.button.primary, { marginTop: 24 }]}
+            style={[styles.button_primary, styles.notFound_button]}
           >
             Return to Home
           </Button>

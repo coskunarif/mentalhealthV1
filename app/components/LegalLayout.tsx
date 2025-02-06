@@ -12,24 +12,24 @@ interface LegalLayoutProps {
 
 export default function LegalLayout({ title, children, lastUpdated }: LegalLayoutProps) {
   return (
-    <View style={(styles.styles as any).base.container as any}>
-      <View style={styles.styles.screen.legal.header}>
+    <View style={styles.layout_container}>
+      <View style={styles.screen_legal_header}>
         <IconButton
           icon="arrow-left"
           size={24}
           onPress={() => router.back()}
         />
-        <Text style={styles.styles.text.heading1 as any}>{title}</Text>
+        <Text style={styles.text_heading1}>{title}</Text>
       </View>
 
       <ScrollView
-        style={(styles.styles as any).base.scrollView as any}
-        contentContainerStyle={(styles.styles as any).base.content as any}
+        style={styles.layout_scrollView}
+        contentContainerStyle={styles.layout_content}
       >
         {children}
 
         {lastUpdated && (
-          <Text style={[styles.styles.text.caption, { marginTop: 24 }]}>
+          <Text style={[styles.text_caption, { marginTop: 24 }]}>
             Last updated: {lastUpdated}
           </Text>
         )}

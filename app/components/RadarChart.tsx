@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, ViewStyle } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, useTheme } from 'react-native-paper';
 import styles from '../config/styles';
 import Svg, { Path, Circle } from 'react-native-svg';
+import type { AppTheme } from '../types/theme';
 
 interface DataPoint {
   value: number;
@@ -15,6 +16,7 @@ interface RadarChartProps {
 }
 
 export default function RadarChart({ data, style }: RadarChartProps) {
+  const theme = useTheme<AppTheme>();
   const size = 200;
   const center = size / 2;
   const radius = (size - 40) / 2;
@@ -43,14 +45,14 @@ export default function RadarChart({ data, style }: RadarChartProps) {
   });
 
   return (
-    <View style={[{ padding: 16 }, style]}>
+    <View style={[styles.radarChart_container, style]}>
       <Svg width={size} height={size}>
         {/* Grid Lines */}
         {gridPath.map((path, index) => (
           <Path
             key={`grid-${index}`}
             d={`${path} Z`}
-            stroke={styles.styles.colors.disabled}
+            stroke={theme.colors.outlineVariant}
             strokeWidth={1}
             fill="none"
           />
@@ -59,9 +61,9 @@ export default function RadarChart({ data, style }: RadarChartProps) {
         {/* Data Lines */}
         <Path
           d={`${path} Z`}
-          stroke={styles.styles.colors.primary}
+          stroke={theme.colors.primary}
           strokeWidth={2}
-          fill={styles.styles.colors.primary}
+          fill={theme.colors.primary}
           fillOpacity={0.2}
         />
 
@@ -72,28 +74,28 @@ export default function RadarChart({ data, style }: RadarChartProps) {
             cx={point.x}
             cy={point.y}
             r={4}
-            fill={styles.styles.colors.primary}
+            fill={theme.colors.primary}
           />
         ))}
       </Svg>
 
       {/* Labels */}
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 16 }}>
+      <View style={styles.radarChart_labelsContainer}>
         {data.map((point, index) => (
           <View
             key={`label-${index}`}
-            style={{ width: '50%', flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}
+            style={styles.radarChart_label}
           >
             <View
               style={{
                 width: 8,
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: styles.styles.colors.primary,
+                backgroundColor: theme.colors.primary,
                 marginRight: 8,
               }}
             />
-            <Text style={styles.styles.text.caption}>{point.label}</Text>
+            <Text style={styles.text_caption}>{point.label}</Text>
           </View>
         ))}
       </View>

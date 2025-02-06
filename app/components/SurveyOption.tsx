@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, useTheme } from 'react-native-paper';
 import styles from '../config/styles';
-import theme from '../config/theme';
+import type { AppTheme } from '../types/theme';
 
 interface SurveyOptionProps {
   text: string;
@@ -11,34 +11,28 @@ interface SurveyOptionProps {
   disabled?: boolean;
 }
 
-export default function SurveyOption({ 
-  text, 
-  selected = false, 
+export default function SurveyOption({
+  text,
+  selected = false,
   onSelect,
-  disabled = false 
+  disabled = false
 }: SurveyOptionProps) {
+  const theme = useTheme<AppTheme>();
   return (
     <TouchableOpacity
       onPress={onSelect}
       disabled={disabled}
       style={[
-        styles.styles.component.card.container,
-        styles.styles.component.card.interactive,
-        {
-          marginVertical: 8,
-          opacity: disabled ? 0.5 : 1,
-        },
-        selected && {
-          backgroundColor: theme.colors.primaryContainer,
-          borderColor: theme.colors.primary,
-          borderWidth: 2,
-        },
+        styles.component_card_container,
+        styles.component_card_interactive,
+        styles.surveyOption,
+        selected && styles.surveyOption_selected,
       ]}
     >
-      <View style={styles.styles.component.card.content}>
-        <Text 
+      <View style={styles.component_card_content}>
+        <Text
           style={[
-            styles.styles.text.body,
+            styles.text_body,
             selected && { color: theme.colors.primary }
           ]}
         >
