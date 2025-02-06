@@ -37,24 +37,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="mood"
-        options={{
-          title: 'Mood',
-          tabBarIcon: ({ color, size }) => (
-            <IconButton icon="emoticon" size={24} iconColor={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="meditate"
-        options={{
-          title: 'Meditate',
-          tabBarIcon: ({ color, size }) => (
-            <IconButton icon="meditation" size={24} iconColor={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',

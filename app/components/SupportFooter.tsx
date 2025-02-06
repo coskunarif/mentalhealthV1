@@ -9,7 +9,7 @@ interface SupportFooterProps {
   showSupport?: boolean;
 }
 
-export function SupportFooter({
+export default function SupportFooter({
   showPrivacyPolicy = true,
   showTerms = true,
   showSupport = true,

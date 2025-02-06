@@ -3,8 +3,8 @@ import { View } from 'react-native';
 import { Text, Surface, IconButton } from 'react-native-paper';
 import { Audio } from 'expo-av';
 import { styles } from './config/styles';
-import { PlayerControls } from './components/PlayerControls';
-import { WaveformVisualizer } from './components/WaveformVisualizer';
+import PlayerControls from './components/PlayerControls';
+import WaveformVisualizer from './components/WaveformVisualizer';
 import { router, useLocalSearchParams } from 'expo-router';
 import type { RootStackParamList } from './types/navigation';
 

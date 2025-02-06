@@ -11,7 +11,7 @@ interface PlayerControlsProps {
   disabled?: boolean;
 }
 
-export function PlayerControls({
+export default function PlayerControls({
   isPlaying,
   onPlayPause,
   onSkipBack,

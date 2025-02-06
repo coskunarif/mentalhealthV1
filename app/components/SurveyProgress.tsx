@@ -9,7 +9,7 @@ interface SurveyProgressProps {
   total: number;
 }
 
-export function SurveyProgress({ current, total }: SurveyProgressProps) {
+export default function SurveyProgress({ current, total }: SurveyProgressProps) {
   const progress = (current + 1) / total;
 
   return (

@@ -11,7 +11,7 @@ interface WaveformVisualizerProps {
 const BAR_COUNT = 20;
 const MAX_BAR_HEIGHT = 40;
 
-export function WaveformVisualizer({ 
+export default function WaveformVisualizer({ 
   isPlaying = false, 
   amplitudes,
   style 

@@ -3,8 +3,8 @@ import { View, ScrollView } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
 import { styles } from './config/styles';
-import { EnhancedCard } from './components/EnhancedCard';
-import { RadarChart } from './components/RadarChart';
+import EnhancedCard from './components/EnhancedCard';
+import RadarChart from './components/RadarChart';
 import type { RootStackParamList } from './types/navigation';
 
 const moods = [

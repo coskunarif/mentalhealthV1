@@ -8,7 +8,7 @@ interface WelcomeHeaderProps {
   subtitle?: string;
 }
 
-export function WelcomeHeader({ title, subtitle }: WelcomeHeaderProps) {
+export default function WelcomeHeader({ title, subtitle }: WelcomeHeaderProps) {
   return (
     <View style={styles.layout.header}>
       <Text style={styles.text.heading1}>{title}</Text>

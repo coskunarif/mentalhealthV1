@@ -11,7 +11,7 @@ interface SurveyOptionProps {
   disabled?: boolean;
 }
 
-export function SurveyOption({ 
+export default function SurveyOption({ 
   text, 
   selected = false, 
   onSelect,

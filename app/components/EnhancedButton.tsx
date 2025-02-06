@@ -11,7 +11,7 @@ interface EnhancedButtonProps extends Omit<ButtonProps, 'style'> {
   style?: ButtonStyle;
 }
 
-export function EnhancedButton({ 
+export default function EnhancedButton({ 
   style, 
   mode = 'text', 
   fullWidth, 

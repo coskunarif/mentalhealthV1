@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { Link } from 'expo-router';
 import { styles } from './config/styles';
-import { QuestionCard } from './components/QuestionCard';
+import QuestionCard from './components/QuestionCard';
 
 const questions = [
   {
@@ -65,7 +65,7 @@ export default function SurveyScreen() {
         <QuestionCard
           question={questions[currentQuestion].text}
           options={questions[currentQuestion].options}
-          onSelect={(index) => handleAnswer(questions[currentQuestion].options[index])}
+          onSelect={(index: number) => handleAnswer(questions[currentQuestion].options[index])}
           currentIndex={currentQuestion}
           totalQuestions={questions.length}
           progress={progress}

@@ -10,7 +10,7 @@ interface LegalLayoutProps {
   lastUpdated?: string;
 }
 
-export function LegalLayout({ title, children, lastUpdated }: LegalLayoutProps) {
+export default function LegalLayout({ title, children, lastUpdated }: LegalLayoutProps) {
   return (
     <View style={(styles as any).base.container as any}>
       <View style={styles.screen.legal.header}>

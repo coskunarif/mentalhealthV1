@@ -3,8 +3,8 @@ import { View, ScrollView } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { Link, router } from 'expo-router';
 import { styles } from '../config/styles';
-import { RadarChart } from '../components/RadarChart';
-import { RecentActivities } from '../components/RecentActivities';
+import RadarChart from '../components/RadarChart';
+import RecentActivities from '../components/RecentActivities';
 
 const radarData = [
   { label: 'Balance past memories', value: 0.8 },

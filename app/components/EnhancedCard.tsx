@@ -70,4 +70,4 @@ type EnhancedCardType = typeof EnhancedCardComponent & {
 const EnhancedCard = EnhancedCardComponent as EnhancedCardType;
 EnhancedCard.Content = CardContent;
 
-export { EnhancedCard };
+export default EnhancedCard;

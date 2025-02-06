@@ -14,7 +14,7 @@ interface RadarChartProps {
   style?: ViewStyle;
 }
 
-export function RadarChart({ data, style }: RadarChartProps) {
+export default function RadarChart({ data, style }: RadarChartProps) {
   const size = 200;
   const center = size / 2;
   const radius = (size - 40) / 2;

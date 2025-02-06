@@ -10,7 +10,7 @@ interface EnhancedInputProps extends Omit<TextInputProps, 'theme'> {
   helperText?: string;
 }
 
-export function EnhancedInput({ 
+export default function EnhancedInput({ 
   label,
   error,
   helperText,
