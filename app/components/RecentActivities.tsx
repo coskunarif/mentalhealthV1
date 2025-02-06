@@ -16,7 +16,7 @@ interface RecentActivitiesProps {
   activities: Activity[];
 }
 
-export function RecentActivities({ activities }: RecentActivitiesProps) {
+export default function RecentActivities({ activities }: RecentActivitiesProps) {
   return (
     <View style={{ marginBottom: 24 }}>
       <Text style={[styles.text.heading3, { marginBottom: 16 }]}>Recent Activities</Text>

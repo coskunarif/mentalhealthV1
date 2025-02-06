@@ -5,7 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { PaperProvider } from 'react-native-paper';
 import { AuthProvider } from './context/auth';
 import { theme } from './config/theme';
-import { ErrorBoundary } from './components/ErrorBoundary';
+import ErrorBoundary from './components/ErrorBoundary';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
 // Keep the splash screen visible while we fetch resources

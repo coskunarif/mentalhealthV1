@@ -3,8 +3,8 @@ import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Link } from 'expo-router';
 import { styles } from '../config/styles';
-import { WelcomeCarousel } from '../components/WelcomeCarousel';
-import { EnhancedButton } from '../components/EnhancedButton';
+import WelcomeCarousel from '../components/WelcomeCarousel';
+import EnhancedButton from '../components/EnhancedButton';
 import { useAuth } from '../../context/auth';
 
 export default function Welcome() {

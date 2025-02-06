@@ -9,7 +9,7 @@ interface WelcomeActionsProps {
   slideAnim: Animated.Value;
 }
 
-export function WelcomeActions({ fadeAnim, slideAnim }: WelcomeActionsProps) {
+export default function WelcomeActions({ fadeAnim, slideAnim }: WelcomeActionsProps) {
   return (
     <Animated.View
       style={[

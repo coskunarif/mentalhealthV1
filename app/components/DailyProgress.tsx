@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { styles } from '../config/styles';
-import { EnhancedCard } from './EnhancedCard';
+import EnhancedCard from './EnhancedCard';
 
 interface DailyProgressProps {
   meditationMinutes: number;
@@ -10,7 +10,7 @@ interface DailyProgressProps {
   streak: number;
 }
 
-export function DailyProgress({
+export default function DailyProgress({
   meditationMinutes,
   moodEntries,
   streak,

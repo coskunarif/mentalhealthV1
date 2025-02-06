@@ -10,7 +10,7 @@ interface SeekableProgressProps {
   style?: ViewStyle;
 }
 
-export function SeekableProgress({ duration, position, onSeek, style }: SeekableProgressProps) {
+export default function SeekableProgress({ duration, position, onSeek, style }: SeekableProgressProps) {
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);

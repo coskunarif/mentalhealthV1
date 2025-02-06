@@ -12,7 +12,7 @@ interface QuestionCardProps {
   progress: number;
 }
 
-export function QuestionCard({
+export default function QuestionCard({
   question,
   options,
   onSelect,

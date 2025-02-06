@@ -24,7 +24,7 @@ const features = [
   },
 ];
 
-export function WelcomeCarousel({ style }: WelcomeCarouselProps) {
+export default function WelcomeCarousel({ style }: WelcomeCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleScroll = (event: any) => {

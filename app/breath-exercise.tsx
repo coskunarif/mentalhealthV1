@@ -3,8 +3,8 @@ import { View } from 'react-native';
 import { Text, Surface } from 'react-native-paper';
 import { useLocalSearchParams, router } from 'expo-router';
 import { styles } from './config/styles';
-import { PlayerControls } from './components/PlayerControls';
-import { WaveformVisualizer } from './components/WaveformVisualizer';
+import PlayerControls from './components/PlayerControls';
+import WaveformVisualizer from './components/WaveformVisualizer';
 
 const EXERCISE_DURATION = 300; // 5 minutes in seconds
 

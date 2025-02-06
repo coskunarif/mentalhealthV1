@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text } from 'react-native-paper';
 import { styles } from '../config/styles';
-import { LegalLayout } from '../components/LegalLayout';
+import LegalLayout from '../components/LegalLayout';
 
 export default function PrivacyPolicyScreen() {
   return (

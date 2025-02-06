@@ -3,7 +3,7 @@ import { View, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Link } from 'expo-router';
 import { styles } from '../config/styles';
-import { EnhancedCard } from './EnhancedCard';
+import EnhancedCard from './EnhancedCard';
 
 interface Meditation {
   id: string;
@@ -16,7 +16,7 @@ interface RecommendedMeditationsProps {
   meditations: Meditation[];
 }
 
-export function RecommendedMeditations({ meditations }: RecommendedMeditationsProps) {
+export default function RecommendedMeditations({ meditations }: RecommendedMeditationsProps) {
   return (
     <View style={styles.component.recommendations.container}>
       <Text style={[styles.text.heading2, { marginBottom: 16 }]}>
