@@ -1,27 +1,21 @@
 import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text, Button, Card } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
 import styles from './config/styles';
 import type { RootStackParamList } from './types/navigation';
 import Slider from '@react-native-community/slider';
 
 const moods = [
-  { label: 'Shame', color: '#f44336' }, // Red
-  { label: 'Guilt', color: '#e91e63' }, // Pink
-  { label: 'Fear', color: '#9c27b0' }, // Purple
-  { label: 'Desire', color: '#3f51b5' }, // Indigo
-  { label: 'Grief', color: '#2196f3' }, // Blue
-  { label: 'Anger', color: '#00bcd4' }, // Cyan
-  { label: 'Pride', color: '#009688' }, // Teal
-  { label: 'Courage', color: '#4caf50' }, // Green
-  { label: 'Neutrality', color: '#8bc34a' }, // Light Green
-  { label: 'Willingness', color: '#cddc39' }, // Lime
-  { label: 'Acceptance', color: '#ffeb3b' }, // Yellow
-  { label: 'Reason', color: '#ffc107' }, // Amber
-  { label: 'Love', color: '#ff9800' }, // Orange
-  { label: 'Joy', color: '#ff5722' }, // Deep Orange
-  { label: 'Peace', color: '#795548' }, // Brown
+  { label: 'Shame', color: '#FFA500' }, // Orange
+  { label: 'Guilt', color: '#FF4500' }, // Red-Orange
+  { label: 'Apathy', color: '#F5DEB3' }, // Pale Orange (Wheat)
+  { label: 'Grief', color: '#FFDAB9' },  //Light Orange (Peach)
+  { label: 'Fear', color: '#FFFF00' }, // Yellow
+  { label: 'Desire', color: '#90EE90' }, // Light Green
+  { label: 'Anger', color: '#ADD8E6' }, // Light Blue
+  { label: 'Pride', color: '#E6E6FA' }, // Light Purple (Lavender)
+  { label: 'Willfulness', color: '#800080' }, // Dark Purple
 ];
 
 export default function MoodScreen() {
@@ -58,7 +52,7 @@ export default function MoodScreen() {
         contentContainerStyle={styles.layout_content}
       >
         <View style={styles.layout_header}>
-          <Text style={styles.text_heading1}>How are you feeling?</Text>
+          <Text style={styles.text_heading1}>Describe your current mood?</Text>
           <Text style={[styles.text_body, styles.mood_subtitle]}>
             Adjust the sliders to reflect your current emotional state
           </Text>
@@ -66,7 +60,8 @@ export default function MoodScreen() {
 
         <View>
           {moods.map((mood, index) => (
-            <View key={index} style={styles.mood_sliderContainer}>
+            <Card key={index} style={[styles.component_card_elevated, styles.mood_sliderContainer]}>
+              <Card.Content>
               <Text style={styles.text_body}>{mood.label}</Text>
               <Slider
                 value={moodValues[mood.label]}
@@ -81,7 +76,8 @@ export default function MoodScreen() {
                 <Text style={styles.text_caption}>Low</Text>
                 <Text style={styles.text_caption}>High</Text>
               </View>
-            </View>
+              </Card.Content>
+            </Card>
           ))}
         </View>
 
