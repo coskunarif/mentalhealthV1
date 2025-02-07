@@ -77,21 +77,7 @@ export default function MoodScreen() {
             </Card>
           ))}
         </View>
-
-        {/* Add extra text to test scrolling */}
-        <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-         <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-        <Text>Test Scrolling</Text>
-
+        
         <View style={styles.layout_footer}>
           <Button
             mode="contained"

@@ -12,7 +12,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.layout_container}>
       <View style={styles.screen_profile_header}>
-        <Text style={styles.text_heading1}>Profile</Text>
+        <Text style={styles.text_heading3}>Profile</Text>
         <Text style={[styles.text_body, styles.profile_subtitle]}>
           Manage your account settings
         </Text>

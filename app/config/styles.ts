@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Kameron',
   } as TextStyle,
   text_heading3: {
-     ...theme.fonts.displaySmall,
+    ...theme.fonts.headlineLarge,
     fontWeight: 'bold' as const,
     color: theme.colors.onSurface,
     fontFamily: 'Kameron',
