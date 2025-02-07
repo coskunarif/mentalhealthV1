@@ -418,6 +418,14 @@ const styles = StyleSheet.create({
     mood_skipButton: {
       marginTop: 8
     } as ViewStyle,
+  mood_sliderContainer: {
+    marginBottom: 16,
+  } as ViewStyle,
+  mood_sliderLabels: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    marginTop: 8,
+  } as ViewStyle,
     player_headerSurface: {
       marginBottom: 24
     } as ViewStyle,
