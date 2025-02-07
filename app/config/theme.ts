@@ -23,7 +23,7 @@ const baseBoldFont = {
 const fontConfig = {
   displayLarge: { ...baseBoldFont, fontSize: scaleFont(34), lineHeight: scaleFont(40) },
   displayMedium: { ...baseBoldFont, fontSize: scaleFont(28), lineHeight: scaleFont(36) },
-  displaySmall: { ...baseBoldFont, fontSize: scaleFont(24), lineHeight: scaleFont(32) },
+  displaySmall: { ...baseBoldFont, fontSize: scaleFont(20), lineHeight: scaleFont(32) },
   headlineLarge: { ...baseBoldFont, fontSize: scaleFont(22), lineHeight: scaleFont(28) },
   headlineMedium: { ...baseBoldFont, fontSize: scaleFont(20), lineHeight: scaleFont(26) },
   headlineSmall: { ...baseBoldFont, fontSize: scaleFont(18), lineHeight: scaleFont(24) },

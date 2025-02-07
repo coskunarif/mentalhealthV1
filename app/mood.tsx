@@ -52,34 +52,45 @@ export default function MoodScreen() {
         contentContainerStyle={styles.layout_content}
       >
         <View style={styles.layout_header}>
-          <Text style={styles.text_heading1}>Describe your current mood?</Text>
-          <Text style={[styles.text_body, styles.mood_subtitle]}>
-            Adjust the sliders to reflect your current emotional state
-          </Text>
+          <Text style={styles.text_heading3}>Describe your current mood?</Text>
         </View>
 
         <View>
           {moods.map((mood, index) => (
             <Card key={index} style={[styles.component_card_elevated, styles.mood_sliderContainer]}>
               <Card.Content>
-              <Text style={styles.text_body}>{mood.label}</Text>
-              <Slider
-                value={moodValues[mood.label]}
-                minimumValue={0}
-                maximumValue={100}
-                step={1}
-                thumbTintColor={mood.color}
-                minimumTrackTintColor={mood.color}
-                onValueChange={(value: number) => handleSliderChange(mood.label, value)}
-              />
-              <View style={styles.mood_sliderLabels}>
-                <Text style={styles.text_caption}>Low</Text>
-                <Text style={styles.text_caption}>High</Text>
-              </View>
+                <Text style={styles.text_body}>{mood.label}</Text>
+                <Slider
+                  value={moodValues[mood.label]}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={1}
+                  thumbTintColor={mood.color}
+                  minimumTrackTintColor={mood.color}
+                  onValueChange={(value: number) => handleSliderChange(mood.label, value)}
+                />
+                <View style={styles.mood_sliderLabels}>
+                  <Text style={styles.text_caption}>Low</Text>
+                  <Text style={styles.text_caption}>High</Text>
+                </View>
               </Card.Content>
             </Card>
           ))}
         </View>
+
+        {/* Add extra text to test scrolling */}
+        <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
+         <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
+        <Text>Test Scrolling</Text>
 
         <View style={styles.layout_footer}>
           <Button
