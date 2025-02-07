@@ -1,34 +1,45 @@
 import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text, Button, Slider } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
 import styles from './config/styles';
-import EnhancedCard from './components/EnhancedCard';
-import RadarChart from './components/RadarChart';
 import type { RootStackParamList } from './types/navigation';
 
 const moods = [
-  { emoji: '😊', label: 'Happy' },
-  { emoji: '😌', label: 'Calm' },
-  { emoji: '😔', label: 'Sad' },
-  { emoji: '😤', label: 'Angry' },
-  { emoji: '😰', label: 'Anxious' },
-  { emoji: '😴', label: 'Tired' },
+  { label: 'Shame', color: '#f44336' }, // Red
+  { label: 'Guilt', color: '#e91e63' }, // Pink
+  { label: 'Fear', color: '#9c27b0' }, // Purple
+  { label: 'Desire', color: '#3f51b5' }, // Indigo
+  { label: 'Grief', color: '#2196f3' }, // Blue
+  { label: 'Anger', color: '#00bcd4' }, // Cyan
+  { label: 'Pride', color: '#009688' }, // Teal
+  { label: 'Courage', color: '#4caf50' }, // Green
+  { label: 'Neutrality', color: '#8bc34a' }, // Light Green
+  { label: 'Willingness', color: '#cddc39' }, // Lime
+  { label: 'Acceptance', color: '#ffeb3b' }, // Yellow
+  { label: 'Reason', color: '#ffc107' }, // Amber
+  { label: 'Love', color: '#ff9800' }, // Orange
+  { label: 'Joy', color: '#ff5722' }, // Deep Orange
+  { label: 'Peace', color: '#795548' }, // Brown
 ];
 
 export default function MoodScreen() {
-  const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [moodValues, setMoodValues] = useState<{ [key: string]: number }>(
+    moods.reduce((acc, mood) => ({ ...acc, [mood.label]: 0 }), {})
+  );
   const { returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['mood']>();
 
-  const handleMoodSelect = (index: number) => {
-    setSelectedMood(index);
+  const handleSliderChange = (moodLabel: string, value: number) => {
+    setMoodValues((prevValues) => ({
+      ...prevValues,
+      [moodLabel]: value,
+    }));
   };
 
   const handleSubmit = async () => {
-    if (selectedMood === null) return;
-
     try {
-      // TODO: Save mood to backend
+      // TODO: Save mood values to backend
+      console.log(moodValues);
       router.replace(returnTo as keyof RootStackParamList);
     } catch (error) {
       console.error('Error saving mood:', error);
@@ -48,48 +59,35 @@ export default function MoodScreen() {
         <View style={styles.layout_header}>
           <Text style={styles.text_heading1}>How are you feeling?</Text>
           <Text style={[styles.text_body, styles.mood_subtitle]}>
-            Select the emoji that best matches your current mood
+            Adjust the sliders to reflect your current emotional state
           </Text>
         </View>
 
-        <View style={styles.component_recommendations_grid}>
+        <View>
           {moods.map((mood, index) => (
-            <EnhancedCard
-              key={index}
-              style={[
-                styles.component_card_elevated,
-                selectedMood === index && styles.component_card_selected,
-              ]}
-              onPress={() => handleMoodSelect(index)}
-            >
-              <Text style={styles.text_heading1}>{mood.emoji}</Text>
-              <Text style={styles.text_caption}>{mood.label}</Text>
-            </EnhancedCard>
+            <View key={index} style={styles.mood_sliderContainer}>
+              <Text style={styles.text_body}>{mood.label}</Text>
+              <Slider
+                value={moodValues[mood.label]}
+                minimumValue={0}
+                maximumValue={100}
+                step={1}
+                thumbTintColor={mood.color}
+                minimumTrackTintColor={mood.color}
+                onValueChange={(value) => handleSliderChange(mood.label, value)}
+              />
+              <View style={styles.mood_sliderLabels}>
+                <Text style={styles.text_caption}>Low</Text>
+                <Text style={styles.text_caption}>High</Text>
+              </View>
+            </View>
           ))}
         </View>
-
-        {selectedMood !== null && (
-          <View style={styles.mood_chartContainer}>
-            <Text style={[styles.text_heading2, styles.mood_chartTitle]}>
-              Your Mood Pattern
-            </Text>
-            <RadarChart
-              data={[
-                { value: 0.8, label: 'Mon' },
-                { value: 0.6, label: 'Tue' },
-                { value: 0.9, label: 'Wed' },
-                { value: 0.7, label: 'Thu' },
-                { value: 0.5, label: 'Today' },
-              ]}
-            />
-          </View>
-        )}
 
         <View style={styles.layout_footer}>
           <Button
             mode="contained"
             onPress={handleSubmit}
-            disabled={selectedMood === null}
             style={styles.button_contained}
           >
             Save Mood
