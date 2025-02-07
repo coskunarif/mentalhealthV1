@@ -1,6 +1,16 @@
 import { MD3LightTheme, configureFonts } from 'react-native-paper';
 import type { AppTheme, ChartColors } from '../types/theme';
 import appColors from './colors';
+import { Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
+
+// Scaling function based on screen width
+const scaleFont = (size: number) => {
+  const scale = width / 375; // 375 is a common base screen width
+  return Math.round(size * scale);
+};
+
 
 const baseFont = {
   fontFamily: 'Kameron',
@@ -11,21 +21,21 @@ const baseBoldFont = {
 };
 
 const fontConfig = {
-  displayLarge: { ...baseBoldFont, fontSize: 34, lineHeight: 40 },
-  displayMedium: { ...baseBoldFont, fontSize: 28, lineHeight: 36 },
-  displaySmall: { ...baseBoldFont, fontSize: 24, lineHeight: 32 },
-  headlineLarge: { ...baseBoldFont, fontSize: 22, lineHeight: 28 },
-  headlineMedium: { ...baseBoldFont, fontSize: 20, lineHeight: 26 },
-  headlineSmall: { ...baseBoldFont, fontSize: 18, lineHeight: 24 },
-  titleLarge: { ...baseBoldFont, fontSize: 18, lineHeight: 24 },
-  titleMedium: { ...baseFont, fontSize: 16, lineHeight: 22 },
-  titleSmall: { ...baseFont, fontSize: 14, lineHeight: 20 },
-  bodyLarge: { ...baseFont, fontSize: 16, lineHeight: 22 },
-  bodyMedium: { ...baseFont, fontSize: 16, lineHeight: 22 },
-  bodySmall: { ...baseFont, fontSize: 16, lineHeight: 22 },
-  labelLarge: { ...baseFont, fontSize: 14, lineHeight: 20 },
-  labelMedium: { ...baseFont, fontSize: 12, lineHeight: 18 },
-  labelSmall: { ...baseFont, fontSize: 11, lineHeight: 16 },
+  displayLarge: { ...baseBoldFont, fontSize: scaleFont(34), lineHeight: scaleFont(40) },
+  displayMedium: { ...baseBoldFont, fontSize: scaleFont(28), lineHeight: scaleFont(36) },
+  displaySmall: { ...baseBoldFont, fontSize: scaleFont(24), lineHeight: scaleFont(32) },
+  headlineLarge: { ...baseBoldFont, fontSize: scaleFont(22), lineHeight: scaleFont(28) },
+  headlineMedium: { ...baseBoldFont, fontSize: scaleFont(20), lineHeight: scaleFont(26) },
+  headlineSmall: { ...baseBoldFont, fontSize: scaleFont(18), lineHeight: scaleFont(24) },
+  titleLarge: { ...baseBoldFont, fontSize: scaleFont(18), lineHeight: scaleFont(24) },
+  titleMedium: { ...baseFont, fontSize: scaleFont(16), lineHeight: scaleFont(22) },
+  titleSmall: { ...baseFont, fontSize: scaleFont(14), lineHeight: scaleFont(20) },
+  bodyLarge: { ...baseFont, fontSize: scaleFont(16), lineHeight: scaleFont(22) },
+  bodyMedium: { ...baseFont, fontSize: scaleFont(16), lineHeight: scaleFont(22) },
+  bodySmall: { ...baseFont, fontSize: scaleFont(16), lineHeight: scaleFont(22) },
+  labelLarge: { ...baseFont, fontSize: scaleFont(14), lineHeight: scaleFont(20) },
+  labelMedium: { ...baseFont, fontSize: scaleFont(12), lineHeight: scaleFont(18) },
+  labelSmall: { ...baseFont, fontSize: scaleFont(11), lineHeight: scaleFont(16) },
 };
 
 const chartColors: ChartColors = {

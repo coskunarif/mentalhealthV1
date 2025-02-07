@@ -33,33 +33,33 @@ const styles = StyleSheet.create({
     padding: 16,
   } as ViewStyle,
   text_heading1: {
-    fontSize: 32,
+    ...theme.fonts.displayLarge,
     fontWeight: 'bold' as const,
     color: theme.colors.onSurface,
     fontFamily: 'Kameron',
   } as TextStyle,
   text_heading2: {
-    fontSize: 24,
+    ...theme.fonts.displayMedium,
     fontWeight: 'bold' as const,
     color: theme.colors.onSurface,
     fontFamily: 'Kameron',
   } as TextStyle,
   text_heading3: {
-    fontSize: 20,
+     ...theme.fonts.displaySmall,
     fontWeight: 'bold' as const,
     color: theme.colors.onSurface,
     fontFamily: 'Kameron',
   } as TextStyle,
   text_body: {
-    fontSize: 16,
+    ...theme.fonts.bodyLarge,
     color: theme.colors.onSurface,
   } as TextStyle,
   text_caption: {
-    fontSize: 16,
+    ...theme.fonts.labelMedium,
     color: theme.colors.onSurfaceVariant,
   } as TextStyle,
   text_subtitle: {
-    fontSize: 16,
+    ...theme.fonts.bodyMedium,
     color: theme.colors.onSurfaceVariant,
   } as TextStyle,
   text_link: {
@@ -67,12 +67,12 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline' as const,
   } as TextStyle,
   text_button: {
-    fontSize: 16,
+    ...theme.fonts.bodyLarge,
     fontWeight: 'bold' as const,
     color: theme.colors.onSurface,
   } as TextStyle,
   text_label: {
-    fontSize: 14,
+    ...theme.fonts.labelLarge,
     color: theme.colors.onSurface,
     fontWeight: 'bold' as const,
   } as TextStyle,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   component_form_error: {
     color: theme.colors.error,
-    fontSize: 16,
+    ...theme.fonts.labelSmall,
     marginTop: 4,
   } as TextStyle,
   component_input_container: {
@@ -140,16 +140,16 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   component_input_content: {
     paddingVertical: 8,
-    fontSize: 16,
+    ...theme.fonts.bodyLarge,
     fontFamily: 'Regular',
   } as TextStyle,
   component_input_label: {
-    fontSize: 16,
+     ...theme.fonts.labelLarge,
     fontFamily: 'Medium',
     marginBottom: 4,
   } as TextStyle,
   component_input_helper: {
-    fontSize: 16,
+    ...theme.fonts.labelSmall,
     fontFamily: 'Regular',
     marginTop: 4,
   } as TextStyle,
@@ -176,12 +176,12 @@ const styles = StyleSheet.create({
     alignItems: 'center' as FlexAlignType,
   } as ViewStyle,
   component_footer_copyright: {
-    fontSize: 16,
+    ...theme.fonts.labelMedium,
     color: theme.colors.onSurfaceVariant,
     marginTop: 10,
   } as TextStyle,
   component_footer_link: {
-    fontSize: 16,
+    ...theme.fonts.bodyMedium,
     color: theme.colors.primary,
     textDecorationLine: 'underline' as const,
   } as TextStyle,
@@ -293,6 +293,7 @@ const styles = StyleSheet.create({
     welcome_subtitle: {
         marginTop: 8,
         color: theme.colors.onSurfaceVariant,
+        ...theme.fonts.bodyMedium
     } as TextStyle,
     welcome_button: {
         marginBottom: 16,
@@ -303,6 +304,7 @@ const styles = StyleSheet.create({
     signIn_subtitle: {
         marginTop: 8,
         color: theme.colors.onSurfaceVariant,
+        ...theme.fonts.bodyMedium
     } as TextStyle,
     playerControls_container: {
         justifyContent: 'center',
@@ -467,19 +469,22 @@ const styles = StyleSheet.create({
       height: 80
     } as ViewStyle,
     profile_subtitle: {
-      marginTop: 8
+      marginTop: 8,
+      ...theme.fonts.bodyMedium
     } as TextStyle,
     profile_section: {
       marginBottom: 24
     } as ViewStyle,
     profile_sectionSubtitle: {
-      marginTop: 8
+      marginTop: 8,
+       ...theme.fonts.bodyMedium
     } as TextStyle,
     profile_button: {
       marginTop: 16
     } as ViewStyle,
     notFound_text: {
-      marginTop: 16
+      marginTop: 16,
+      ...theme.fonts.bodyMedium
     } as TextStyle,
     notFound_button: {
       marginTop: 24
