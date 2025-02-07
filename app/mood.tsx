@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button, Slider } from 'react-native-paper';
+import { Text, Button } from 'react-native-paper';
 import { router, useLocalSearchParams } from 'expo-router';
 import styles from './config/styles';
 import type { RootStackParamList } from './types/navigation';
+import Slider from '@react-native-community/slider';
 
 const moods = [
   { label: 'Shame', color: '#f44336' }, // Red
@@ -74,7 +75,7 @@ export default function MoodScreen() {
                 step={1}
                 thumbTintColor={mood.color}
                 minimumTrackTintColor={mood.color}
-                onValueChange={(value) => handleSliderChange(mood.label, value)}
+                onValueChange={(value: number) => handleSliderChange(mood.label, value)}
               />
               <View style={styles.mood_sliderLabels}>
                 <Text style={styles.text_caption}>Low</Text>
