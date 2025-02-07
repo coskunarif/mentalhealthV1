@@ -68,7 +68,7 @@ export default function Home() {
 
         {/* Exercise Progress */}
         <View style={styles.home_exerciseProgressContainer}>
-          <Text style={[styles.text_heading3, styles.home_exerciseProgressTitle]}>Exercise Progress</Text>
+          <Text style={[styles.text_heading2, styles.home_exerciseProgressTitle]}>Exercise Progress</Text>
           <View style={styles.home_exerciseProgressGrid}>
             {breathExercises.map(exercise => (
               <View
