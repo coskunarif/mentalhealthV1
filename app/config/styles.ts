@@ -55,11 +55,11 @@ const styles = StyleSheet.create({
     color: theme.colors.onSurface,
   } as TextStyle,
   text_caption: {
-    fontSize: 12,
+    fontSize: 16,
     color: theme.colors.onSurfaceVariant,
   } as TextStyle,
   text_subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: theme.colors.onSurfaceVariant,
   } as TextStyle,
   text_link: {
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   component_form_error: {
     color: theme.colors.error,
-    fontSize: 12,
+    fontSize: 16,
     marginTop: 4,
   } as TextStyle,
   component_input_container: {
@@ -144,12 +144,12 @@ const styles = StyleSheet.create({
     fontFamily: 'Regular',
   } as TextStyle,
   component_input_label: {
-    fontSize: 12,
+    fontSize: 16,
     fontFamily: 'Medium',
     marginBottom: 4,
   } as TextStyle,
   component_input_helper: {
-    fontSize: 12,
+    fontSize: 16,
     fontFamily: 'Regular',
     marginTop: 4,
   } as TextStyle,
@@ -176,12 +176,12 @@ const styles = StyleSheet.create({
     alignItems: 'center' as FlexAlignType,
   } as ViewStyle,
   component_footer_copyright: {
-    fontSize: 12,
+    fontSize: 16,
     color: theme.colors.onSurfaceVariant,
     marginTop: 10,
   } as TextStyle,
   component_footer_link: {
-    fontSize: 14,
+    fontSize: 16,
     color: theme.colors.primary,
     textDecorationLine: 'underline' as const,
   } as TextStyle,
