@@ -32,17 +32,9 @@ export default function RadarChart({ data, style, size = 250 }: RadarChartProps)
 
     const getLabelCoordinates = (index: number) => {
     const angle = index * angleStep - Math.PI / 2;
-    const distance = radius * 1.15; // Adjust this multiplier for label distance
+    const distance = radius * 1.35; // Increased distance
     const x = center + distance * Math.cos(angle);
-    let y = center + distance * Math.sin(angle);
-
-     //Vertical Adjustment for Collision Avoidance (Simple)
-     if (angle < -Math.PI / 4 && angle > -3 * Math.PI / 4) {
-        y -= 5; // Adjust top labels up slightly
-    } else if (angle > Math.PI / 4 && angle < 3 * Math.PI / 4) {
-        y += 5; // Adjust bottom labels down slightly
-    }
-
+    const y = center + distance * Math.sin(angle);
     return { x, y };
   };
 

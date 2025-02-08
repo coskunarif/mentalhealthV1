@@ -442,7 +442,7 @@ const styles = StyleSheet.create({
       gap: 16
     } as ViewStyle,
     home_progressChartContainer: {
-      marginBottom: 24
+      marginBottom: 32 // Increased marginBottom
     } as ViewStyle,
     home_exerciseProgressContainer: {
       marginBottom: 24
