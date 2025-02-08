@@ -39,13 +39,13 @@ const styles = StyleSheet.create({
     fontFamily: 'Kameron',
   } as TextStyle,
   text_heading2: {
-    ...theme.fonts.displayMedium,
+    ...theme.fonts.headlineMedium,
     fontWeight: 'bold' as const,
     color: theme.colors.onSurface,
     fontFamily: 'Kameron',
   } as TextStyle,
   text_heading3: {
-    ...theme.fonts.headlineLarge,
+    ...theme.fonts.headlineSmall,
     fontWeight: 'bold' as const,
     color: theme.colors.onSurface,
     fontFamily: 'Kameron',
