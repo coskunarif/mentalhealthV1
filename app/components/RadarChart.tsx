@@ -3,7 +3,7 @@ import { View, ViewStyle, StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
 import type { AppTheme } from '../types/theme';
-import { theme } from '../config/theme';
+import { theme, colors } from '../config/theme';
 
 interface DataPoint {
   value: number;
@@ -23,20 +23,21 @@ const staticLabels = [
   "Breath up",
 ];
 
-// Define distinct colors.  Make sure there are enough for your data points.
-const pointColors = [
-  theme.colors.primary,
-  theme.colors.secondary,
-  theme.colors.tertiary,
-  theme.colors.error,
-  theme.colors.primaryContainer,
-];
 
 export default function RadarChart({ data, style, size = 250 }: RadarChartProps) {
   const theme = useTheme<AppTheme>();
   const center = size / 2;
   const radius = (size - 50) / 2;
-  const angleStep = (Math.PI * 2) / staticLabels.length; // Use staticLabels.length
+  const angleStep = (Math.PI * 2) / staticLabels.length;
+
+  // More distinct colors
+    const pointColors = [
+        colors.primary,
+        colors.secondary,
+        colors.tertiary,
+        colors.error,
+        colors.surfaceVariant,
+    ];
 
   const getCoordinates = (value: number, index: number) => {
     const angle = index * angleStep - Math.PI / 2;
@@ -49,7 +50,7 @@ export default function RadarChart({ data, style, size = 250 }: RadarChartProps)
 
   const getLabelCoordinates = (index: number) => {
     const angle = index * angleStep - Math.PI / 2;
-    const distance = radius * 1.35;
+    const distance = radius * 1.4; // Increased for label spacing
     const x = center + distance * Math.cos(angle);
     const y = center + distance * Math.sin(angle);
     return { x, y };
@@ -71,7 +72,7 @@ export default function RadarChart({ data, style, size = 250 }: RadarChartProps)
     );
   }
 
-  const gridLines = staticLabels.map((_, index) => { // Use staticLabels.length
+  const gridLines = staticLabels.map((_, index) => {
     const { x, y } = getCoordinates(1, index);
     return (
       <Line
@@ -89,15 +90,10 @@ export default function RadarChart({ data, style, size = 250 }: RadarChartProps)
   const points = data.map((point, index) => getCoordinates(point.value, index));
   const path = points.map((p, index) => `${p.x},${p.y}`).join(' L ');
 
-    // Ensure data length matches label and color lengths
-    if (data.length !== staticLabels.length || data.length !== pointColors.length) {
-      console.warn("RadarChart: Data, labels, and colors arrays have mismatched lengths.");
-      // Handle the mismatch appropriately.  You might truncate the longer arrays, or pad the shorter ones.
-      // For example, to truncate:
-      data = data.slice(0, staticLabels.length);
-      // Or, throw an error:
-      // throw new Error("Data, labels, and colors arrays must have the same length.");
-    }
+  if (data.length !== staticLabels.length || data.length !== pointColors.length) {
+    console.warn("RadarChart: Data, labels, and colors arrays have mismatched lengths.");
+    data = data.slice(0, staticLabels.length);
+  }
 
   return (
     <View style={[localStyles.container, style]}>
@@ -107,7 +103,7 @@ export default function RadarChart({ data, style, size = 250 }: RadarChartProps)
 
         <Path
           d={`M${points[0].x},${points[0].y} ${path} Z`}
-          stroke={theme.colors.secondary} // Keep a stroke color for the overall path
+          stroke={theme.colors.secondary}
           strokeWidth={2.5}
           fill={theme.colors.secondary}
           fillOpacity={0.2}
@@ -119,7 +115,7 @@ export default function RadarChart({ data, style, size = 250 }: RadarChartProps)
             cx={point.x}
             cy={point.y}
             r={6}
-            fill={pointColors[index % pointColors.length]} // Use modulo for color cycling
+            fill={pointColors[index % pointColors.length]}
             stroke={theme.colors.onSurface}
             strokeWidth={1}
             accessibilityLabel={`Data point ${staticLabels[index]}: ${data[index].value}`} // Use static label
@@ -133,10 +129,10 @@ export default function RadarChart({ data, style, size = 250 }: RadarChartProps)
               key={`label-${index}`}
               x={labelCoords.x}
               y={labelCoords.y}
-              fontSize={10} // Reduced font size
+              fontSize={9} // Reduced font size
               textAnchor="middle"
               alignmentBaseline="middle"
-              fill={pointColors[index % pointColors.length]} // Use modulo for color cycling
+              fill={pointColors[index % pointColors.length]}
             >
               {label}
             </SvgText>
