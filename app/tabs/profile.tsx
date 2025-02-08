@@ -12,7 +12,7 @@ export default function ProfileScreen() {
   return (
     <View style={styles.layout_container}>
       <View style={styles.screen_profile_header}>
-        <Text style={styles.text_heading3}>Profile</Text>
+        <Text style={styles.text_heading2}>Profile</Text>
         <Text style={[styles.text_body, styles.profile_subtitle]}>
           Manage your account settings
         </Text>
@@ -26,7 +26,7 @@ export default function ProfileScreen() {
           elevation={1}
           style={[styles.component_card_elevated, styles.profile_section]}
         >
-          <Text style={styles.text_heading2}>Account</Text>
+          <Text style={styles.text_heading3}>Account</Text>
           <Text style={[styles.text_body, styles.profile_sectionSubtitle]}>
             Update your account information
           </Text>
@@ -43,7 +43,7 @@ export default function ProfileScreen() {
           elevation={1}
           style={[styles.component_card_elevated, styles.profile_section]}
         >
-          <Text style={styles.text_heading2}>Notifications</Text>
+          <Text style={styles.text_heading3}>Notifications</Text>
           <Text style={[styles.text_body, styles.profile_sectionSubtitle]}>
             Manage your notification preferences
           </Text>
@@ -60,7 +60,7 @@ export default function ProfileScreen() {
           elevation={1}
           style={styles.component_card_elevated}
         >
-          <Text style={styles.text_heading2}>Sign Out</Text>
+          <Text style={styles.text_heading3}>Sign Out</Text>
           <Text style={[styles.text_body, styles.profile_sectionSubtitle]}>
             Sign out of your account
           </Text>

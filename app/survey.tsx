@@ -58,7 +58,7 @@ export default function SurveyScreen() {
   return (
     <View style={styles.layout_container}>
       <View style={styles.layout_content}>
-        <Text style={[styles.text_heading3, styles.survey_title]}>
+        <Text style={[styles.text_heading2, styles.survey_title]}>
           Daily Survey
         </Text>
 
