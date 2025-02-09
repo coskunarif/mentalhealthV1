@@ -9,10 +9,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   } as ViewStyle,
   layout_content: {
-    flex: 1,
     padding: 16,
   } as ViewStyle,
-  layout_header: {
+    layout_header: {
     flexDirection: 'row' as const,
     alignItems: 'center' as FlexAlignType,
     padding: 16,
@@ -24,11 +23,11 @@ const styles = StyleSheet.create({
   layout_row: {
     flexDirection: 'row' as const,
     alignItems: 'center' as FlexAlignType,
-  } as ViewStyle,
-  layout_scrollView: {
-    flex: 1,
-  } as ViewStyle,
-  layout_form: {
+    } as ViewStyle,
+    layout_scrollView: {
+        // flex: 1, // Removed flex: 1 to allow content-based sizing
+    } as ViewStyle,
+    layout_form: {
     flex: 1,
     padding: 16,
   } as ViewStyle,
@@ -418,9 +417,15 @@ const styles = StyleSheet.create({
     mood_skipButton: {
       marginTop: 8
     } as ViewStyle,
-  mood_sliderContainer: {
-    marginBottom: 16,
-  } as ViewStyle,
+    mood_card: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      marginVertical: 8,
+    },
+    mood_sliderContainer: {
+      marginBottom: 16,
+    } as ViewStyle,
   mood_sliderLabels: {
     flexDirection: 'row' as const,
     justifyContent: 'space-between' as const,
@@ -524,7 +529,39 @@ const styles = StyleSheet.create({
     errorBoundary_message: {
       marginTop: 8,
       marginBottom: 24,
-    } as TextStyle
+    } as TextStyle,
+    exerciseProgress_container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 16,
+      } as ViewStyle,
+      exerciseProgress_step: {
+        alignItems: 'center',
+        flex: 1, // Add flex: 1 here
+      },
+      exerciseProgress_circle: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+      } as ViewStyle,
+      exerciseProgress_circleText: {
+        ...theme.fonts.bodyMedium,
+        fontWeight: 'bold',
+      } as TextStyle,
+      exerciseProgress_label: {
+        ...theme.fonts.labelMedium,
+        color: theme.colors.onSurfaceVariant,
+        marginTop: 4,
+      } as TextStyle,
+      exerciseProgress_bar: {
+        height: 4,
+        backgroundColor: theme.colors.surfaceVariant,
+        flex: 1, // Add flex: 1 here
+        marginHorizontal: -15, // Add negative margin
+      } as ViewStyle,
 });
 
 export default styles;
