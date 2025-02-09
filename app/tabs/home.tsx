@@ -5,6 +5,7 @@ import { Link, router } from 'expo-router';
 import styles from '../config/styles';
 import RadarChart from '../components/RadarChart';
 import RecentActivities from '../components/RecentActivities';
+import ExerciseProgress from '../components/ExerciseProgress';
 import type { AppTheme } from '../types/theme';
 
 const radarData = [
@@ -40,22 +41,22 @@ const recentActivities = [
 ];
 
 const breathExercises = [
-  { id: 1, title: 'Breath Exercise 1', duration: '15 min', isCompleted: true },
-  { id: 2, title: 'Breath Exercise 2', duration: '20 min', isCompleted: true },
-  { id: 3, title: 'Breath Exercise 3', duration: '15 min', isCompleted: false },
-  { id: 4, title: 'Breath Exercise 4', duration: '20 min', isCompleted: false },
-  { id: 5, title: 'Breath Exercise 5', duration: '25 min', isCompleted: false },
+  { id: 'Step 1', title: 'Breath Exercise Step 1', duration: '15 min', isCompleted: true },
+  { id: 'Step 2', title: 'Breath Exercise Step 2', duration: '20 min', isCompleted: true },
+  { id: 'Step 3', title: 'Breath Exercise Step 3', duration: '15 min', isCompleted: false },
+  { id: 'Step 4', title: 'Breath Exercise Step 4', duration: '20 min', isCompleted: false },
+  { id: 'Step 5', title: 'Breath Exercise Step 5', duration: '25 min', isCompleted: false },
 ];
 
 export default function Home() {
-  const nextExercise = breathExercises.find(exercise => !exercise.isCompleted);
-  const theme = useTheme<AppTheme>();
+    const nextExercise = breathExercises.find(exercise => !exercise.isCompleted);
+    const theme = useTheme<AppTheme>();
 
-  const handleStartExercise = () => {
-    if (nextExercise) {
-      router.push(`/breath-exercise?id=${nextExercise.id}`);
-    }
-  };
+    const handleStartExercise = () => {
+        if (nextExercise) {
+            router.push(`/breath-exercise?id=${nextExercise.id}`);
+        }
+    };
 
   return (
     <ScrollView style={styles.screen_home_container}>
@@ -69,34 +70,18 @@ export default function Home() {
         {/* Exercise Progress */}
         <View style={styles.home_exerciseProgressContainer}>
           <Text style={[styles.text_heading2, styles.home_exerciseProgressTitle]}>Exercise Progress</Text>
-          <View style={styles.home_exerciseProgressGrid}>
-            {breathExercises.map(exercise => (
-              <View
-                key={exercise.id}
-                style={[
-                  styles.home_exerciseProgressItem,
-                  {
-                    backgroundColor: exercise.isCompleted ? theme.colors.primary : theme.colors.surfaceVariant,
-                  }
-                ]}
+            <ExerciseProgress exercises={breathExercises} currentStep={nextExercise?.id} />
+            {nextExercise && (
+              <Button
+                mode="contained"
+                onPress={handleStartExercise}
+                style={styles.home_startButton}
+                labelStyle={styles.text_button}
               >
-                <Text style={[styles.text_body, { color: exercise.isCompleted ? theme.colors.surface : theme.colors.onSurface }]}>
-                  {exercise.id}
-                </Text>
-              </View>
-            ))}
+                Start {nextExercise.id}
+              </Button>
+            )}
           </View>
-          {nextExercise && (
-            <Button
-              mode="contained"
-              onPress={handleStartExercise}
-              style={styles.home_startButton}
-              labelStyle={styles.text_button}
-            >
-              Start Exercise {nextExercise.id}
-            </Button>
-          )}
-        </View>
 
         {/* Quick Actions */}
         <View style={styles.home_quickActionsContainer}>
