@@ -1,19 +1,16 @@
-import { useState } from 'react';
-import { View, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { Text, Surface, TextInput, Button, useTheme, HelperText } from 'react-native-paper';
-import { useRouter } from 'expo-router';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import { Text, TextInput, Button } from 'react-native-paper';
+import { Link, router } from 'expo-router';
+import styles from '../config/styles';
 import { auth } from '../lib/firebase';
-import { globalStyles } from '../config/styles';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
-export default function SignIn() {
+export default function SignInScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
-  const theme = useTheme();
 
   const handleSignIn = async () => {
     if (loading) return;
@@ -22,103 +19,75 @@ export default function SignIn() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.replace('/');
+      router.replace('/tabs/home');
     } catch (err) {
       setError('Invalid email or password');
-      console.error(err);
+      console.error('Sign in error:', err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Surface style={globalStyles.authContainer}>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={globalStyles.fill}
-      >
-        <ScrollView 
-          contentContainerStyle={[
-            globalStyles.authContent,
-            globalStyles.centerContent
-          ]}
-        >
-          <View style={[globalStyles.authLogoContainer, { maxWidth: 400 }]}>
-            <Image
-              source={require('../../assets/images/adaptive-icon.png')}
-              style={globalStyles.authAppIcon}
-            />
-            
-            <Text style={globalStyles.authHeading}>
-              Welcome Back
-            </Text>
-          </View>
+    <View style={styles.layout_container}>
+      <View style={styles.layout_content}>
+        <View style={styles.screen_auth_header}>
+          <Text style={styles.text_heading1}>Welcome Back</Text>
+          <Text style={[styles.text_body, styles.signIn_subtitle]}>
+            Sign in to continue your journey
+          </Text>
+        </View>
 
-          <View style={globalStyles.authFormContainer}>
+        <View style={styles.screen_auth_form}>
+          <View style={styles.component_input_container}>
+            <Text style={styles.component_input_label}>Email</Text>
             <TextInput
-              label="Email"
+              mode="outlined"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              mode="outlined"
-              error={!!error}
-              style={globalStyles.authInput}
-              contentStyle={globalStyles.bodyMedium}
-              left={<TextInput.Icon icon="email" />}
+              style={styles.component_input_field}
             />
+          </View>
 
+          <View style={styles.component_input_container}>
+            <Text style={styles.component_input_label}>Password</Text>
             <TextInput
-              label="Password"
+              mode="outlined"
               value={password}
               onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              mode="outlined"
-              error={!!error}
-              style={globalStyles.authInput}
-              contentStyle={globalStyles.bodyMedium}
-              left={<TextInput.Icon icon="lock" />}
-              right={
-                <TextInput.Icon
-                  icon={showPassword ? 'eye-off' : 'eye'}
-                  onPress={() => setShowPassword(!showPassword)}
-                />
-              }
+              secureTextEntry
+              style={styles.component_input_field}
             />
-
-            <HelperText 
-              type="error" 
-              visible={!!error}
-              style={globalStyles.authErrorText}
-            >
-              {error}
-            </HelperText>
-
-            <View style={globalStyles.authActions}>
-              <Button
-                mode="contained"
-                onPress={handleSignIn}
-                loading={loading}
-                disabled={loading}
-                style={globalStyles.authPrimaryButton}
-                contentStyle={globalStyles.buttonContent}
-                labelStyle={globalStyles.labelLarge}
-              >
-                {loading ? 'Signing in...' : 'Sign In'}
-              </Button>
-
-              <Button
-                mode="text"
-                onPress={() => router.push('/auth/sign-up')}
-                style={globalStyles.authTextButton}
-                labelStyle={globalStyles.labelLarge}
-              >
-                Don't have an account? Sign Up
-              </Button>
-            </View>
+            {error ? (
+              <Text style={styles.component_input_error}>{error}</Text>
+            ) : null}
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </Surface>
+
+          <Button
+            mode="contained"
+            onPress={handleSignIn}
+            loading={loading}
+            style={styles.button_primary}
+          >
+            Sign In
+          </Button>
+
+          <View style={styles.screen_auth_footer}>
+            <Text style={styles.text_body}>Don't have an account? </Text>
+            <Link href="/auth/sign-up" style={styles.text_link}>
+              Sign Up
+            </Link>
+          </View>
+
+          <View style={styles.screen_auth_footer}>
+            <Link href="/auth/forgot-password" style={styles.text_link}>
+              Forgot Password?
+            </Link>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 }

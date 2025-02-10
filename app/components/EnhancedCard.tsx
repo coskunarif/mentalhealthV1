@@ -1,71 +1,73 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ViewStyle,
-  Animated,
-  TouchableOpacity,
-} from 'react-native';
-import { globalStyles } from '../config/styles';
-import { colors } from '../config/colors';
+import { Card } from 'react-native-paper';
+import { StyleProp, ViewStyle } from 'react-native';
+import styles from '../config/styles';
 
-interface CardProps {
-  children: React.ReactNode;
-  style?: ViewStyle;
+type CardStyle = StyleProp<ViewStyle>;
+
+interface BaseCardProps {
+  mode?: 'elevated' | 'outlined';
+  style?: CardStyle;
   onPress?: () => void;
-  interactive?: boolean;
+  selected?: boolean;
 }
 
-export const EnhancedCard: React.FC<CardProps> = ({
-  children,
+interface EnhancedCardProps extends BaseCardProps {
+  contentStyle?: CardStyle;
+  children?: React.ReactNode;
+}
+
+interface CardContentProps {
+  style?: CardStyle;
+  children?: React.ReactNode;
+}
+
+const CardContent = ({ style, children }: CardContentProps): JSX.Element => (
+  <Card.Content style={style}>{children}</Card.Content>
+);
+
+const EnhancedCardComponent = ({
   style,
+  mode = 'elevated',
   onPress,
-  interactive = false,
-}) => {
-  const animatedScale = new Animated.Value(1);
+  selected,
+  children,
+  contentStyle,
+  ...props
+}: EnhancedCardProps): JSX.Element => {
+  const baseStyle: CardStyle = mode === 'elevated'
+    ? styles.component_card_elevated
+    : styles.component_card_listItem;
 
-  const handlePressIn = () => {
-    if (interactive) {
-      Animated.spring(animatedScale, {
-        toValue: 0.98,
-        useNativeDriver: true,
-      }).start();
-    }
-  };
+  const selectedStyle: CardStyle = selected
+    ? styles.component_card_selected
+    : undefined;
 
-  const handlePressOut = () => {
-    if (interactive) {
-      Animated.spring(animatedScale, {
-        toValue: 1,
-        useNativeDriver: true,
-      }).start();
-    }
-  };
+  const cardStyle: CardStyle = [
+    baseStyle,
+    selectedStyle,
+    style,
+  ].filter(Boolean);
 
-  const content = (
-    <Animated.View
-      style={[
-        globalStyles.card,
-        style,
-        { transform: [{ scale: animatedScale }] },
-      ]}
+  return (
+    <Card
+      mode={mode}
+      style={cardStyle}
+      onPress={onPress}
+      {...props}
     >
-      {children}
-    </Animated.View>
+      <CardContent style={contentStyle}>
+        {children}
+      </CardContent>
+    </Card>
   );
-
-  if (onPress || interactive) {
-    return (
-      <TouchableOpacity
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        activeOpacity={0.8}
-      >
-        {content}
-      </TouchableOpacity>
-    );
-  }
-
-  return content;
 };
+
+type EnhancedCardType = typeof EnhancedCardComponent & {
+  Content: typeof CardContent;
+};
+
+const EnhancedCard = EnhancedCardComponent as EnhancedCardType;
+EnhancedCard.Content = CardContent;
+
+export default EnhancedCard;

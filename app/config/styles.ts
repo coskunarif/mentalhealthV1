@@ -1,738 +1,567 @@
-import { StyleSheet, Platform } from 'react-native';
-import { colors, withOpacity } from './colors';
-import { typography } from './typography';
-import { GlobalStyles } from '../types/styles';
+import { StyleSheet } from 'react-native';
+import type { FlexAlignType, TextStyle, ViewStyle } from 'react-native';
+import { theme } from '../config/theme';
 
-const spacing = {
-  xxs: 4,
-  xs: 8,
-  sm: 16,
-  md: 24,
-  lg: 32,
-  xl: 40,
-} as const;
-
-const horizontalMargin = 16;
-
-const touchableSize = {
-  minWidth: 48,
-  minHeight: 48,
-  spacing: spacing.xs,
-} as const;
-
-export const globalStyles = StyleSheet.create<GlobalStyles>({
-  // ============= Typography =============
-  text: typography.bodyMedium,
-  textBold: {
-    ...typography.bodyMedium,
-    fontWeight: 'bold',
-  },
-  heading1: typography.headlineLarge,
-  heading2: typography.headlineMedium,
-  heading3: typography.headlineSmall,
-  bodyLarge: typography.bodyLarge,
-  bodyMedium: typography.bodyMedium,
-  bodySmall: typography.bodySmall,
-  labelLarge: typography.labelLarge,
-  labelMedium: typography.labelMedium,
-  titleLarge: typography.titleLarge,
-  titleMedium: typography.titleMedium,
-  headlineLarge: typography.headlineLarge,
-  headlineMedium: typography.headlineMedium,
-  headlineSmall: typography.headlineSmall,
-  displaySmall: typography.displaySmall,
-
-  // ============= Layout =============
-  screen: {
+const styles = StyleSheet.create({
+  // colors: theme.colors, // No need to include colors here
+  layout_container: {
     flex: 1,
-    backgroundColor: colors.primary50,
-  },
-  safeArea: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    padding: 24,
-  },
-  contentContainer: {
-    flex: 1,
-    padding: spacing.md,
-  },
-  centerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  column: {
-    flexDirection: 'column',
-  },
-  spaceBetween: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  fill: {
-    flex: 1,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: spacing.sm,
-    padding: spacing.md,
-    elevation: 2,
-  },
-
-  // ============= Cards =============
-  exerciseCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    backgroundColor: theme.colors.background,
+  } as ViewStyle,
+  layout_content: {
     padding: 16,
-    gap: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.primary,
-  },
-  statCard: {
-    backgroundColor: colors.surface,
-    borderRadius: spacing.sm,
-    padding: spacing.md,
-    elevation: 2,
+  } as ViewStyle,
+    layout_header: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as FlexAlignType,
+    padding: 16,
+  } as ViewStyle,
+  layout_footer: {
+    padding: 16,
+    alignItems: 'center' as FlexAlignType,
+  } as ViewStyle,
+  layout_row: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as FlexAlignType,
+    } as ViewStyle,
+    layout_scrollView: {
+        // flex: 1, // Removed flex: 1 to allow content-based sizing
+    } as ViewStyle,
+    layout_form: {
     flex: 1,
-    minWidth: 150,
-    aspectRatio: 1,
-  },
-
-  // ============= Forms & Inputs =============
-  form: {
-    gap: 16,
-    width: '100%',
-    maxWidth: 400,
-    alignSelf: 'center',
-  },
-  input: {
-    backgroundColor: colors.surface,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.primary200,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    padding: 16,
+  } as ViewStyle,
+  text_heading1: {
+    ...theme.fonts.displayLarge,
+    fontWeight: 'bold' as const,
+    color: theme.colors.onSurface,
     fontFamily: 'Kameron',
-    fontSize: 16,
-  },
-  searchInput: {
-    backgroundColor: colors.surfaceVariant,
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    height: 48,
-  },
-
-  // ============= Buttons =============
-  button: {
-    minHeight: touchableSize.minHeight,
-    borderRadius: spacing.xs,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.md,
-    minWidth: touchableSize.minWidth * 2.5,
-  },
-  buttonSecondary: {
-    borderColor: colors.primary,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-  },
-  buttonPrimary: {
-    backgroundColor: colors.primary,
-  },
-  buttonLabel: {
-    ...typography.labelLarge,
-    textAlign: 'center',
-  },
-  buttonLabelPrimary: {
-    ...typography.labelLarge,
-    textAlign: 'center',
-    color: colors.onPrimary,
-  },
-  buttonLabelSecondary: {
-    ...typography.labelLarge,
-    textAlign: 'center',
-    color: colors.primary,
-  },
-  iconButton: {
-    width: touchableSize.minWidth,
-    height: touchableSize.minHeight,
-    borderRadius: touchableSize.minWidth / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.primary100,
-  },
-
-  // ============= Lists =============
-  list: {
-    paddingHorizontal: 16,
-  },
-  listItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.primary100,
-  },
-  listItemContent: {
-    flex: 1,
-    marginLeft: 16,
-  },
-
-  // ============= Progress =============
-  progressBar: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: withOpacity(colors.primary, 0.08),
-  },
-  progressSection: {
-    paddingTop: Platform.OS === 'ios' ? spacing.xl : spacing.lg,
-    paddingHorizontal: horizontalMargin,
-    paddingBottom: spacing.sm,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: withOpacity(colors.primary, 0.08),
-    minHeight: touchableSize.minHeight,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary900,
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  progressText: {
-    ...typography.titleLarge,
-    color: colors.primary700,
-    marginBottom: spacing.xs,
-    textAlign: 'center',
-  },
-  progress: {
+  } as TextStyle,
+  text_heading2: {
+    ...theme.fonts.headlineMedium,
+    fontWeight: 'bold' as const,
+    color: theme.colors.onSurface,
+    fontFamily: 'Kameron',
+  } as TextStyle,
+  text_heading3: {
+    ...theme.fonts.headlineSmall,
+    fontWeight: 'bold' as const,
+    color: theme.colors.onSurface,
+    fontFamily: 'Kameron',
+  } as TextStyle,
+  text_body: {
+    ...theme.fonts.bodyLarge,
+    color: theme.colors.onSurface,
+  } as TextStyle,
+  text_caption: {
+    ...theme.fonts.labelMedium,
+    color: theme.colors.onSurfaceVariant,
+  } as TextStyle,
+  text_subtitle: {
+    ...theme.fonts.bodyMedium,
+    color: theme.colors.onSurfaceVariant,
+  } as TextStyle,
+  text_link: {
+    color: theme.colors.primary,
+    textDecorationLine: 'underline' as const,
+  } as TextStyle,
+  text_button: {
+    ...theme.fonts.bodyLarge,
+    fontWeight: 'bold' as const,
+    color: theme.colors.onSurface,
+  } as TextStyle,
+  text_label: {
+    ...theme.fonts.labelLarge,
+    color: theme.colors.onSurface,
+    fontWeight: 'bold' as const,
+  } as TextStyle,
+  button_primary: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: 12,
     marginVertical: 8,
-  },
-
-  // ============= Survey Screen =============
-  surveyScreen: {
-    flex: 1,
-    backgroundColor: colors.surfaceVariant,
-  },
-  surveySafeArea: {
-    flex: 1,
-    backgroundColor: colors.surface,
-  },
-  contentSection: {
-    flex: 1,
-    paddingHorizontal: horizontalMargin,
-    paddingTop: spacing.sm,
-    backgroundColor: colors.surfaceVariant,
-  },
-  questionSection: {
-    marginBottom: spacing.md,
-    maxWidth: 600,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  questionText: {
-    ...typography.titleLarge,
-    color: colors.primary800,
-    textAlign: 'left',
-  },
-  optionsContainer: {
-    flex: 1,
-    width: '100%',
-    maxWidth: 600,
-    alignSelf: 'center',
-    gap: touchableSize.spacing,
-  },
-  optionButton: {
-    padding: spacing.sm,
-    borderRadius: spacing.sm,
-    backgroundColor: colors.surface,
-    marginBottom: spacing.xs,
-    width: '100%',
-    minHeight: touchableSize.minHeight,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary900,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  optionButtonSelected: {
-    backgroundColor: colors.primary50,
+  } as ViewStyle,
+  button_secondary: {
+    borderColor: theme.colors.primary,
+    borderRadius: 12,
+    marginVertical: 8,
+  } as ViewStyle,
+  button_contained: {
+    backgroundColor: theme.colors.primary,
+  } as ViewStyle,
+  button_outlined: {
+    borderWidth: 1,
+    borderColor: theme.colors.primary,
+  } as ViewStyle,
+  button_icon: {
+    padding: 8,
+    borderRadius: 20,
+  } as ViewStyle,
+  component_card_elevated: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginVertical: 8,
+  } as ViewStyle,
+  component_card_listItem: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    marginVertical: 8,
+  } as ViewStyle,
+  component_card_selected: {
     borderWidth: 2,
-    borderColor: colors.primary,
-  },
-  optionText: {
-    ...typography.bodyLarge,
-    color: colors.onSurfaceVariant,
-    textAlign: 'left',
-    width: '100%',
-  },
-  optionTextSelected: {
-    color: colors.primary800,
-  },
-  navigationSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.sm,
-    paddingHorizontal: horizontalMargin,
-    paddingBottom: Platform.OS === 'ios' ? spacing.md : spacing.sm,
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: spacing.md,
-    borderTopRightRadius: spacing.md,
-    maxWidth: 600,
-    alignSelf: 'center',
-    width: '100%',
-    gap: spacing.xs,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary900,
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  navigationButton: {
+    borderColor: theme.colors.primary,
+  } as ViewStyle,
+  component_card_interactive: {} as ViewStyle,
+  component_card_container: {
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: theme.colors.surface,
+    marginVertical: 8,
+  } as ViewStyle,
+  component_card_content: {
+    padding: 10,
+  } as ViewStyle,
+  component_form_input: {
+    marginBottom: 16,
+  } as ViewStyle,
+  component_form_error: {
+    color: theme.colors.error,
+    ...theme.fonts.labelSmall,
+    marginTop: 4,
+  } as TextStyle,
+  component_input_container: {
+    marginBottom: 16,
+  } as ViewStyle,
+  component_input_outline: {
+    borderWidth: 1,
+    borderRadius: 8,
+  } as ViewStyle,
+  component_input_content: {
+    paddingVertical: 8,
+    ...theme.fonts.bodyLarge,
+    fontFamily: 'Regular',
+  } as TextStyle,
+  component_input_label: {
+     ...theme.fonts.labelLarge,
+    fontFamily: 'Medium',
+    marginBottom: 4,
+  } as TextStyle,
+  component_input_helper: {
+    ...theme.fonts.labelSmall,
+    fontFamily: 'Regular',
+    marginTop: 4,
+  } as TextStyle,
+  component_input_error: {
+    color: theme.colors.error,
+  } as TextStyle,
+  component_input_field: {
+    padding: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.outline,
+    borderRadius: 4,
+  } as ViewStyle,
+  component_link: {
+    color: theme.colors.primary,
+    textDecorationLine: 'underline' as const,
+  } as TextStyle,
+  component_footer_container: {
+    padding: 16,
+    backgroundColor: theme.colors.surface,
+  } as ViewStyle,
+  component_footer_content: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as FlexAlignType,
+  } as ViewStyle,
+  component_footer_copyright: {
+    ...theme.fonts.labelMedium,
+    color: theme.colors.onSurfaceVariant,
+    marginTop: 10,
+  } as TextStyle,
+  component_footer_link: {
+    ...theme.fonts.bodyMedium,
+    color: theme.colors.primary,
+    textDecorationLine: 'underline' as const,
+  } as TextStyle,
+  component_recommendations_container: {
+    padding: 16,
+  } as ViewStyle,
+  component_recommendations_card: {
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    marginVertical: 8,
+  } as ViewStyle,
+  component_recommendations_grid: {
+    flexDirection: 'row' as const,
+    flexWrap: 'wrap' as const,
+    justifyContent: 'space-between' as const,
+    padding: 16,
+  } as ViewStyle,
+  component_recommendations_scrollView: {} as ViewStyle,
+  component_iconButton_container: {
+    padding: 8,
+    borderRadius: 20,
+  } as ViewStyle,
+  component_iconButton_icon: {
+    width: 24,
+    height: 24,
+  } as ViewStyle,
+  component_progress_container: {
+    height: 4,
+    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: 2,
+  } as ViewStyle,
+  component_progress_bar: {
+    height: 4,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 2,
+  } as ViewStyle,
+  component_progress_grid: {
+    flexDirection: 'row' as const,
+    flexWrap: 'wrap' as const,
+    justifyContent: 'space-between' as const,
+    padding: 16,
+  } as ViewStyle,
+  screen_auth_container: {
     flex: 1,
-    minWidth: touchableSize.minWidth * 2.25,
-    maxWidth: 160,
-    minHeight: touchableSize.minHeight,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: spacing.xs,
-  },
-  navigationButtonLeft: {
-    marginRight: spacing.xs,
-  },
-  navigationButtonRight: {
-    marginLeft: spacing.xs,
-  },
-  navigationButtonLabel: {
-    ...typography.labelLarge,
-    textAlign: 'center',
-    color: colors.onPrimary,
-  },
-
-  // ============= Auth Screens =============
-  authContainer: {
+    backgroundColor: theme.colors.background,
+  } as ViewStyle,
+  screen_auth_form: {
     flex: 1,
-    backgroundColor: colors.surface,
-    padding: spacing.md,
-  },
-  authContent: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: spacing.md,
-  },
-  authHeader: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  authTitle: {
-    ...typography.headlineLarge,
-    color: colors.onSurface,
-    marginBottom: spacing.xs,
-  },
-  authSubtitle: {
-    ...typography.bodyLarge,
-    color: colors.onSurfaceVariant,
-    textAlign: 'center',
-  },
-  authForm: {
-    width: '100%',
-    maxWidth: 400,
-    alignSelf: 'center',
-    gap: spacing.md,
-  },
-  authInput: {
-    backgroundColor: colors.surfaceVariant,
-    borderRadius: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-  },
-  authActions: {
-    marginTop: spacing.md,
-    gap: spacing.sm,
-  },
-  authLink: {
-    ...typography.labelLarge,
-    color: colors.primary,
-    textAlign: 'center',
-  },
-  authLogoContainer: {
-    alignItems: 'center',
-    marginBottom: spacing.xl,
-  },
-  authLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  authLogoText: {
-    ...typography.headlineLarge,
-    color: colors.onPrimary,
-  },
-  authAppTitle: {
-    ...typography.headlineMedium,
-    color: colors.onSurface,
-    textAlign: 'center',
-    marginTop: spacing.sm,
-  },
-  authHeading: {
-    ...typography.headlineLarge,
-    color: colors.onSurface,
-    marginBottom: spacing.sm,
-  },
-  authSubheading: {
-    ...typography.bodyLarge,
-    color: colors.onSurfaceVariant,
-    textAlign: 'center',
-    marginBottom: spacing.lg,
-  },
-  authFormContainer: {
-    width: '100%',
-    maxWidth: 400,
-    alignSelf: 'center',
-  },
-  authFormFields: {
-    gap: spacing.md,
-    marginBottom: spacing.lg,
-  },
-  authPrimaryButton: {
-    backgroundColor: colors.primary,
-    borderRadius: spacing.xs,
-    paddingVertical: spacing.sm,
-  },
-  authTextButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: spacing.xs,
-  },
-  authSnackbar: {
-    backgroundColor: colors.surfaceVariant,
-    marginBottom: spacing.lg,
-  },
-  authErrorText: {
-    ...typography.bodySmall,
-    color: colors.error,
-    marginTop: -spacing.xs,
-    marginBottom: spacing.sm,
-  },
-  authAppIcon: {
-    width: 80,
-    height: 80,
-    resizeMode: 'contain',
-  },
-
-  // ============= Screen-Specific Patterns =============
-  // Player Screen
-  playerContainer: {
-    flex: 1,
-    justifyContent: 'space-between',
     padding: 24,
-  },
-  playerControls: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 24,
-    marginVertical: 32,
-  },
-
-  // Home Screen
-  homeContainer: {
+  } as ViewStyle,
+  screen_auth_header: {
+    marginBottom: 48,
+  } as ViewStyle,
+  screen_auth_footer: {
+    padding: 24,
+    alignItems: 'center' as FlexAlignType,
+  } as ViewStyle,
+  screen_auth_content: {
     flex: 1,
-    backgroundColor: colors.surfaceVariant,
-  },
-  homeContent: {
-    padding: horizontalMargin,
-    gap: spacing.lg,
-  },
-  homeScreenHeader: {
-    ...typography.headlineSmall,
-    color: colors.primary,
-    marginBottom: spacing.xs,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-  },
-
-  // ============= Home Screen =============
-  // Progress Visualization
-  progressCard: {
-    backgroundColor: colors.surface,
-    borderRadius: spacing.lg,
-    padding: spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary900,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
-  },
-  radarChartContainer: {
-    height: 300,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: spacing.lg,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary900,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
-  },
-  radarLabel: {
-    ...typography.bodySmall,
-    color: colors.onSurfaceVariant,
-    position: 'absolute',
-    textAlign: 'center',
-  },
-  // Day Progress
-  dayProgressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: spacing.xs,
-    padding: spacing.md,
-    backgroundColor: colors.surface,
-    borderRadius: spacing.md,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary900,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  dayCircle: {
-    width: touchableSize.minWidth * 0.833,
-    height: touchableSize.minWidth * 0.833,
-    borderRadius: touchableSize.minWidth * 0.417,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface,
-  },
-  // Next Session
-  nextSessionCard: {
-    borderRadius: spacing.xl,
-    overflow: 'hidden',
-    backgroundColor: colors.surface,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary900,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
-  },
-  nextSessionContent: {
-    padding: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  // Action Buttons
-  actionButtonsContainer: {
-    flexDirection: 'row',
-    gap: spacing.md,
-    height: 160,
-  },
-  actionButtonWrapper: {
+    padding: 16,
+  } as ViewStyle,
+  screen_profile_container: {
     flex: 1,
-    backgroundColor: colors.surface,
-    borderRadius: spacing.lg,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary900,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
-  },
-  actionButtonContent: {
-    padding: spacing.lg,
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  actionButtonText: {
-    ...typography.bodyLarge,
-    color: colors.onSurface,
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  // Recent Activities
-  recentActivitiesContainer: {
-    gap: spacing.md,
-  },
-  recentActivityItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: spacing.md,
-    borderRadius: spacing.md,
-    marginBottom: spacing.sm,
-    backgroundColor: colors.surface,
-    ...Platform.select({
-      ios: {
-        shadowColor: colors.primary900,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  recentActivityTitle: {
-    ...typography.titleMedium,
-    color: colors.onSurface,
-  },
-  recentActivitySubtitle: {
-    ...typography.bodyMedium,
-    color: colors.onSurfaceVariant,
-  },
-  recentActivityDuration: {
-    ...typography.labelMedium,
-    color: colors.primary,
-  },
-
-  // ============= Profile Screen =============
-  profileContainer: {
+    backgroundColor: theme.colors.background,
+  } as ViewStyle,
+  screen_profile_header: {
+    padding: 16,
+    alignItems: 'center' as FlexAlignType,
+  } as ViewStyle,
+  screen_profile_content: {
+    padding: 16,
+  } as ViewStyle,
+  screen_home_container: {
     flex: 1,
-    backgroundColor: colors.surfaceVariant,
-  },
-  profileContent: {
-    padding: spacing.xl,
-    gap: spacing.xl,
-  },
-  profileHeader: {
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  profilePhoneNumber: {
-    ...typography.bodyLarge,
-    color: colors.onSurfaceVariant,
-    marginTop: spacing.xs,
-  },
-  profileName: {
-    ...typography.headlineLarge,
-    color: colors.onSurface,
-    fontWeight: '600',
-  },
-  profileStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-  },
-  profileStatItem: {
-    alignItems: 'center',
-    gap: spacing.xxs,
-  },
-  profileStatValue: {
-    ...typography.displaySmall,
-    color: colors.primary,
-    fontWeight: '600',
-  },
-  profileStatLabel: {
-    ...typography.titleMedium,
-    color: colors.onSurfaceVariant,
-  },
-  profileSettings: {
-    gap: spacing.xs,
-  },
-  profileSettingItem: {
-    borderBottomWidth: 1,
-    borderBottomColor: colors.surfaceVariant,
-  },
-  profileSettingContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.xs,
-  },
-  profileSettingIcon: {
-    margin: 0,
-  },
-  profileSettingLabel: {
-    ...typography.bodyLarge,
+    backgroundColor: theme.colors.background,
+  } as ViewStyle,
+  screen_home_header: {
+    marginBottom: 24,
+  } as ViewStyle,
+  screen_home_content: {
+    padding: 16,
+  } as ViewStyle,
+  screen_mood_container: {
     flex: 1,
-    marginLeft: spacing.xs,
-    color: colors.onSurfaceVariant,
-  },
-  centerContentContainer: {
+    backgroundColor: theme.colors.background,
+  } as ViewStyle,
+  screen_mood_header: {
+    marginBottom: 24,
+  } as ViewStyle,
+  screen_mood_content: {
+    padding: 16,
+  } as ViewStyle,
+  screen_mood_grid: {
+    flexDirection: 'row' as const,
+    flexWrap: 'wrap' as const,
+    justifyContent: 'space-between' as const,
+  } as ViewStyle,
+  screen_legal_container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.sm,
-  },
-  buttonIcon: {
-    marginRight: spacing.xs,
-  },
-
-  // ============= Missing GlobalStyles Properties =============
-  // These keys were required by the GlobalStyles interface.
-  formContainer: {},
-  inputError: {},
-  errorText: {},
-  playerProgress: {},
-  playerTime: {},
+    backgroundColor: theme.colors.background,
+  } as ViewStyle,
+    screen_legal_header: {
+        marginBottom: 24,
+    } as ViewStyle,
+    screen_legal_content: {
+        padding: 16,
+    } as ViewStyle,
+    welcome_subtitle: {
+        marginTop: 8,
+        color: theme.colors.onSurfaceVariant,
+        ...theme.fonts.bodyMedium
+    } as TextStyle,
+    welcome_button: {
+        marginBottom: 16,
+    } as ViewStyle,
+    welcome_buttonContent: {
+        height: 48
+    } as ViewStyle,
+    signIn_subtitle: {
+        marginTop: 8,
+        color: theme.colors.onSurfaceVariant,
+        ...theme.fonts.bodyMedium
+    } as TextStyle,
+    playerControls_container: {
+        justifyContent: 'center',
+        gap: 16
+    } as ViewStyle,
+    radarChart_container: {
+      padding: 16
+    } as ViewStyle,
+    radarChart_labelsContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginTop: 16
+    } as ViewStyle,
+    radarChart_label: {
+      width: '50%',
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 8
+    } as ViewStyle,
+    recentActivities_container: {
+      marginBottom: 24
+    } as ViewStyle,
+    recentActivities_title: {
+      marginBottom: 16
+    } as TextStyle,
+    recentActivities_surface: {
+      padding: 0
+    } as ViewStyle,
+    recentActivities_item: {
+      padding: 16,
+      flexDirection: 'row' as const,
+      justifyContent: 'space-between' as const,
+      alignItems: 'center' as FlexAlignType,
+    } as ViewStyle,
+    recentActivities_itemBorder: {
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.surfaceVariant,
+    } as ViewStyle,
+    recommendedMeditations_title: {
+      marginBottom: 16
+    } as TextStyle,
+    recommendedMeditations_duration: {
+      marginTop: 4
+    } as TextStyle,
+    recommendedMeditations_category: {
+      marginTop: 4
+    } as TextStyle,
+    seekableProgress_container: {
+      flexDirection: 'row',
+      alignItems: 'center'
+    } as ViewStyle,
+    seekableProgress_bar: {
+      flex: 1,
+      height: 4,
+      marginHorizontal: 8,
+      borderRadius: 2,
+    } as ViewStyle,
+    surveyOption: {
+      marginVertical: 8,
+      opacity: 1,
+    } as ViewStyle,
+    surveyOption_selected: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderColor: theme.colors.primary,
+      borderWidth: 2,
+    } as ViewStyle,
+    waveformVisualizer_container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: 40
+    } as ViewStyle,
+    waveformVisualizer_bar: {
+      flex: 1,
+      marginHorizontal: 2,
+    } as ViewStyle,
+    welcomeCarousel_item: {
+      alignItems: 'center'
+    } as ViewStyle,
+    welcomeCarousel_description: {
+      marginTop: 16,
+      textAlign: 'center'
+    } as TextStyle,
+    welcomeCarousel_footer: {
+      flexDirection: 'row',
+      justifyContent: 'center'
+    } as ViewStyle,
+    welcomeCarousel_indicator: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginHorizontal: 4
+    } as ViewStyle,
+    legal_heading: {
+      marginBottom: 16
+    } as TextStyle,
+    legal_body: {
+      marginBottom: 24
+    } as TextStyle,
+    legal_subheading: {
+      marginBottom: 8
+    } as TextStyle,
+    mood_subtitle: {
+      marginTop: 8
+    } as TextStyle,
+    mood_chartContainer: {
+      marginTop: 24
+    } as ViewStyle,
+    mood_chartTitle: {
+      marginBottom: 16
+    } as TextStyle,
+    mood_skipButton: {
+      marginTop: 8
+    } as ViewStyle,
+    mood_card: {
+      backgroundColor: theme.colors.surface,
+      borderRadius: 16,
+      padding: 16,
+      marginVertical: 8,
+    },
+    mood_sliderContainer: {
+      marginBottom: 16,
+    } as ViewStyle,
+  mood_sliderLabels: {
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    marginTop: 8,
+  } as ViewStyle,
+    player_headerSurface: {
+      marginBottom: 24
+    } as ViewStyle,
+    player_contentSurface: {
+      marginBottom: 24
+    } as ViewStyle,
+    player_duration: {
+      marginTop: 4
+    } as TextStyle,
+    survey_title: {
+      marginBottom: 24
+    } as TextStyle,
+    survey_footer: {
+      gap: 16
+    } as ViewStyle,
+    home_progressChartContainer: {
+      marginBottom: 32 // Increased marginBottom
+    } as ViewStyle,
+    home_exerciseProgressContainer: {
+      marginBottom: 24
+    } as ViewStyle,
+    home_exerciseProgressTitle: {
+      marginBottom: 16
+    } as TextStyle,
+    home_exerciseProgressGrid: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 8
+    } as ViewStyle,
+    home_exerciseProgressItem: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      justifyContent: 'center',
+      alignItems: 'center',
+    } as ViewStyle,
+    home_startButton: {
+      marginTop: 16
+    } as ViewStyle,
+    home_quickActionsContainer: {
+      flexDirection: 'row',
+      gap: 16,
+      marginBottom: 24
+    } as ViewStyle,
+    home_quickActionItem: {
+      flex: 1
+    } as ViewStyle,
+    home_quickActionButton: {
+      height: 80
+    } as ViewStyle,
+    profile_subtitle: {
+      marginTop: 8,
+      ...theme.fonts.bodyMedium
+    } as TextStyle,
+    profile_section: {
+      marginBottom: 24
+    } as ViewStyle,
+    profile_sectionSubtitle: {
+      marginTop: 8,
+       ...theme.fonts.bodyMedium
+    } as TextStyle,
+    profile_button: {
+      marginTop: 16
+    } as ViewStyle,
+    notFound_text: {
+      marginTop: 16,
+      ...theme.fonts.bodyMedium
+    } as TextStyle,
+    notFound_button: {
+      marginTop: 24
+    } as ViewStyle,
+    breathExercise_container: {
+      padding: 16
+    } as ViewStyle,
+    breathExercise_surface: {
+      flex: 1
+    } as ViewStyle,
+    breathExercise_header: {
+      alignItems: 'center',
+      marginBottom: 24
+    } as ViewStyle,
+    breathExercise_timer: {
+      marginTop: 16
+    } as TextStyle,
+    breathExercise_visualizer: {
+      height: 120,
+      marginBottom: 24
+    } as ViewStyle,
+    breathExercise_footer: {
+      marginTop: 'auto'
+    } as ViewStyle,
+    breathExercise_instruction: {
+      textAlign: 'center',
+      marginBottom: 16
+    } as TextStyle,
+    errorBoundary_message: {
+      marginTop: 8,
+      marginBottom: 24,
+    } as TextStyle,
+    exerciseProgress_container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 16,
+      } as ViewStyle,
+      exerciseProgress_step: {
+        alignItems: 'center',
+        flex: 1, // Add flex: 1 here
+      },
+      exerciseProgress_circle: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        justifyContent: 'center',
+        alignItems: 'center',
+      } as ViewStyle,
+      exerciseProgress_circleText: {
+        ...theme.fonts.bodyMedium,
+        fontWeight: 'bold',
+      } as TextStyle,
+      exerciseProgress_label: {
+        ...theme.fonts.labelMedium,
+        color: theme.colors.onSurfaceVariant,
+        marginTop: 4,
+      } as TextStyle,
+      exerciseProgress_bar: {
+        height: 4,
+        backgroundColor: theme.colors.surfaceVariant,
+        flex: 1, // Add flex: 1 here
+        marginHorizontal: -15, // Add negative margin
+      } as ViewStyle,
 });
+
+export default styles;

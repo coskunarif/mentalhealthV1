@@ -1,74 +1,54 @@
-import React, { useState } from 'react';
-import {
-  TextInput,
-  View,
-  StyleSheet,
-  Animated,
-  TextInputProps,
-  ViewStyle,
-} from 'react-native';
-import { globalStyles } from '../config/styles';
-import { colors } from '../config/colors';
+import React from 'react';
+import { StyleSheet, Text } from 'react-native';
+import { TextInput, TextInputProps, useTheme } from 'react-native-paper';
+import type { AppTheme } from '../types/theme';
+import styles from '../config/styles';
 
-interface EnhancedInputProps extends TextInputProps {
-  containerStyle?: ViewStyle;
+interface EnhancedInputProps extends Omit<TextInputProps, 'theme'> {
+  label?: string;
+  error?: boolean;
+  helperText?: string;
 }
 
-export const EnhancedInput: React.FC<EnhancedInputProps> = ({
-  containerStyle,
+export default function EnhancedInput({
+  label,
+  error,
+  helperText,
+  style,
   ...props
-}) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const animatedScale = new Animated.Value(1);
-
-  const handleFocus = () => {
-    setIsFocused(true);
-    Animated.spring(animatedScale, {
-      toValue: 1.02,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-    Animated.spring(animatedScale, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
-  };
+}: EnhancedInputProps): JSX.Element {
+  const theme = useTheme<AppTheme>();
+  const inputStyles = StyleSheet.create({
+    input: {
+      ...styles.component_input_container,
+      backgroundColor: theme.colors.surface,
+    },
+    outline: {
+      ...styles.component_input_outline,
+      borderColor: error ? theme.colors.error : theme.colors.outline,
+    },
+    content: {
+      ...styles.component_input_content,
+      color: theme.colors.onSurface,
+    },
+  });
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        containerStyle,
-        { transform: [{ scale: animatedScale }] },
-      ]}
-    >
+    <>
       <TextInput
+        mode="outlined"
+        label={label}
+        error={error}
+        style={[inputStyles.input, style]}
+        outlineStyle={inputStyles.outline}
+        contentStyle={inputStyles.content}
         {...props}
-        style={[
-          globalStyles.input,
-          styles.input,
-          isFocused && styles.inputFocused,
-        ]}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        placeholderTextColor={colors.primary400}
       />
-    </Animated.View>
+      {helperText ? (
+        <Text style={{ marginTop: 4, color: error ? theme.colors.error : theme.colors.onSurfaceVariant, fontSize: 12 }}>
+          {helperText}
+        </Text>
+      ) : null}
+    </>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  input: {
-    backgroundColor: colors.surface,
-  },
-  inputFocused: {
-    borderColor: colors.primary,
-    backgroundColor: colors.surfaceVariant,
-  },
-});
+}
