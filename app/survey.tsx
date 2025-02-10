@@ -1,142 +1,86 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, SafeAreaView, StatusBar } from 'react-native';
-import { Text, Button, Surface, TouchableRipple, ProgressBar, useTheme } from 'react-native-paper';
-import { useRouter } from 'expo-router';
-import { globalStyles } from './config/styles';
-import { colors, withOpacity } from './config/colors';
+import { View } from 'react-native';
+import { Text, Button } from 'react-native-paper';
+import { Link } from 'expo-router';
+import styles from './config/styles';
+import QuestionCard from './components/QuestionCard';
 
 const questions = [
   {
-    id: 0,
-    text: 'How do you typically feel or react when you sense danger or a threat?',
-    options: [
-      'I feel a strong urge to or escape the situation',
-      'I become paralyzed with fear',
-      'I remain calm and analytical',
-      'I feel overwhelmed and someone make decisions for me',
-    ],
+    text: 'How are you feeling today?',
+    options: ['Great', 'Good', 'Okay', 'Not so good', 'Bad'],
   },
   {
-    id: 1,
-    text: 'Which definition describes you better',
-    options: [
-      'Option 1',
-      'Option 2',
-      'Option 3',
-      'Option 4',
-    ],
+    text: 'What is your main source of stress?',
+    options: ['Work', 'Relationships', 'Health', 'Finances', 'Other'],
   },
-  // Add more questions as needed
+  {
+    text: 'How often do you feel anxious?',
+    options: ['Never', 'Rarely', 'Sometimes', 'Often', 'Always'],
+  },
+  {
+    text: 'How would you rate your overall mood today?',
+    options: ['Great', 'Good', 'Okay', 'Not so good', 'Bad'],
+  },
+  {
+    text: 'How well did you sleep last night?',
+    options: ['Great', 'Good', 'Okay', 'Not so good', 'Bad'],
+  },
+  {
+    text: 'How would you rate your stress level today?',
+    options: ['Low', 'Moderate', 'High', 'Very High', 'Extremely High'],
+  },
+  {
+    text: 'Have you engaged in any physical activity today?',
+    options: ['Yes', 'No'],
+  },
+  {
+    text: 'Have you practiced any mindfulness or meditation today?',
+    options: ['Yes', 'No'],
+  },
 ];
 
 export default function SurveyScreen() {
-  const router = useRouter();
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<{[key: number]: number}>({});
+  const [answers, setAnswers] = useState<string[]>([]);
 
-  const handleSelect = (questionId: number, optionIndex: number) => {
-    setSelectedAnswers(prev => ({
-      ...prev,
-      [currentQuestion]: optionIndex
-    }));
-  };
+  const handleAnswer = (answer: string) => {
+    const newAnswers = [...answers, answer];
+    setAnswers(newAnswers);
 
-  const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
-    } else {
-      router.replace('/tabs/home');
+      setCurrentQuestion(currentQuestion + 1);
     }
   };
 
-  const handlePrevious = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(prev => prev - 1);
-    }
-  };
+  const progress = (currentQuestion + 1) / questions.length;
 
   return (
-    <View style={globalStyles.surveyScreen}>
-      <StatusBar barStyle="dark-content" backgroundColor={colors.surface} />
-      <SafeAreaView style={globalStyles.surveySafeArea}>
-        {/* Progress Section */}
-        <View style={globalStyles.progressSection}>
-          <Text style={globalStyles.progressText}>
-            Question {currentQuestion + 1} of {questions.length}
-          </Text>
-          <ProgressBar
-            progress={(currentQuestion + 1) / questions.length}
-            color={colors.primary}
-            style={globalStyles.progressBar}
-          />
-        </View>
+    <View style={styles.layout_container}>
+      <View style={styles.layout_content}>
+        <Text style={[styles.text_heading2, styles.survey_title]}>
+          Daily Survey
+        </Text>
 
-        {/* Content Section */}
-        <View style={globalStyles.contentSection}>
-          {/* Question */}
-          <View style={globalStyles.questionSection}>
-            <Text style={globalStyles.questionText}>
-              {questions[currentQuestion].text}
-            </Text>
-          </View>
+        <QuestionCard
+          question={questions[currentQuestion].text}
+          options={questions[currentQuestion].options}
+          onSelect={(index: number) => handleAnswer(questions[currentQuestion].options[index])}
+          currentIndex={currentQuestion}
+          totalQuestions={questions.length}
+          progress={progress}
+        />
 
-          {/* Options */}
-          <View style={globalStyles.optionsContainer}>
-            {questions[currentQuestion].options.map((option, index) => {
-              const isSelected = selectedAnswers[currentQuestion] === index;
-              return (
-                <TouchableRipple
-                  key={index}
-                  onPress={() => handleSelect(currentQuestion, index)}
-                  style={[
-                    globalStyles.optionButton,
-                    isSelected && globalStyles.optionButtonSelected,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      globalStyles.optionText,
-                      isSelected && globalStyles.optionTextSelected
-                    ]}
-                  >
-                    {option}
-                  </Text>
-                </TouchableRipple>
-              );
-            })}
-          </View>
+        <View style={[styles.layout_footer, styles.survey_footer]}>
+          {currentQuestion === questions.length - 1 && (
+            <Link href="/tabs" asChild>
+              <Button mode="contained" style={styles.button_primary}>
+                Submit
+              </Button>
+            </Link>
+          )}
         </View>
-
-        {/* Navigation Section */}
-        <View style={globalStyles.navigationSection}>
-          <Button
-            mode="outlined"
-            onPress={handlePrevious}
-            disabled={currentQuestion === 0}
-            style={[
-              globalStyles.navigationButton,
-              globalStyles.buttonSecondary,
-              globalStyles.navigationButtonLeft
-            ]}
-            labelStyle={globalStyles.buttonLabelSecondary}
-          >
-            Previous
-          </Button>
-          <Button
-            mode="contained"
-            onPress={handleNext}
-            disabled={selectedAnswers[currentQuestion] === undefined}
-            style={[
-              globalStyles.navigationButton,
-              globalStyles.buttonPrimary,
-              globalStyles.navigationButtonRight
-            ]}
-            labelStyle={globalStyles.buttonLabelPrimary}
-          >
-            {currentQuestion === questions.length - 1 ? 'Finish' : 'Next'}
-          </Button>
-        </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }

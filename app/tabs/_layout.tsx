@@ -1,27 +1,27 @@
+import React from 'react';
 import { Tabs } from 'expo-router';
-import { useTheme } from 'react-native-paper';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import styles from '../config/styles';
+import { IconButton, useTheme } from 'react-native-paper';
+import type { AppTheme } from '../types/theme';
 
-export default function TabsLayout() {
-  const theme = useTheme();
-
+export default function TabLayout() {
+  const theme = useTheme<AppTheme>();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: theme.colors.primary,
-        tabBarInactiveTintColor: theme.colors.onSurfaceDisabled,
         tabBarStyle: {
-          borderTopWidth: 1,
-          borderTopColor: theme.colors.surfaceVariant,
-          elevation: 0,
+          backgroundColor: theme.colors.surface,
+          borderTopColor: theme.colors.outlineVariant,
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
         },
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
         tabBarLabelStyle: {
-          fontFamily: theme.fonts.labelMedium.fontFamily,
           fontSize: 12,
+          fontFamily: 'Kameron',
         },
       }}
     >
@@ -29,8 +29,12 @@ export default function TabsLayout() {
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialIcons name="home" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <IconButton 
+              icon="home" 
+              size={24} 
+              iconColor={color}
+            />
           ),
         }}
       />
@@ -38,8 +42,12 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account" size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <IconButton 
+              icon="account" 
+              size={24} 
+              iconColor={color}
+            />
           ),
         }}
       />

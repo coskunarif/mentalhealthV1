@@ -1,89 +1,101 @@
 import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Surface, TouchableRipple, IconButton, useTheme } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { globalStyles } from './config/styles';
-
-const emotions = [
-  { name: 'Enlightenment', color: '#8A2BE2' }, // Purple
-  { name: 'Peace', color: '#9370DB' },
-  { name: 'Joy', color: '#9B59B6' },
-  { name: 'Love', color: '#87CEEB' }, // Light blue
-  { name: 'Reason', color: '#48D1CC' },
-  { name: 'Acceptance', color: '#98FB98' },
-  { name: 'Willingness', color: '#90EE90' },
-  { name: 'Neutrality', color: '#8FBC8F' },
-  { name: 'Courage', color: '#9ACD32' },
-  { name: 'Pride', color: '#FFEB3B' },
-  { name: 'Anger', color: '#FFA07A' },
-  { name: 'Desire', color: '#FFA500' },
-  { name: 'Grief', color: '#FF7F50' },
-  { name: 'Apathy', color: '#FF6347' },
-  { name: 'Guilt', color: '#FF4500' },
-  { name: 'Shame', color: '#FF8C00' },
-];
+import { Text, Button, Card } from 'react-native-paper';
+import { router, useLocalSearchParams } from 'expo-router';
+import styles from './config/styles';
+import type { RootStackParamList } from './types/navigation';
+import Slider from '@react-native-community/slider';
+import colors from './config/colors';
 
 export default function MoodScreen() {
-  const router = useRouter();
-  const theme = useTheme();
-  const [selectedEmotion, setSelectedEmotion] = useState<string>('');
+  const moods = [
+    { label: 'Shame', color: colors.colors.moods.shame },
+    { label: 'Guilt', color: colors.colors.moods.guilt },
+    { label: 'Apathy', color: colors.colors.moods.apathy },
+    { label: 'Grief', color: colors.colors.moods.grief },
+    { label: 'Fear', color: colors.colors.moods.fear },
+    { label: 'Desire', color: colors.colors.moods.desire },
+    { label: 'Anger', color: colors.colors.moods.anger },
+    { label: 'Pride', color: colors.colors.moods.pride },
+    { label: 'Willfulness', color: colors.colors.moods.willfulness },
+  ];
 
-  const handleEmotionSelect = (emotion: string) => {
-    setSelectedEmotion(emotion);
+  const [moodValues, setMoodValues] = useState<{ [key: string]: number }>(
+    moods.reduce((acc, mood) => ({ ...acc, [mood.label]: 0 }), {})
+  );
+  const { returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['mood']>();
+
+  const handleSliderChange = (moodLabel: string, value: number) => {
+    setMoodValues((prevValues) => ({
+      ...prevValues,
+      [moodLabel]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      // TODO: Save mood values to backend
+      console.log(moodValues);
+      router.replace(returnTo as keyof RootStackParamList);
+    } catch (error) {
+      console.error('Error saving mood:', error);
+    }
+  };
+
+  const handleSkip = () => {
+    router.replace(returnTo as keyof RootStackParamList);
   };
 
   return (
-    <Surface style={{ flex: 1, backgroundColor: theme.colors.primaryContainer }}>
-      {/* Back Button */}
-      <View style={{ position: 'absolute', top: 16, left: 16, zIndex: 1 }}>
-        <IconButton
-          icon="arrow-left"
-          mode="contained"
-          size={24}
-          onPress={() => router.back()}
-          containerColor={theme.colors.primary}
-          iconColor={theme.colors.onPrimary}
-        />
-      </View>
-
-      {/* Main Content */}
+    <View style={styles.layout_container}>
       <ScrollView
-        style={{ flex: 1, paddingHorizontal: 24, paddingTop: 80 }}
-        showsVerticalScrollIndicator={false}
+        style={[styles.layout_scrollView, { padding: 16, paddingBottom: 64 }]} // Added padding and paddingBottom
       >
-        <View style={{ gap: 12, paddingBottom: 24 }}>
-          {emotions.map((emotion, index) => {
-            const isSelected = selectedEmotion === emotion.name;
-            return (
-              <TouchableRipple
-                key={index}
-                onPress={() => handleEmotionSelect(emotion.name)}
-                style={{
-                  backgroundColor: isSelected ? emotion.color : `${emotion.color}40`,
-                  borderRadius: 12,
-                  overflow: 'hidden',
-                }}
-              >
-                <View style={{ 
-                  padding: 16,
-                  alignItems: 'center',
-                }}>
-                  <Text
-                    variant="titleMedium"
-                    style={[
-                      globalStyles.text,
-                      { color: isSelected ? 'white' : '#000000' }
-                    ]}
-                  >
-                    {emotion.name}
-                  </Text>
+        <View style={styles.layout_header}>
+          <Text style={styles.text_heading3}>Describe your current mood?</Text>
+        </View>
+
+        <View>
+          {moods.map((mood, index) => (
+            <Card key={index} style={[styles.component_card_elevated, styles.mood_card]}>
+              <Card.Content>
+                <Text style={styles.text_body}>{mood.label}</Text>
+                <Slider
+                  value={moodValues[mood.label]}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={1}
+                  thumbTintColor={mood.color}
+                  minimumTrackTintColor={mood.color}
+                  onValueChange={(value: number) => handleSliderChange(mood.label, value)}
+                />
+                <View style={styles.mood_sliderLabels}>
+                  <Text style={styles.text_caption}>Low</Text>
+                  <Text style={styles.text_caption}>High</Text>
                 </View>
-              </TouchableRipple>
-            );
-          })}
+              </Card.Content>
+            </Card>
+          ))}
+        </View>
+
+        <View style={styles.layout_footer}>
+          <Button
+            mode="contained"
+            onPress={handleSubmit}
+            style={styles.button_contained}
+          >
+            Save Mood
+          </Button>
+
+          <Button
+            mode="outlined"
+            onPress={handleSkip}
+            style={[styles.button_outlined, styles.mood_skipButton]}
+          >
+            Skip
+          </Button>
         </View>
       </ScrollView>
-    </Surface>
+    </View>
   );
 }

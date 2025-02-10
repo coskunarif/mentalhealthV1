@@ -1,73 +1,48 @@
 import React from 'react';
-import { 
-  TouchableOpacity, 
-  Text, 
-  StyleSheet,
-  Animated,
-  ViewStyle,
-  TextStyle,
-  Platform,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { globalStyles } from '../config/styles';
-import { colors } from '../config/colors';
+import { Button, ButtonProps } from 'react-native-paper';
+import { StyleProp, ViewStyle } from 'react-native';
+import styles from '../config/styles';
 
-interface ButtonProps {
-  onPress: () => void;
-  title: string;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
-  variant?: 'primary' | 'secondary';
+type ButtonStyle = StyleProp<ViewStyle>;
+
+interface EnhancedButtonProps extends Omit<ButtonProps, 'style'> {
+  loading?: boolean;
+  fullWidth?: boolean;
+  style?: ButtonStyle;
 }
 
-export const EnhancedButton: React.FC<ButtonProps> = ({
-  onPress,
-  title,
+export default function EnhancedButton({
   style,
-  textStyle,
-  variant = 'primary',
-}) => {
-  const animatedScale = new Animated.Value(1);
+  mode = 'text',
+  fullWidth,
+  ...props
+}: EnhancedButtonProps) {
+  const baseStyle: ButtonStyle = mode === 'contained'
+    ? styles.button_contained
+    : mode === 'outlined'
+      ? styles.button_outlined
+      : undefined;
 
-  const handlePressIn = () => {
-    Animated.spring(animatedScale, {
-      toValue: 0.98,
-      useNativeDriver: true,
-    }).start();
-  };
+  const shapeStyle: ButtonStyle = mode === 'contained' || mode === 'outlined'
+    ? styles.button_primary
+    : undefined;
 
-  const handlePressOut = () => {
-    Animated.spring(animatedScale, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
-  };
+  const fullWidthStyle: ButtonStyle = fullWidth
+    ? { width: '100%' }
+    : undefined;
+
+  const buttonStyle: ButtonStyle = [
+    baseStyle,
+    shapeStyle,
+    fullWidthStyle,
+    style,
+  ].filter(Boolean);
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      activeOpacity={0.8}
-    >
-      <Animated.View
-        style={[
-          globalStyles.button,
-          variant === 'primary' ? globalStyles.buttonPrimary : globalStyles.buttonSecondary,
-          style,
-          { transform: [{ scale: animatedScale }] },
-        ]}
-      >
-        <Text
-          style={[
-            globalStyles.buttonLabel,
-            { color: variant === 'primary' ? colors.onPrimary : colors.primary },
-            textStyle,
-          ]}
-        >
-          {title}
-        </Text>
-      </Animated.View>
-    </TouchableOpacity>
+    <Button
+      mode={mode}
+      style={buttonStyle}
+      {...props}
+    />
   );
-};
+}
