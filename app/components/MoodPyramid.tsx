@@ -24,10 +24,10 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
   const [selectedEmotions, setSelectedEmotions] = useState<EmotionSelection[]>([]);
 
   const emotions: Emotion[] = [
-    { label: 'Peace', color: '#87CEEB', width: '60%' },
-    { label: 'Joy', color: '#FFD700', width: '70%' },
-    { label: 'Love', color: '#FF69B4', width: '80%' },
-    { label: 'Reason', color: '#FFA500', width: '90%' },
+    { label: 'Peace', color: '#87CEEB', width: '40%' },
+    { label: 'Joy', color: '#FFD700', width: '55%' },
+    { label: 'Love', color: '#FF69B4', width: '70%' },
+    { label: 'Reason', color: '#FFA500', width: '85%' },
     { label: 'Acceptance', color: '#9370DB', width: '100%' },
   ];
 
@@ -38,6 +38,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       style: { 
         left: '15%',
         top: 20,
+        zIndex: 1,
       }
     },
     { 
@@ -45,15 +46,17 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       fontSize: 14,
       style: { 
         right: '15%',
-        top: 40,
+        top: 20,
+        zIndex: 1,
       }
     },
     { 
       size: 100,
       fontSize: 12,
       style: { 
-        alignSelf: 'center',
-        top: 120,
+        left: '40%',
+        top: 150,
+        zIndex: 2,
       }
     },
   ];

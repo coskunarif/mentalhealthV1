@@ -44,7 +44,7 @@ export function MoodSelector({
     return '#F44336';
   };
 
-  const renderSliderCard = (mood: MoodType, isMain: boolean = false) => (
+  const renderSliderCard = (mood: MoodType) => (
     <Card 
       key={mood.label}
       style={[
@@ -87,7 +87,6 @@ export function MoodSelector({
         contentContainerStyle={{ paddingBottom: 100 }}
       >
         <Text style={styles.header_shadow}>How are you feeling?</Text>
-        <Text style={[styles.text_body, { marginBottom: 16 }]}>Select all that apply:</Text>
         
         <View style={styles.mood_gridContainer}>
           {moods.map((mood, index) => (
@@ -101,10 +100,10 @@ export function MoodSelector({
             >
               <MaterialCommunityIcons
                 name={mood.icon as any}
-                size={32}
+                size={28}
                 color={mood.color}
               />
-              <Text style={styles.text_caption}>{mood.label}</Text>
+              <Text style={[styles.text_caption, { marginTop: 4 }]}>{mood.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
