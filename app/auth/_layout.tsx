@@ -15,7 +15,7 @@ export default function AuthLayout() {
       screenOptions={{
         ...screenOptions,
         contentStyle: {
-          backgroundColor: styles.screen_auth_container.backgroundColor,
+          backgroundColor: styles.common_screen_auth_container.backgroundColor,
         },
       }}
     >

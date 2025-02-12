@@ -3,7 +3,6 @@ import { View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Link } from 'expo-router';
 import styles from '../config/styles';
-import WelcomeCarousel from '../components/WelcomeCarousel';
 import EnhancedButton from '../components/EnhancedButton';
 import { useAuth } from '../../context/auth';
 
@@ -21,14 +20,14 @@ export default function Welcome() {
   return (
     <View style={styles.layout_container}>
       <View style={styles.layout_content}>
-        <View style={styles.screen_auth_header}>
+        <View style={styles.common_screen_auth_header}>
           <Text style={styles.text_heading1}>Welcome Back</Text>
           <Text style={[styles.text_body, styles.signIn_subtitle]}>
             Sign in to continue your journey
           </Text>
         </View>
 
-        <View style={styles.screen_auth_form}>
+        <View style={styles.common_screen_auth_form}>
           <EnhancedButton
             mode="contained"
             onPress={handleSignIn}
@@ -50,7 +49,7 @@ export default function Welcome() {
           </EnhancedButton>
         </View>
 
-        <View style={styles.screen_auth_footer}>
+        <View style={styles.common_screen_auth_footer}>
           <Text style={styles.text_body}>Don't have an account? </Text>
           <Link href="/auth/sign-up" style={styles.text_link}>
             <Text style={[styles.text_body, styles.text_link]}>

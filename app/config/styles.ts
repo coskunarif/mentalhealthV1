@@ -230,22 +230,66 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between' as const,
     padding: 16,
   } as ViewStyle,
-  screen_auth_container: {
+  common_screen_auth_container: {
     flex: 1,
     backgroundColor: theme.colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   } as ViewStyle,
-  screen_auth_form: {
+  common_screen_auth_form: {
     width: '100%',
     maxWidth: 400,
     padding: 24,
   } as ViewStyle,
-  screen_auth_header: {
+  common_screen_auth_header: {
     marginBottom: 32,
     alignItems: 'center',
   } as ViewStyle,
-  screen_auth_footer: {
+  common_screen_auth_footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  } as ViewStyle,
+  signIn_screen_auth_container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as ViewStyle,
+  signIn_screen_auth_form: {
+    width: '100%',
+    maxWidth: 400,
+    padding: 24,
+  } as ViewStyle,
+  signIn_screen_auth_header: {
+    marginBottom: 32,
+    alignItems: 'center',
+  } as ViewStyle,
+  signIn_screen_auth_footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  } as ViewStyle,
+  welcome_screen_auth_container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as ViewStyle,
+ welcome_screen_auth_form: {
+    width: '100%',
+    maxWidth: 400,
+    padding: 24,
+  } as ViewStyle,
+ welcome_screen_auth_header: {
+    marginBottom: 32,
+    alignItems: 'center',
+  } as ViewStyle,
+ welcome_screen_auth_footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
