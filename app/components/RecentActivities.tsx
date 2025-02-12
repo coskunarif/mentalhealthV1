@@ -26,7 +26,15 @@ export default function RecentActivities({ activities }: RecentActivitiesProps) 
         {activities.map((activity, index) => (
           <Link
             key={activity.id}
-            href={`/breath-exercise?id=${activity.id}`}
+            href={{
+              pathname: "/player",
+              params: { 
+                meditationId: activity.id,
+                title: activity.title,
+                subtitle: activity.subtitle,
+                returnTo: 'tabs/home'
+              }
+            }}
             asChild
           >
             <Pressable>

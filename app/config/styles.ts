@@ -133,21 +133,23 @@ const styles = StyleSheet.create({
     marginTop: 4,
   } as TextStyle,
   component_input_container: {
-    marginBottom: 16,
+    marginBottom: 24,
   } as ViewStyle,
   component_input_outline: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
   } as ViewStyle,
   component_input_content: {
-    paddingVertical: 8,
+    paddingVertical: 12,
     ...theme.fonts.bodyLarge,
     fontFamily: 'Regular',
   } as TextStyle,
   component_input_label: {
-     ...theme.fonts.labelLarge,
+    ...theme.fonts.labelLarge,
     fontFamily: 'Medium',
-    marginBottom: 4,
+    marginBottom: 8,
+    color: theme.colors.onSurface,
+    fontWeight: 'bold',
   } as TextStyle,
   component_input_helper: {
     ...theme.fonts.labelSmall,
@@ -156,12 +158,16 @@ const styles = StyleSheet.create({
   } as TextStyle,
   component_input_error: {
     color: theme.colors.error,
+    marginTop: 4,
+    ...theme.fonts.labelMedium,
   } as TextStyle,
   component_input_field: {
-    padding: 8,
+    padding: 12,
     borderWidth: 1,
     borderColor: theme.colors.outline,
-    borderRadius: 4,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    fontSize: 16,
   } as ViewStyle,
   component_link: {
     color: theme.colors.primary,
@@ -226,20 +232,71 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between' as const,
     padding: 16,
   } as ViewStyle,
-  screen_auth_container: {
+  common_screen_auth_container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
   } as ViewStyle,
-  screen_auth_form: {
+  common_screen_auth_form: {
+    width: '100%',
+    maxWidth: 400,
+    padding: 24,
+  } as ViewStyle,
+  common_screen_auth_header: {
+    marginBottom: 32,
+    alignItems: 'center',
+  } as ViewStyle,
+  common_screen_auth_footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  } as ViewStyle,
+  signIn_screen_auth_container: {
     flex: 1,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as ViewStyle,
+  signIn_screen_auth_form: {
+    width: '100%',
+    maxWidth: 400,
     padding: 24,
   } as ViewStyle,
-  screen_auth_header: {
-    marginBottom: 48,
+  signIn_screen_auth_header: {
+    marginBottom: 32,
+    alignItems: 'center',
   } as ViewStyle,
-  screen_auth_footer: {
+  signIn_screen_auth_footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  } as ViewStyle,
+  welcome_screen_auth_container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as ViewStyle,
+ welcome_screen_auth_form: {
+    width: '100%',
+    maxWidth: 400,
     padding: 24,
-    alignItems: 'center' as FlexAlignType,
+  } as ViewStyle,
+ welcome_screen_auth_header: {
+    marginBottom: 32,
+    alignItems: 'center',
+  } as ViewStyle,
+ welcome_screen_auth_footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
   } as ViewStyle,
   screen_auth_content: {
     flex: 1,
@@ -533,175 +590,82 @@ const styles = StyleSheet.create({
       marginTop: 8,
       marginBottom: 24,
     } as TextStyle,
-    exerciseProgress_container: {
+  exerciseProgress_container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+  } as ViewStyle,
+  exerciseProgress_step: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  exerciseProgress_circle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  } as ViewStyle,
+  exerciseProgress_circleText: {
+    ...theme.fonts.bodyMedium,
+    fontWeight: 'bold',
+  } as TextStyle,
+  exerciseProgress_label: {
+    ...theme.fonts.labelMedium,
+    color: theme.colors.onSurfaceVariant,
+    marginTop: 4,
+  } as ViewStyle,
+  exerciseProgress_bar: {
+    height: 4,
+    backgroundColor: theme.colors.surfaceVariant,
+    flex: 1,
+    marginHorizontal: -15,
+  } as ViewStyle,
+    player_container: {
+        flex: 1,
+        backgroundColor: theme.colors.background,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+    } as ViewStyle,
+    player_content: {
+        width: '100%',
+        alignItems: 'center',
+    } as ViewStyle,
+    player_title: {
+        ...theme.fonts.displayMedium,
+        color: theme.colors.secondary,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 8,
+    } as TextStyle,
+    player_subtitle: {
+        ...theme.fonts.headlineSmall,
+        color: theme.colors.onSurfaceVariant,
+        marginBottom: 4,
+        textAlign: 'center'
+    } as TextStyle,
+    player_controls: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 16,
-      } as ViewStyle,
-      exerciseProgress_step: {
-        alignItems: 'center',
-        flex: 1, // Add flex: 1 here
-      },
-      exerciseProgress_circle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
         justifyContent: 'center',
+        marginTop: 16,
+    } as ViewStyle,
+    player_progress_container: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-      } as ViewStyle,
-      exerciseProgress_circleText: {
-        ...theme.fonts.bodyMedium,
-        fontWeight: 'bold',
-      } as TextStyle,
-      exerciseProgress_label: {
-        ...theme.fonts.labelMedium,
-        color: theme.colors.onSurfaceVariant,
-        marginTop: 4,
-      } as TextStyle,
-      exerciseProgress_bar: {
-        height: 4,
+        marginTop: 24,
+        marginBottom: 16,
+    } as ViewStyle,
+    player_progress_bar_container: {
+        flex: 1,
+        height: 10,
         backgroundColor: theme.colors.surfaceVariant,
-        flex: 1, // Add flex: 1 here
-        marginHorizontal: -15, // Add negative margin
-      } as ViewStyle,
-  mood_item: {
-    width: '30%',
-    aspectRatio: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: theme.colors.outline,
-    padding: 8,
-    marginBottom: 16,
-  } as ViewStyle,
-  mood_headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-  } as ViewStyle,
-  mood_backButton: {
-    marginTop: 8,
-  } as ViewStyle,
-  mood_row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  } as ViewStyle,
-  mood_scrollContainer: {
-    marginBottom: 16,
-  } as ViewStyle,
-  mood_slider_card: {
-    marginVertical: 16,
-  } as ViewStyle,
-  mood_gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginVertical: 16,
-    width: '100%',
-  } as ViewStyle,
-  mood_submitButton: {
-    marginTop: 16,
-  } as ViewStyle,
-  pyramid_container: {
-    alignItems: 'center',
-    marginVertical: 24,
-  } as ViewStyle,
-  pyramid_item: {
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 8,
-    alignItems: 'center',
-    alignSelf: 'center',
-  } as ViewStyle,
-  pyramid_itemSelected: {
-    borderWidth: 2,
-    borderColor: theme.colors.primary,
-  } as ViewStyle,
-  pyramid_text: {
-    ...theme.fonts.bodyLarge,
-    color: theme.colors.onPrimary,
-    fontWeight: 'bold',
-  } as TextStyle,
-  pyramid_focusTitle: {
-    marginTop: 32,
-    marginBottom: 16,
-  } as TextStyle,
-  pyramid_bubbleContainer: {
-    position: 'relative',
-    minHeight: 250,
-    width: '100%',
-    marginTop: 16,
-    marginBottom: 100,
-  } as ViewStyle,
-  pyramid_bubble: {
-    position: 'absolute',
-    borderRadius: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-  } as ViewStyle,
-  pyramid_bubbleText: {
-    ...theme.fonts.bodyMedium,
-    color: theme.colors.onPrimary,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  } as TextStyle,
-  mood_nextButton: {
-    marginTop: 8,
-  } as ViewStyle,
-  mood_screen: {
-    flex: 1,
-  } as ViewStyle,
-  mood_pagination: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    padding: 16,
-  } as ViewStyle,
-  mood_paginationDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: theme.colors.surfaceVariant,
-    marginHorizontal: 4,
-  } as ViewStyle,
-  mood_paginationDotActive: {
-    backgroundColor: theme.colors.primary,
-  } as ViewStyle,
-  mood_buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: theme.colors.background,
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.outline,
-    zIndex: 1000,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-  } as ViewStyle,
-  mood_button: {
-    flex: 1,
-    borderRadius: 25,
-    height: 45,
-  } as ViewStyle,
-  mood_buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    paddingVertical: 4,
-    textTransform: 'none',
-  } as TextStyle,
+        marginHorizontal: -15,
+    } as ViewStyle,
 });
 
 export default styles;
