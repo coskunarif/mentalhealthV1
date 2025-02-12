@@ -54,7 +54,7 @@ export default function Home() {
 
     const handleStartExercise = () => {
         if (nextExercise) {
-            router.push(`/breath-exercise?id=${nextExercise.id}`);
+            router.push(`/player?meditationId=${nextExercise.id}`);
         }
     };
 
@@ -76,12 +76,12 @@ export default function Home() {
                 mode="contained"
                 onPress={handleStartExercise}
                 style={styles.home_startButton}
-                labelStyle={styles.text_button}
-              >
-                Start {nextExercise.id}
-              </Button>
-            )}
-          </View>
+              labelStyle={styles.text_button}
+            >
+              Start {nextExercise.title}
+            </Button>
+          )}
+        </View>
 
         {/* Quick Actions */}
         <View style={styles.home_quickActionsContainer}>
