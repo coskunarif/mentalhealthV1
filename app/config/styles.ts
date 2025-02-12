@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import type { FlexAlignType, TextStyle, ViewStyle } from 'react-native';
 import { theme } from '../config/theme';
+import colors from './colors';
 
 const styles = StyleSheet.create({
   // colors: theme.colors, // No need to include colors here
@@ -91,6 +92,7 @@ const styles = StyleSheet.create({
   button_outlined: {
     borderWidth: 1,
     borderColor: theme.colors.primary,
+    backgroundColor: 'transparent',
   } as ViewStyle,
   button_icon: {
     padding: 8,
@@ -275,9 +277,10 @@ const styles = StyleSheet.create({
     padding: 16,
   } as ViewStyle,
   screen_mood_grid: {
-    flexDirection: 'row' as const,
-    flexWrap: 'wrap' as const,
-    justifyContent: 'space-between' as const,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginVertical: 16,
   } as ViewStyle,
   screen_legal_container: {
     flex: 1,
@@ -562,6 +565,143 @@ const styles = StyleSheet.create({
         flex: 1, // Add flex: 1 here
         marginHorizontal: -15, // Add negative margin
       } as ViewStyle,
+  mood_item: {
+    width: '30%',
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.outline,
+    padding: 8,
+    marginBottom: 16,
+  } as ViewStyle,
+  mood_headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  } as ViewStyle,
+  mood_backButton: {
+    marginTop: 8,
+  } as ViewStyle,
+  mood_row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  } as ViewStyle,
+  mood_scrollContainer: {
+    marginBottom: 16,
+  } as ViewStyle,
+  mood_slider_card: {
+    marginVertical: 16,
+  } as ViewStyle,
+  mood_gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginVertical: 16,
+    width: '100%',
+  } as ViewStyle,
+  mood_submitButton: {
+    marginTop: 16,
+  } as ViewStyle,
+  pyramid_container: {
+    alignItems: 'center',
+    marginVertical: 24,
+  } as ViewStyle,
+  pyramid_item: {
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 8,
+    alignItems: 'center',
+    alignSelf: 'center',
+  } as ViewStyle,
+  pyramid_itemSelected: {
+    borderWidth: 2,
+    borderColor: theme.colors.primary,
+  } as ViewStyle,
+  pyramid_text: {
+    ...theme.fonts.bodyLarge,
+    color: theme.colors.onPrimary,
+    fontWeight: 'bold',
+  } as TextStyle,
+  pyramid_focusTitle: {
+    marginTop: 32,
+    marginBottom: 16,
+  } as TextStyle,
+  pyramid_bubbleContainer: {
+    position: 'relative',
+    minHeight: 250,
+    width: '100%',
+    marginTop: 16,
+    marginBottom: 100,
+  } as ViewStyle,
+  pyramid_bubble: {
+    position: 'absolute',
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  } as ViewStyle,
+  pyramid_bubbleText: {
+    ...theme.fonts.bodyMedium,
+    color: theme.colors.onPrimary,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  } as TextStyle,
+  mood_nextButton: {
+    marginTop: 8,
+  } as ViewStyle,
+  mood_screen: {
+    flex: 1,
+  } as ViewStyle,
+  mood_pagination: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 16,
+  } as ViewStyle,
+  mood_paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: theme.colors.surfaceVariant,
+    marginHorizontal: 4,
+  } as ViewStyle,
+  mood_paginationDotActive: {
+    backgroundColor: theme.colors.primary,
+  } as ViewStyle,
+  mood_buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: theme.colors.background,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.outline,
+    zIndex: 1000,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  } as ViewStyle,
+  mood_button: {
+    flex: 1,
+    borderRadius: 25,
+    height: 45,
+  } as ViewStyle,
+  mood_buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingVertical: 4,
+    textTransform: 'none',
+  } as TextStyle,
 });
 
 export default styles;
