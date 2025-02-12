@@ -21,6 +21,8 @@ export type RootStackParamList = {
   };
   player: {
     meditationId: string;
+    title?: string;
+    subtitle?: string;
     returnTo?: keyof RootStackParamList;
   };
   welcome: undefined;
