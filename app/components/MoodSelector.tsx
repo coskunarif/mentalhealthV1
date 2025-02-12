@@ -23,6 +23,13 @@ type Props = {
   onFinish: () => void;
 };
 
+const relatedMoods: { [key: string]: string[] } = {
+  'Shame': ['Humiliation'],
+  'Guilt': ['Grief', 'Regret'],
+  'Fear': ['Anxiety'],
+  'Anger': ['Hate', 'Aggression']
+};
+
 export function MoodSelector({ 
   moods, 
   selectedMood, 
@@ -37,14 +44,50 @@ export function MoodSelector({
     return '#F44336';
   };
 
+  const renderSliderCard = (mood: MoodType, isMain: boolean = false) => (
+    <Card 
+      key={mood.label}
+      style={[
+        styles.component_card_elevated, 
+        styles.mood_slider_card,
+        { padding: 6, marginVertical: 1 }
+      ]}
+    >
+      <Card.Content style={{ gap: 2 }}>
+        <View style={styles.mood_headerRow}>
+          <MaterialCommunityIcons
+            name={mood.icon as any}
+            size={14}
+            color={mood.color}
+          />
+          <Text style={[styles.text_body, { fontSize: 11 }]}>{mood.label}</Text>
+        </View>
+        <Slider
+          value={mood.value}
+          minimumValue={0}
+          maximumValue={100}
+          step={1}
+          thumbTintColor={getSliderColor(mood.value)}
+          minimumTrackTintColor={getSliderColor(mood.value)}
+          onValueChange={onSliderChange}
+          style={{ height: 16 }}
+        />
+        <View style={[styles.mood_sliderLabels, { marginTop: -2 }]}>
+          <Text style={[styles.text_caption, { fontSize: 9 }]}>Low</Text>
+          <Text style={[styles.text_caption, { fontSize: 9 }]}>High</Text>
+        </View>
+      </Card.Content>
+    </Card>
+  );
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView 
         style={[styles.layout_scrollView, { padding: 16 }]}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <Text style={styles.text_heading3}>How are you feeling?</Text>
-        <Text style={styles.text_body}>Select all that apply:</Text>
+        <Text style={styles.header_shadow}>How are you feeling?</Text>
+        <Text style={[styles.text_body, { marginBottom: 16 }]}>Select all that apply:</Text>
         
         <View style={styles.mood_gridContainer}>
           {moods.map((mood, index) => (
@@ -67,31 +110,17 @@ export function MoodSelector({
         </View>
 
         {selectedMood && (
-          <Card style={[styles.component_card_elevated, styles.mood_slider_card]}>
-            <Card.Content>
-              <View style={styles.mood_headerRow}>
-                <MaterialCommunityIcons
-                  name={selectedMood.icon as any}
-                  size={24}
-                  color={selectedMood.color}
-                />
-                <Text style={styles.text_body}>{selectedMood.label}</Text>
-              </View>
-              <Slider
-                value={selectedMood.value}
-                minimumValue={0}
-                maximumValue={100}
-                step={1}
-                thumbTintColor={getSliderColor(selectedMood.value)}
-                minimumTrackTintColor={getSliderColor(selectedMood.value)}
-                onValueChange={onSliderChange}
-              />
-              <View style={styles.mood_sliderLabels}>
-                <Text style={styles.text_caption}>Low</Text>
-                <Text style={styles.text_caption}>High</Text>
-              </View>
-            </Card.Content>
-          </Card>
+          <View style={{ gap: 4 }}>
+            {renderSliderCard(selectedMood)}
+            {relatedMoods[selectedMood.label]?.map(relatedMood => {
+              const relatedMoodData = {
+                ...selectedMood,
+                label: relatedMood,
+                value: 0,
+              };
+              return renderSliderCard(relatedMoodData);
+            })}
+          </View>
         )}
       </ScrollView>
       <View style={styles.mood_buttonContainer}>

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button, Surface } from 'react-native-paper';
+import { Text, Button, Surface, Snackbar } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
 import styles from '../config/styles';
@@ -8,6 +8,22 @@ import styles from '../config/styles';
 export default function ProfileScreen() {
   const router = useRouter();
   const { signOut } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSignOut = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await signOut();
+      // Navigation will be handled by the root navigator
+    } catch (err) {
+      setError('Failed to sign out. Please try again.');
+      console.error('Sign out error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <View style={styles.layout_container}>
@@ -66,13 +82,25 @@ export default function ProfileScreen() {
           </Text>
           <Button
             mode="outlined"
-            onPress={signOut}
+            onPress={handleSignOut}
+            loading={isLoading}
+            disabled={isLoading}
             style={[styles.button_secondary, styles.profile_button]}
           >
-            Sign Out
+            {isLoading ? 'Signing Out...' : 'Sign Out'}
           </Button>
         </Surface>
       </ScrollView>
+      <Snackbar
+        visible={!!error}
+        onDismiss={() => setError(null)}
+        action={{
+          label: 'Dismiss',
+          onPress: () => setError(null),
+        }}
+      >
+        {error}
+      </Snackbar>
     </View>
   );
 }

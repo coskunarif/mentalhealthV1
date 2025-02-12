@@ -27,14 +27,35 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
     { label: 'Peace', color: '#87CEEB', width: '60%' },
     { label: 'Joy', color: '#FFD700', width: '70%' },
     { label: 'Love', color: '#FF69B4', width: '80%' },
-    { label: 'Reason', color: '#E6E6FA', width: '90%' },
-    { label: 'Acceptance', color: '#E6E6FA', width: '100%' },
+    { label: 'Reason', color: '#FFA500', width: '90%' },
+    { label: 'Acceptance', color: '#9370DB', width: '100%' },
   ];
 
   const bubbleConfig = [
-    { size: 120, style: { alignSelf: 'flex-end', marginRight: 20 } }, // En büyük, sağa yakın
-    { size: 100, style: { alignSelf: 'center', marginTop: 30, marginLeft: 40 } }, // Ortada ve biraz aşağıda
-    { size: 80, style: { alignSelf: 'flex-end', marginTop: -20, marginRight: 60 } }, // En küçük, sağ ve aşağıda
+    { 
+      size: 140,
+      fontSize: 16,
+      style: { 
+        left: '15%',
+        top: 20,
+      }
+    },
+    { 
+      size: 120,
+      fontSize: 14,
+      style: { 
+        right: '15%',
+        top: 40,
+      }
+    },
+    { 
+      size: 100,
+      fontSize: 12,
+      style: { 
+        alignSelf: 'center',
+        top: 120,
+      }
+    },
   ];
 
   const handleEmotionSelect = (emotion: Emotion) => {
@@ -102,7 +123,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
             {selectedEmotions[index] && (
               <Text style={[
                 styles.pyramid_bubbleText,
-                { fontSize: config.size * 0.2 } // Bubble boyutuna göre font size
+                { fontSize: config.fontSize }
               ]}>
                 {selectedEmotions[index].label}
               </Text>
