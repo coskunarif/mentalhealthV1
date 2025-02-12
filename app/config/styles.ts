@@ -131,21 +131,23 @@ const styles = StyleSheet.create({
     marginTop: 4,
   } as TextStyle,
   component_input_container: {
-    marginBottom: 16,
+    marginBottom: 24,
   } as ViewStyle,
   component_input_outline: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
   } as ViewStyle,
   component_input_content: {
-    paddingVertical: 8,
+    paddingVertical: 12,
     ...theme.fonts.bodyLarge,
     fontFamily: 'Regular',
   } as TextStyle,
   component_input_label: {
-     ...theme.fonts.labelLarge,
+    ...theme.fonts.labelLarge,
     fontFamily: 'Medium',
-    marginBottom: 4,
+    marginBottom: 8,
+    color: theme.colors.onSurface,
+    fontWeight: 'bold',
   } as TextStyle,
   component_input_helper: {
     ...theme.fonts.labelSmall,
@@ -154,12 +156,16 @@ const styles = StyleSheet.create({
   } as TextStyle,
   component_input_error: {
     color: theme.colors.error,
+    marginTop: 4,
+    ...theme.fonts.labelMedium,
   } as TextStyle,
   component_input_field: {
-    padding: 8,
+    padding: 12,
     borderWidth: 1,
     borderColor: theme.colors.outline,
-    borderRadius: 4,
+    borderRadius: 12,
+    backgroundColor: theme.colors.surface,
+    fontSize: 16,
   } as ViewStyle,
   component_link: {
     color: theme.colors.primary,
@@ -224,20 +230,71 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between' as const,
     padding: 16,
   } as ViewStyle,
-  screen_auth_container: {
+  common_screen_auth_container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
   } as ViewStyle,
-  screen_auth_form: {
+  common_screen_auth_form: {
+    width: '100%',
+    maxWidth: 400,
+    padding: 24,
+  } as ViewStyle,
+  common_screen_auth_header: {
+    marginBottom: 32,
+    alignItems: 'center',
+  } as ViewStyle,
+  common_screen_auth_footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  } as ViewStyle,
+  signIn_screen_auth_container: {
     flex: 1,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as ViewStyle,
+  signIn_screen_auth_form: {
+    width: '100%',
+    maxWidth: 400,
     padding: 24,
   } as ViewStyle,
-  screen_auth_header: {
-    marginBottom: 48,
+  signIn_screen_auth_header: {
+    marginBottom: 32,
+    alignItems: 'center',
   } as ViewStyle,
-  screen_auth_footer: {
+  signIn_screen_auth_footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  } as ViewStyle,
+  welcome_screen_auth_container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  } as ViewStyle,
+ welcome_screen_auth_form: {
+    width: '100%',
+    maxWidth: 400,
     padding: 24,
-    alignItems: 'center' as FlexAlignType,
+  } as ViewStyle,
+ welcome_screen_auth_header: {
+    marginBottom: 32,
+    alignItems: 'center',
+  } as ViewStyle,
+ welcome_screen_auth_footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
   } as ViewStyle,
   screen_auth_content: {
     flex: 1,
