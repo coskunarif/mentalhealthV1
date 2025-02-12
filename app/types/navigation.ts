@@ -27,6 +27,7 @@ export type RootStackParamList = {
   };
   welcome: undefined;
   'not-found': undefined;
+  'mood-pyramid': undefined;
 };
 
 declare global {

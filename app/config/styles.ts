@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import type { FlexAlignType, TextStyle, ViewStyle } from 'react-native';
 import { theme } from '../config/theme';
+import colors from './colors';
 
 const styles = StyleSheet.create({
   // colors: theme.colors, // No need to include colors here
@@ -91,6 +92,7 @@ const styles = StyleSheet.create({
   button_outlined: {
     borderWidth: 1,
     borderColor: theme.colors.primary,
+    backgroundColor: 'transparent',
   } as ViewStyle,
   button_icon: {
     padding: 8,
@@ -332,9 +334,10 @@ const styles = StyleSheet.create({
     padding: 16,
   } as ViewStyle,
   screen_mood_grid: {
-    flexDirection: 'row' as const,
-    flexWrap: 'wrap' as const,
-    justifyContent: 'space-between' as const,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginVertical: 16,
   } as ViewStyle,
   screen_legal_container: {
     flex: 1,
@@ -484,9 +487,9 @@ const styles = StyleSheet.create({
       marginBottom: 16,
     } as ViewStyle,
   mood_sliderLabels: {
-    flexDirection: 'row' as const,
-    justifyContent: 'space-between' as const,
-    marginTop: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 1,
   } as ViewStyle,
     player_headerSurface: {
       marginBottom: 24
@@ -661,21 +664,120 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 10,
         backgroundColor: theme.colors.surfaceVariant,
-        borderRadius: 8,
-        marginHorizontal: 16
+        marginHorizontal: -15,
     } as ViewStyle,
-  player_progress_bar: {
-    height: 10,
-    backgroundColor: theme.colors.secondary,
-    borderRadius: 8,
+  mood_slider_card: {
+    marginVertical: 1,
   } as ViewStyle,
-  player_time: {
-    ...theme.fonts.bodyMedium,
+  mood_headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginBottom: 2,
+  } as ViewStyle,
+  header_shadow: {
+    fontSize: 20,
     color: theme.colors.onSurfaceVariant,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
+    marginBottom: 16,
+  } as TextStyle,
+  mood_gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    gap: 12,
   } as ViewStyle,
-    player_button: {
-        margin: 16
-    } as ViewStyle,
+  mood_item: {
+    width: '30%', // 3'lü grid için
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.outline,
+    padding: 8,
+  } as ViewStyle,
+  pyramid_container: {
+    alignItems: 'center',
+    marginVertical: 24,
+    paddingHorizontal: 16,
+  } as ViewStyle,
+  pyramid_item: {
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 12,
+    alignItems: 'center',
+    alignSelf: 'center',
+  } as ViewStyle,
+  pyramid_bubbleContainer: {
+    position: 'relative',
+    minHeight: 200,
+    width: '100%',
+    marginTop: 30,
+    marginBottom: 100,
+  } as ViewStyle,
+  pyramid_bubble: {
+    position: 'absolute',
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    borderWidth: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  } as ViewStyle,
+  pyramid_text: {
+    ...theme.fonts.bodyLarge,
+    color: theme.colors.onPrimary,
+    fontWeight: 'bold',
+    fontSize: 14,
+  } as TextStyle,
+  pyramid_itemSelected: {
+    borderWidth: 2,
+    borderColor: theme.colors.primary,
+  } as ViewStyle,
+  pyramid_focusTitle: {
+    marginTop: 32,
+    marginBottom: 16,
+  } as TextStyle,
+  pyramid_bubbleText: {
+    color: theme.colors.onPrimary,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  } as TextStyle,
+  mood_buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: theme.colors.background,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.outline,
+    zIndex: 1000,
+    elevation: 5,
+  } as ViewStyle,
+  mood_button: {
+    flex: 1,
+    borderRadius: 25,
+    height: 45,
+  } as ViewStyle,
+  mood_buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingVertical: 4,
+    textTransform: 'none',
+  } as TextStyle,
 });
 
 export default styles;
