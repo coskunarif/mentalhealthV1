@@ -37,14 +37,14 @@ export default function ForgotPasswordScreen() {
   return (
     <View style={styles.layout_container}>
       <View style={styles.layout_content}>
-        <View style={styles.screen_auth_header}>
+        <View style={styles.common_screen_auth_header}>
           <Text style={styles.text_heading1}>Reset Password</Text>
           <Text style={styles.text_body}>
             Enter your email to receive a password reset link
           </Text>
         </View>
 
-        <View style={styles.screen_auth_form}>
+        <View style={styles.common_screen_auth_form}>
           <View style={styles.component_input_container}>
             <Text style={styles.component_input_label}>Email</Text>
             <TextInput
@@ -69,7 +69,7 @@ export default function ForgotPasswordScreen() {
             Send Reset Link
           </Button>
 
-          <View style={styles.screen_auth_footer}>
+          <View style={styles.common_screen_auth_footer}>
             <Text style={styles.text_body}>Remember your password? </Text>
             <Link href="/auth/sign-in" style={styles.text_link}>
               Sign In
