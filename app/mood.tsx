@@ -1,40 +1,64 @@
-import React, { useState } from 'react';
-import { View, ScrollView } from 'react-native';
-import { Text, Button, Card } from 'react-native-paper';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, ScrollView, Dimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import styles from './config/styles';
 import type { RootStackParamList } from './types/navigation';
-import Slider from '@react-native-community/slider';
-import colors from './config/colors';
+import styles from './config/styles';
+import { MoodSelector } from './components/MoodSelector';
+import { MoodPyramid } from './components/MoodPyramid';
+
+type MoodType = {
+  label: string;
+  color: string;
+  icon: string;
+  value: number;
+  isSelected: boolean;
+};
 
 export default function MoodScreen() {
-  const moods = [
-    { label: 'Shame', color: colors.colors.moods.shame },
-    { label: 'Guilt', color: colors.colors.moods.guilt },
-    { label: 'Apathy', color: colors.colors.moods.apathy },
-    { label: 'Grief', color: colors.colors.moods.grief },
-    { label: 'Fear', color: colors.colors.moods.fear },
-    { label: 'Desire', color: colors.colors.moods.desire },
-    { label: 'Anger', color: colors.colors.moods.anger },
-    { label: 'Pride', color: colors.colors.moods.pride },
-    { label: 'Willfulness', color: colors.colors.moods.willfulness },
-  ];
+  const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
+  const [moods, setMoods] = useState<MoodType[]>([
+    { label: 'Shame', color: '#87CEEB', icon: 'emoticon-sad', value: 0, isSelected: false },
+    { label: 'Guilt', color: '#FFD700', icon: 'emoticon-confused', value: 0, isSelected: false },
+    { label: 'Apathy', color: '#E6E6FA', icon: 'emoticon-neutral', value: 0, isSelected: false },
+    { label: 'Grief', color: '#FF69B4', icon: 'emoticon-cry', value: 0, isSelected: false },
+    { label: 'Fear', color: '#FF69B4', icon: 'emoticon-scared', value: 0, isSelected: false },
+    { label: 'Desire', color: '#FF69B4', icon: 'emoticon-excited', value: 0, isSelected: false },
+    { label: 'Anger', color: '#FF69B4', icon: 'emoticon-angry', value: 0, isSelected: false },
+    { label: 'Pride', color: '#FF69B4', icon: 'emoticon-cool', value: 0, isSelected: false },
+    { label: 'Willfulness', color: '#FF69B4', icon: 'emoticon-confident', value: 0, isSelected: false },
+  ]);
 
-  const [moodValues, setMoodValues] = useState<{ [key: string]: number }>(
-    moods.reduce((acc, mood) => ({ ...acc, [mood.label]: 0 }), {})
-  );
   const { returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['mood']>();
 
-  const handleSliderChange = (moodLabel: string, value: number) => {
-    setMoodValues((prevValues) => ({
-      ...prevValues,
-      [moodLabel]: value,
-    }));
+  const screenWidth = Dimensions.get('window').width;
+  const [activeScreen, setActiveScreen] = useState(0);
+
+  const handleMoodSelect = (index: number) => {
+    const mood = moods[index];
+    setSelectedMood(selectedMood?.label === mood.label ? null : mood);
+  };
+
+  const handleSliderChange = (value: number) => {
+    if (!selectedMood) return;
+    
+    setMoods(prevMoods =>
+      prevMoods.map(mood => ({
+        ...mood,
+        value: mood.label === selectedMood.label ? value : mood.value,
+        isSelected: mood.label === selectedMood.label ? true : mood.isSelected
+      }))
+    );
   };
 
   const handleSubmit = async () => {
     try {
-      // TODO: Save mood values to backend
+      const moodValues = moods
+        .filter(mood => mood.isSelected)
+        .reduce((acc, mood) => ({
+          ...acc,
+          [mood.label]: mood.value
+        }), {});
+      
       console.log(moodValues);
       router.replace(returnTo as keyof RootStackParamList);
     } catch (error) {
@@ -42,60 +66,77 @@ export default function MoodScreen() {
     }
   };
 
-  const handleSkip = () => {
+  const handleScroll = (event: any) => {
+    const screenIndex = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
+    setActiveScreen(screenIndex);
+  };
+
+  const handleNext = () => {
+    scrollViewRef.current?.scrollTo({
+      x: screenWidth,
+      animated: true
+    });
+  };
+
+  const handlePrevious = () => {
+    scrollViewRef.current?.scrollTo({
+      x: 0,
+      animated: true
+    });
+  };
+
+  const handleFinish = () => {
     router.replace(returnTo as keyof RootStackParamList);
   };
+
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    scrollViewRef.current?.scrollTo({
+      x: activeScreen * screenWidth,
+      animated: true
+    });
+  }, [activeScreen, screenWidth]);
 
   return (
     <View style={styles.layout_container}>
       <ScrollView
-        style={[styles.layout_scrollView, { padding: 16, paddingBottom: 64 }]} // Added padding and paddingBottom
+        ref={scrollViewRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        scrollEnabled={false}
+        scrollEventThrottle={16}
       >
-        <View style={styles.layout_header}>
-          <Text style={styles.text_heading3}>Describe your current mood?</Text>
+        <View style={[styles.mood_screen, { width: screenWidth }]}>
+          <MoodSelector
+            moods={moods}
+            selectedMood={selectedMood}
+            onMoodSelect={handleMoodSelect}
+            onSliderChange={handleSliderChange}
+            onNext={handleNext}
+            onFinish={handleFinish}
+          />
         </View>
 
-        <View>
-          {moods.map((mood, index) => (
-            <Card key={index} style={[styles.component_card_elevated, styles.mood_card]}>
-              <Card.Content>
-                <Text style={styles.text_body}>{mood.label}</Text>
-                <Slider
-                  value={moodValues[mood.label]}
-                  minimumValue={0}
-                  maximumValue={100}
-                  step={1}
-                  thumbTintColor={mood.color}
-                  minimumTrackTintColor={mood.color}
-                  onValueChange={(value: number) => handleSliderChange(mood.label, value)}
-                />
-                <View style={styles.mood_sliderLabels}>
-                  <Text style={styles.text_caption}>Low</Text>
-                  <Text style={styles.text_caption}>High</Text>
-                </View>
-              </Card.Content>
-            </Card>
-          ))}
-        </View>
-
-        <View style={styles.layout_footer}>
-          <Button
-            mode="contained"
-            onPress={handleSubmit}
-            style={styles.button_contained}
-          >
-            Save Mood
-          </Button>
-
-          <Button
-            mode="outlined"
-            onPress={handleSkip}
-            style={[styles.button_outlined, styles.mood_skipButton]}
-          >
-            Skip
-          </Button>
+        <View style={[styles.mood_screen, { width: screenWidth }]}>
+          <MoodPyramid
+            onPrevious={handlePrevious}
+            onFinish={handleFinish}
+          />
         </View>
       </ScrollView>
+
+      <View style={styles.mood_pagination}>
+        <View style={[
+          styles.mood_paginationDot,
+          activeScreen === 0 && styles.mood_paginationDotActive
+        ]} />
+        <View style={[
+          styles.mood_paginationDot,
+          activeScreen === 1 && styles.mood_paginationDotActive
+        ]} />
+      </View>
     </View>
   );
 }
