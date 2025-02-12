@@ -530,38 +530,95 @@ const styles = StyleSheet.create({
       marginTop: 8,
       marginBottom: 24,
     } as TextStyle,
-    exerciseProgress_container: {
+  exerciseProgress_container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 16,
+  } as ViewStyle,
+  exerciseProgress_step: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  exerciseProgress_circle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  } as ViewStyle,
+  exerciseProgress_circleText: {
+    ...theme.fonts.bodyMedium,
+    fontWeight: 'bold',
+  } as TextStyle,
+  exerciseProgress_label: {
+    ...theme.fonts.labelMedium,
+    color: theme.colors.onSurfaceVariant,
+    marginTop: 4,
+  } as ViewStyle,
+  exerciseProgress_bar: {
+    height: 4,
+    backgroundColor: theme.colors.surfaceVariant,
+    flex: 1,
+    marginHorizontal: -15,
+  } as ViewStyle,
+    player_container: {
+        flex: 1,
+        backgroundColor: theme.colors.background,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+    } as ViewStyle,
+    player_content: {
+        width: '100%',
+        alignItems: 'center',
+    } as ViewStyle,
+    player_title: {
+        ...theme.fonts.displayMedium,
+        color: theme.colors.secondary,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 8,
+    } as TextStyle,
+    player_subtitle: {
+        ...theme.fonts.headlineSmall,
+        color: theme.colors.onSurfaceVariant,
+        marginBottom: 4,
+        textAlign: 'center'
+    } as TextStyle,
+    player_controls: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 16,
-      } as ViewStyle,
-      exerciseProgress_step: {
-        alignItems: 'center',
-        flex: 1, // Add flex: 1 here
-      },
-      exerciseProgress_circle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
         justifyContent: 'center',
+        marginTop: 16,
+    } as ViewStyle,
+    player_progress_container: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-      } as ViewStyle,
-      exerciseProgress_circleText: {
-        ...theme.fonts.bodyMedium,
-        fontWeight: 'bold',
-      } as TextStyle,
-      exerciseProgress_label: {
-        ...theme.fonts.labelMedium,
-        color: theme.colors.onSurfaceVariant,
-        marginTop: 4,
-      } as TextStyle,
-      exerciseProgress_bar: {
-        height: 4,
+        marginTop: 24,
+        marginBottom: 16,
+    } as ViewStyle,
+    player_progress_bar_container: {
+        flex: 1,
+        height: 10,
         backgroundColor: theme.colors.surfaceVariant,
-        flex: 1, // Add flex: 1 here
-        marginHorizontal: -15, // Add negative margin
-      } as ViewStyle,
+        borderRadius: 8,
+        marginHorizontal: 16
+    } as ViewStyle,
+  player_progress_bar: {
+    height: 10,
+    backgroundColor: theme.colors.secondary,
+    borderRadius: 8,
+  } as ViewStyle,
+  player_time: {
+    ...theme.fonts.bodyMedium,
+    color: theme.colors.onSurfaceVariant,
+  } as ViewStyle,
+    player_button: {
+        margin: 16
+    } as ViewStyle,
 });
 
 export default styles;
