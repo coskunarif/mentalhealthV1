@@ -33,9 +33,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await auth.signOut();
-    await AsyncStorage.removeItem('user');
-    setUser(null);
+    try {
+      // Sign out from Firebase
+      await auth.signOut();
+      
+      // Clear all user-related data from AsyncStorage
+      const keys = ['user', 'userPreferences', 'recentActivities'];
+      await Promise.all(keys.map(key => AsyncStorage.removeItem(key)));
+      
+      // Reset user state
+      setUser(null);
+      
+      // Note: Navigation will be handled automatically by the root navigator
+      // when auth state changes to null
+    } catch (error) {
+      console.error('Error signing out:', error);
+      throw error; // Propagate error to be handled by the UI
+    }
   };
 
   return (

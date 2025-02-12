@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { Text, TextInput, Button } from 'react-native-paper';
+import { Text, TextInput, Button, useTheme } from 'react-native-paper';
 import { Link, router } from 'expo-router';
 import styles from '../config/styles';
+import type { AppTheme } from '../types/theme';
 import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function SignInScreen() {
+  const theme = useTheme<AppTheme>();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,17 +32,17 @@ export default function SignInScreen() {
 
   return (
     <View style={styles.layout_container}>
-      <View style={styles.layout_content}>
-        <View style={styles.screen_auth_header}>
-          <Text style={styles.text_heading1}>Welcome Back</Text>
-          <Text style={[styles.text_body, styles.signIn_subtitle]}>
-            Sign in to continue your journey
-          </Text>
-        </View>
+      <View style={styles.common_screen_auth_container}>
+        <View style={styles.signIn_screen_auth_form}>
+          <View style={styles.signIn_screen_auth_header}>
+            <Text style={styles.text_heading1}>Welcome Back</Text>
+            <Text style={[styles.text_body, styles.signIn_subtitle]}>
+              Sign in to continue your journey
+            </Text>
+          </View>
 
-        <View style={styles.screen_auth_form}>
           <View style={styles.component_input_container}>
-            <Text style={styles.component_input_label}>Email</Text>
+            <Text style={styles.component_input_label}>Email Address</Text>
             <TextInput
               mode="outlined"
               value={email}
@@ -48,6 +50,8 @@ export default function SignInScreen() {
               keyboardType="email-address"
               autoCapitalize="none"
               style={styles.component_input_field}
+              placeholder="Enter your email"
+              placeholderTextColor={theme.colors.onSurfaceVariant}
             />
           </View>
 
@@ -59,6 +63,8 @@ export default function SignInScreen() {
               onChangeText={setPassword}
               secureTextEntry
               style={styles.component_input_field}
+              placeholder="Enter your password"
+              placeholderTextColor={theme.colors.onSurfaceVariant}
             />
             {error ? (
               <Text style={styles.component_input_error}>{error}</Text>
@@ -69,19 +75,20 @@ export default function SignInScreen() {
             mode="contained"
             onPress={handleSignIn}
             loading={loading}
-            style={styles.button_primary}
+            style={[styles.button_primary, { marginTop: 8 }]}
+            labelStyle={styles.text_button}
           >
-            Sign In
+            {loading ? 'Signing In...' : 'Sign In'}
           </Button>
 
-          <View style={styles.screen_auth_footer}>
+          <View style={styles.signIn_screen_auth_footer}>
             <Text style={styles.text_body}>Don't have an account? </Text>
             <Link href="/auth/sign-up" style={styles.text_link}>
               Sign Up
             </Link>
           </View>
 
-          <View style={styles.screen_auth_footer}>
+          <View style={styles.signIn_screen_auth_footer}>
             <Link href="/auth/forgot-password" style={styles.text_link}>
               Forgot Password?
             </Link>

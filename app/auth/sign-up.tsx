@@ -37,12 +37,12 @@ export default function SignUpScreen() {
   return (
     <View style={styles.layout_container}>
       <View style={styles.layout_content}>
-        <View style={styles.screen_auth_header}>
+        <View style={styles.common_screen_auth_header}>
           <Text style={styles.text_heading1}>Create Account</Text>
           <Text style={styles.text_body}>Sign up to start your journey</Text>
         </View>
 
-        <View style={styles.screen_auth_form}>
+        <View style={styles.common_screen_auth_form}>
           <View style={styles.component_input_container}>
             <Text style={styles.component_input_label}>Email</Text>
             <TextInput
@@ -89,7 +89,7 @@ export default function SignUpScreen() {
             Sign Up
           </Button>
 
-          <View style={styles.screen_auth_footer}>
+          <View style={styles.common_screen_auth_footer}>
             <Text style={styles.text_body}>Already have an account? </Text>
             <Link href="/auth/sign-in" style={styles.text_link}>
               Sign In
