@@ -8,16 +8,16 @@ import type { AppTheme } from './types/theme';
 export default function WelcomeScreen() {
   const theme = useTheme<AppTheme>();
   return (
-    <SafeAreaView style={styles.screen_auth_container}>
+    <SafeAreaView style={styles.welcome_screen_auth_container}>
       <View style={styles.screen_auth_content}>
-        <View style={styles.screen_auth_header}>
+        <View style={styles.welcome_screen_auth_header}>
           <Text style={styles.text_heading1}>Welcome</Text>
           <Text style={[styles.text_body, styles.welcome_subtitle]}>
             Begin your journey to better mental health
           </Text>
         </View>
 
-        <View style={styles.screen_auth_form}>
+        <View style={styles.welcome_screen_auth_form}>
           <Link href="/auth/sign-in" asChild>
             <Button
               mode="contained"
@@ -41,7 +41,7 @@ export default function WelcomeScreen() {
           </Link>
         </View>
 
-        <View style={styles.screen_auth_footer}>
+        <View style={styles.welcome_screen_auth_footer}>
           <Text style={[styles.text_caption, { textAlign: 'center' }]}>
             By continuing, you agree to our{' '}
             <Link href="/legal/terms" asChild>

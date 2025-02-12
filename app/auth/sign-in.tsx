@@ -32,9 +32,9 @@ export default function SignInScreen() {
 
   return (
     <View style={styles.layout_container}>
-      <View style={styles.screen_auth_container}>
-        <View style={styles.screen_auth_form}>
-          <View style={styles.screen_auth_header}>
+      <View style={styles.common_screen_auth_container}>
+        <View style={styles.signIn_screen_auth_form}>
+          <View style={styles.signIn_screen_auth_header}>
             <Text style={styles.text_heading1}>Welcome Back</Text>
             <Text style={[styles.text_body, styles.signIn_subtitle]}>
               Sign in to continue your journey
@@ -81,14 +81,14 @@ export default function SignInScreen() {
             {loading ? 'Signing In...' : 'Sign In'}
           </Button>
 
-          <View style={styles.screen_auth_footer}>
+          <View style={styles.signIn_screen_auth_footer}>
             <Text style={styles.text_body}>Don't have an account? </Text>
             <Link href="/auth/sign-up" style={styles.text_link}>
               Sign Up
             </Link>
           </View>
 
-          <View style={styles.screen_auth_footer}>
+          <View style={styles.signIn_screen_auth_footer}>
             <Link href="/auth/forgot-password" style={styles.text_link}>
               Forgot Password?
             </Link>
