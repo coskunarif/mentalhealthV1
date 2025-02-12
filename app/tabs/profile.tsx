@@ -12,14 +12,27 @@ export default function ProfileScreen() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSignOut = async () => {
+    console.log("handleSignOut called");
     setIsLoading(true);
     setError(null);
     try {
+      if (!signOut) {
+        throw new Error('Sign out function not available');
+      }
+      console.log("Attempting to sign out");
       await signOut();
-      // Navigation will be handled by the root navigator
-    } catch (err) {
-      setError('Failed to sign out. Please try again.');
-      console.error('Sign out error:', err);
+      console.log("Sign out successful");
+
+      // Explicitly redirect to the sign-in screen
+      router.replace("/auth/sign-in");
+    } catch (err: any) {
+      const errorMessage = err?.message || "Failed to sign out. Please try again.";
+      console.error("Sign out error:", {
+        message: err?.message,
+        code: err?.code,
+        stack: err?.stack
+      });
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
