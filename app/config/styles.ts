@@ -545,15 +545,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
     ...theme.fonts.bodyMedium
   } as TextStyle,
-  profile_section: {
-    marginBottom: 24
+  profile_mainSection: {
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 12,
+    overflow: 'hidden',
   } as ViewStyle,
-  profile_sectionSubtitle: {
-    marginTop: 8,
-       ...theme.fonts.bodyMedium
-  } as TextStyle,
-  profile_button: {
-    marginTop: 16
+  profile_sectionContainer: {
+    marginBottom: 24,
+  } as ViewStyle,
+  profile_actionButton: {
+    marginTop: 16,
   } as ViewStyle,
   notFound_text: {
     marginTop: 16,
@@ -796,6 +798,71 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     textTransform: 'none',
   } as TextStyle,
+  profile_header: {
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    backgroundColor: theme.colors.surface,
+  } as ViewStyle,
+  profile_headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  } as ViewStyle,
+  profile_headerText: {
+    marginLeft: 16,
+  } as ViewStyle,
+  profile_name: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.onSurface,
+  } as TextStyle,
+  profile_email: {
+    fontSize: 14,
+    color: theme.colors.onSurfaceVariant,
+  } as TextStyle,
+  profile_sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  } as ViewStyle,
+  profile_sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginLeft: 8,
+    color: theme.colors.onSurface,
+  } as TextStyle,
+  profile_subscriptionStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  } as ViewStyle,
+  profile_statusLabel: {
+    fontSize: 16,
+    color: theme.colors.onSurfaceVariant,
+  } as TextStyle,
+  profile_statusBadge: {
+    backgroundColor: theme.colors.secondary,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginLeft: 8,
+  } as ViewStyle,
+  profile_statusText: {
+    color: theme.colors.onSecondary,
+    fontSize: 14,
+    fontWeight: '500',
+  } as TextStyle,
+  profile_subscriptionDetails: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    color: theme.colors.onSurfaceVariant,
+  } as TextStyle,
+  profile_signOutSection: {
+    marginBottom: 24,
+  } as ViewStyle,
+  profile_signOutButton: {
+    margin: 16,
+  } as ViewStyle,
 });
 
 export default styles;
