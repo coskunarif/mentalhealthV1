@@ -659,7 +659,7 @@ const styles = StyleSheet.create({
     } as ViewStyle,
     player_progress_bar_container: {
         flex: 1,
-        height: 10,
+        height: 8,
         backgroundColor: theme.colors.surfaceVariant,
         borderRadius: 8,
         marginHorizontal: 16
