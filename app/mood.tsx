@@ -105,10 +105,11 @@ export default function MoodScreen() {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        scrollEnabled={false}
+        scrollEnabled={true}
+        onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        <View style={[styles.mood_screen, { width: screenWidth }]}>
+        <View style={[styles.mood_gridContainer, { width: screenWidth }]}>
           <MoodSelector
             moods={moods}
             selectedMood={selectedMood}
@@ -119,24 +120,13 @@ export default function MoodScreen() {
           />
         </View>
 
-        <View style={[styles.mood_screen, { width: screenWidth }]}>
+        <View style={[styles.mood_gridContainer, { width: screenWidth }]}>
           <MoodPyramid
             onPrevious={handlePrevious}
             onFinish={handleFinish}
           />
         </View>
       </ScrollView>
-
-      <View style={styles.mood_pagination}>
-        <View style={[
-          styles.mood_paginationDot,
-          activeScreen === 0 && styles.mood_paginationDotActive
-        ]} />
-        <View style={[
-          styles.mood_paginationDot,
-          activeScreen === 1 && styles.mood_paginationDotActive
-        ]} />
-      </View>
     </View>
   );
 }
