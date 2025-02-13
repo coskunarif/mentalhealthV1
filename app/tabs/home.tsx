@@ -69,13 +69,18 @@ export default function Home() {
 
         {/* Exercise Progress */}
         <View style={styles.home_exerciseProgressContainer}>
-          <Text style={[styles.text_heading2, styles.home_exerciseProgressTitle]}>Exercise Progress</Text>
-            <ExerciseProgress exercises={breathExercises} currentStep={nextExercise?.id} />
-            {nextExercise && (
-              <Button
-                mode="contained"
-                onPress={handleStartExercise}
-                style={styles.home_startButton}
+          <Text style={[styles.text_heading2, styles.home_exerciseProgressTitle]}>
+            Exercise Progress
+          </Text>
+          <ExerciseProgress 
+            exercises={breathExercises} 
+            currentStep={nextExercise?.id} 
+          />
+          {nextExercise && (
+            <Button
+              mode="contained"
+              onPress={handleStartExercise}
+              style={styles.home_startButton}
               labelStyle={styles.text_button}
             >
               Start {nextExercise.title}
