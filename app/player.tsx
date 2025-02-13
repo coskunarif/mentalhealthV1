@@ -107,10 +107,11 @@ export default function PlayerScreen() {
         <View style={styles.player_controls}>
           <IconButton
             icon={isPlaying ? 'pause-circle' : 'play-circle'}
-            iconColor={theme.colors.secondary}
-            size={70}
+            iconColor={theme.colors.onSecondary}
+            size={50}
             onPress={handlePlayPause}
-            style={styles.player_button}
+            style={null}
+            containerColor={theme.colors.secondary}
           />
         </View>
       </View>

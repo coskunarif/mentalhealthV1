@@ -34,32 +34,24 @@ export default function RadarChart({
   const theme = useTheme<AppTheme>();
   const center = size / 2;
 
-  // Define padding (space for labels) and calculate a consistent radius.
-  const padding = 40; // Adjust this value to allow more/less space for labels.
+  // Define padding and calculate radius
+  const padding = 40;
   const radius = (size - padding * 2) / 2;
   const angleStep = (Math.PI * 2) / staticLabels.length;
 
-  // Distinct colors for each data point.
-  const pointColors = [
-    '#4C8A65', // Dark Green
-    '#B00020', // Red
-    '#2196F3', // Blue
-    '#FFA726', // Orange
-    '#9C27B0', // Purple
-  ];
+  // Single consistent color for the entire chart
+  const chartColor = '#FFF176'; // Yellow from the moods palette
 
-  // Ensure the arrays have consistent lengths.
-  if (data.length !== staticLabels.length || data.length !== pointColors.length) {
+  // Ensure data length matches labels
+  if (data.length !== staticLabels.length) {
     console.warn(
-      "RadarChart: Data, labels, and colors arrays have mismatched lengths. Adjusting data array."
+      "RadarChart: Data and labels arrays have mismatched lengths. Adjusting data array."
     );
     data = data.slice(0, staticLabels.length);
   }
 
-  // Calculate coordinates for data points using the same radius.
   const getCoordinates = (value: number, index: number) => {
     const angle = index * angleStep - Math.PI / 2;
-    // Ensure that your data values are normalized between 0 and 1.
     const distance = value * radius;
     return {
       x: center + distance * Math.cos(angle),
@@ -67,17 +59,16 @@ export default function RadarChart({
     };
   };
 
-  // Position labels slightly outside the drawn polygon.
   const getLabelCoordinates = (index: number) => {
     const angle = index * angleStep - Math.PI / 2;
-    const labelDistance = radius + 15; // 15px outside the data polygon.
+    const labelDistance = radius + 15;
     return {
       x: center + labelDistance * Math.cos(angle),
       y: center + labelDistance * Math.sin(angle),
     };
   };
 
-  // Draw grid circles that match the radius used for data.
+  // Draw grid circles
   const gridCircles = [];
   const gridSteps = 5;
   for (let i = 1; i <= gridSteps; i++) {
@@ -88,14 +79,14 @@ export default function RadarChart({
         cx={center}
         cy={center}
         r={gridRadius}
-        stroke={theme.colors.outlineVariant + "40"} // Subtle grid color.
-        strokeWidth={0.5} // Thin grid lines.
+        stroke={theme.colors.outlineVariant + "40"}
+        strokeWidth={0.5}
         fill="none"
       />
     );
   }
 
-  // Draw radial grid lines.
+  // Draw radial grid lines
   const gridLines = staticLabels.map((_, index) => {
     const { x, y } = getCoordinates(1, index);
     return (
@@ -111,9 +102,8 @@ export default function RadarChart({
     );
   });
 
-  // Compute the data points.
+  // Compute data points and path
   const points = data.map((point, index) => getCoordinates(point.value, index));
-  // Build the path string for the polygon.
   const pathData =
     points
       .map((p, index) =>
@@ -129,9 +119,9 @@ export default function RadarChart({
 
         <Path
           d={pathData}
-          stroke={pointColors[0]}
+          stroke={chartColor}
           strokeWidth={strokeWidth}
-          fill={pointColors[0]}
+          fill={chartColor}
           fillOpacity={fillOpacity}
         />
 
@@ -141,7 +131,7 @@ export default function RadarChart({
             cx={point.x}
             cy={point.y}
             r={6}
-            fill={pointColors[index]}
+            fill={chartColor}
             stroke="#FFFFFF"
             strokeWidth={2}
             accessibilityLabel={`Data point ${staticLabels[index]}: ${data[index].value}`}
@@ -151,10 +141,10 @@ export default function RadarChart({
         {staticLabels.map((label, index) => {
           const { x, y } = getLabelCoordinates(index);
           const angle = index * angleStep - Math.PI / 2;
-          // Adjust text alignment based on the position.
           let textAnchor: "start" | "middle" | "end" = "middle";
           let xOffset = 0;
           let yOffset = 0;
+          
           if (angle >= -Math.PI / 4 && angle <= Math.PI / 4) {
             textAnchor = "start";
             xOffset = 5;
@@ -165,6 +155,7 @@ export default function RadarChart({
             textAnchor = "middle";
             yOffset = angle > 0 ? 5 : -5;
           }
+          
           return (
             <SvgText
               key={`label-${index}`}
@@ -173,7 +164,7 @@ export default function RadarChart({
               fontSize={9}
               fontFamily="SpaceMono-Regular"
               textAnchor={textAnchor}
-              fill={pointColors[index]}
+              fill={chartColor}
               fontWeight="bold"
             >
               {label}
