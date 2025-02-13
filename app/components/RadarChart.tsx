@@ -34,15 +34,17 @@ export default function RadarChart({
   const theme = useTheme<AppTheme>();
   const center = size / 2;
 
-  // Define padding and calculate radius
-  const padding = 40;
+  // Increase padding further to prevent label truncation
+  const padding = 70; // Increased from 60 to 70
   const radius = (size - padding * 2) / 2;
   const angleStep = (Math.PI * 2) / staticLabels.length;
 
-  // Single consistent color for the entire chart
-  const chartColor = '#FFF176'; // Yellow from the moods palette
+  const pointColor = '#FFF176';
+  
+  // Define grid colors with increased opacity
+  const gridColor = theme.colors.outlineVariant + "80"; // Increased from 40 to 80
+  const gridStrokeWidth = 1; // Increased from 0.5 to 1
 
-  // Ensure data length matches labels
   if (data.length !== staticLabels.length) {
     console.warn(
       "RadarChart: Data and labels arrays have mismatched lengths. Adjusting data array."
@@ -61,14 +63,67 @@ export default function RadarChart({
 
   const getLabelCoordinates = (index: number) => {
     const angle = index * angleStep - Math.PI / 2;
-    const labelDistance = radius + 15;
+    // Increase label distance from the chart
+    const labelDistance = radius + 25;
     return {
       x: center + labelDistance * Math.cos(angle),
       y: center + labelDistance * Math.sin(angle),
     };
   };
 
-  // Draw grid circles
+  // Calculate label positioning and wrapping
+  const getLabelLayout = (index: number) => {
+    const angle = index * angleStep - Math.PI / 2;
+    const { x, y } = getLabelCoordinates(index);
+    let textAnchor: "start" | "middle" | "end" = "middle";
+    let xOffset = 0;
+    let yOffset = 0;
+    let maxWidth = 80;
+
+    // Enhanced positioning logic for better label placement
+    if (angle >= -Math.PI / 4 && angle <= Math.PI / 4) {
+      textAnchor = "start";
+      xOffset = 12; // Increased from 8 to 12
+    } else if (angle >= (3 * Math.PI) / 4 || angle <= -(3 * Math.PI) / 4) {
+      textAnchor = "end";
+      xOffset = -12; // Increased from -8 to -12
+    } else if (angle > Math.PI / 4 && angle < (3 * Math.PI) / 4) {
+      textAnchor = "middle";
+      yOffset = 16; // Increased from 12 to 16
+    } else {
+      textAnchor = "middle";
+      yOffset = -16; // Increased from -12 to -16
+    }
+
+    // Special handling for "Breath Up" label
+    if (staticLabels[index] === "Breath up") {
+      if (angle < 0) {
+        xOffset -= 8; // Additional offset for "Breath Up" when in upper half
+      }
+    }
+
+    // Enhanced text wrapping logic
+    const words = staticLabels[index].split(' ');
+    let lines: string[] = [];
+    let currentLine = '';
+
+    words.forEach(word => {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      if (testLine.length * 5 > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    });
+    if (currentLine) {
+      lines.push(currentLine);
+    }
+
+    return { x, y, textAnchor, xOffset, yOffset, lines };
+  };
+
+  // Enhanced grid circles with increased visibility
   const gridCircles = [];
   const gridSteps = 5;
   for (let i = 1; i <= gridSteps; i++) {
@@ -79,14 +134,14 @@ export default function RadarChart({
         cx={center}
         cy={center}
         r={gridRadius}
-        stroke={theme.colors.outlineVariant + "40"}
-        strokeWidth={0.5}
+        stroke={gridColor}
+        strokeWidth={gridStrokeWidth}
         fill="none"
       />
     );
   }
 
-  // Draw radial grid lines
+  // Enhanced grid lines with increased visibility
   const gridLines = staticLabels.map((_, index) => {
     const { x, y } = getCoordinates(1, index);
     return (
@@ -96,8 +151,8 @@ export default function RadarChart({
         y1={center}
         x2={x}
         y2={y}
-        stroke={theme.colors.outlineVariant + "40"}
-        strokeWidth={0.5}
+        stroke={gridColor}
+        strokeWidth={gridStrokeWidth}
       />
     );
   });
@@ -114,61 +169,53 @@ export default function RadarChart({
   return (
     <View style={[localStyles.container, style]}>
       <Svg width={size} height={size}>
+        {/* Background grid elements */}
         {gridCircles}
         {gridLines}
 
+        {/* Data visualization */}
         <Path
           d={pathData}
-          stroke={chartColor}
+          stroke={theme.colors.primary}
           strokeWidth={strokeWidth}
-          fill={chartColor}
+          fill={theme.colors.primary}
           fillOpacity={fillOpacity}
         />
 
+        {/* Data points */}
         {points.map((point, index) => (
           <Circle
             key={`point-${index}`}
             cx={point.x}
             cy={point.y}
             r={6}
-            fill={chartColor}
+            fill={pointColor}
             stroke="#FFFFFF"
             strokeWidth={2}
             accessibilityLabel={`Data point ${staticLabels[index]}: ${data[index].value}`}
           />
         ))}
 
-        {staticLabels.map((label, index) => {
-          const { x, y } = getLabelCoordinates(index);
-          const angle = index * angleStep - Math.PI / 2;
-          let textAnchor: "start" | "middle" | "end" = "middle";
-          let xOffset = 0;
-          let yOffset = 0;
-          
-          if (angle >= -Math.PI / 4 && angle <= Math.PI / 4) {
-            textAnchor = "start";
-            xOffset = 5;
-          } else if (angle >= (3 * Math.PI) / 4 || angle <= -(3 * Math.PI) / 4) {
-            textAnchor = "end";
-            xOffset = -5;
-          } else {
-            textAnchor = "middle";
-            yOffset = angle > 0 ? 5 : -5;
-          }
-          
+        {/* Labels */}
+        {staticLabels.map((_, index) => {
+          const { x, y, textAnchor, xOffset, yOffset, lines } = getLabelLayout(index);
           return (
-            <SvgText
-              key={`label-${index}`}
-              x={x + xOffset}
-              y={y + yOffset}
-              fontSize={9}
-              fontFamily="SpaceMono-Regular"
-              textAnchor={textAnchor}
-              fill={chartColor}
-              fontWeight="bold"
-            >
-              {label}
-            </SvgText>
+            <React.Fragment key={`label-${index}`}>
+              {lines.map((line, lineIndex) => (
+                <SvgText
+                  key={`label-${index}-line-${lineIndex}`}
+                  x={x + xOffset}
+                  y={y + yOffset + (lineIndex * 14)} // Increased line spacing from 12 to 14
+                  fontSize={9}
+                  fontFamily="SpaceMono-Regular"
+                  textAnchor={textAnchor}
+                  fill={theme.colors.primary}
+                  fontWeight="bold"
+                >
+                  {line}
+                </SvgText>
+              ))}
+            </React.Fragment>
           );
         })}
       </Svg>
@@ -180,5 +227,6 @@ const localStyles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
+    padding: 8, // Added padding to container
   },
 });
