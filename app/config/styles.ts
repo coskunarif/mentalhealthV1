@@ -491,105 +491,105 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 1,
   } as ViewStyle,
-    player_headerSurface: {
-      marginBottom: 24
-    } as ViewStyle,
-    player_contentSurface: {
-      marginBottom: 24
-    } as ViewStyle,
-    player_duration: {
-      marginTop: 4
-    } as TextStyle,
-    survey_title: {
-      marginBottom: 24
-    } as TextStyle,
-    survey_footer: {
-      gap: 16
-    } as ViewStyle,
-    home_progressChartContainer: {
-      marginBottom: 32 // Increased marginBottom
-    } as ViewStyle,
-    home_exerciseProgressContainer: {
-      marginBottom: 24
-    } as ViewStyle,
-    home_exerciseProgressTitle: {
-      marginBottom: 16
-    } as TextStyle,
-    home_exerciseProgressGrid: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 8
-    } as ViewStyle,
-    home_exerciseProgressItem: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      justifyContent: 'center',
-      alignItems: 'center',
-    } as ViewStyle,
-    home_startButton: {
-      marginTop: 16
-    } as ViewStyle,
-    home_quickActionsContainer: {
-      flexDirection: 'row',
-      gap: 16,
-      marginBottom: 24
-    } as ViewStyle,
-    home_quickActionItem: {
-      flex: 1
-    } as ViewStyle,
-    home_quickActionButton: {
-      height: 80
-    } as ViewStyle,
-    profile_subtitle: {
-      marginTop: 8,
-      ...theme.fonts.bodyMedium
-    } as TextStyle,
-    profile_section: {
-      marginBottom: 24
-    } as ViewStyle,
-    profile_sectionSubtitle: {
-      marginTop: 8,
+  player_headerSurface: {
+    marginBottom: 24
+  } as ViewStyle,
+  player_contentSurface: {
+    marginBottom: 24
+  } as ViewStyle,
+  player_duration: {
+    marginTop: 4
+  } as TextStyle,
+  survey_title: {
+    marginBottom: 24
+  } as TextStyle,
+  survey_footer: {
+    gap: 16
+  } as ViewStyle,
+  home_progressChartContainer: {
+    marginBottom: 32 // Increased marginBottom
+  } as ViewStyle,
+  home_exerciseProgressContainer: {
+    marginBottom: 24
+  } as ViewStyle,
+  home_exerciseProgressTitle: {
+    marginBottom: 16
+  } as TextStyle,
+  home_exerciseProgressGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8
+  } as ViewStyle,
+  home_exerciseProgressItem: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  } as ViewStyle,
+  home_startButton: {
+    marginTop: 16
+  } as ViewStyle,
+  home_quickActionsContainer: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 24
+  } as ViewStyle,
+  home_quickActionItem: {
+    flex: 1
+  } as ViewStyle,
+  home_quickActionButton: {
+    height: 80
+  } as ViewStyle,
+  profile_subtitle: {
+    marginTop: 8,
+    ...theme.fonts.bodyMedium
+  } as TextStyle,
+  profile_section: {
+    marginBottom: 24
+  } as ViewStyle,
+  profile_sectionSubtitle: {
+    marginTop: 8,
        ...theme.fonts.bodyMedium
-    } as TextStyle,
-    profile_button: {
-      marginTop: 16
-    } as ViewStyle,
-    notFound_text: {
-      marginTop: 16,
-      ...theme.fonts.bodyMedium
-    } as TextStyle,
-    notFound_button: {
-      marginTop: 24
-    } as ViewStyle,
-    breathExercise_container: {
-      padding: 16
-    } as ViewStyle,
-    breathExercise_surface: {
-      flex: 1
-    } as ViewStyle,
-    breathExercise_header: {
-      alignItems: 'center',
-      marginBottom: 24
-    } as ViewStyle,
-    breathExercise_timer: {
-      marginTop: 16
-    } as TextStyle,
-    breathExercise_visualizer: {
-      height: 120,
-      marginBottom: 24
-    } as ViewStyle,
-    breathExercise_footer: {
-      marginTop: 'auto'
-    } as ViewStyle,
-    breathExercise_instruction: {
-      textAlign: 'center',
-      marginBottom: 16
-    } as TextStyle,
-    errorBoundary_message: {
-      marginTop: 8,
-      marginBottom: 24,
-    } as TextStyle,
+  } as TextStyle,
+  profile_button: {
+    marginTop: 16
+  } as ViewStyle,
+  notFound_text: {
+    marginTop: 16,
+    ...theme.fonts.bodyMedium
+  } as TextStyle,
+  notFound_button: {
+    marginTop: 24
+  } as ViewStyle,
+  breathExercise_container: {
+    padding: 16
+  } as ViewStyle,
+  breathExercise_surface: {
+    flex: 1
+  } as ViewStyle,
+  breathExercise_header: {
+    alignItems: 'center',
+    marginBottom: 24
+  } as ViewStyle,
+  breathExercise_timer: {
+    marginTop: 16
+  } as TextStyle,
+  breathExercise_visualizer: {
+    height: 120,
+    marginBottom: 24
+  } as ViewStyle,
+  breathExercise_footer: {
+    marginTop: 'auto'
+  } as ViewStyle,
+  breathExercise_instruction: {
+    textAlign: 'center',
+    marginBottom: 16
+  } as TextStyle,
+  errorBoundary_message: {
+    marginTop: 8,
+    marginBottom: 24,
+  } as TextStyle,
   exerciseProgress_container: {
     flexDirection: 'row',
     alignItems: 'center',
