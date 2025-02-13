@@ -640,12 +640,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 8,
     } as TextStyle,
-    player_subtitle: {
-        ...theme.fonts.headlineSmall,
-        color: theme.colors.onSurfaceVariant,
-        marginBottom: 4,
-        textAlign: 'center'
-    } as TextStyle,
+	player_subtitle: {
+		...theme.fonts.headlineSmall,
+		color: theme.colors.onSurfaceVariant,
+		marginBottom: 4,
+		textAlign: 'center'
+	} as TextStyle,
     player_controls: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -664,7 +664,25 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 10,
         backgroundColor: theme.colors.surfaceVariant,
-        marginHorizontal: -15,
+        marginHorizontal: 16,
+    } as ViewStyle,
+    player_progress_bar: {
+        height: 8,
+        backgroundColor: theme.colors.secondary,
+        borderRadius: 8,
+    } as ViewStyle,
+    player_time: {
+        ...theme.fonts.bodyMedium,
+        color: theme.colors.onSurfaceVariant
+    } as TextStyle,
+    player_button: {
+        backgroundColor: theme.colors.primary,
+        padding: 10,
+        borderRadius: 25,
+        width: 50,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
     } as ViewStyle,
   mood_slider_card: {
     marginVertical: 1,
