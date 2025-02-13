@@ -57,7 +57,7 @@ export function MoodSelector({
         <View style={styles.mood_headerRow}>
           <MaterialCommunityIcons
             name={mood.icon as any}
-            size={14}
+            size={24}
             color={mood.color}
           />
           <Text style={[styles.text_body, { fontSize: 11 }]}>{mood.label}</Text>
@@ -86,7 +86,7 @@ export function MoodSelector({
         style={[styles.layout_scrollView, { padding: 16 }]}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <Text style={styles.header_shadow}>How are you feeling?</Text>
+        <Text style={[styles.header_shadow, { textAlign: 'center', color: theme.colors.primary }]}>How are you feeling?</Text>
         
         <View style={styles.mood_gridContainer}>
           {moods.map((mood, index) => (
@@ -100,7 +100,7 @@ export function MoodSelector({
             >
               <MaterialCommunityIcons
                 name={mood.icon as any}
-                size={28}
+                size={40}
                 color={mood.color}
               />
               <Text style={[styles.text_caption, { marginTop: 4 }]}>{mood.label}</Text>
