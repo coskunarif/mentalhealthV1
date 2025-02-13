@@ -33,17 +33,17 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
 
   const bubbleConfig = [
     { 
-      size: 140,
-      fontSize: 16,
+      size: 162,
+      fontSize: 18,
       style: { 
-        left: '15%',
-        top: 20,
+        left: '7%',
+        top: 10,
         zIndex: 1,
       }
     },
     { 
-      size: 120,
-      fontSize: 14,
+      size: 132,
+      fontSize: 15,
       style: { 
         right: '15%',
         top: 20,
@@ -51,11 +51,11 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       }
     },
     { 
-      size: 100,
-      fontSize: 12,
+      size: 110,
+      fontSize: 13,
       style: { 
         left: '40%',
-        top: 150,
+        top: 140,
         zIndex: 2,
       }
     },
@@ -80,61 +80,80 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
   };
 
   return (
-    <ScrollView style={[styles.layout_scrollView, { padding: 16, paddingBottom: 80 }]}>
-      <Text style={styles.text_heading3}>Identify the emotions to focus on</Text>
-      
-      <View style={styles.pyramid_container}>
-        {emotions.map((emotion) => (
-          <TouchableOpacity
-            key={emotion.label}
-            onPress={() => handleEmotionSelect(emotion)}
-            style={[
-              styles.pyramid_item,
-              { 
-                backgroundColor: emotion.color,
-                width: emotion.width,
-              } as ViewStyle,
-              selectedEmotions.some(e => e.label === emotion.label) && 
-              styles.pyramid_itemSelected
-            ]}
-          >
-            <Text style={styles.pyramid_text}>{emotion.label}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+    <View style={{ flex: 1 }}>
+      <ScrollView 
+        style={[styles.layout_scrollView, { padding: 16 }]}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      >
+        <Text style={[styles.header_shadow, { textAlign: 'center', color: theme.colors.primary }]}>Identify the emotions to focus on</Text>
+        
+        <View style={styles.pyramid_container}>
+          {emotions.map((emotion) => (
+            <TouchableOpacity
+              key={emotion.label}
+              onPress={() => handleEmotionSelect(emotion)}
+              style={[
+                styles.pyramid_item,
+                { 
+                  backgroundColor: emotion.color,
+                  width: emotion.width,
+                  ...(selectedEmotions.some(e => e.label === emotion.label) && {
+                    borderWidth: 2,
+                    borderColor: '#E0E0E0'
+                  })
+                } as ViewStyle,
+              ]}
+            >
+              <Text style={styles.pyramid_text}>{emotion.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      <Text style={[styles.text_heading3, styles.pyramid_focusTitle]}>Focus Emotions</Text>
-      <View style={styles.pyramid_bubbleContainer}>
-        {bubbleConfig.map((config, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => handleBubbleClick(index)}
-            style={[
-              styles.pyramid_bubble,
-              {
-                width: config.size,
-                height: config.size,
-                backgroundColor: selectedEmotions[index]?.color || 'transparent',
-                borderWidth: 2,
-                borderColor: theme.colors.outline,
-              },
-              {
-                ...config.style as ViewStyle
-              }
-            ]}
-          >
-            {selectedEmotions[index] && (
-              <Text style={[
-                styles.pyramid_bubbleText,
-                { fontSize: config.fontSize }
-              ]}>
-                {selectedEmotions[index].label}
-              </Text>
-            )}
-          </TouchableOpacity>
-        ))}
-      </View>
-
+        <Text style={[styles.header_shadow, { textAlign: 'left', color: theme.colors.primary }]}>Focus Emotions</Text>
+        <View style={styles.pyramid_bubbleContainer}>
+          {bubbleConfig.map((config, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleBubbleClick(index)}
+              style={[
+                styles.pyramid_bubble,
+                {
+                  width: config.size,
+                  height: config.size,
+                  backgroundColor: selectedEmotions[index]?.color || '#F5F5F5',
+                  borderWidth: 2,
+                  borderColor: '#E0E0E0',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                },
+                {
+                  ...config.style as ViewStyle
+                }
+              ]}
+            >
+              {selectedEmotions[index] ? (
+                <Text style={[
+                  styles.pyramid_bubbleText,
+                  { fontSize: config.fontSize }
+                ]}>
+                  {selectedEmotions[index].label}
+                </Text>
+              ) : (
+                <Text style={[
+                  styles.text_heading3,
+                  { 
+                    fontSize: config.fontSize * 0.8,
+                    color: theme.colors.primary,
+                    textAlign: 'center'
+                  }
+                ]}>
+                  Focus{'\n'}Emotions
+                </Text>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
       <View style={styles.mood_buttonContainer}>
         <Button
           mode="outlined"
@@ -148,11 +167,11 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
           mode="contained"
           onPress={onFinish}
           style={[styles.mood_button, styles.button_contained]}
-          labelStyle={styles.mood_buttonText}
+          labelStyle={[styles.mood_buttonText, { color: theme.colors.onPrimary }]}
         >
           Finish
         </Button>
       </View>
-    </ScrollView>
+    </View>
   );
 } 
