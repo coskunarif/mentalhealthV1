@@ -863,6 +863,19 @@ const styles = StyleSheet.create({
   profile_signOutButton: {
     margin: 16,
   } as ViewStyle,
+    home_sectionSurface: {
+      marginBottom: 16,
+      padding: 16,
+      borderRadius: 8,
+      elevation: 2,
+      backgroundColor: theme.colors.surface,
+    } as ViewStyle,
+  
+    home_sectionTitle: {
+      marginBottom: 12,
+      color: theme.colors.onSurface,
+      ...theme.fonts.headlineMedium,
+    } as TextStyle,
 });
 
 export default styles;
