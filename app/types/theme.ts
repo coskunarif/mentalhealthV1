@@ -13,6 +13,17 @@ export interface ChartColors {
 
 export interface AppTheme extends MD3Theme {
   chartColors: ChartColors;
+  spacing: {
+    medium: number;
+    small: number;
+    tiny: number;
+  };
+  shape: {
+    borderRadius: number;
+  };
+  elevation: {
+    level2: string;
+  };
 }
 
 export interface PlayerTheme {

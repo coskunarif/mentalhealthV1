@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, Button, Surface, Snackbar, Avatar, Divider, List, Dialog, Portal } from 'react-native-paper';
+import { PersonalInformationSection } from '../components/PersonalInformationSection';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -46,25 +47,13 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.layout_container}>
-      {/* Header Section */}
-      <Surface style={styles.profile_header} elevation={2}>
-        <View style={styles.profile_headerContent}>
-          <Avatar.Text 
-            size={80} 
-            label={user?.displayName?.[0]?.toUpperCase() || 'U'}
-            labelStyle={theme.fonts.titleLarge}
-          />
-          <View style={styles.profile_headerText}>
-            <Text style={[styles.profile_name, theme.fonts.headlineMedium]}>
-              {user?.displayName || 'User'}
-            </Text>
-            <Text style={[styles.profile_email, theme.fonts.bodyMedium]}>
-              {user?.email}
-            </Text>
-          </View>
-        </View>
-      </Surface>
-
+      <PersonalInformationSection 
+        info={{
+          name: "John Doe",
+          email: "johndoe@example.com",
+          phoneNumber: "555-1234",
+        }}
+      />
       <ScrollView style={styles.layout_scrollView}>
         {/* Subscription Section */}
         <Surface style={styles.profile_mainSection} elevation={1}>
