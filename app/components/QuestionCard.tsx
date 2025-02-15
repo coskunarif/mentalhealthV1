@@ -1,66 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
-import { Text, Button, Surface, useTheme } from 'react-native-paper';
+import { Text, Button, Surface, useTheme, RadioButton } from 'react-native-paper';
 import styles from '../config/styles';
 import type { AppTheme } from '../types/theme';
 
 interface QuestionCardProps {
-  question: string;
   options: string[];
+  selectedOption: string;
   onSelect: (index: number) => void;
-  currentIndex: number;
-  totalQuestions: number;
-  progress: number;
 }
 
 export default function QuestionCard({
-  question,
   options,
+  selectedOption,
   onSelect,
-  currentIndex,
-  totalQuestions,
-  progress,
 }: QuestionCardProps) {
   const theme = useTheme<AppTheme>();
+
+  const handleOptionSelect = (value: string) => {
+    onSelect(options.indexOf(value));
+  };
+
   return (
     <Surface style={[styles.component_card_elevated, { marginBottom: 24 }]}>
-      <View style={{ marginBottom: 16 }}>
-        <Text style={styles.text_caption}>
-          Question {currentIndex + 1} of {totalQuestions}
-        </Text>
-        <View
-          style={{
-            height: 4,
-            backgroundColor: theme.colors.surfaceVariant,
-            borderRadius: 2,
-            marginTop: 8,
-          }}
-        >
-          <View
-            style={{
-              height: '100%',
-              width: `${progress * 100}%`,
-              backgroundColor: theme.colors.primary,
-              borderRadius: 2,
-            }}
+      <RadioButton.Group onValueChange={handleOptionSelect} value={selectedOption}>
+        {options.map((option) => (
+          <RadioButton.Item
+            key={option}
+            label={option}
+            value={option}
+            mode="android"
+            style={{ paddingVertical: 8 }}
+            labelStyle={{ color: theme.colors.onSurface }}
           />
-        </View>
-      </View>
-
-      <Text style={styles.text_heading2}>{question}</Text>
-
-      <View style={{ marginTop: 16 }}>
-        {options.map((option, index) => (
-          <Button
-            key={index}
-            mode="outlined"
-            onPress={() => onSelect(index)}
-            style={[styles.button_secondary, { marginBottom: 8 }]}
-          >
-            {option}
-          </Button>
         ))}
-      </View>
+      </RadioButton.Group>
     </Surface>
   );
 }

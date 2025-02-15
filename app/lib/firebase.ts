@@ -13,8 +13,17 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID
 };
 
+// Log Firebase config (excluding sensitive data)
+// console.log('Firebase Config Status:', {
+//   apiKeyExists: !!firebaseConfig.apiKey,
+//   authDomainExists: !!firebaseConfig.authDomain,
+//   projectIdExists: !!firebaseConfig.projectId,
+//   configComplete: Object.values(firebaseConfig).every(value => !!value)
+// });
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+// console.log('Firebase App Initialized');
 
 // Get Auth and Firestore instances
 export const auth = initializeAuth(app, {

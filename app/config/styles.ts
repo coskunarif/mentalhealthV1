@@ -545,15 +545,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
     ...theme.fonts.bodyMedium
   } as TextStyle,
-  profile_section: {
-    marginBottom: 24
+  profile_mainSection: {
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 12,
+    overflow: 'hidden',
   } as ViewStyle,
-  profile_sectionSubtitle: {
-    marginTop: 8,
-       ...theme.fonts.bodyMedium
-  } as TextStyle,
-  profile_button: {
-    marginTop: 16
+  profile_sectionContainer: {
+    marginBottom: 24,
+  } as ViewStyle,
+  profile_actionButton: {
+    marginTop: 16,
   } as ViewStyle,
   notFound_text: {
     marginTop: 16,
@@ -640,12 +642,12 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 8,
     } as TextStyle,
-    player_subtitle: {
-        ...theme.fonts.headlineSmall,
-        color: theme.colors.onSurfaceVariant,
-        marginBottom: 4,
-        textAlign: 'center'
-    } as TextStyle,
+	player_subtitle: {
+		...theme.fonts.headlineSmall,
+		color: theme.colors.onSurfaceVariant,
+		marginBottom: 4,
+		textAlign: 'center'
+	} as TextStyle,
     player_controls: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -664,7 +666,25 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 10,
         backgroundColor: theme.colors.surfaceVariant,
-        marginHorizontal: -15,
+        marginHorizontal: 16,
+    } as ViewStyle,
+    player_progress_bar: {
+        height: 8,
+        backgroundColor: theme.colors.secondary,
+        borderRadius: 8,
+    } as ViewStyle,
+    player_time: {
+        ...theme.fonts.bodyMedium,
+        color: theme.colors.onSurfaceVariant
+    } as TextStyle,
+    player_button: {
+        backgroundColor: theme.colors.primary,
+        padding: 10,
+        borderRadius: 25,
+        width: 50,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
     } as ViewStyle,
   mood_slider_card: {
     marginVertical: 1,
@@ -776,6 +796,80 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     textTransform: 'none',
   } as TextStyle,
+  profile_header: {
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    backgroundColor: theme.colors.surface,
+    borderRadius: 12,
+    marginBottom: 8,
+  } as ViewStyle,
+  profile_headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  } as ViewStyle,
+  profile_headerText: {
+    marginLeft: 16,
+    flex: 1,
+  } as ViewStyle,
+  profile_name: {
+    color: theme.colors.onSurface,
+  } as TextStyle,
+  profile_email: {
+    color: theme.colors.onSurfaceVariant,
+  } as TextStyle,
+  profile_sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+  } as ViewStyle,
+  profile_sectionTitle: {
+    marginLeft: 8,
+    color: theme.colors.onSurface,
+  } as TextStyle,
+  profile_subscriptionStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  } as ViewStyle,
+  profile_statusLabel: {
+    color: theme.colors.onSurfaceVariant,
+  } as TextStyle,
+  profile_statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginLeft: 8,
+  } as ViewStyle,
+  profile_statusText: {
+    color: theme.colors.onSecondary,
+    fontSize: 14,
+    fontWeight: '500',
+  } as TextStyle,
+  profile_subscriptionDetails: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    color: theme.colors.onSurfaceVariant,
+  } as TextStyle,
+  profile_signOutSection: {
+    marginBottom: 24,
+  } as ViewStyle,
+  profile_signOutButton: {
+    margin: 16,
+  } as ViewStyle,
+    home_sectionSurface: {
+      marginBottom: 16,
+      padding: 16,
+      borderRadius: 8,
+      elevation: 2,
+      backgroundColor: theme.colors.surface,
+    } as ViewStyle,
+  
+    home_sectionTitle: {
+      marginBottom: 12,
+      color: theme.colors.onSurface,
+      ...theme.fonts.headlineMedium,
+    } as TextStyle,
 });
 
 export default styles;

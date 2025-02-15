@@ -11,7 +11,6 @@ const scaleFont = (size: number) => {
   return Math.round(size * scale);
 };
 
-
 const baseFont = {
   fontFamily: 'Kameron',
 };
@@ -94,6 +93,17 @@ const customTheme = {
     },
   },
   fonts: configureFonts({ config: fontConfig }),
+  spacing: {
+    medium: 16,
+    small: 8,
+    tiny: 4,
+  },
+  shape: {
+    borderRadius: 8,
+  },
+  elevation: {
+    level2: '#2',
+  },
 };
 
 export const colors = customTheme.colors;
