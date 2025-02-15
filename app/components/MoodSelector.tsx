@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, Button, Card } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -41,6 +41,7 @@ export function MoodSelector({
   onNext,
   onFinish,
 }: Props) {
+  const [mainSliderValues, setMainSliderValues] = useState<{ [key: string]: number }>({});
   const [mainSliderColors, setMainSliderColors] = useState<{ [key: string]: string }>({});
   const [relatedMoodValues, setRelatedMoodValues] = useState<{ [key: string]: number }>({});
   const [relatedSliderColors, setRelatedSliderColors] = useState<{ [key: string]: string }>({});
@@ -72,11 +73,16 @@ export function MoodSelector({
       [label]: value
     }));
     updateSliderColor(value, label, true);
+    onSliderChange(value, label);
   };
 
   const handleMainSliderChange = (value: number, label: string) => {
-    onSliderChange(value, label);
+    setMainSliderValues(prev => ({
+      ...prev,
+      [label]: value
+    }));
     updateSliderColor(value, label, false);
+    onSliderChange(value, label);
   };
 
   const getDurationLabel = (value: number) => {
@@ -122,10 +128,12 @@ export function MoodSelector({
   );
 
   const renderSliderCard = (mood: MoodType, isRelated: boolean = false) => {
-    const sliderValue = isRelated ? (relatedMoodValues[mood.label] || 0) : mood.value;
+    const sliderValue = isRelated 
+      ? (relatedMoodValues[mood.label] || 0) 
+      : (mainSliderValues[mood.label] || mood.value);
     const sliderColor = isRelated 
       ? (relatedSliderColors[mood.label] || getSliderColor(0))
-      : (mainSliderColors[mood.label] || getSliderColor(mood.value));
+      : (mainSliderColors[mood.label] || getSliderColor(sliderValue));
     
     return (
       <Card 
@@ -168,6 +176,16 @@ export function MoodSelector({
       </Card>
     );
   };
+
+  React.useEffect(() => {
+    if (selectedMood) {
+      setMainSliderValues(prev => ({
+        ...prev,
+        [selectedMood.label]: selectedMood.value
+      }));
+      updateSliderColor(selectedMood.value, selectedMood.label, false);
+    }
+  }, [selectedMood?.label]);
 
   return (
     <View style={{ flex: 1 }}>
