@@ -1,3 +1,4 @@
+// File: app/components/RecentActivities.tsx
 import React from 'react';
 import { View, Pressable } from 'react-native';
 import { Text, Surface, useTheme } from 'react-native-paper';
@@ -21,7 +22,7 @@ export default function RecentActivities({ activities }: RecentActivitiesProps) 
   const theme = useTheme<AppTheme>();
   return (
     <View style={styles.recentActivities_container}>
-      <Text style={[styles.text_heading3, styles.recentActivities_title]}>Recent Activities</Text>
+      {/* Header removed to avoid duplication */}
       <Surface style={[styles.component_card_container, styles.recentActivities_surface]}>
         {activities.map((activity, index) => (
           <Link
