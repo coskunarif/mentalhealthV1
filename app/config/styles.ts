@@ -802,6 +802,8 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 16,
     backgroundColor: theme.colors.surface,
+    borderRadius: 12,
+    marginBottom: 8,
   } as ViewStyle,
   profile_headerContent: {
     flexDirection: 'row',
@@ -809,14 +811,12 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   profile_headerText: {
     marginLeft: 16,
+    flex: 1,
   } as ViewStyle,
   profile_name: {
-    fontSize: 24,
-    fontWeight: 'bold',
     color: theme.colors.onSurface,
   } as TextStyle,
   profile_email: {
-    fontSize: 14,
     color: theme.colors.onSurfaceVariant,
   } as TextStyle,
   profile_sectionHeader: {
@@ -825,8 +825,6 @@ const styles = StyleSheet.create({
     padding: 16,
   } as ViewStyle,
   profile_sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
     marginLeft: 8,
     color: theme.colors.onSurface,
   } as TextStyle,
@@ -837,11 +835,9 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   } as ViewStyle,
   profile_statusLabel: {
-    fontSize: 16,
     color: theme.colors.onSurfaceVariant,
   } as TextStyle,
   profile_statusBadge: {
-    backgroundColor: theme.colors.secondary,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
