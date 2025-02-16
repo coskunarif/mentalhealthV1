@@ -31,7 +31,15 @@ export const PersonalInformationSection: React.FC<PersonalInformationSectionProp
               <Paragraph style={styles.label}>Phone Number:</Paragraph>
               <Paragraph style={styles.value}>{info.phoneNumber}</Paragraph>
             </View>
+            <Divider style={styles.divider} />
           </>
+        )}
+
+        {info.dateOfBirth && (
+          <View style={styles.infoRow}>
+            <Paragraph style={styles.label}>Date of Birth:</Paragraph>
+            <Paragraph style={styles.value}>{info.dateOfBirth}</Paragraph>
+          </View>
         )}
       </Card.Content>
     </Card>
@@ -43,7 +51,7 @@ const styles = StyleSheet.create({
     margin: theme.spacing.medium,
     padding: theme.spacing.medium,
     borderRadius: theme.shape.borderRadius,
-elevation: 2,
+    elevation: 2,
     backgroundColor: theme.colors.surface,
   },
   sectionTitle: {
