@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, Button, Surface, Snackbar, Avatar, Divider, List, Dialog, Portal } from 'react-native-paper';
 import { PersonalInformationSection } from '../components/PersonalInformationSection';
+import type { PersonalInformation } from '../types/personalInformation';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -52,6 +53,7 @@ export default function ProfileScreen() {
           name: "John Doe",
           email: "johndoe@example.com",
           phoneNumber: "555-1234",
+          dateOfBirth: "1990-01-01",
         }}
       />
       <ScrollView style={styles.layout_scrollView}>
