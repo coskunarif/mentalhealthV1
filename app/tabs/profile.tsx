@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button, Surface, Snackbar, Dialog, Portal } from 'react-native-paper';
+import { Text, Button, Surface, Snackbar, Dialog, Portal, List, Modal } from 'react-native-paper';
 import { EditPersonalInfoForm } from '../components/EditPersonalInfoForm';
 import { NotificationPreferences } from '../components/NotificationPreferences';
 import { LanguageRegionSettings } from '../components/LanguageRegionSettings';
@@ -20,10 +20,18 @@ export default function ProfileScreen() {
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const router = useRouter();
 
+  // Modal visibility states
+  const [isPersonalInfoModalVisible, setIsPersonalInfoModalVisible] = useState(false);
+  const [isNotificationsModalVisible, setIsNotificationsModalVisible] = useState(false);
+  const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
+  const [isHelpModalVisible, setIsHelpModalVisible] = useState(false);
+  const [isLegalModalVisible, setIsLegalModalVisible] = useState(false);
+
   const handleSavePersonalInfo = useCallback(async (info: PersonalInformation) => {
     try {
       // TODO: Implement API call to save personal info
       console.log('Saving personal info:', info);
+      setIsPersonalInfoModalVisible(false); // Close modal on success
     } catch (err: any) {
       setError(err?.message || "Failed to save personal information");
       throw err;
@@ -44,6 +52,7 @@ export default function ProfileScreen() {
     try {
       // TODO: Implement API call to update language settings
       console.log('Changing language to:', languageCode);
+      setIsLanguageModalVisible(false); // Close modal on success
     } catch (err: any) {
       setError(err?.message || "Failed to change language");
       throw err;
@@ -70,8 +79,8 @@ export default function ProfileScreen() {
   };
 
   const personalInfo = {
-    name: "John Doe",
-    email: "johndoe@example.com",
+    name: user?.displayName || "User Name",
+    email: user?.email || "user@example.com",
     phoneNumber: "555-1234",
     dateOfBirth: "1990-01-01",
   };
@@ -79,27 +88,27 @@ export default function ProfileScreen() {
   return (
     <View style={styles.layout_container}>
       <ScrollView style={styles.layout_scrollView}>
-        {/* Personal Information Form */}
-        <EditPersonalInfoForm 
-          info={personalInfo}
-          onSave={handleSavePersonalInfo}
-        />
-
-        {/* Subscription Section */}
-        <Surface style={styles.profile_mainSection} elevation={1}>
-          <View style={styles.profile_sectionHeader}>
+        {/* Profile Header */}
+        <Surface style={styles.profile_header} elevation={1}>
+          <View style={styles.profile_headerContent}>
             <MaterialCommunityIcons 
-              name="crown" 
-              size={24} 
-              color={theme.colors.secondary} 
+              name="account-circle" 
+              size={64} 
+              color={theme.colors.primary} 
             />
-            <Text style={[styles.profile_sectionTitle, theme.fonts.titleMedium]}>
-              Premium Subscription
-            </Text>
+            <View style={styles.profile_headerText}>
+              <Text style={[styles.text_heading2, styles.profile_name]}>
+                {personalInfo.name}
+              </Text>
+              <Text style={styles.profile_email}>
+                {personalInfo.email}
+              </Text>
+            </View>
           </View>
+          
           <View style={styles.profile_subscriptionStatus}>
             <Text style={[styles.profile_statusLabel, theme.fonts.bodyMedium]}>
-              Status:
+              Subscription Status:
             </Text>
             <View style={[styles.profile_statusBadge, { backgroundColor: theme.colors.secondary }]}>
               <Text style={[styles.profile_statusText, { color: theme.colors.onSecondary }]}>
@@ -107,30 +116,41 @@ export default function ProfileScreen() {
               </Text>
             </View>
           </View>
-          <Text style={[styles.profile_subscriptionDetails, theme.fonts.bodyMedium]}>
-            Next billing date: March 15, 2024
-          </Text>
-          <Button
-            mode="contained"
-            onPress={() => router.push('/subscription/manage')}
-            style={styles.profile_actionButton}
-            labelStyle={theme.fonts.labelLarge}
-          >
-            Manage Subscription
-          </Button>
         </Surface>
 
-        {/* Notification Preferences */}
-        <NotificationPreferences onToggle={handleNotificationToggle} />
-
-        {/* Language & Region Settings */}
-        <LanguageRegionSettings onLanguageChange={handleLanguageChange} />
-
-        {/* Help Center */}
-        <HelpCenterCard onContactSupport={handleContactSupport} />
-
-        {/* Legal Links */}
-        <LegalLinks />
+        {/* Settings List */}
+        <List.Section>
+          <List.Item
+            title="Edit Personal Information"
+            onPress={() => setIsPersonalInfoModalVisible(true)}
+            left={() => <List.Icon icon="account-edit" />}
+            right={() => <List.Icon icon="chevron-right" />}
+          />
+          <List.Item
+            title="Notification Preferences"
+            onPress={() => setIsNotificationsModalVisible(true)}
+            left={() => <List.Icon icon="bell-outline" />}
+            right={() => <List.Icon icon="chevron-right" />}
+          />
+          <List.Item
+            title="Language & Region"
+            onPress={() => setIsLanguageModalVisible(true)}
+            left={() => <List.Icon icon="earth" />}
+            right={() => <List.Icon icon="chevron-right" />}
+          />
+          <List.Item
+            title="Help Center"
+            onPress={() => setIsHelpModalVisible(true)}
+            left={() => <List.Icon icon="help-circle-outline" />}
+            right={() => <List.Icon icon="chevron-right" />}
+          />
+          <List.Item
+            title="Privacy Policy & Terms of Service"
+            onPress={() => setIsLegalModalVisible(true)}
+            left={() => <List.Icon icon="file-document-outline" />}
+            right={() => <List.Icon icon="chevron-right" />}
+          />
+        </List.Section>
 
         {/* Sign Out Button */}
         <Surface style={[styles.profile_mainSection, styles.profile_signOutSection]} elevation={1}>
@@ -148,8 +168,57 @@ export default function ProfileScreen() {
         </Surface>
       </ScrollView>
 
-      {/* Sign Out Confirmation Dialog */}
+      {/* Modals */}
       <Portal>
+        {/* Personal Info Modal */}
+        <Modal
+          visible={isPersonalInfoModalVisible}
+          onDismiss={() => setIsPersonalInfoModalVisible(false)}
+          contentContainerStyle={styles.modal_container}
+        >
+          <EditPersonalInfoForm 
+            info={personalInfo}
+            onSave={handleSavePersonalInfo}
+          />
+        </Modal>
+
+        {/* Notifications Modal */}
+        <Modal
+          visible={isNotificationsModalVisible}
+          onDismiss={() => setIsNotificationsModalVisible(false)}
+          contentContainerStyle={styles.modal_container}
+        >
+          <NotificationPreferences onToggle={handleNotificationToggle} />
+        </Modal>
+
+        {/* Language & Region Modal */}
+        <Modal
+          visible={isLanguageModalVisible}
+          onDismiss={() => setIsLanguageModalVisible(false)}
+          contentContainerStyle={styles.modal_container}
+        >
+          <LanguageRegionSettings onLanguageChange={handleLanguageChange} />
+        </Modal>
+
+        {/* Help Center Modal */}
+        <Modal
+          visible={isHelpModalVisible}
+          onDismiss={() => setIsHelpModalVisible(false)}
+          contentContainerStyle={styles.modal_container}
+        >
+          <HelpCenterCard onContactSupport={handleContactSupport} />
+        </Modal>
+
+        {/* Legal Modal */}
+        <Modal
+          visible={isLegalModalVisible}
+          onDismiss={() => setIsLegalModalVisible(false)}
+          contentContainerStyle={styles.modal_container}
+        >
+          <LegalLinks />
+        </Modal>
+
+        {/* Sign Out Dialog */}
         <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)}>
           <Dialog.Title style={theme.fonts.titleLarge}>Sign Out</Dialog.Title>
           <Dialog.Content>
@@ -177,6 +246,7 @@ export default function ProfileScreen() {
         </Dialog>
       </Portal>
 
+      {/* Error Snackbar */}
       <Snackbar
         visible={!!error}
         onDismiss={() => setError(null)}

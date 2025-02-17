@@ -869,7 +869,14 @@ const styles = StyleSheet.create({
       marginBottom: 12,
       color: theme.colors.onSurface,
       ...theme.fonts.headlineMedium,
-    } as TextStyle,
+  } as TextStyle,
+  modal_container: {
+    margin: 16,
+    backgroundColor: theme.colors.surface,
+    padding: 16,
+    borderRadius: 12,
+    maxHeight: '90%',
+  } as ViewStyle,
 });
 
 export default styles;
