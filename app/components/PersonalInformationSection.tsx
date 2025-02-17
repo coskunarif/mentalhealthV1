@@ -49,29 +49,36 @@ export const PersonalInformationSection: React.FC<PersonalInformationSectionProp
 const styles = StyleSheet.create({
   card: {
     margin: theme.spacing.medium,
+    marginTop: theme.spacing.small, // Reduced top margin since it's first in ScrollView
     padding: theme.spacing.medium,
     borderRadius: theme.shape.borderRadius,
     elevation: 2,
     backgroundColor: theme.colors.surface,
   },
   sectionTitle: {
-    marginBottom: theme.spacing.small,
-    color: theme.colors.onSurface,
+    marginBottom: theme.spacing.medium,
+    color: theme.colors.primary,
     fontSize: theme.fonts.headlineMedium.fontSize,
+    fontFamily: theme.fonts.headlineMedium.fontFamily,
+    fontWeight: theme.fonts.headlineMedium.fontWeight,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: theme.spacing.tiny,
+    alignItems: 'center',
+    paddingVertical: theme.spacing.small,
   },
   label: {
-    fontWeight: 'bold',
+    fontSize: theme.fonts.bodyMedium.fontSize,
+    fontFamily: theme.fonts.bodyMedium.fontFamily,
     color: theme.colors.onSurfaceVariant,
   },
   value: {
+    fontSize: theme.fonts.bodyLarge.fontSize,
+    fontFamily: theme.fonts.bodyLarge.fontFamily,
     color: theme.colors.onSurface,
   },
   divider: {
-    marginVertical: theme.spacing.tiny,
+    backgroundColor: theme.colors.outlineVariant,
   },
 });

@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button, Surface, Snackbar, Avatar, Divider, List, Dialog, Portal } from 'react-native-paper';
-import { PersonalInformationSection } from '../components/PersonalInformationSection';
+import { Text, Button, Surface, Snackbar, Dialog, Portal } from 'react-native-paper';
+import { EditPersonalInfoForm } from '../components/EditPersonalInfoForm';
+import { NotificationPreferences } from '../components/NotificationPreferences';
+import { LanguageRegionSettings } from '../components/LanguageRegionSettings';
+import { HelpCenterCard } from '../components/HelpCenterCard';
+import { LegalLinks } from '../components/LegalLinks';
 import type { PersonalInformation } from '../types/personalInformation';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
@@ -9,28 +13,47 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import styles from '../config/styles';
 import { theme } from '../config/theme';
 
-interface ProfileListItemProps {
-  title: string;
-  icon: string;
-  onPress: () => void;
-}
-
-const ProfileListItem = ({ title, icon, onPress }: ProfileListItemProps) => (
-  <List.Item
-    title={title}
-    left={props => <List.Icon {...props} icon={icon} />}
-    right={props => <List.Icon {...props} icon="chevron-right" />}
-    onPress={onPress}
-    titleStyle={theme.fonts.bodyLarge}
-  />
-);
-
 export default function ProfileScreen() {
-  const router = useRouter();
   const { user, signOut } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const router = useRouter();
+
+  const handleSavePersonalInfo = useCallback(async (info: PersonalInformation) => {
+    try {
+      // TODO: Implement API call to save personal info
+      console.log('Saving personal info:', info);
+    } catch (err: any) {
+      setError(err?.message || "Failed to save personal information");
+      throw err;
+    }
+  }, []);
+
+  const handleNotificationToggle = useCallback(async (settingId: string, value: boolean) => {
+    try {
+      // TODO: Implement API call to update notification settings
+      console.log('Updating notification setting:', settingId, value);
+    } catch (err: any) {
+      setError(err?.message || "Failed to update notification settings");
+      throw err;
+    }
+  }, []);
+
+  const handleLanguageChange = useCallback(async (languageCode: string) => {
+    try {
+      // TODO: Implement API call to update language settings
+      console.log('Changing language to:', languageCode);
+    } catch (err: any) {
+      setError(err?.message || "Failed to change language");
+      throw err;
+    }
+  }, []);
+
+  const handleContactSupport = useCallback(() => {
+    // TODO: Implement live chat functionality
+    console.log('Opening live chat');
+  }, []);
 
   const handleSignOut = async () => {
     setIsLoading(true);
@@ -46,17 +69,22 @@ export default function ProfileScreen() {
     }
   };
 
+  const personalInfo = {
+    name: "John Doe",
+    email: "johndoe@example.com",
+    phoneNumber: "555-1234",
+    dateOfBirth: "1990-01-01",
+  };
+
   return (
     <View style={styles.layout_container}>
-      <PersonalInformationSection 
-        info={{
-          name: "John Doe",
-          email: "johndoe@example.com",
-          phoneNumber: "555-1234",
-          dateOfBirth: "1990-01-01",
-        }}
-      />
       <ScrollView style={styles.layout_scrollView}>
+        {/* Personal Information Form */}
+        <EditPersonalInfoForm 
+          info={personalInfo}
+          onSave={handleSavePersonalInfo}
+        />
+
         {/* Subscription Section */}
         <Surface style={styles.profile_mainSection} elevation={1}>
           <View style={styles.profile_sectionHeader}>
@@ -92,56 +120,17 @@ export default function ProfileScreen() {
           </Button>
         </Surface>
 
-        {/* Settings Sections */}
-        <Surface style={styles.profile_mainSection} elevation={1}>
-          <List.Section>
-            <List.Subheader style={theme.fonts.titleMedium}>
-              Account Settings
-            </List.Subheader>
-            
-            <ProfileListItem
-              title="Personal Information"
-              icon="account"
-              onPress={() => router.push('/account/personal-info')}
-            />
-            
-            <ProfileListItem
-              title="Notification Preferences"
-              icon="bell"
-              onPress={() => router.push('/account/notifications')}
-            />
-            
-            <ProfileListItem
-              title="Language & Region"
-              icon="translate"
-              onPress={() => router.push('/account/language')}
-            />
-            
-            <Divider />
-            
-            <List.Subheader style={theme.fonts.titleMedium}>
-              Support & Legal
-            </List.Subheader>
-            
-            <ProfileListItem
-              title="Help Center"
-              icon="help-circle"
-              onPress={() => router.push('/support/help')}
-            />
-            
-            <ProfileListItem
-              title="Privacy Policy"
-              icon="shield-account"
-              onPress={() => router.push('/legal/privacy')}
-            />
-            
-            <ProfileListItem
-              title="Terms of Service"
-              icon="file-document"
-              onPress={() => router.push('/legal/terms')}
-            />
-          </List.Section>
-        </Surface>
+        {/* Notification Preferences */}
+        <NotificationPreferences onToggle={handleNotificationToggle} />
+
+        {/* Language & Region Settings */}
+        <LanguageRegionSettings onLanguageChange={handleLanguageChange} />
+
+        {/* Help Center */}
+        <HelpCenterCard onContactSupport={handleContactSupport} />
+
+        {/* Legal Links */}
+        <LegalLinks />
 
         {/* Sign Out Button */}
         <Surface style={[styles.profile_mainSection, styles.profile_signOutSection]} elevation={1}>
