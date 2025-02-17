@@ -4,7 +4,9 @@ import { Text, Button, Card } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import styles from '../config/styles';
-import { theme } from '../config/theme';
+import themeExports, { theme } from '../config/theme';
+
+const { moodColors, scaleFont } = themeExports;
 
 type MoodType = {
   label: string;
@@ -47,9 +49,9 @@ export function MoodSelector({
   const [relatedSliderColors, setRelatedSliderColors] = useState<{ [key: string]: string }>({});
 
   const getSliderColor = (value: number) => {
-    if (value <= 33) return '#4CAF50'; // Green for low
-    if (value <= 66) return '#FFC107'; // Yellow for medium
-    return '#F44336'; // Red for high
+    if (value <= 33) return moodColors.low;
+    if (value <= 66) return moodColors.medium;
+    return moodColors.high;
   };
 
   const updateSliderColor = (value: number, label: string, isRelated: boolean) => {
@@ -96,17 +98,18 @@ export function MoodSelector({
       style={[
         styles.component_card_elevated, 
         styles.mood_slider_card,
-        { padding: 6, marginBottom: 8 }
+        { padding: theme.spacing.small, marginBottom: theme.spacing.small }
       ]}
+      accessibilityLabel={`Duration slider for ${mood.label}`}
     >
-      <Card.Content style={{ gap: 2 }}>
+      <Card.Content style={{ gap: theme.spacing.tiny }}>
         <View style={styles.mood_headerRow}>
           <MaterialCommunityIcons
             name="clock-outline"
             size={24}
             color={theme.colors.primary}
           />
-          <Text style={[styles.text_body, { fontSize: 11 }]}>How long</Text>
+          <Text style={[styles.text_body, { fontSize: scaleFont(11) }]}>How long</Text>
         </View>
         <Slider
           value={mood.duration}
@@ -116,12 +119,13 @@ export function MoodSelector({
           thumbTintColor={theme.colors.primary}
           minimumTrackTintColor={theme.colors.primary}
           onValueChange={onDurationChange}
-          style={{ height: 16 }}
+          style={{ height: scaleFont(16) }}
+          accessibilityLabel={`Set duration for ${mood.label}`}
         />
-        <View style={[styles.mood_sliderLabels, { marginTop: -2 }]}>
-          <Text style={[styles.text_caption, { fontSize: 9 }]}>{'< 3 months'}</Text>
-          <Text style={[styles.text_caption, { fontSize: 9 }]}>6 months</Text>
-          <Text style={[styles.text_caption, { fontSize: 9 }]}>{'> 1 year'}</Text>
+        <View style={[styles.mood_sliderLabels, { marginTop: -theme.spacing.tiny/2 }]}>
+          <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>{'< 3 months'}</Text>
+          <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>6 months</Text>
+          <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>{'> 1 year'}</Text>
         </View>
       </Card.Content>
     </Card>
@@ -141,17 +145,18 @@ export function MoodSelector({
         style={[
           styles.component_card_elevated, 
           styles.mood_slider_card,
-          { padding: 6, marginVertical: 1 }
+          { padding: theme.spacing.small, marginVertical: theme.spacing.tiny/4 }
         ]}
+        accessibilityLabel={`Intensity slider for ${mood.label}`}
       >
-        <Card.Content style={{ gap: 2 }}>
+        <Card.Content style={{ gap: theme.spacing.tiny }}>
           <View style={styles.mood_headerRow}>
             <MaterialCommunityIcons
               name={mood.icon as any}
               size={24}
               color={mood.color}
             />
-            <Text style={[styles.text_body, { fontSize: 11 }]}>{mood.label}</Text>
+            <Text style={[styles.text_body, { fontSize: scaleFont(11) }]}>{mood.label}</Text>
           </View>
           <Slider
             value={sliderValue}
@@ -160,17 +165,18 @@ export function MoodSelector({
             step={1}
             thumbTintColor={sliderColor}
             minimumTrackTintColor={sliderColor}
-            maximumTrackTintColor="#E0E0E0"
+            maximumTrackTintColor={theme.colors.surfaceVariant}
             onValueChange={(value) => 
               isRelated 
                 ? handleRelatedMoodChange(value, mood.label)
                 : handleMainSliderChange(value, mood.label)
             }
-            style={{ height: 16 }}
+            style={{ height: scaleFont(16) }}
+            accessibilityLabel={`Adjust intensity for ${mood.label}`}
           />
-          <View style={[styles.mood_sliderLabels, { marginTop: -2 }]}>
-            <Text style={[styles.text_caption, { fontSize: 9 }]}>Low</Text>
-            <Text style={[styles.text_caption, { fontSize: 9 }]}>High</Text>
+          <View style={[styles.mood_sliderLabels, { marginTop: -theme.spacing.tiny/2 }]}>
+            <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>Low</Text>
+            <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>High</Text>
           </View>
         </Card.Content>
       </Card>
@@ -190,10 +196,12 @@ export function MoodSelector({
   return (
     <View style={{ flex: 1 }}>
       <ScrollView 
-        style={[styles.layout_scrollView, { padding: 16 }]}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        style={[styles.layout_scrollView, { padding: theme.spacing.medium }]}
+        contentContainerStyle={{ paddingBottom: theme.spacing.medium * 6.25 }}
       >
-        <Text style={[styles.header_shadow, { textAlign: 'center', color: theme.colors.primary }]}>How are you feeling?</Text>
+        <Text style={[styles.header_shadow, { textAlign: 'center', color: theme.colors.primary }]}>
+          How are you feeling?
+        </Text>
         
         <View style={styles.mood_gridContainer}>
           {moods.map((mood, index) => (
@@ -202,21 +210,30 @@ export function MoodSelector({
               onPress={() => onMoodSelect(index)}
               style={[
                 styles.mood_item,
-                selectedMood?.label === mood.label && { backgroundColor: mood.color + '20' }
+                selectedMood?.label === mood.label && { 
+                  backgroundColor: mood.color + '20',
+                  borderWidth: 2,
+                  borderColor: theme.colors.surfaceVariant 
+                }
               ]}
+              accessibilityLabel={`Select mood ${mood.label}`}
+              accessibilityRole="button"
+              accessibilityState={{ selected: selectedMood?.label === mood.label }}
             >
               <MaterialCommunityIcons
                 name={mood.icon as any}
                 size={40}
                 color={mood.color}
               />
-              <Text style={[styles.text_caption, { marginTop: 4 }]}>{mood.label}</Text>
+              <Text style={[styles.text_caption, { marginTop: theme.spacing.tiny }]}>
+                {mood.label}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {selectedMood && (
-          <View style={{ gap: 4 }}>
+          <View style={{ gap: theme.spacing.tiny }}>
             {renderDurationSlider(selectedMood)}
             {renderSliderCard(selectedMood, false)}
             {relatedMoods[selectedMood.label]?.map(relatedMood => {
@@ -237,6 +254,7 @@ export function MoodSelector({
           onPress={onNext}
           style={[styles.mood_button, styles.button_outlined]}
           labelStyle={styles.mood_buttonText}
+          accessibilityLabel="Go to next step"
         >
           Next
         </Button>
@@ -245,6 +263,7 @@ export function MoodSelector({
           onPress={onFinish}
           style={[styles.mood_button, styles.button_contained]}
           labelStyle={[styles.mood_buttonText, { color: theme.colors.onPrimary }]}
+          accessibilityLabel="Complete mood selection"
         >
           Finish
         </Button>
