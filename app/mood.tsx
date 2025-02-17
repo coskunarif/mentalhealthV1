@@ -11,21 +11,22 @@ type MoodType = {
   color: string;
   icon: string;
   value: number;
+  duration: number;
   isSelected: boolean;
 };
 
 export default function MoodScreen() {
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
   const [moods, setMoods] = useState<MoodType[]>([
-    { label: 'Shame', color: '#87CEEB', icon: 'emoticon-sad', value: 0, isSelected: false },
-    { label: 'Guilt', color: '#FFD700', icon: 'emoticon-confused', value: 0, isSelected: false },
-    { label: 'Apathy', color: '#E6E6FA', icon: 'emoticon-neutral', value: 0, isSelected: false },
-    { label: 'Grief', color: '#FF69B4', icon: 'emoticon-cry', value: 0, isSelected: false },
-    { label: 'Fear', color: '#FF69B4', icon: 'emoticon-scared', value: 0, isSelected: false },
-    { label: 'Desire', color: '#FF69B4', icon: 'emoticon-excited', value: 0, isSelected: false },
-    { label: 'Anger', color: '#FF69B4', icon: 'emoticon-angry', value: 0, isSelected: false },
-    { label: 'Pride', color: '#FF69B4', icon: 'emoticon-cool', value: 0, isSelected: false },
-    { label: 'Willfulness', color: '#FF69B4', icon: 'emoticon-confident', value: 0, isSelected: false },
+    { label: 'Shame', color: '#87CEEB', icon: 'emoticon-sad', value: 0, duration: 0, isSelected: false },
+    { label: 'Guilt', color: '#FFD700', icon: 'emoticon-confused', value: 0, duration: 0, isSelected: false },
+    { label: 'Apathy', color: '#E6E6FA', icon: 'emoticon-neutral', value: 0, duration: 0, isSelected: false },
+    { label: 'Grief', color: '#FF69B4', icon: 'emoticon-cry', value: 0, duration: 0, isSelected: false },
+    { label: 'Fear', color: '#FF69B4', icon: 'emoticon-scared', value: 0, duration: 0, isSelected: false },
+    { label: 'Desire', color: '#FF69B4', icon: 'emoticon-excited', value: 0, duration: 0, isSelected: false },
+    { label: 'Anger', color: '#FF69B4', icon: 'emoticon-angry', value: 0, duration: 0, isSelected: false },
+    { label: 'Pride', color: '#FF69B4', icon: 'emoticon-cool', value: 0, duration: 0, isSelected: false },
+    { label: 'Willfulness', color: '#FF69B4', icon: 'emoticon-confident', value: 0, duration: 0, isSelected: false },
   ]);
 
   const { returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['mood']>();
@@ -38,14 +39,23 @@ export default function MoodScreen() {
     setSelectedMood(selectedMood?.label === mood.label ? null : mood);
   };
 
-  const handleSliderChange = (value: number) => {
+  const handleSliderChange = (value: number, label: string) => {
+    setMoods(prevMoods =>
+      prevMoods.map(mood => ({
+        ...mood,
+        value: mood.label === label ? value : mood.value,
+        isSelected: mood.label === label ? true : mood.isSelected
+      }))
+    );
+  };
+
+  const handleDurationChange = (value: number) => {
     if (!selectedMood) return;
     
     setMoods(prevMoods =>
       prevMoods.map(mood => ({
         ...mood,
-        value: mood.label === selectedMood.label ? value : mood.value,
-        isSelected: mood.label === selectedMood.label ? true : mood.isSelected
+        duration: mood.label === selectedMood.label ? value : mood.duration
       }))
     );
   };
@@ -56,7 +66,10 @@ export default function MoodScreen() {
         .filter(mood => mood.isSelected)
         .reduce((acc, mood) => ({
           ...acc,
-          [mood.label]: mood.value
+          [mood.label]: {
+            value: mood.value,
+            duration: mood.duration
+          }
         }), {});
       
       console.log(moodValues);
@@ -115,6 +128,7 @@ export default function MoodScreen() {
             selectedMood={selectedMood}
             onMoodSelect={handleMoodSelect}
             onSliderChange={handleSliderChange}
+            onDurationChange={handleDurationChange}
             onNext={handleNext}
             onFinish={handleFinish}
           />

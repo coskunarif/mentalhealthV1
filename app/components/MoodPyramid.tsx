@@ -37,7 +37,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       fontSize: 18,
       style: { 
         left: '7%',
-        top: 10,
+        top: 1,
         zIndex: 1,
       }
     },
@@ -46,7 +46,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       fontSize: 15,
       style: { 
         right: '15%',
-        top: 20,
+        top: 5,
         zIndex: 1,
       }
     },
@@ -54,8 +54,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       size: 110,
       fontSize: 13,
       style: { 
-        left: '40%',
-        top: 140,
+        left: '38.5%',
+        top: 130,
         zIndex: 2,
       }
     },
