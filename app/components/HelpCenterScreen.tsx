@@ -17,7 +17,7 @@ export default function HelpCenterScreen() {
     <View style={styles.layout_container}>
       <Surface style={styles.header_surface} elevation={2}>
         <IconButton icon="arrow-left" size={24} onPress={() => router.back()} />
-        <Text style={styles.text_heading1}>Help Center</Text>
+        <Text style={styles.text_heading2}>Help Center</Text>
       </Surface>
       <ScrollView contentContainerStyle={styles.layout_content}>
         <Text style={styles.text_subtitle}>

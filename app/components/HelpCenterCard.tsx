@@ -52,8 +52,6 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({ onContactSupport
   return (
     <Card style={styles.card}>
       <Card.Content>
-        <Title style={styles.sectionTitle}>Help Center</Title>
-
         <List.Section>
           <List.Subheader style={styles.subheader}>Frequently Asked Questions</List.Subheader>
           {faqs.map((faq, index) => (
@@ -110,16 +108,9 @@ const styles = StyleSheet.create({
   card: {
     margin: theme.spacing.medium,
     padding: theme.spacing.medium,
-    borderRadius: theme.shape.borderRadius * 2,
-    elevation: 2,
+    borderRadius: theme.shape.borderRadius,
+    elevation: 1,
     backgroundColor: theme.colors.surface,
-  },
-  sectionTitle: {
-    marginBottom: theme.spacing.medium * 2,
-    color: theme.colors.primary,
-    fontSize: theme.fonts.headlineMedium.fontSize,
-    fontFamily: theme.fonts.headlineMedium.fontFamily,
-    fontWeight: theme.fonts.headlineMedium.fontWeight,
   },
   subheader: {
     ...theme.fonts.titleMedium,
@@ -128,7 +119,7 @@ const styles = StyleSheet.create({
   accordion: {
     backgroundColor: theme.colors.surfaceVariant,
     marginVertical: theme.spacing.small,
-    borderRadius: theme.shape.borderRadius * 2,
+    borderRadius: theme.shape.borderRadius,
   },
   accordionTitle: {
     ...theme.fonts.bodyLarge,

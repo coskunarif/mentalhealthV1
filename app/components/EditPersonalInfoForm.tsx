@@ -70,8 +70,6 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
   return (
     <Card style={styles.card}>
       <Card.Content>
-        <Title style={styles.sectionTitle}>Edit Personal Information</Title>
-        
         <TextInput
           label="Name"
           value={formData.name}
@@ -138,16 +136,9 @@ const styles = StyleSheet.create({
     margin: theme.spacing.medium,
     marginTop: theme.spacing.small,
     padding: theme.spacing.medium,
-    borderRadius: theme.shape.borderRadius * 2,
-    elevation: 2,
+    borderRadius: theme.shape.borderRadius,
+    elevation: 1,
     backgroundColor: theme.colors.surface,
-  },
-  sectionTitle: {
-    marginBottom: theme.spacing.medium * 2,
-    color: theme.colors.primary,
-    fontSize: theme.fonts.headlineMedium.fontSize,
-    fontFamily: theme.fonts.headlineMedium.fontFamily,
-    fontWeight: theme.fonts.headlineMedium.fontWeight,
   },
   input: {
     marginBottom: theme.spacing.medium,
