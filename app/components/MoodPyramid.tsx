@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, DimensionValue, ViewStyle } from 'react-native';
 import { Text, Button } from 'react-native-paper';
-import { theme } from '@/app/config/theme';
+import themeExports, { theme } from '../config/theme';
 import styles from '../config/styles';
+
+const { moodColors, scaleFont, scaleSize } = themeExports;
 
 type Emotion = {
   label: string;
@@ -24,17 +26,17 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
   const [selectedEmotions, setSelectedEmotions] = useState<EmotionSelection[]>([]);
 
   const emotions: Emotion[] = [
-    { label: 'Peace', color: '#87CEEB', width: '40%' },
-    { label: 'Joy', color: '#FFD700', width: '55%' },
-    { label: 'Love', color: '#FF69B4', width: '70%' },
-    { label: 'Reason', color: '#FFA500', width: '85%' },
-    { label: 'Acceptance', color: '#9370DB', width: '100%' },
+    { label: 'Peace', color: moodColors.peace, width: '40%' },
+    { label: 'Joy', color: moodColors.joy, width: '55%' },
+    { label: 'Love', color: moodColors.love, width: '70%' },
+    { label: 'Reason', color: moodColors.reason, width: '85%' },
+    { label: 'Acceptance', color: moodColors.acceptance, width: '100%' },
   ];
 
   const bubbleConfig = [
     { 
-      size: 162,
-      fontSize: 18,
+      size: scaleSize(162),
+      fontSize: scaleFont(18),
       style: { 
         left: '7%',
         top: 1,
@@ -42,8 +44,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       }
     },
     { 
-      size: 132,
-      fontSize: 15,
+      size: scaleSize(132),
+      fontSize: scaleFont(15),
       style: { 
         right: '15%',
         top: 5,
@@ -51,8 +53,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       }
     },
     { 
-      size: 110,
-      fontSize: 13,
+      size: scaleSize(110),
+      fontSize: scaleFont(13),
       style: { 
         left: '38.5%',
         top: 130,
@@ -82,7 +84,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView 
-        style={[styles.layout_scrollView, { padding: 16 }]}
+        style={[styles.layout_scrollView, { padding: theme.spacing.medium }]}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
         <Text style={[styles.header_shadow, { textAlign: 'center', color: theme.colors.primary }]}>Identify the emotions to focus on</Text>
@@ -92,6 +94,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
             <TouchableOpacity
               key={emotion.label}
               onPress={() => handleEmotionSelect(emotion)}
+              accessibilityLabel={`Select emotion ${emotion.label}`}
+              accessibilityRole="button"
               style={[
                 styles.pyramid_item,
                 { 
@@ -115,6 +119,10 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
             <TouchableOpacity
               key={index}
               onPress={() => handleBubbleClick(index)}
+              accessibilityLabel={selectedEmotions[index] ? 
+                `Remove ${selectedEmotions[index].label}` : 
+                `Select focus emotion ${index + 1}`}
+              accessibilityRole="button"
               style={[
                 styles.pyramid_bubble,
                 {
@@ -174,4 +182,4 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       </View>
     </View>
   );
-} 
+}

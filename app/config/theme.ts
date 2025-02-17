@@ -5,7 +5,12 @@ import { Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
 
-// Scaling function based on screen width
+// Scaling functions based on screen width
+const scaleSize = (size: number) => {
+  const scale = width / 375;
+  return Math.round(size * scale);
+};
+
 const scaleFont = (size: number) => {
   const scale = width / 375; // 375 is a common base screen width
   return Math.round(size * scale);
@@ -113,7 +118,26 @@ export const theme: AppTheme = {
   chartColors,
 };
 
+const moodColors = {
+  shame: '#8B0000',
+  guilt: '#4B0082',
+  fear: '#483D8B',
+  anger: '#B22222',
+  peace: '#87CEEB',
+  joy: '#FFD700',
+  love: '#FF69B4',
+  reason: '#FFA500',
+  acceptance: '#9370DB',
+  // Slider intensity colors
+  low: '#4CAF50',
+  medium: '#FFC107',
+  high: '#F44336',
+};
+
 export default {
   theme,
   colors,
+  scaleFont,
+  scaleSize,
+  moodColors,
 };
