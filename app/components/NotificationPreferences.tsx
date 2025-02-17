@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { Card, Title, List, Switch } from 'react-native-paper';
+import { Card, Title, List, Switch, Divider } from 'react-native-paper';
 import { theme } from '../config/theme';
 
 interface NotificationSetting {
@@ -68,20 +68,25 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
         
         <List.Section>
           {defaultSettings.map(setting => (
-            <List.Item
-              key={setting.id}
-              title={setting.label}
-              description={setting.description}
-              right={() => (
-                <Switch
-                  value={settings[setting.id]}
-                  onValueChange={() => handleToggle(setting.id)}
-                  disabled={isSubmitting[setting.id]}
-                />
+            <React.Fragment key={setting.id}>
+              <List.Item
+                title={setting.label}
+                description={setting.description}
+                right={() => (
+                  <Switch
+                    value={settings[setting.id]}
+                    onValueChange={() => handleToggle(setting.id)}
+                    disabled={isSubmitting[setting.id]}
+                  />
+                )}
+                titleStyle={styles.itemTitle}
+                descriptionStyle={styles.itemDescription}
+                style={styles.listItem}
+              />
+              {defaultSettings.indexOf(setting) < defaultSettings.length - 1 && (
+                <Divider style={styles.divider} />
               )}
-              titleStyle={styles.itemTitle}
-              descriptionStyle={styles.itemDescription}
-            />
+            </React.Fragment>
           ))}
         </List.Section>
       </Card.Content>
@@ -92,13 +97,13 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
 const styles = StyleSheet.create({
   card: {
     margin: theme.spacing.medium,
-    padding: theme.spacing.small,
-    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing.medium,
+    borderRadius: theme.shape.borderRadius * 2,
     elevation: 2,
     backgroundColor: theme.colors.surface,
   },
   sectionTitle: {
-    marginBottom: theme.spacing.medium,
+    marginBottom: theme.spacing.medium * 2,
     color: theme.colors.primary,
     fontSize: theme.fonts.headlineMedium.fontSize,
     fontFamily: theme.fonts.headlineMedium.fontFamily,
@@ -111,5 +116,11 @@ const styles = StyleSheet.create({
   itemDescription: {
     ...theme.fonts.bodyMedium,
     color: theme.colors.onSurfaceVariant,
+  },
+  listItem: {
+    paddingVertical: theme.spacing.small,
+  },
+  divider: {
+    backgroundColor: theme.colors.surfaceVariant,
   },
 });

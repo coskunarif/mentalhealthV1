@@ -122,8 +122,8 @@ export const LanguageRegionSettings: React.FC<LanguageRegionSettingsProps> = ({
 const styles = StyleSheet.create({
   card: {
     margin: theme.spacing.medium,
-    padding: theme.spacing.small,
-    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing.medium,
+    borderRadius: theme.shape.borderRadius * 2,
     elevation: 2,
     backgroundColor: theme.colors.surface,
   },
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     padding: theme.spacing.medium,
     margin: theme.spacing.medium,
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: theme.shape.borderRadius * 2,
     maxHeight: '80%',
   },
   modalTitle: {

@@ -1,11 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button, Surface, Snackbar, Dialog, Portal, List, Modal } from 'react-native-paper';
-import { EditPersonalInfoForm } from '../components/EditPersonalInfoForm';
-import { NotificationPreferences } from '../components/NotificationPreferences';
-import { LanguageRegionSettings } from '../components/LanguageRegionSettings';
-import { HelpCenterCard } from '../components/HelpCenterCard';
-import { LegalLinks } from '../components/LegalLinks';
+import { Text, Button, Surface, Snackbar, Dialog, Portal, List } from 'react-native-paper';
 import type { PersonalInformation } from '../types/personalInformation';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
@@ -20,49 +15,6 @@ export default function ProfileScreen() {
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const router = useRouter();
 
-  // Modal visibility states
-  const [isPersonalInfoModalVisible, setIsPersonalInfoModalVisible] = useState(false);
-  const [isNotificationsModalVisible, setIsNotificationsModalVisible] = useState(false);
-  const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
-  const [isHelpModalVisible, setIsHelpModalVisible] = useState(false);
-  const [isLegalModalVisible, setIsLegalModalVisible] = useState(false);
-
-  const handleSavePersonalInfo = useCallback(async (info: PersonalInformation) => {
-    try {
-      // TODO: Implement API call to save personal info
-      console.log('Saving personal info:', info);
-      setIsPersonalInfoModalVisible(false); // Close modal on success
-    } catch (err: any) {
-      setError(err?.message || "Failed to save personal information");
-      throw err;
-    }
-  }, []);
-
-  const handleNotificationToggle = useCallback(async (settingId: string, value: boolean) => {
-    try {
-      // TODO: Implement API call to update notification settings
-      console.log('Updating notification setting:', settingId, value);
-    } catch (err: any) {
-      setError(err?.message || "Failed to update notification settings");
-      throw err;
-    }
-  }, []);
-
-  const handleLanguageChange = useCallback(async (languageCode: string) => {
-    try {
-      // TODO: Implement API call to update language settings
-      console.log('Changing language to:', languageCode);
-      setIsLanguageModalVisible(false); // Close modal on success
-    } catch (err: any) {
-      setError(err?.message || "Failed to change language");
-      throw err;
-    }
-  }, []);
-
-  const handleContactSupport = useCallback(() => {
-    // TODO: Implement live chat functionality
-    console.log('Opening live chat');
-  }, []);
 
   const handleSignOut = async () => {
     setIsLoading(true);
@@ -88,12 +40,12 @@ export default function ProfileScreen() {
   return (
     <View style={styles.layout_container}>
       <ScrollView style={styles.layout_scrollView}>
-        {/* Profile Header */}
-        <Surface style={styles.profile_header} elevation={1}>
+        {/* Profile Header with Stats */}
+        <Surface style={styles.profile_header} elevation={2}>
           <View style={styles.profile_headerContent}>
             <MaterialCommunityIcons 
               name="account-circle" 
-              size={64} 
+              size={80} 
               color={theme.colors.primary} 
             />
             <View style={styles.profile_headerText}>
@@ -105,7 +57,24 @@ export default function ProfileScreen() {
               </Text>
             </View>
           </View>
-          
+
+          {/* Mental Health Stats */}
+          <View style={styles.profile_statsContainer}>
+            <View style={styles.profile_statItem}>
+              <Text style={styles.profile_statNumber}>12</Text>
+              <Text style={styles.profile_statLabel}>Sessions</Text>
+            </View>
+            <View style={styles.profile_statItem}>
+              <Text style={styles.profile_statNumber}>5</Text>
+              <Text style={styles.profile_statLabel}>Streak</Text>
+            </View>
+            <View style={styles.profile_statItem}>
+              <Text style={styles.profile_statNumber}>8</Text>
+              <Text style={styles.profile_statLabel}>Surveys</Text>
+            </View>
+          </View>
+
+          {/* Subscription Status */}
           <View style={styles.profile_subscriptionStatus}>
             <Text style={[styles.profile_statusLabel, theme.fonts.bodyMedium]}>
               Subscription Status:
@@ -118,39 +87,55 @@ export default function ProfileScreen() {
           </View>
         </Surface>
 
-        {/* Settings List */}
-        <List.Section>
-          <List.Item
-            title="Edit Personal Information"
-            onPress={() => setIsPersonalInfoModalVisible(true)}
-            left={() => <List.Icon icon="account-edit" />}
-            right={() => <List.Icon icon="chevron-right" />}
-          />
-          <List.Item
-            title="Notification Preferences"
-            onPress={() => setIsNotificationsModalVisible(true)}
-            left={() => <List.Icon icon="bell-outline" />}
-            right={() => <List.Icon icon="chevron-right" />}
-          />
-          <List.Item
-            title="Language & Region"
-            onPress={() => setIsLanguageModalVisible(true)}
-            left={() => <List.Icon icon="earth" />}
-            right={() => <List.Icon icon="chevron-right" />}
-          />
-          <List.Item
-            title="Help Center"
-            onPress={() => setIsHelpModalVisible(true)}
-            left={() => <List.Icon icon="help-circle-outline" />}
-            right={() => <List.Icon icon="chevron-right" />}
-          />
-          <List.Item
-            title="Privacy Policy & Terms of Service"
-            onPress={() => setIsLegalModalVisible(true)}
-            left={() => <List.Icon icon="file-document-outline" />}
-            right={() => <List.Icon icon="chevron-right" />}
-          />
-        </List.Section>
+        {/* Account Information */}
+        <Surface style={styles.profile_mainSection} elevation={1}>
+          <Text style={styles.profile_sectionTitle}>Account Information</Text>
+          <List.Section>
+            <List.Item
+              title="Edit Personal Information"
+              onPress={() => router.push('/components/EditPersonalInfoScreen')}
+              left={() => <List.Icon icon="account-edit" />}
+              right={() => <List.Icon icon="chevron-right" />}
+            />
+            <List.Item
+              title="Manage Subscription"
+              onPress={() => router.push('/components/ManageSubscriptionScreen')}
+              left={() => <List.Icon icon="credit-card" />}
+              right={() => <List.Icon icon="chevron-right" />}
+            />
+          </List.Section>
+        </Surface>
+
+        {/* Options */}
+        <Surface style={styles.profile_mainSection} elevation={1}>
+          <Text style={styles.profile_sectionTitle}>Options</Text>
+          <List.Section>
+            <List.Item
+              title="Language & Region"
+              onPress={() => router.push('/components/LanguageRegionScreen')}
+              left={() => <List.Icon icon="earth" />}
+              right={() => <List.Icon icon="chevron-right" />}
+            />
+            <List.Item
+              title="Notification Preferences"
+              onPress={() => router.push('/components/NotificationPreferencesScreen')}
+              left={() => <List.Icon icon="bell-outline" />}
+              right={() => <List.Icon icon="chevron-right" />}
+            />
+            <List.Item
+              title="Help Center"
+              onPress={() => router.push('/components/HelpCenterScreen')}
+              left={() => <List.Icon icon="help-circle-outline" />}
+              right={() => <List.Icon icon="chevron-right" />}
+            />
+            <List.Item
+              title="Privacy Policy & Terms of Service"
+              onPress={() => router.push('/components/LegalScreen')}
+              left={() => <List.Icon icon="file-document-outline" />}
+              right={() => <List.Icon icon="chevron-right" />}
+            />
+          </List.Section>
+        </Surface>
 
         {/* Sign Out Button */}
         <Surface style={[styles.profile_mainSection, styles.profile_signOutSection]} elevation={1}>
@@ -167,56 +152,6 @@ export default function ProfileScreen() {
           </Button>
         </Surface>
       </ScrollView>
-
-      {/* Modals */}
-      <Portal>
-        {/* Personal Info Modal */}
-        <Modal
-          visible={isPersonalInfoModalVisible}
-          onDismiss={() => setIsPersonalInfoModalVisible(false)}
-          contentContainerStyle={styles.modal_container}
-        >
-          <EditPersonalInfoForm 
-            info={personalInfo}
-            onSave={handleSavePersonalInfo}
-          />
-        </Modal>
-
-        {/* Notifications Modal */}
-        <Modal
-          visible={isNotificationsModalVisible}
-          onDismiss={() => setIsNotificationsModalVisible(false)}
-          contentContainerStyle={styles.modal_container}
-        >
-          <NotificationPreferences onToggle={handleNotificationToggle} />
-        </Modal>
-
-        {/* Language & Region Modal */}
-        <Modal
-          visible={isLanguageModalVisible}
-          onDismiss={() => setIsLanguageModalVisible(false)}
-          contentContainerStyle={styles.modal_container}
-        >
-          <LanguageRegionSettings onLanguageChange={handleLanguageChange} />
-        </Modal>
-
-        {/* Help Center Modal */}
-        <Modal
-          visible={isHelpModalVisible}
-          onDismiss={() => setIsHelpModalVisible(false)}
-          contentContainerStyle={styles.modal_container}
-        >
-          <HelpCenterCard onContactSupport={handleContactSupport} />
-        </Modal>
-
-        {/* Legal Modal */}
-        <Modal
-          visible={isLegalModalVisible}
-          onDismiss={() => setIsLegalModalVisible(false)}
-          contentContainerStyle={styles.modal_container}
-        >
-          <LegalLinks />
-        </Modal>
 
         {/* Sign Out Dialog */}
         <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)}>
@@ -244,8 +179,6 @@ export default function ProfileScreen() {
             </Button>
           </Dialog.Actions>
         </Dialog>
-      </Portal>
-
       {/* Error Snackbar */}
       <Snackbar
         visible={!!error}
