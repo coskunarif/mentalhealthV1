@@ -109,13 +109,13 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({ onContactSupport
 const styles = StyleSheet.create({
   card: {
     margin: theme.spacing.medium,
-    padding: theme.spacing.small,
-    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing.medium,
+    borderRadius: theme.shape.borderRadius * 2,
     elevation: 2,
     backgroundColor: theme.colors.surface,
   },
   sectionTitle: {
-    marginBottom: theme.spacing.medium,
+    marginBottom: theme.spacing.medium * 2,
     color: theme.colors.primary,
     fontSize: theme.fonts.headlineMedium.fontSize,
     fontFamily: theme.fonts.headlineMedium.fontFamily,
@@ -127,8 +127,8 @@ const styles = StyleSheet.create({
   },
   accordion: {
     backgroundColor: theme.colors.surfaceVariant,
-    marginVertical: theme.spacing.tiny,
-    borderRadius: theme.shape.borderRadius,
+    marginVertical: theme.spacing.small,
+    borderRadius: theme.shape.borderRadius * 2,
   },
   accordionTitle: {
     ...theme.fonts.bodyLarge,

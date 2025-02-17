@@ -137,20 +137,20 @@ const styles = StyleSheet.create({
   card: {
     margin: theme.spacing.medium,
     marginTop: theme.spacing.small,
-    padding: theme.spacing.small,
-    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing.medium,
+    borderRadius: theme.shape.borderRadius * 2,
     elevation: 2,
     backgroundColor: theme.colors.surface,
   },
   sectionTitle: {
-    marginBottom: theme.spacing.medium,
+    marginBottom: theme.spacing.medium * 2,
     color: theme.colors.primary,
     fontSize: theme.fonts.headlineMedium.fontSize,
     fontFamily: theme.fonts.headlineMedium.fontFamily,
     fontWeight: theme.fonts.headlineMedium.fontWeight,
   },
   input: {
-    marginBottom: theme.spacing.tiny,
+    marginBottom: theme.spacing.medium,
     backgroundColor: theme.colors.surface,
   },
   saveButton: {

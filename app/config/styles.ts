@@ -12,7 +12,15 @@ const styles = StyleSheet.create({
   layout_content: {
     padding: 16,
   } as ViewStyle,
-    layout_header: {
+    header_surface: {
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    elevation: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+  } as ViewStyle,
+  layout_header: {
     flexDirection: 'row' as const,
     alignItems: 'center' as FlexAlignType,
     padding: 16,
@@ -37,6 +45,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold' as const,
     color: theme.colors.onSurface,
     fontFamily: 'Kameron',
+    marginBottom: 8,
   } as TextStyle,
   text_heading2: {
     ...theme.fonts.headlineMedium,
@@ -61,6 +70,7 @@ const styles = StyleSheet.create({
   text_subtitle: {
     ...theme.fonts.bodyMedium,
     color: theme.colors.onSurfaceVariant,
+    marginBottom: theme.spacing.medium,
   } as TextStyle,
   text_link: {
     color: theme.colors.primary,
@@ -851,7 +861,26 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     color: theme.colors.onSurfaceVariant,
   } as TextStyle,
-  profile_signOutSection: {
+  profile_statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 16,
+    paddingHorizontal: 16,
+  } as ViewStyle,
+  profile_statItem: {
+    alignItems: 'center',
+  } as ViewStyle,
+  profile_statNumber: {
+    ...theme.fonts.titleLarge,
+    color: theme.colors.onSurface,
+    fontWeight: 'bold',
+  } as TextStyle,
+  profile_statLabel: {
+    ...theme.fonts.labelMedium,
+    color: theme.colors.onSurfaceVariant,
+    marginTop: 4,
+  } as TextStyle,
+  profile_signOutSection: {  
     marginBottom: 24,
   } as ViewStyle,
   profile_signOutButton: {
