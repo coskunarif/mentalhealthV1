@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { Card, Title, List, Switch, Divider } from 'react-native-paper';
+import { Surface, List, Switch, Divider } from 'react-native-paper';
 import { theme } from '../config/theme';
 
 interface NotificationSetting {
@@ -62,52 +62,39 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
   };
 
   return (
-    <Card style={styles.card}>
-      <Card.Content>
-        <Title style={styles.sectionTitle}>Notification Preferences</Title>
-        
-        <List.Section>
-          {defaultSettings.map(setting => (
-            <React.Fragment key={setting.id}>
-              <List.Item
-                title={setting.label}
-                description={setting.description}
-                right={() => (
-                  <Switch
-                    value={settings[setting.id]}
-                    onValueChange={() => handleToggle(setting.id)}
-                    disabled={isSubmitting[setting.id]}
-                  />
-                )}
-                titleStyle={styles.itemTitle}
-                descriptionStyle={styles.itemDescription}
-                style={styles.listItem}
-              />
-              {defaultSettings.indexOf(setting) < defaultSettings.length - 1 && (
-                <Divider style={styles.divider} />
+    <Surface style={styles.container} elevation={1}>
+      <List.Section>
+        {defaultSettings.map(setting => (
+          <React.Fragment key={setting.id}>
+            <List.Item
+              title={setting.label}
+              description={setting.description}
+              right={() => (
+                <Switch
+                  value={settings[setting.id]}
+                  onValueChange={() => handleToggle(setting.id)}
+                  disabled={isSubmitting[setting.id]}
+                />
               )}
-            </React.Fragment>
-          ))}
-        </List.Section>
-      </Card.Content>
-    </Card>
+              titleStyle={styles.itemTitle}
+              descriptionStyle={styles.itemDescription}
+              style={styles.listItem}
+            />
+            {defaultSettings.indexOf(setting) < defaultSettings.length - 1 && (
+              <Divider style={styles.divider} />
+            )}
+          </React.Fragment>
+        ))}
+      </List.Section>
+    </Surface>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
+  container: {
     margin: theme.spacing.medium,
-    padding: theme.spacing.medium,
-    borderRadius: theme.shape.borderRadius * 2,
-    elevation: 2,
     backgroundColor: theme.colors.surface,
-  },
-  sectionTitle: {
-    marginBottom: theme.spacing.medium * 2,
-    color: theme.colors.primary,
-    fontSize: theme.fonts.headlineMedium.fontSize,
-    fontFamily: theme.fonts.headlineMedium.fontFamily,
-    fontWeight: theme.fonts.headlineMedium.fontWeight,
+    borderRadius: theme.shape.borderRadius,
   },
   itemTitle: {
     ...theme.fonts.bodyLarge,

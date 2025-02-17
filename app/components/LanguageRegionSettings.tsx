@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
-import { Card, Title, List, Portal, Modal, RadioButton, Searchbar, Text } from 'react-native-paper';
+import { Surface, Title, List, Portal, Modal, RadioButton, Searchbar, Text } from 'react-native-paper';
 import { theme } from '../config/theme';
 
 interface Language {
@@ -64,11 +64,9 @@ export const LanguageRegionSettings: React.FC<LanguageRegionSettingsProps> = ({
 
   return (
     <>
-      <Card style={styles.card}>
-        <Card.Content>
-          <Title style={styles.sectionTitle}>Language & Region</Title>
-          
-          <List.Item
+    <Surface style={styles.container} elevation={1}>
+      <List.Section>
+        <List.Item
             title="Language"
             description={getCurrentLanguageName()}
             onPress={showModal}
@@ -76,8 +74,8 @@ export const LanguageRegionSettings: React.FC<LanguageRegionSettingsProps> = ({
             titleStyle={styles.itemTitle}
             descriptionStyle={styles.itemDescription}
           />
-        </Card.Content>
-      </Card>
+      </List.Section>
+    </Surface>
 
       <Portal>
         <Modal
@@ -120,19 +118,10 @@ export const LanguageRegionSettings: React.FC<LanguageRegionSettingsProps> = ({
 };
 
 const styles = StyleSheet.create({
-  card: {
+  container: {
     margin: theme.spacing.medium,
-    padding: theme.spacing.medium,
-    borderRadius: theme.shape.borderRadius * 2,
-    elevation: 2,
     backgroundColor: theme.colors.surface,
-  },
-  sectionTitle: {
-    marginBottom: theme.spacing.medium,
-    color: theme.colors.primary,
-    fontSize: theme.fonts.headlineMedium.fontSize,
-    fontFamily: theme.fonts.headlineMedium.fontFamily,
-    fontWeight: theme.fonts.headlineMedium.fontWeight,
+    borderRadius: theme.shape.borderRadius,
   },
   itemTitle: {
     ...theme.fonts.bodyLarge,
