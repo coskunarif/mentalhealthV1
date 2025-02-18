@@ -36,21 +36,21 @@ export const LegalLinks: React.FC = () => {
 
 const styles = StyleSheet.create({
   card: {
-    margin: theme.spacing.medium,
+    marginHorizontal: theme.spacing.medium,
     padding: theme.spacing.small,
     borderRadius: theme.shape.borderRadius,
-    elevation: 2,
+    elevation: 1,
     backgroundColor: theme.colors.surface,
   },
   sectionTitle: {
-    marginBottom: theme.spacing.medium,
-    color: theme.colors.primary,
-    fontSize: theme.fonts.headlineMedium.fontSize,
-    fontFamily: theme.fonts.headlineMedium.fontFamily,
-    fontWeight: theme.fonts.headlineMedium.fontWeight,
+    marginBottom: theme.spacing.small,
+    color: theme.colors.onSurface,
+    ...theme.fonts.titleMedium,
+    fontWeight: '500',
   },
   linkTitle: {
     ...theme.fonts.bodyLarge,
     color: theme.colors.onSurface,
+    lineHeight: theme.fonts.bodyLarge.lineHeight * 0.9,
   },
 });

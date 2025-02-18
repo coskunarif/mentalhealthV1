@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { IconButton, Text, Surface } from 'react-native-paper';
+import { Appbar, Text } from 'react-native-paper';
 import { EditPersonalInfoForm } from './EditPersonalInfoForm';
 import { useRouter } from 'expo-router';
-import styles from '../config/styles';
+import globalStyles from '../config/styles';
 
 export default function EditPersonalInfoScreen() {
   const router = useRouter();
@@ -20,13 +20,14 @@ export default function EditPersonalInfoScreen() {
   };
 
   return (
-    <View style={styles.layout_container}>
-      <Surface style={styles.header_surface} elevation={2}>
-        <IconButton icon="arrow-left" size={24} onPress={() => router.back()} />
-        <Text style={styles.text_heading2}>Edit Personal Information</Text>
-      </Surface>
-      <ScrollView contentContainerStyle={styles.layout_content}>
-        <Text style={styles.text_subtitle}>
+    <View style={globalStyles.layout_container}>
+      <Appbar.Header>
+        <Appbar.BackAction onPress={() => router.back()} />
+        <Appbar.Content title="Personal Information" />
+      </Appbar.Header>
+
+      <ScrollView contentContainerStyle={globalStyles.layout_content}>
+        <Text style={globalStyles.text_subtitle}>
           Update your personal details to keep your profile accurate.
         </Text>
         <EditPersonalInfoForm 

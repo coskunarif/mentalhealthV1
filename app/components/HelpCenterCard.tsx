@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, Linking } from 'react-native';
-import { Card, Title, List, Button, Text } from 'react-native-paper';
+import { StyleSheet, Linking, ViewStyle, TextStyle } from 'react-native';
+import { Surface, List, Button, Text, Divider } from 'react-native-paper';
 import { theme } from '../config/theme';
 
 interface FAQ {
@@ -50,13 +50,12 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({ onContactSupport
   };
 
   return (
-    <Card style={styles.card}>
-      <Card.Content>
-        <List.Section>
-          <List.Subheader style={styles.subheader}>Frequently Asked Questions</List.Subheader>
-          {faqs.map((faq, index) => (
+    <Surface style={styles.container} elevation={1}>
+      <List.Section>
+        <List.Subheader style={styles.subheader}>Frequently Asked Questions</List.Subheader>
+        {faqs.map((faq, index) => (
+          <React.Fragment key={index}>
             <List.Accordion
-              key={index}
               title={faq.question}
               expanded={expandedId === `faq-${index}`}
               onPress={() => handleExpand(`faq-${index}`)}
@@ -65,71 +64,83 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({ onContactSupport
             >
               <Text style={styles.answerText}>{faq.answer}</Text>
             </List.Accordion>
-          ))}
-        </List.Section>
+          </React.Fragment>
+        ))}
+      </List.Section>
 
-        <List.Section>
-          <List.Subheader style={styles.subheader}>Contact Support</List.Subheader>
-          
-          <List.Item
-            title="Email Support"
-            description={supportEmail}
-            left={props => <List.Icon {...props} icon="email" />}
-            onPress={handleEmailPress}
-            titleStyle={styles.contactTitle}
-            descriptionStyle={styles.contactDescription}
-          />
-          
-          <List.Item
-            title="Phone Support"
-            description={supportPhone}
-            left={props => <List.Icon {...props} icon="phone" />}
-            onPress={handlePhonePress}
-            titleStyle={styles.contactTitle}
-            descriptionStyle={styles.contactDescription}
-          />
-        </List.Section>
+      <Divider style={styles.sectionDivider} />
 
-        <Button
-          mode="contained"
-          onPress={onContactSupport}
-          icon="message"
-          style={styles.chatButton}
-          labelStyle={theme.fonts.labelLarge}
-        >
-          Start Live Chat
-        </Button>
-      </Card.Content>
-    </Card>
+      <List.Section>
+        <List.Subheader style={styles.subheader}>Contact Support</List.Subheader>
+        <List.Item
+          title="Email Support"
+          description={supportEmail}
+          left={props => <List.Icon {...props} icon="email" />}
+          onPress={handleEmailPress}
+          titleStyle={styles.contactTitle}
+          descriptionStyle={styles.contactDescription}
+        />
+        <Divider style={styles.divider} />
+        <List.Item
+          title="Phone Support"
+          description={supportPhone}
+          left={props => <List.Icon {...props} icon="phone" />}
+          onPress={handlePhonePress}
+          titleStyle={styles.contactTitle}
+          descriptionStyle={styles.contactDescription}
+        />
+      </List.Section>
+
+      <Button
+        mode="contained"
+        onPress={onContactSupport}
+        icon="message"
+        style={styles.chatButton}
+      >
+        Start Live Chat
+      </Button>
+    </Surface>
   );
 };
 
-const styles = StyleSheet.create({
-  card: {
-    margin: theme.spacing.medium,
-    padding: theme.spacing.medium,
+const styles = StyleSheet.create<{
+  container: ViewStyle;
+  subheader: TextStyle;
+  accordion: ViewStyle;
+  accordionTitle: TextStyle;
+  answerText: TextStyle;
+  contactTitle: TextStyle;
+  contactDescription: TextStyle;
+  divider: ViewStyle;
+  sectionDivider: ViewStyle;
+  chatButton: ViewStyle;
+}>({
+  container: {
+    marginHorizontal: theme.spacing.medium,
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.shape.borderRadius,
     elevation: 1,
-    backgroundColor: theme.colors.surface,
   },
   subheader: {
     ...theme.fonts.titleMedium,
     color: theme.colors.primary,
+    paddingTop: theme.spacing.small,
   },
   accordion: {
-    backgroundColor: theme.colors.surfaceVariant,
-    marginVertical: theme.spacing.small,
-    borderRadius: theme.shape.borderRadius,
+    backgroundColor: 'transparent',
+    paddingHorizontal: theme.spacing.small,
   },
   accordionTitle: {
     ...theme.fonts.bodyLarge,
     color: theme.colors.onSurface,
+    fontWeight: '500',
   },
   answerText: {
     ...theme.fonts.bodyMedium,
     color: theme.colors.onSurfaceVariant,
-    padding: theme.spacing.medium,
+    padding: theme.spacing.small,
     paddingTop: 0,
+    lineHeight: theme.fonts.bodyMedium.lineHeight * 0.9,
   },
   contactTitle: {
     ...theme.fonts.bodyLarge,
@@ -139,7 +150,14 @@ const styles = StyleSheet.create({
     ...theme.fonts.bodyMedium,
     color: theme.colors.primary,
   },
+  divider: {
+    backgroundColor: theme.colors.surfaceVariant,
+  },
+  sectionDivider: {
+    backgroundColor: theme.colors.surfaceVariant,
+    marginVertical: theme.spacing.medium,
+  },
   chatButton: {
-    marginTop: theme.spacing.medium,
+    margin: theme.spacing.medium,
   },
 });
