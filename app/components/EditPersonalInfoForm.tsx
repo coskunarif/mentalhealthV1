@@ -17,40 +17,47 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
-  // Validation helpers
-  const validatePhoneNumber = (phone: string) => {
-    const phoneRegex = /^\+?[\d\s-]{10,}$/;
-    return phoneRegex.test(phone);
-  };
+  // Enhanced validation with better feedback
+  const validateField = (field: keyof PersonalInformation, value: string | undefined): string => {
+    if (!value) {
+      return field === 'name' ? 'Name is required' : '';
+    }
 
-  const validateName = (name: string) => name.trim().length >= 2;
+    switch (field) {
+      case 'name':
+        return value.trim().length < 2 ? 'Name must be at least 2 characters' : '';
+      case 'phoneNumber':
+        return value && !/^\+?[\d\s-]{10,}$/.test(value) ? 'Please enter a valid phone number' : '';
+      default:
+        return '';
+    }
+  };
 
   const handleChange = (field: keyof PersonalInformation, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: '' }));
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
   };
 
   const handleConfirmDate = (date: Date) => {
-    // Format the date as YYYY-MM-DD
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    handleChange('dateOfBirth', `${yyyy}-${mm}-${dd}`);
+    const formattedDate = date.toISOString().split('T')[0];
+    handleChange('dateOfBirth', formattedDate);
     setDatePickerVisible(false);
   };
 
   const handleSubmit = async () => {
+    // Validate all fields before submission
     const newErrors: Partial<Record<keyof PersonalInformation, string>> = {};
-    if (!validateName(formData.name)) {
-      newErrors.name = 'Name must be at least 2 characters long';
-    }
-    if (formData.phoneNumber && !validatePhoneNumber(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number';
-    }
+    (Object.keys(formData) as Array<keyof PersonalInformation>).forEach(field => {
+      const error = validateField(field, formData[field]);
+      if (error) newErrors[field] = error;
+    });
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
+
     setIsSubmitting(true);
     try {
       await onSave(formData);
@@ -59,40 +66,80 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
     }
   };
 
+  const renderInput = (
+    field: keyof PersonalInformation,
+    label: string,
+    options: {
+      disabled?: boolean;
+      icon?: string;
+      keyboardType?: "default" | "phone-pad" | "email-address";
+      onIconPress?: () => void;
+    } = {}
+  ) => (
+    <View style={styles.fieldGroup}>
+      <TextInput
+        label={label}
+        value={formData[field]}
+        onChangeText={(val) => handleChange(field, val)}
+        mode="outlined"
+        error={!!errors[field]}
+        style={styles.input}
+        disabled={options.disabled}
+        keyboardType={options.keyboardType}
+        right={options.icon && (
+          <TextInput.Icon 
+            icon={options.icon}
+            onPress={options.onIconPress}
+          />
+        )}
+      />
+      <HelperText type="error" visible={!!errors[field]}>
+        {errors[field]}
+      </HelperText>
+    </View>
+  );
+
   return (
-    <Surface style={styles.container} elevation={1}>
-      <Text style={styles.subsectionTitle}>Personal Information</Text>
+    <Surface style={styles.container} elevation={2}>
       <View style={styles.section}>
-        <TextInput
-          label="Name"
-          value={formData.name}
-          onChangeText={(val) => handleChange('name', val)}
-          mode="outlined"
-          error={!!errors.name}
-          style={styles.input}
-        />
-        <HelperText type="error" visible={!!errors.name}>
-          {errors.name}
-        </HelperText>
+        <View style={styles.sectionHeader}>
+          <MaterialCommunityIcons name="account" size={24} color={theme.colors.primary} />
+          <Text style={styles.sectionTitle}>Personal Information</Text>
+        </View>
+        {renderInput('name', 'Full Name')}
+        {renderInput('dateOfBirth', 'Date of Birth', {
+          icon: 'calendar',
+          onIconPress: () => setDatePickerVisible(true)
+        })}
       </View>
 
-      <View style={styles.fieldGroup}>
-        <TextInput
-          label="Date of Birth"
-          value={formData.dateOfBirth}
-          mode="outlined"
-          style={styles.input}
-          editable={false}
-          right={<TextInput.Icon 
-            icon="calendar" 
-            onPress={() => setDatePickerVisible(true)} 
-            color={theme.colors.primary}
-          />}
-        />
-        <HelperText type="error" visible={!!errors.dateOfBirth}>
-          {errors.dateOfBirth}
-        </HelperText>
+      <Divider style={styles.divider} />
+
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <MaterialCommunityIcons name="contacts" size={24} color={theme.colors.primary} />
+          <Text style={styles.sectionTitle}>Contact Information</Text>
+        </View>
+        {renderInput('email', 'Email Address', { 
+          disabled: true,
+          keyboardType: 'email-address'
+        })}
+        {renderInput('phoneNumber', 'Phone Number', { 
+          keyboardType: 'phone-pad',
+          icon: 'phone'
+        })}
       </View>
+
+      <Button
+        mode="contained"
+        onPress={handleSubmit}
+        loading={isSubmitting}
+        disabled={isSubmitting}
+        style={styles.saveButton}
+        contentStyle={styles.saveButtonContent}
+      >
+        Save Changes
+      </Button>
 
       <DatePickerModal
         locale="en"
@@ -106,75 +153,45 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
           endDate: new Date(),
         }}
       />
-
-      <Divider style={styles.divider} />
-      
-      <Text style={styles.subsectionTitle}>Contact Information</Text>
-      <View style={styles.section}>
-        <TextInput
-          label="Email"
-          value={formData.email}
-          disabled
-          mode="outlined"
-          style={styles.input}
-        />
-      </View>
-
-      <View style={styles.fieldGroup}>
-        <TextInput
-          label="Phone Number"
-          value={formData.phoneNumber}
-          onChangeText={(val) => handleChange('phoneNumber', val)}
-          mode="outlined"
-          error={!!errors.phoneNumber}
-          keyboardType="phone-pad"
-          style={styles.input}
-        />
-        <HelperText type="error" visible={!!errors.phoneNumber}>
-          {errors.phoneNumber}
-        </HelperText>
-      </View>
-
-      <Button
-        mode="contained"
-        onPress={handleSubmit}
-        loading={isSubmitting}
-        disabled={isSubmitting}
-        style={styles.saveButton}
-      >
-        Save Changes
-      </Button>
     </Surface>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    margin: theme.spacing.small,
-    padding: theme.spacing.small,
+    margin: theme.spacing.medium,
+    padding: theme.spacing.medium,
     borderRadius: theme.shape.borderRadius,
     backgroundColor: theme.colors.surface,
   },
-  subsectionTitle: {
-    ...theme.fonts.titleMedium,
-    color: theme.colors.onSurface,
-    fontWeight: '600',
-    marginBottom: theme.spacing.tiny,
-  },
   section: {
+    marginBottom: theme.spacing.medium,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: theme.spacing.small,
   },
+  sectionTitle: {
+    ...theme.fonts.titleMedium,
+    color: theme.colors.primary,
+    marginLeft: theme.spacing.small,
+    fontWeight: '600',
+  },
   fieldGroup: {
-    marginBottom: theme.spacing.tiny,
+    marginBottom: theme.spacing.small,
   },
   input: {
     backgroundColor: theme.colors.surface,
-    marginBottom: theme.spacing.tiny,
   },
   divider: {
-    marginVertical: theme.spacing.small,
+    marginVertical: theme.spacing.medium,
   },
   saveButton: {
-    marginTop: theme.spacing.tiny,
+    marginTop: theme.spacing.medium,
+    borderRadius: theme.shape.borderRadius,
+  },
+  saveButtonContent: {
+    paddingVertical: 8,
   },
 });
