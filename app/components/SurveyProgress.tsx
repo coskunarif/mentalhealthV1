@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Text, ProgressBar } from 'react-native-paper';
 import styles from '../config/styles';
-import theme from '../config/theme';
+import { theme } from '../config/theme';
 
 interface SurveyProgressProps {
   current: number;

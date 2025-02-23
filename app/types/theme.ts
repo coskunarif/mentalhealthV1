@@ -1,4 +1,4 @@
-import { MD3Theme } from 'react-native-paper';
+import { MD3Theme, configureFonts } from 'react-native-paper';
 import { TextStyle } from 'react-native';
 
 export interface ChartColors {
@@ -11,19 +11,74 @@ export interface ChartColors {
   };
 }
 
+interface MD3Colors {
+    primary: string;
+    onPrimary: string;
+    primaryContainer: string;
+    onPrimaryContainer: string;
+    secondary: string;
+    onSecondary: string;
+    background: string;
+    surface: string;
+    surfaceVariant: string;
+    error: string;
+    onError: string;
+    errorContainer: string;
+    onErrorContainer: string;
+    outline: string;
+    secondaryContainer: string;
+    onSecondaryContainer: string;
+    tertiary: string;
+    onTertiary: string;
+    tertiaryContainer: string;
+    onTertiaryContainer: string;
+    outlineVariant: string;
+    shadow: string;
+    scrim: string;
+    inverseSurface: string;
+    inverseOnSurface: string;
+    inversePrimary: string;
+    surfaceDisabled: string;
+    onSurfaceDisabled: string;
+    backdrop: string;
+    onSurface: string;
+    onSurfaceVariant: string;
+    onBackground: string;
+    elevation: {
+      level0: string;
+      level1: string;
+      level2: string;
+      level3: string;
+      level4: string;
+      level5: string;
+    }
+}
+
+
 export interface AppTheme extends MD3Theme {
+  version: 3;
+  isV3: true;
+  colors: MD3Colors;
+  roundness: number;
+  fonts: ReturnType<typeof configureFonts>;
+  animation: { scale: number };
+  dark: boolean;
   chartColors: ChartColors;
-  spacing: {
-    medium: number;
-    small: number;
+  moodColors: {
+    peace: string;
+    joy: string;
+    love: string;
+    reason: string;
+    acceptance: string;
+  };
+  spacing: { // Add this back, since it's custom
     tiny: number;
+    small: number;
+    medium: number;
+    large: number;
   };
-  shape: {
-    borderRadius: number;
-  };
-  elevation: {
-    level2: string;
-  };
+  scaleFont: (size: number) => number;
+  scaleSize: (size: number) => number;
 }
 
 export interface PlayerTheme {

@@ -1,6 +1,7 @@
 // Base color: #5DA47A (Primary Green)
 const colors = {
-  dominant: '#F2F7F4', // 60% - Very light background
+  primary: '#5DA47A',
+  background: '#F2F7F4', // 60% - Very light background
   secondary: '#5DA47A', // 30% - Primary Green
   accent: '#4C8A65', // 10% - Darker shade of primary
 

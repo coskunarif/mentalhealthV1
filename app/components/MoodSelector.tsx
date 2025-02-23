@@ -4,9 +4,8 @@ import { Text, Button, Card } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import styles from '../config/styles';
-import themeExports, { theme } from '../config/theme';
+import { theme } from '../config/theme';
 
-const { moodColors, scaleFont } = themeExports;
 
 type MoodType = {
   label: string;
@@ -49,9 +48,9 @@ export function MoodSelector({
   const [relatedSliderColors, setRelatedSliderColors] = useState<{ [key: string]: string }>({});
 
   const getSliderColor = (value: number) => {
-    if (value <= 33) return moodColors.low;
-    if (value <= 66) return moodColors.medium;
-    return moodColors.high;
+    if (value <= 33) return theme.chartColors.progress.inactive;
+    if (value <= 66) return theme.chartColors.progress.active;
+    return theme.colors.primary;
   };
 
   const updateSliderColor = (value: number, label: string, isRelated: boolean) => {
@@ -109,7 +108,7 @@ export function MoodSelector({
             size={24}
             color={theme.colors.primary}
           />
-          <Text style={[styles.text_body, { fontSize: scaleFont(11) }]}>How long</Text>
+          <Text style={[styles.text_body, { fontSize: theme.scaleFont(11) }]}>How long</Text>
         </View>
         <Slider
           value={mood.duration}
@@ -119,13 +118,13 @@ export function MoodSelector({
           thumbTintColor={theme.colors.primary}
           minimumTrackTintColor={theme.colors.primary}
           onValueChange={onDurationChange}
-          style={{ height: scaleFont(16) }}
+          style={{ height: theme.scaleFont(16) }}
           accessibilityLabel={`Set duration for ${mood.label}`}
         />
         <View style={[styles.mood_sliderLabels, { marginTop: -theme.spacing.tiny/2 }]}>
-          <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>{'< 3 months'}</Text>
-          <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>6 months</Text>
-          <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>{'> 1 year'}</Text>
+          <Text style={[styles.text_caption, { fontSize: theme.scaleFont(9) }]}>{'< 3 months'}</Text>
+          <Text style={[styles.text_caption, { fontSize: theme.scaleFont(9) }]}>6 months</Text>
+          <Text style={[styles.text_caption, { fontSize: theme.scaleFont(9) }]}>{'> 1 year'}</Text>
         </View>
       </Card.Content>
     </Card>
@@ -156,7 +155,7 @@ export function MoodSelector({
               size={24}
               color={mood.color}
             />
-            <Text style={[styles.text_body, { fontSize: scaleFont(11) }]}>{mood.label}</Text>
+            <Text style={[styles.text_body, { fontSize: theme.scaleFont(11) }]}>{mood.label}</Text>
           </View>
           <Slider
             value={sliderValue}
@@ -171,12 +170,12 @@ export function MoodSelector({
                 ? handleRelatedMoodChange(value, mood.label)
                 : handleMainSliderChange(value, mood.label)
             }
-            style={{ height: scaleFont(16) }}
+            style={{ height: theme.scaleFont(16) }}
             accessibilityLabel={`Adjust intensity for ${mood.label}`}
           />
           <View style={[styles.mood_sliderLabels, { marginTop: -theme.spacing.tiny/2 }]}>
-            <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>Low</Text>
-            <Text style={[styles.text_caption, { fontSize: scaleFont(9) }]}>High</Text>
+            <Text style={[styles.text_caption, { fontSize: theme.scaleFont(9) }]}>Low</Text>
+            <Text style={[styles.text_caption, { fontSize: theme.scaleFont(9) }]}>High</Text>
           </View>
         </Card.Content>
       </Card>
