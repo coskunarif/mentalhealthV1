@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
-import { Surface, Text, TextInput, HelperText, Button, IconButton, Divider } from 'react-native-paper';
+import { View, StyleSheet, Platform, Animated } from 'react-native';
+import { Card, Text, TextInput, HelperText, Button, IconButton, Divider } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { PersonalInformation } from '../types/personalInformation';
@@ -16,6 +16,25 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
   const [errors, setErrors] = useState<Partial<Record<keyof PersonalInformation, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
+    const fadeAnim = useState(new Animated.Value(0))[0]; // Initial value for opacity: 0
+
+    // Function to animate fade in
+    const fadeIn = () => {
+        Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 200,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    // Function to animate fade out
+    const fadeOut = () => {
+        Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+        }).start();
+    };
 
   // Enhanced validation with better feedback
   const validateField = (field: keyof PersonalInformation, value: string | undefined): string => {
@@ -55,8 +74,13 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      fadeIn(); // Fade in on error
       return;
     }
+
+        if (Object.keys(errors).length > 0 && Object.keys(newErrors).length === 0) {
+            fadeOut();
+        }
 
     setIsSubmitting(true);
     try {
@@ -66,132 +90,146 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      margin: theme.spacing.medium, // Increased margin to medium (16)
+      padding: theme.spacing.medium, // Increased padding to medium (16)
+      borderRadius: theme.shape.borderRadius,
+      backgroundColor: theme.colors.surface,
+      // For iOS shadow:
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 2,
+    },
+    section: {
+      marginBottom: theme.spacing.medium, // Increased marginBottom to medium (16)
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: theme.spacing.small, // Increased marginBottom to small (8)
+    },
+    sectionTitle: {
+      ...theme.fonts.titleMedium,
+      color: theme.colors.primary,
+      marginLeft: theme.spacing.small, // Increased marginLeft to small (8)
+      fontWeight: "600",
+    },
+    fieldGroup: {
+      marginBottom: theme.spacing.medium, // Increased marginBottom to medium (16)
+    },
+    input: {
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: theme.spacing.small, // Added horizontal padding
+    },
+    divider: {
+      marginVertical: theme.spacing.medium, // Increased marginVertical to medium (16)
+      backgroundColor: theme.colors.surfaceVariant,
+    },
+    saveButton: {
+      marginTop: theme.spacing.medium, // Increased marginTop to medium (16)
+      borderRadius: theme.shape.borderRadius,
+      elevation: 3, // Increased elevation
+    },
+    saveButtonContent: {
+      paddingVertical: theme.spacing.small, // Increased paddingVertical to small (8)
+    },
+  });
+
   const renderInput = (
     field: keyof PersonalInformation,
     label: string,
-    options: {
-      disabled?: boolean;
-      icon?: string;
-      keyboardType?: "default" | "phone-pad" | "email-address";
-      onIconPress?: () => void;
-    } = {}
+    keyboardType: any = 'default',
+    disabled: boolean = false,
+    icon?: string,
+    onIconPress?: () => void
   ) => (
     <View style={styles.fieldGroup}>
       <TextInput
-        label={label}
-        value={formData[field]}
-        onChangeText={(val) => handleChange(field, val)}
         mode="outlined"
-        error={!!errors[field]}
+        label={label}
+        value={formData[field] || ''}
+        onChangeText={(value) => handleChange(field, value)}
+        keyboardType={keyboardType}
+        disabled={disabled}
         style={styles.input}
-        disabled={options.disabled}
-        keyboardType={options.keyboardType}
-        right={options.icon && (
-          <TextInput.Icon 
-            icon={options.icon}
-            onPress={options.onIconPress}
-          />
-        )}
+        error={!!errors[field]} // Show error state
+        right={
+          icon ? (
+            <TextInput.Icon
+              icon={icon}
+              onPress={onIconPress}
+              color={theme.colors.onSurface}
+            />
+          ) : undefined
+        }
       />
-      <HelperText type="error" visible={!!errors[field]}>
-        {errors[field]}
-      </HelperText>
+      {errors[field] && (
+        <HelperText type="error" visible={!!errors[field]}>
+          {errors[field]}
+        </HelperText>
+      )}
     </View>
   );
 
   return (
-    <Surface style={styles.container} elevation={2}>
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <MaterialCommunityIcons name="account" size={24} color={theme.colors.primary} />
-          <Text style={styles.sectionTitle}>Personal Information</Text>
+    <Card style={styles.container} elevation={2}>
+      <Animated.View style={{ opacity: fadeAnim }}>
+        <View style={styles.section}>
+          {renderInput('name', 'Full Name')}
+          {renderInput('dateOfBirth', 'Date of Birth', 'default', false, 'calendar', () =>
+            setDatePickerVisible(true)
+          )}
         </View>
-        {renderInput('name', 'Full Name')}
-        {renderInput('dateOfBirth', 'Date of Birth', {
-          icon: 'calendar',
-          onIconPress: () => setDatePickerVisible(true)
-        })}
-      </View>
 
-      <Divider style={styles.divider} />
+        <Divider style={styles.divider} />
 
-      <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <MaterialCommunityIcons name="contacts" size={24} color={theme.colors.primary} />
-          <Text style={styles.sectionTitle}>Contact Information</Text>
+        <View style={styles.section}>
+          {renderInput('email', 'Email Address', 'email-address', true)}
+          {renderInput('phoneNumber', 'Phone Number', 'phone-pad', false, 'phone')}
         </View>
-        {renderInput('email', 'Email Address', { 
-          disabled: true,
-          keyboardType: 'email-address'
-        })}
-        {renderInput('phoneNumber', 'Phone Number', { 
-          keyboardType: 'phone-pad',
-          icon: 'phone'
-        })}
-      </View>
 
-      <Button
-        mode="contained"
-        onPress={handleSubmit}
-        loading={isSubmitting}
-        disabled={isSubmitting}
-        style={styles.saveButton}
-        contentStyle={styles.saveButtonContent}
-      >
-        Save Changes
-      </Button>
+        <Button
+          mode="elevated"
+          onPress={handleSubmit}
+          loading={isSubmitting}
+          disabled={isSubmitting}
+          style={styles.saveButton}
+          contentStyle={styles.saveButtonContent}
+        >
+          Save Changes
+        </Button>
+      </Animated.View>
 
       <DatePickerModal
         locale="en"
         mode="single"
         visible={datePickerVisible}
-        onDismiss={() => setDatePickerVisible(false)}
+        onDismiss={() => {
+          setDatePickerVisible(false);
+          Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }).start();
+        }}
         date={formData.dateOfBirth ? new Date(formData.dateOfBirth) : new Date()}
-        onConfirm={handleConfirmDate}
+        onConfirm={(date) => {
+          handleConfirmDate(date);
+          Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }).start();
+        }}
         validRange={{
           startDate: new Date(1900, 0, 1),
           endDate: new Date(),
         }}
+        // Add animation
+
       />
-    </Surface>
+    </Card>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    margin: theme.spacing.medium,
-    padding: theme.spacing.medium,
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: theme.colors.surface,
-  },
-  section: {
-    marginBottom: theme.spacing.medium,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: theme.spacing.small,
-  },
-  sectionTitle: {
-    ...theme.fonts.titleMedium,
-    color: theme.colors.primary,
-    marginLeft: theme.spacing.small,
-    fontWeight: '600',
-  },
-  fieldGroup: {
-    marginBottom: theme.spacing.small,
-  },
-  input: {
-    backgroundColor: theme.colors.surface,
-  },
-  divider: {
-    marginVertical: theme.spacing.medium,
-  },
-  saveButton: {
-    marginTop: theme.spacing.medium,
-    borderRadius: theme.shape.borderRadius,
-  },
-  saveButtonContent: {
-    paddingVertical: 8,
-  },
-});

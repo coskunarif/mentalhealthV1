@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, ScrollView, StyleSheet, Animated } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
 import { EditPersonalInfoForm } from './EditPersonalInfoForm';
 import { useRouter } from 'expo-router';
@@ -18,7 +18,7 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
   },
   headerTitle: {
     ...theme.fonts.titleLarge,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   subtitle: {
     ...theme.fonts.bodyLarge,
@@ -31,6 +31,15 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
 export default function EditPersonalInfoScreen() {
   const router = useRouter();
   const styles = createStyles(theme);
+  const slideAnim = new Animated.Value(0);
+
+  useEffect(() => {
+    Animated.timing(slideAnim, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [slideAnim]);
 
   const handleSave = async (info: any) => {
     try {
@@ -43,25 +52,45 @@ export default function EditPersonalInfoScreen() {
     }
   };
 
+    const handleBack = () => {
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => router.back());
+  };
+
   return (
-    <View style={styles.container}>
+    <Animated.View style={[
+      styles.container,
+      {
+        transform: [
+          {
+            translateX: slideAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [300, 0], // Slide in from right
+            }),
+          },
+        ],
+      },
+    ]}>
       <StatusBar style="auto" />
       <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content 
+        <Appbar.BackAction onPress={handleBack} />
+        <Appbar.Content
           title="Personal Information"
           titleStyle={styles.headerTitle}
         />
       </Appbar.Header>
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.subtitle}>
           Keep your profile up to date by maintaining accurate personal information.
         </Text>
-        <EditPersonalInfoForm 
+        <EditPersonalInfoForm
           onSave={handleSave}
           info={{
             name: "",
@@ -71,6 +100,6 @@ export default function EditPersonalInfoScreen() {
           }}
         />
       </ScrollView>
-    </View>
+    </Animated.View>
   );
 }

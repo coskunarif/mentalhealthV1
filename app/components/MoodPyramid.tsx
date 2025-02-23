@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { View, ScrollView, TouchableOpacity, DimensionValue, ViewStyle } from 'react-native';
 import { Text, Button } from 'react-native-paper';
-import themeExports, { theme } from '../config/theme';
+import { theme } from '../config/theme';
 import styles from '../config/styles';
 
-const { moodColors, scaleFont, scaleSize } = themeExports;
 
 type Emotion = {
   label: string;
@@ -26,17 +25,17 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
   const [selectedEmotions, setSelectedEmotions] = useState<EmotionSelection[]>([]);
 
   const emotions: Emotion[] = [
-    { label: 'Peace', color: moodColors.peace, width: '40%' },
-    { label: 'Joy', color: moodColors.joy, width: '55%' },
-    { label: 'Love', color: moodColors.love, width: '70%' },
-    { label: 'Reason', color: moodColors.reason, width: '85%' },
-    { label: 'Acceptance', color: moodColors.acceptance, width: '100%' },
+    { label: 'Peace', color: theme.moodColors.peace, width: '40%' },
+    { label: 'Joy', color: theme.moodColors.joy, width: '55%' },
+    { label: 'Love', color: theme.moodColors.love, width: '70%' },
+    { label: 'Reason', color: theme.moodColors.reason, width: '85%' },
+    { label: 'Acceptance', color: theme.moodColors.acceptance, width: '100%' },
   ];
 
   const bubbleConfig = [
     { 
-      size: scaleSize(162),
-      fontSize: scaleFont(18),
+      size: theme.scaleSize(162),
+      fontSize: theme.scaleFont(18),
       style: { 
         left: '7%',
         top: 1,
@@ -44,8 +43,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       }
     },
     { 
-      size: scaleSize(132),
-      fontSize: scaleFont(15),
+      size: theme.scaleSize(132),
+      fontSize: theme.scaleFont(15),
       style: { 
         right: '15%',
         top: 5,
@@ -53,8 +52,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       }
     },
     { 
-      size: scaleSize(110),
-      fontSize: scaleFont(13),
+      size: theme.scaleSize(110),
+      fontSize: theme.scaleFont(13),
       style: { 
         left: '38.5%',
         top: 130,
