@@ -96,12 +96,13 @@ const formatPhoneNumber = (value: string): string => {
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.2,
       shadowRadius: 2,
+      elevation: 3, // Slightly increased for improved depth
     },
     section: {
-      marginBottom: theme.spacing.medium,
+      marginBottom: theme.spacing.small,
     },
     divider: {
-      marginVertical: theme.spacing.small,
+      marginVertical: theme.spacing.tiny,
       backgroundColor: theme.colors.surfaceVariant,
     },
     saveButton: {
@@ -109,7 +110,7 @@ const formatPhoneNumber = (value: string): string => {
       borderRadius: theme.shape.borderRadius,
     },
     fieldGroup: {
-      marginBottom: theme.spacing.medium,
+      marginBottom: theme.spacing.small,
     },
     input: {
       backgroundColor: theme.colors.surface,
@@ -136,7 +137,10 @@ const formatPhoneNumber = (value: string): string => {
         editable={field === 'dateOfBirth' ? false : true}
         showSoftInputOnFocus={field === 'dateOfBirth' ? false : undefined}
         disabled={disabled}
-        style={styles.input}
+        style={[
+          styles.input,
+          disabled && { backgroundColor: theme.colors.surfaceVariant } // Differentiates read-only fields
+        ]}
         error={!!errors[field]}
         right={
           icon ? (
