@@ -10,7 +10,7 @@ export const CustomAppBar: React.FC<{ title: string }> = ({ title }) => {
       <Appbar.BackAction onPress={() => router.back()} />
       <Appbar.Content
         title={title}
-        titleStyle={{ ...theme.fonts.titleLarge, color: theme.colors.onSurface }}
+        titleStyle={{ ...theme.fonts.titleLarge, color: theme.colors.onSurface, marginLeft: theme.spacing.small }}
       />
     </Appbar.Header>
   );

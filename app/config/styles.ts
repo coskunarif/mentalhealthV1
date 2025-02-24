@@ -10,12 +10,12 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background,
   } as ViewStyle,
   layout_content: {
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
     header_surface: {
     backgroundColor: theme.colors.surface,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: theme.spacing.medium,
+    paddingVertical: theme.spacing.medium - 4,
     elevation: 2,
     flexDirection: 'row',
     alignItems: 'center',
@@ -23,10 +23,10 @@ const styles = StyleSheet.create({
   layout_header: {
     flexDirection: 'row' as const,
     alignItems: 'center' as FlexAlignType,
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   layout_footer: {
-    padding: 16,
+    padding: theme.spacing.medium,
     alignItems: 'center' as FlexAlignType,
   } as ViewStyle,
   layout_row: {
@@ -38,14 +38,14 @@ const styles = StyleSheet.create({
     } as ViewStyle,
     layout_form: {
     flex: 1,
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   text_heading1: {
     ...theme.fonts.displayLarge,
     fontWeight: 'bold' as const,
     color: theme.colors.onSurface,
     fontFamily: 'Kameron',
-    marginBottom: 8,
+    marginBottom: theme.spacing.small,
   } as TextStyle,
   text_heading2: {
     ...theme.fonts.headlineMedium,
@@ -109,20 +109,22 @@ const styles = StyleSheet.create({
         borderRadius: theme.shape.borderRadius,
     } as ViewStyle,
   button_icon: {
-    padding: 8,
+    padding: theme.spacing.small,
     borderRadius: 20,
   } as ViewStyle,
   component_card_elevated: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginVertical: 8,
+    borderRadius: theme.spacing.medium,
+    padding: theme.spacing.medium,
+    marginVertical: theme.spacing.small,
+    elevation: 1,
   } as ViewStyle,
   component_card_listItem: {
     backgroundColor: theme.colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    marginVertical: 8,
+    borderRadius: theme.spacing.medium,
+    padding: theme.spacing.medium,
+    marginVertical: theme.spacing.small,
+    elevation: 1,
   } as ViewStyle,
   component_card_selected: {
     borderWidth: 2,
@@ -130,56 +132,56 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   component_card_interactive: {} as ViewStyle,
   component_card_container: {
-    padding: 10,
-    borderRadius: 5,
+    padding: theme.spacing.medium - 6,
+    borderRadius: theme.spacing.tiny + 1,
     backgroundColor: theme.colors.surface,
-    marginVertical: 8,
+    marginVertical: theme.spacing.small,
   } as ViewStyle,
   component_card_content: {
-    padding: 10,
+    padding: theme.spacing.medium - 6,
   } as ViewStyle,
   component_form_input: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.medium,
   } as ViewStyle,
   component_form_error: {
     color: theme.colors.error,
     ...theme.fonts.labelSmall,
-    marginTop: 4,
+    marginTop: theme.spacing.tiny,
   } as TextStyle,
   component_input_container: {
-    marginBottom: 24,
+    marginBottom: theme.spacing.large,
   } as ViewStyle,
   component_input_outline: {
     borderWidth: 1,
-    borderRadius: 12,
+    borderRadius: theme.spacing.medium - 4,
   } as ViewStyle,
   component_input_content: {
-    paddingVertical: 12,
+    paddingVertical: theme.spacing.medium - 4,
     ...theme.fonts.bodyLarge,
     fontFamily: 'Regular',
   } as TextStyle,
   component_input_label: {
     ...theme.fonts.labelLarge,
     fontFamily: 'Medium',
-    marginBottom: 8,
+    marginBottom: theme.spacing.small,
     color: theme.colors.onSurface,
     fontWeight: 'bold',
   } as TextStyle,
   component_input_helper: {
     ...theme.fonts.labelSmall,
     fontFamily: 'Regular',
-    marginTop: 4,
+    marginTop: theme.spacing.tiny,
   } as TextStyle,
   component_input_error: {
     color: theme.colors.error,
-    marginTop: 4,
+    marginTop: theme.spacing.tiny,
     ...theme.fonts.labelMedium,
   } as TextStyle,
   component_input_field: {
-    padding: 12,
+    padding: theme.spacing.medium - 4,
     borderWidth: 1,
     borderColor: theme.colors.outline,
-    borderRadius: 12,
+    borderRadius: theme.spacing.medium - 4,
     backgroundColor: theme.colors.surface,
     fontSize: 16,
   } as ViewStyle,
@@ -188,7 +190,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline' as const,
   } as TextStyle,
   component_footer_container: {
-    padding: 16,
+    padding: theme.spacing.medium,
     backgroundColor: theme.colors.surface,
   } as ViewStyle,
   component_footer_content: {
@@ -199,7 +201,7 @@ const styles = StyleSheet.create({
   component_footer_copyright: {
     ...theme.fonts.labelMedium,
     color: theme.colors.onSurfaceVariant,
-    marginTop: 10,
+    marginTop: theme.spacing.medium - 6,
   } as TextStyle,
   component_footer_link: {
     ...theme.fonts.bodyMedium,
@@ -207,23 +209,23 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline' as const,
   } as TextStyle,
   component_recommendations_container: {
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   component_recommendations_card: {
-    padding: 16,
-    borderRadius: 12,
+    padding: theme.spacing.medium,
+    borderRadius: theme.spacing.medium - 4,
     backgroundColor: theme.colors.surface,
-    marginVertical: 8,
+    marginVertical: theme.spacing.small,
   } as ViewStyle,
   component_recommendations_grid: {
     flexDirection: 'row' as const,
     flexWrap: 'wrap' as const,
     justifyContent: 'space-between' as const,
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   component_recommendations_scrollView: {} as ViewStyle,
   component_iconButton_container: {
-    padding: 8,
+    padding: theme.spacing.small,
     borderRadius: 20,
   } as ViewStyle,
   component_iconButton_icon: {
@@ -244,7 +246,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row' as const,
     flexWrap: 'wrap' as const,
     justifyContent: 'space-between' as const,
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   common_screen_auth_container: {
     flex: 1,
@@ -255,10 +257,10 @@ const styles = StyleSheet.create({
   common_screen_auth_form: {
     width: '100%',
     maxWidth: 400,
-    padding: 24,
+    padding: theme.spacing.large,
   } as ViewStyle,
   common_screen_auth_header: {
-    marginBottom: 32,
+    marginBottom: theme.spacing.large + theme.spacing.small,
     alignItems: 'center',
   } as ViewStyle,
   common_screen_auth_footer: {
@@ -277,10 +279,10 @@ const styles = StyleSheet.create({
   signIn_screen_auth_form: {
     width: '100%',
     maxWidth: 400,
-    padding: 24,
+    padding: theme.spacing.large,
   } as ViewStyle,
   signIn_screen_auth_header: {
-    marginBottom: 32,
+    marginBottom: theme.spacing.large + theme.spacing.small,
     alignItems: 'center',
   } as ViewStyle,
   signIn_screen_auth_footer: {
@@ -299,10 +301,10 @@ const styles = StyleSheet.create({
  welcome_screen_auth_form: {
     width: '100%',
     maxWidth: 400,
-    padding: 24,
+    padding: theme.spacing.large,
   } as ViewStyle,
  welcome_screen_auth_header: {
-    marginBottom: 32,
+    marginBottom: theme.spacing.large + theme.spacing.small,
     alignItems: 'center',
   } as ViewStyle,
  welcome_screen_auth_footer: {
@@ -314,18 +316,18 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   screen_auth_content: {
     flex: 1,
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   screen_profile_container: {
     flex: 1,
     backgroundColor: theme.colors.background,
   } as ViewStyle,
   screen_profile_header: {
-    padding: 16,
+    padding: theme.spacing.medium,
     alignItems: 'center' as FlexAlignType,
   } as ViewStyle,
   screen_profile_content: {
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   screen_home_container: {
     flex: 1,
@@ -335,7 +337,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   } as ViewStyle,
   screen_home_content: {
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   screen_mood_container: {
     flex: 1,
@@ -345,13 +347,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   } as ViewStyle,
   screen_mood_content: {
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   screen_mood_grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginVertical: 16,
+    marginVertical: theme.spacing.medium,
   } as ViewStyle,
   screen_legal_container: {
     flex: 1,
@@ -361,7 +363,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     } as ViewStyle,
     screen_legal_content: {
-        padding: 16,
+        padding: theme.spacing.medium,
     } as ViewStyle,
     welcome_subtitle: {
         marginTop: 8,
@@ -384,12 +386,12 @@ const styles = StyleSheet.create({
         gap: 16
     } as ViewStyle,
     radarChart_container: {
-      padding: 16
+      padding: theme.spacing.medium,
     } as ViewStyle,
     radarChart_labelsContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      marginTop: 16
+      marginTop: theme.spacing.medium,
     } as ViewStyle,
     radarChart_label: {
       width: '50%',
@@ -407,7 +409,7 @@ const styles = StyleSheet.create({
       padding: 0
     } as ViewStyle,
     recentActivities_item: {
-      padding: 16,
+      padding: theme.spacing.medium,
       flexDirection: 'row' as const,
       justifyContent: 'space-between' as const,
       alignItems: 'center' as FlexAlignType,
@@ -493,12 +495,12 @@ const styles = StyleSheet.create({
     } as ViewStyle,
     mood_card: {
       backgroundColor: theme.colors.surface,
-      borderRadius: 16,
-      padding: 16,
-      marginVertical: 8,
+      borderRadius: theme.spacing.medium,
+      padding: theme.spacing.medium,
+      marginVertical: theme.spacing.small,
     },
     mood_sliderContainer: {
-      marginBottom: 16,
+      marginBottom: theme.spacing.medium,
     } as ViewStyle,
   mood_sliderLabels: {
     flexDirection: 'row',
@@ -560,8 +562,8 @@ const styles = StyleSheet.create({
     ...theme.fonts.bodyMedium
   } as TextStyle,
   profile_mainSection: {
-    marginHorizontal: 16,
-    marginVertical: 8,
+    marginHorizontal: theme.spacing.medium,
+    marginVertical: theme.spacing.small,
     borderRadius: 12,
     overflow: 'hidden',
   } as ViewStyle,
@@ -610,7 +612,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 16,
+    paddingVertical: theme.spacing.medium,
   } as ViewStyle,
   exerciseProgress_step: {
     alignItems: 'center',
@@ -643,7 +645,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.background,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 16,
+        padding: theme.spacing.medium,
     } as ViewStyle,
     player_content: {
         width: '100%',
@@ -673,14 +675,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 24,
-        marginBottom: 16,
+        marginTop: theme.spacing.large,
+        marginBottom: theme.spacing.medium,
     } as ViewStyle,
     player_progress_bar_container: {
         flex: 1,
         height: 10,
         backgroundColor: theme.colors.surfaceVariant,
-        marginHorizontal: 16,
+        marginHorizontal: theme.spacing.medium,
     } as ViewStyle,
     player_progress_bar: {
         height: 8,
@@ -721,7 +723,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingHorizontal: 8,
+    paddingHorizontal: theme.spacing.small,
     gap: 12,
   } as ViewStyle,
   mood_item: {
@@ -736,8 +738,8 @@ const styles = StyleSheet.create({
   } as ViewStyle,
   pyramid_container: {
     alignItems: 'center',
-    marginVertical: 24,
-    paddingHorizontal: 16,
+    marginVertical: theme.spacing.large,
+    paddingHorizontal: theme.spacing.medium,
   } as ViewStyle,
   pyramid_item: {
     padding: 12,
@@ -750,7 +752,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     minHeight: 200,
     width: '100%',
-    marginTop: 30,
+    marginTop: theme.spacing.large + theme.spacing.medium - 2,
     marginBottom: 100,
   } as ViewStyle,
   pyramid_bubble: {
@@ -777,8 +779,8 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary,
   } as ViewStyle,
   pyramid_focusTitle: {
-    marginTop: 32,
-    marginBottom: 16,
+    marginTop: theme.spacing.large + theme.spacing.small,
+    marginBottom: theme.spacing.medium,
   } as TextStyle,
   pyramid_bubbleText: {
     color: theme.colors.onPrimary,
@@ -788,8 +790,8 @@ const styles = StyleSheet.create({
   mood_buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: theme.spacing.medium,
+    paddingVertical: theme.spacing.medium - 4,
     gap: 12,
     position: 'absolute',
     bottom: 0,
@@ -811,18 +813,18 @@ const styles = StyleSheet.create({
     textTransform: 'none',
   } as TextStyle,
   profile_header: {
-    paddingVertical: 24,
-    paddingHorizontal: 16,
+    paddingVertical: theme.spacing.large,
+    paddingHorizontal: theme.spacing.medium,
     backgroundColor: theme.colors.surface,
     borderRadius: 12,
-    marginBottom: 8,
+    marginBottom: theme.spacing.small,
   } as ViewStyle,
   profile_headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
   } as ViewStyle,
   profile_headerText: {
-    marginLeft: 16,
+    marginLeft: theme.spacing.medium,
     flex: 1,
   } as ViewStyle,
   profile_name: {
@@ -834,7 +836,7 @@ const styles = StyleSheet.create({
   profile_sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: theme.spacing.medium,
   } as ViewStyle,
   profile_sectionTitle: {
     marginLeft: 8,
@@ -843,8 +845,8 @@ const styles = StyleSheet.create({
   profile_subscriptionStatus: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingHorizontal: theme.spacing.medium,
+    paddingBottom: theme.spacing.small,
   } as ViewStyle,
   profile_statusLabel: {
     color: theme.colors.onSurfaceVariant,
@@ -861,15 +863,15 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   } as TextStyle,
   profile_subscriptionDetails: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: theme.spacing.medium,
+    paddingBottom: theme.spacing.medium,
     color: theme.colors.onSurfaceVariant,
   } as TextStyle,
   profile_statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginVertical: 16,
-    paddingHorizontal: 16,
+    marginVertical: theme.spacing.medium,
+    paddingHorizontal: theme.spacing.medium,
   } as ViewStyle,
   profile_statItem: {
     alignItems: 'center',
@@ -888,11 +890,11 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   } as ViewStyle,
   profile_signOutButton: {
-    margin: 16,
+    margin: theme.spacing.medium,
   } as ViewStyle,
     home_sectionSurface: {
-      marginBottom: 16,
-      padding: 16,
+      marginBottom: theme.spacing.medium,
+      padding: theme.spacing.medium,
       borderRadius: 8,
       elevation: 2,
       backgroundColor: theme.colors.surface,
@@ -904,9 +906,9 @@ const styles = StyleSheet.create({
       ...theme.fonts.headlineMedium,
   } as TextStyle,
   modal_container: {
-    margin: 16,
+    margin: theme.spacing.medium,
     backgroundColor: theme.colors.surface,
-    padding: 16,
+    padding: theme.spacing.medium,
     borderRadius: 12,
     maxHeight: '90%',
   } as ViewStyle,

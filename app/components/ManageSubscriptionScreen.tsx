@@ -91,10 +91,9 @@ const styles = StyleSheet.create<{
     padding: theme.spacing.medium,
   },
   sectionTitle: {
-    ...theme.fonts.titleSmall,
+    ...theme.fonts.headlineSmall,
     color: theme.colors.onSurface,
     marginTop: theme.spacing.small,
-    fontWeight: '500',
   },
   divider: {
     marginVertical: theme.spacing.small,
