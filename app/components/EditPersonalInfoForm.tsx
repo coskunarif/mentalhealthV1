@@ -18,6 +18,18 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
+
+// Helper function for phone number formatting (simple masking)
+const formatPhoneNumber = (value: string): string => {
+  // Remove any character that is not a digit or plus sign
+  let phone = value.replace(/[^\d+]/g, '');
+  if (!phone.startsWith('+')) {
+    phone = '+' + phone;
+  }
+  // Limit to 16 characters (including +)
+  return phone.substring(0, 16);
+};
+
   // Validate individual fields
   const validateField = (field: keyof PersonalInformation, value: string | undefined): string => {
     if (!value) {
@@ -26,14 +38,23 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
     switch (field) {
       case 'name':
         return value.trim().length < 2 ? 'Name must be at least 2 characters' : '';
-      case 'phoneNumber':
-        return value && !/^\+?[\d\s-]{10,}$/.test(value) ? 'Please enter a valid phone number' : '';
+      case 'phoneNumber': {
+        // Remove spaces for validation and enforce international format
+        const normalized = value.replace(/\s+/g, '');
+        return !/^\+\d{10,15}$/.test(normalized)
+          ? 'Please enter a valid international phone number'
+          : '';
+      }
       default:
         return '';
     }
   };
 
   const handleChange = (field: keyof PersonalInformation, value: string) => {
+    // Apply formatting for phone number inputs
+    if (field === 'phoneNumber') {
+      value = formatPhoneNumber(value);
+    }
     setFormData(prev => ({ ...prev, [field]: value }));
     const error = validateField(field, value);
     setErrors(prev => ({ ...prev, [field]: error }));
@@ -80,7 +101,7 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
       marginBottom: theme.spacing.medium,
     },
     divider: {
-      marginVertical: theme.spacing.medium,
+      marginVertical: theme.spacing.small,
       backgroundColor: theme.colors.surfaceVariant,
     },
     saveButton: {
@@ -111,6 +132,9 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
         value={formData[field] || ''}
         onChangeText={(value) => handleChange(field, value)}
         keyboardType={keyboardType}
+        // For the date field, disable keyboard input so that only the date picker is used
+        editable={field === 'dateOfBirth' ? false : true}
+        showSoftInputOnFocus={field === 'dateOfBirth' ? false : undefined}
         disabled={disabled}
         style={styles.input}
         error={!!errors[field]}
@@ -123,6 +147,8 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
             />
           ) : undefined
         }
+        // For phone number, limit input length (including the '+' sign)
+        {...(field === 'phoneNumber' ? { maxLength: 16 } : {})}
       />
       {errors[field] && (
         <HelperText type="error" visible={!!errors[field]}>
