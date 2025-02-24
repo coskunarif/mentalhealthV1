@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, ScrollView, StyleSheet, Animated, KeyboardAvoidingView, Platform, Easing } from 'react-native';
 import { Text } from 'react-native-paper';
 import { EditPersonalInfoForm } from './EditPersonalInfoForm';
@@ -32,16 +32,16 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
 export default function EditPersonalInfoScreen() {
   const router = useRouter();
   const styles = createStyles(theme);
-  const slideAnim = new Animated.Value(0);
+  const slideAnim = useRef(new Animated.Value(0)).current;
 
-useEffect(() => {
-  Animated.timing(slideAnim, {
-    toValue: 1,
-    duration: 200,
-    easing: Easing.out(Easing.ease), // Added easing
-    useNativeDriver: true,
-  }).start();
-}, [slideAnim]);
+  useEffect(() => {
+    Animated.timing(slideAnim, {
+      toValue: 1,
+      duration: 200,
+      easing: Easing.out(Easing.ease), // Added easing
+      useNativeDriver: true,
+    }).start();
+  }, [slideAnim]);
 
 const handleSave = async (info: any) => {
   try {

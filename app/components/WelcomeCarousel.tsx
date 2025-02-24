@@ -12,15 +12,15 @@ interface WelcomeCarouselProps {
 
 const features = [
   {
-    title: '🧘‍♀️ Guided Meditation',
+    title: 'Guided Meditation',
     description: 'Access a library of guided meditations for stress relief and mindfulness',
   },
   {
-    title: '📊 Mood Tracking',
+    title: 'Mood Tracking',
     description: 'Track your daily moods and emotions to understand your patterns',
   },
   {
-    title: '💭 Personalized Journey',
+    title: 'Personalized Journey',
     description: 'Get personalized recommendations based on your mental wellness goals',
   },
 ];

@@ -39,14 +39,16 @@ export default function ManageSubscriptionScreen() {
           <List.Item
             title="Monthly Plan"
             description="$9.99/month"
-            left={props => <List.Icon {...props} icon="calendar-month" />}
-            right={() => <Button mode="outlined">Select</Button>}
+            left={props => <List.Icon {...props} icon="calendar" />}
+            right={() => <Button mode="contained" style={styles.selectButton}>Select</Button>}
           />
           <List.Item
             title="Annual Plan"
             description="$99.99/year (Save 17%)"
             left={props => <List.Icon {...props} icon="calendar" />}
-            right={() => <Button mode="outlined">Select</Button>}
+            titleStyle={styles.planTitle}
+            descriptionStyle={styles.planDescription}
+            right={() => <Button mode="contained" style={styles.selectButton}>Select</Button>}
           />
 
           <Divider style={styles.divider} />
@@ -83,6 +85,9 @@ const styles = StyleSheet.create<{
   sectionTitle: TextStyle;
   divider: ViewStyle;
   cancelButton: ViewStyle;
+  selectButton: ViewStyle;
+  planTitle: TextStyle;
+  planDescription: TextStyle;
 }>({
   container: {
     marginHorizontal: theme.spacing.medium,
@@ -94,6 +99,7 @@ const styles = StyleSheet.create<{
     ...theme.fonts.headlineSmall,
     color: theme.colors.onSurface,
     marginTop: theme.spacing.small,
+    marginBottom: theme.spacing.small,
   },
   divider: {
     marginVertical: theme.spacing.small,
@@ -104,5 +110,16 @@ const styles = StyleSheet.create<{
     marginTop: theme.spacing.small,
     marginHorizontal: theme.spacing.medium,
     borderRadius: theme.shape.borderRadius / 2,
+  },
+  selectButton: {
+    alignSelf: 'center',
+    marginRight: theme.spacing.small,
+    borderRadius: theme.shape.borderRadius,
+  },
+  planTitle: {
+    flex: 1,
+  },
+  planDescription: {
+    flexShrink: 1,
   },
 });
