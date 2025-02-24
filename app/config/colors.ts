@@ -18,19 +18,6 @@ const colors = {
 
   // Status Colors
   error: '#B00020',
-
-  // Mood Colors
-  moods: {
-    shame: '#E57373', // Reddish
-    guilt: '#F06292', // Pinkish Red
-    apathy: '#FFB74D', // Orangey
-    grief: '#FF8A65', // Lighter Orange
-    fear: '#FFF176', // Yellow
-    desire: '#A5D6A7', // Light Green
-    anger: '#81D4FA', // Light Blue
-    pride: '#B39DDB', // Light Purple
-    willfulness: '#9575CD', // Purplish
-  },
 } as const;
 
 // Helper function to create opacity variants

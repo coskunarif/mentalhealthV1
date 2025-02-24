@@ -70,6 +70,20 @@ export interface AppTheme extends MD3Theme {
     love: string;
     reason: string;
     acceptance: string;
+    shame: string;
+    guilt: string;
+    apathy: string;
+    grief: string;
+    fear: string;
+    desire: string;
+    anger: string;
+    pride: string;
+    willfulness: string;
+    humiliation: string;
+    regret: string;
+    anxiety: string;
+    hate: string;
+    aggression: string;
   };
   spacing: { // Add this back, since it's custom
     tiny: number;
