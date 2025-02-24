@@ -43,11 +43,20 @@ export default function EditPersonalInfoScreen() {
     }).start();
   }, [slideAnim]);
 
+  // Replace the hardcoded info with a realistic example (or use auth context)
+  const userInfo = {
+    name: "",
+    email: "user@example.com",
+    phoneNumber: "",
+    dateOfBirth: ""
+  };
+
 const handleSave = async (info: any) => {
   try {
     // TODO: Implement API call to save personal info
     console.log('Saving personal info:', info);
-    router.back();
+    // Use the slide-out animation before navigating back
+    handleBack();
   } catch (error: any) {
     console.error('Failed to save:', error);
     // TODO: Implement error handling
@@ -90,7 +99,7 @@ const handleSave = async (info: any) => {
             <Text style={styles.subtitle}>
               Keep your profile up to date by maintaining accurate personal information.
             </Text>
-            <EditPersonalInfoForm onSave={handleSave} info={{ name: "", email: "", phoneNumber: "", dateOfBirth: "" }} />
+            <EditPersonalInfoForm onSave={handleSave} info={userInfo} />
           </ScrollView>
         </Animated.View>
       </KeyboardAvoidingView>
