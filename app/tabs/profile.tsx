@@ -48,7 +48,7 @@ export default function ProfileScreen() {
               size={80} 
               color={theme.colors.primary} 
             />
-            <View style={styles.profile_headerText}>
+            <View style={[styles.profile_headerText, { marginLeft: theme.spacing.medium }]}>
               <Text style={[styles.text_heading2, styles.profile_name]}>
                 {personalInfo.name}
               </Text>
@@ -59,7 +59,7 @@ export default function ProfileScreen() {
           </View>
 
           {/* Mental Health Stats */}
-          <View style={styles.profile_statsContainer}>
+          <View style={[styles.profile_statsContainer, { justifyContent: 'space-around' }]}>
             <View style={styles.profile_statItem}>
               <Text style={styles.profile_statNumber}>12</Text>
               <Text style={styles.profile_statLabel}>Sessions</Text>

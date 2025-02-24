@@ -93,13 +93,13 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
     }
   };
 
-  const styles = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
-      margin: theme.spacing.medium, // Increased margin to medium (16)
-      padding: theme.spacing.medium, // Increased padding to medium (16)
+      margin: theme.spacing.medium,
+      padding: theme.spacing.medium,
       borderRadius: theme.shape.borderRadius,
       backgroundColor: theme.colors.surface,
-      // For iOS shadow:
+      // iOS shadow:
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.2,
