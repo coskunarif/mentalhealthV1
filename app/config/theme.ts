@@ -3,116 +3,137 @@ import type { AppTheme } from '../types/theme';
 import { MD3Typescale, MD3Type } from 'react-native-paper/lib/typescript/types';
 
 const fontConfig: Partial<Record<keyof MD3Typescale, MD3Type>> = {
-        titleMedium: {
-            fontFamily: 'System',
-            fontWeight: "600",
-            fontSize: 20,
-            lineHeight: 28,
-            letterSpacing: 0,
-        },
-        bodyMedium: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 16,
-            lineHeight: 24,
-            letterSpacing: 0,
-        },
-        displayLarge: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 57,
-            lineHeight: 64,
-            letterSpacing: 0,
-        },
-        displayMedium: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 45,
-            lineHeight: 52,
-            letterSpacing: 0,
-        },
-        displaySmall: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 36,
-            lineHeight: 44,
-            letterSpacing: 0,
-        },
-        headlineLarge: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 32,
-            lineHeight: 40,
-            letterSpacing: 0,
-        },
-        headlineMedium: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 28,
-            lineHeight: 36,
-            letterSpacing: 0,
-        },
-        headlineSmall: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 24,
-            lineHeight: 32,
-            letterSpacing: 0,
-        },
-        titleLarge: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 22,
-            lineHeight: 28,
-            letterSpacing: 0,
-        },
-        titleSmall: {
-            fontFamily: 'System',
-            fontWeight: "500",
-            fontSize: 14,
-            lineHeight: 20,
-            letterSpacing: 0.1,
-        },
-        bodyLarge: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 16,
-            lineHeight: 24,
-            letterSpacing: 0.5,
-        },
-        bodySmall: {
-            fontFamily: 'System',
-            fontWeight: "400",
-            fontSize: 12,
-            lineHeight: 16,
-            letterSpacing: 0.4,
-        },
-        labelLarge: {
-            fontFamily: 'System',
-            fontWeight: "500",
-            fontSize: 14,
-            lineHeight: 20,
-            letterSpacing: 0.1,
-        },
-        labelMedium: {
-            fontFamily: 'System',
-            fontWeight: "500",
-            fontSize: 12,
-            lineHeight: 16,
-            letterSpacing: 0.5,
-        },
-        labelSmall: {
-            fontFamily: 'System',
-            fontWeight: "500",
-            fontSize: 11,
-            lineHeight: 16,
-            letterSpacing: 0.5,
-        },
+  titleMedium: {
+    fontFamily: 'Nunito',
+    fontWeight: "600",
+    fontSize: 20,
+    lineHeight: 28,
+    letterSpacing: 0,
+  },
+  bodyMedium: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: 0,
+  },
+  displayLarge: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 57,
+    lineHeight: 64,
+    letterSpacing: 0,
+  },
+  displayMedium: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 45,
+    lineHeight: 52,
+    letterSpacing: 0,
+  },
+  displaySmall: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 36,
+    lineHeight: 44,
+    letterSpacing: 0,
+  },
+  headlineLarge: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 32,
+    lineHeight: 40,
+    letterSpacing: 0,
+  },
+  headlineMedium: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 28,
+    lineHeight: 36,
+    letterSpacing: 0,
+  },
+  headlineSmall: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 24,
+    lineHeight: 32,
+    letterSpacing: 0,
+  },
+  titleLarge: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 22,
+    lineHeight: 28,
+    letterSpacing: 0,
+  },
+  titleSmall: {
+    fontFamily: 'Nunito',
+    fontWeight: "500",
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.1,
+  },
+  bodyLarge: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 16,
+    lineHeight: 24,
+    letterSpacing: 0.5,
+  },
+  bodySmall: {
+    fontFamily: 'Nunito',
+    fontWeight: "400",
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
+  },
+  labelLarge: {
+    fontFamily: 'Nunito',
+    fontWeight: "500",
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.1,
+  },
+  labelMedium: {
+    fontFamily: 'Nunito',
+    fontWeight: "500",
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.5,
+  },
+  labelSmall: {
+    fontFamily: 'Nunito',
+    fontWeight: "500",
+    fontSize: 11,
+    lineHeight: 16,
+    letterSpacing: 0.5,
+  },
 };
 
 export const theme: AppTheme = {
   version: 3 as const,
   isV3: true,
+  // Update fonts to use Nunito
+  fonts: configureFonts({
+    config: {
+      ...fontConfig,
+      displayLarge: { fontFamily: 'Nunito', ...fontConfig.displayLarge },
+      displayMedium: { fontFamily: 'Nunito', ...fontConfig.displayMedium },
+      displaySmall: { fontFamily: 'Nunito', ...fontConfig.displaySmall },
+      headlineLarge: { fontFamily: 'Nunito', ...fontConfig.headlineLarge },
+      headlineMedium: { fontFamily: 'Nunito', ...fontConfig.headlineMedium },
+      headlineSmall: { fontFamily: 'Nunito', ...fontConfig.headlineSmall },
+      titleLarge: { fontFamily: 'Nunito', ...fontConfig.titleLarge },
+      titleMedium: { fontFamily: 'Nunito', ...fontConfig.titleMedium },
+      titleSmall: { fontFamily: 'Nunito', ...fontConfig.titleSmall },
+      bodyLarge: { fontFamily: 'Nunito', ...fontConfig.bodyLarge },
+      bodyMedium: { fontFamily: 'Nunito', ...fontConfig.bodyMedium },
+      bodySmall: { fontFamily: 'Nunito', ...fontConfig.bodySmall },
+      labelLarge: { fontFamily: 'Nunito', ...fontConfig.labelLarge },
+      labelMedium: { fontFamily: 'Nunito', ...fontConfig.labelMedium },
+      labelSmall: { fontFamily: 'Nunito', ...fontConfig.labelSmall },
+    }
+  }) as any,
   colors: {
     primary: '#36618E',
     onPrimary: '#FFFFFF',
@@ -162,7 +183,6 @@ export const theme: AppTheme = {
     large: 24,
   },
   roundness: 8,
-  fonts: configureFonts({ config: fontConfig }) as any, // Type assertion as a workaround
   shape: {
     borderRadius: 8,
   },
@@ -181,6 +201,20 @@ export const theme: AppTheme = {
     love: '#FFB6C1',
     reason: '#BDB2FF',
     acceptance: '#AED9E0',
+    shame: '#E6B8B8', // Added from recommendation
+    guilt: '#F06292', // Keep consistent with colors.ts for now
+    apathy: '#FFB74D', // Keep consistent with colors.ts for now
+    grief: '#FF8A65', // Keep consistent with colors.ts for now
+    fear: '#FFF176', // Keep consistent with colors.ts for now
+    desire: '#A5D6A7', // Keep consistent with colors.ts for now
+    anger: '#81D4FA', // Keep consistent with colors.ts for now
+    pride: '#B39DDB', // Keep consistent with colors.ts for now
+    willfulness: '#9575CD', // Keep consistent with colors.ts for now
+    humiliation: '#E57373', // Added, same as shame for now
+    regret: '#F06292', // Added, same as guilt for now
+    anxiety: '#FFF176', // Added, same as fear for now
+    hate: '#81D4FA', // Added, same as anger for now
+    aggression: '#81D4FA', // Added, same as anger for now
   },
   animation: {
     scale: 1.0, // You can adjust this value if needed

@@ -5,11 +5,31 @@ import type { RootStackParamList } from './types/navigation';
 import styles from './config/styles';
 import { MoodSelector } from './components/MoodSelector';
 import { MoodPyramid } from './components/MoodPyramid';
+import { theme } from './config/theme';
+import type { IconName } from './components/MoodSelector'; // Import IconName
+
+// New ProgressDots component
+const ProgressDots = ({ activeScreen }: { activeScreen: number }) => (
+  <View style={{ flexDirection: 'row', justifyContent: 'center', paddingVertical: 10 }}>
+    {[0, 1].map((index) => (
+      <View
+        key={index}
+        style={{
+          width: 8,
+          height: 8,
+          borderRadius: 4,
+          backgroundColor: index === activeScreen ? theme.colors.primary : theme.colors.surfaceVariant,
+          marginHorizontal: 4,
+        }}
+      />
+    ))}
+  </View>
+);
 
 type MoodType = {
   label: string;
-  color: string;
-  icon: string;
+  icon: IconName;
+  key: keyof typeof theme.moodColors;
   value: number;
   duration: number;
   isSelected: boolean;
@@ -18,21 +38,28 @@ type MoodType = {
 export default function MoodScreen() {
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
   const [moods, setMoods] = useState<MoodType[]>([
-    { label: 'Shame', color: '#87CEEB', icon: 'emoticon-sad', value: 0, duration: 0, isSelected: false },
-    { label: 'Guilt', color: '#FFD700', icon: 'emoticon-confused', value: 0, duration: 0, isSelected: false },
-    { label: 'Apathy', color: '#E6E6FA', icon: 'emoticon-neutral', value: 0, duration: 0, isSelected: false },
-    { label: 'Grief', color: '#FF69B4', icon: 'emoticon-cry', value: 0, duration: 0, isSelected: false },
-    { label: 'Fear', color: '#FF69B4', icon: 'emoticon-scared', value: 0, duration: 0, isSelected: false },
-    { label: 'Desire', color: '#FF69B4', icon: 'emoticon-excited', value: 0, duration: 0, isSelected: false },
-    { label: 'Anger', color: '#FF69B4', icon: 'emoticon-angry', value: 0, duration: 0, isSelected: false },
-    { label: 'Pride', color: '#FF69B4', icon: 'emoticon-cool', value: 0, duration: 0, isSelected: false },
-    { label: 'Willfulness', color: '#FF69B4', icon: 'emoticon-confident', value: 0, duration: 0, isSelected: false },
+    { label: 'Shame', key: 'shame', icon: 'emoticon-sad', value: 0, duration: 0, isSelected: false },
+    { label: 'Guilt', key: 'guilt', icon: 'emoticon-confused', value: 0, duration: 0, isSelected: false },
+    { label: 'Apathy', key: 'apathy', icon: 'emoticon-neutral', value: 0, duration: 0, isSelected: false },
+    { label: 'Grief', key: 'grief', icon: 'emoticon-cry', value: 0, duration: 0, isSelected: false },
+    { label: 'Fear', key: 'fear', icon: 'emoticon-frown', value: 0, duration: 0, isSelected: false },
+    { label: 'Desire', key: 'desire', icon: 'emoticon-excited', value: 0, duration: 0, isSelected: false },
+    { label: 'Anger', key: 'anger', icon: 'emoticon-angry', value: 0, duration: 0, isSelected: false },
+    { label: 'Pride', key: 'pride', icon: 'emoticon-cool', value: 0, duration: 0, isSelected: false },
+    { label: 'Willfulness', key: 'willfulness', icon: 'emoticon-cool', value: 0, duration: 0, isSelected: false },
   ]);
 
   const { returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['mood']>();
 
-  const screenWidth = Dimensions.get('window').width;
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
   const [activeScreen, setActiveScreen] = useState(0);
+
+    useEffect(() => {
+      const subscription = Dimensions.addEventListener('change', () => {
+        setScreenWidth(Dimensions.get('window').width);
+      });
+      return () => subscription?.remove();
+    }, []);
 
   const handleMoodSelect = (index: number) => {
     const mood = moods[index];
@@ -51,7 +78,7 @@ export default function MoodScreen() {
 
   const handleDurationChange = (value: number) => {
     if (!selectedMood) return;
-    
+
     setMoods(prevMoods =>
       prevMoods.map(mood => ({
         ...mood,
@@ -71,7 +98,7 @@ export default function MoodScreen() {
             duration: mood.duration
           }
         }), {});
-      
+
       console.log(moodValues);
       router.replace(returnTo as keyof RootStackParamList);
     } catch (error) {
@@ -113,6 +140,7 @@ export default function MoodScreen() {
 
   return (
     <View style={styles.layout_container}>
+      <ProgressDots activeScreen={activeScreen} />
       <ScrollView
         ref={scrollViewRef}
         horizontal
