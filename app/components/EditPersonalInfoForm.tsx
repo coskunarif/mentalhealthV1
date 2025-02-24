@@ -1,8 +1,8 @@
+// File: app/components/EditPersonalInfoForm.tsx
 import React, { useState } from 'react';
-import { View, StyleSheet, Platform, Animated, Easing } from 'react-native';
-import { Card, Text, TextInput, HelperText, Button, IconButton, Divider } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Card, Text, TextInput, HelperText, Button, Divider } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { PersonalInformation } from '../types/personalInformation';
 import { theme } from '../config/theme';
 import globalStyles from '../config/styles';
@@ -17,34 +17,12 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
   const [errors, setErrors] = useState<Partial<Record<keyof PersonalInformation, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
-    const fadeAnim = useState(new Animated.Value(0))[0]; // Initial value for opacity: 0
 
-   // Function to animate fade in
-    const fadeIn = () => {
-        Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 200,
-            easing: Easing.out(Easing.ease), // Added easing
-            useNativeDriver: true,
-        }).start();
-    };
-
-    // Function to animate fade out
-    const fadeOut = () => {
-        Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 200,
-            easing: Easing.out(Easing.ease), // Added easing
-            useNativeDriver: true,
-        }).start();
-    };
-
-  // Enhanced validation with better feedback
+  // Validate individual fields
   const validateField = (field: keyof PersonalInformation, value: string | undefined): string => {
     if (!value) {
       return field === 'name' ? 'Name is required' : '';
     }
-
     switch (field) {
       case 'name':
         return value.trim().length < 2 ? 'Name must be at least 2 characters' : '';
@@ -68,23 +46,16 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
   };
 
   const handleSubmit = async () => {
-    // Validate all fields before submission
+    // Validate all fields
     const newErrors: Partial<Record<keyof PersonalInformation, string>> = {};
     (Object.keys(formData) as Array<keyof PersonalInformation>).forEach(field => {
       const error = validateField(field, formData[field]);
       if (error) newErrors[field] = error;
     });
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      fadeIn(); // Fade in on error
       return;
     }
-
-        if (Object.keys(errors).length > 0 && Object.keys(newErrors).length === 0) {
-            fadeOut();
-        }
-
     setIsSubmitting(true);
     try {
       await onSave(formData);
@@ -93,7 +64,7 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
     }
   };
 
-const styles = StyleSheet.create({
+  const styles = StyleSheet.create({
     container: {
       margin: theme.spacing.medium,
       padding: theme.spacing.medium,
@@ -108,24 +79,6 @@ const styles = StyleSheet.create({
     section: {
       marginBottom: theme.spacing.medium,
     },
-    sectionHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: theme.spacing.small,
-    },
-    sectionTitle: {
-      ...theme.fonts.titleMedium,
-      color: theme.colors.primary,
-      marginLeft: theme.spacing.small,
-      fontWeight: '600',
-    },
-    fieldGroup: {
-      marginBottom: theme.spacing.medium,
-    },
-    input: {
-      backgroundColor: theme.colors.surface,
-      paddingHorizontal: theme.spacing.small,
-    },
     divider: {
       marginVertical: theme.spacing.medium,
       backgroundColor: theme.colors.surfaceVariant,
@@ -133,6 +86,13 @@ const styles = StyleSheet.create({
     saveButton: {
       marginTop: theme.spacing.medium,
       borderRadius: theme.shape.borderRadius,
+    },
+    fieldGroup: {
+      marginBottom: theme.spacing.medium,
+    },
+    input: {
+      backgroundColor: theme.colors.surface,
+      paddingHorizontal: theme.spacing.small,
     },
   });
 
@@ -153,7 +113,7 @@ const styles = StyleSheet.create({
         keyboardType={keyboardType}
         disabled={disabled}
         style={styles.input}
-        error={!!errors[field]} // Show error state
+        error={!!errors[field]}
         right={
           icon ? (
             <TextInput.Icon
@@ -174,58 +134,45 @@ const styles = StyleSheet.create({
 
   return (
     <Card style={styles.container} elevation={2}>
-      <Animated.View style={{ opacity: fadeAnim }}>
-        <View style={styles.section}>
-          {renderInput('name', 'Full Name')}
-          {renderInput('dateOfBirth', 'Date of Birth', 'default', false, 'calendar', () =>
-            setDatePickerVisible(true)
-          )}
-        </View>
+      <View style={styles.section}>
+        {renderInput('name', 'Full Name')}
+        {renderInput('dateOfBirth', 'Date of Birth', 'default', false, 'calendar', () =>
+          setDatePickerVisible(true)
+        )}
+      </View>
 
-        <Divider style={styles.divider} />
+      <Divider style={styles.divider} />
 
-        <View style={styles.section}>
-          {renderInput('email', 'Email Address', 'email-address', true)}
-          {renderInput('phoneNumber', 'Phone Number', 'phone-pad', false, 'phone')}
-        </View>
+      <View style={styles.section}>
+        {renderInput('email', 'Email Address', 'email-address', true)}
+        {renderInput('phoneNumber', 'Phone Number', 'phone-pad', false, 'phone')}
+      </View>
 
-        <Button
-          onPress={handleSubmit}
-          loading={isSubmitting}
-          disabled={isSubmitting}
-          style={[globalStyles.button_primary, styles.saveButton]}
-        >
-          Save Changes
-        </Button>
-      </Animated.View>
+      <Button
+        onPress={handleSubmit}
+        loading={isSubmitting}
+        disabled={isSubmitting}
+        style={[globalStyles.button_primary, styles.saveButton]}
+      >
+        Save Changes
+      </Button>
 
       <DatePickerModal
         locale="en"
         mode="single"
         visible={datePickerVisible}
-        onDismiss={() => {
-          setDatePickerVisible(false);
-          Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }).start();
-        }}
-        date={formData.dateOfBirth ? new Date(formData.dateOfBirth) : new Date()}
-        onConfirm={(date) => {
-          handleConfirmDate(date);
-          Animated.timing(fadeAnim, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }).start();
-        }}
+        onDismiss={() => setDatePickerVisible(false)}
+        date={
+          formData.dateOfBirth &&
+          !isNaN(new Date(formData.dateOfBirth).getTime())
+            ? new Date(formData.dateOfBirth)
+            : new Date()
+        }
+        onConfirm={handleConfirmDate}
         validRange={{
           startDate: new Date(1900, 0, 1),
           endDate: new Date(),
         }}
-        // Add animation
-
       />
     </Card>
   );
