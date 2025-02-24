@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { View, ScrollView, StyleSheet, Animated } from 'react-native';
-import { Appbar, Text } from 'react-native-paper';
+import { View, ScrollView, StyleSheet, Animated, KeyboardAvoidingView, Platform, Easing } from 'react-native';
+import { Text } from 'react-native-paper';
 import { EditPersonalInfoForm } from './EditPersonalInfoForm';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import type { AppTheme } from '../types/theme';
 import { theme } from '../config/theme';
+import { CustomAppBar } from './CustomAppBar';
 
 const createStyles = (theme: AppTheme) => StyleSheet.create({
   container: {
@@ -33,73 +34,65 @@ export default function EditPersonalInfoScreen() {
   const styles = createStyles(theme);
   const slideAnim = new Animated.Value(0);
 
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [slideAnim]);
+useEffect(() => {
+  Animated.timing(slideAnim, {
+    toValue: 1,
+    duration: 200,
+    easing: Easing.out(Easing.ease), // Added easing
+    useNativeDriver: true,
+  }).start();
+}, [slideAnim]);
 
-  const handleSave = async (info: any) => {
-    try {
-      // TODO: Implement API call to save personal info
-      console.log('Saving personal info:', info);
-      router.back();
-    } catch (error: any) {
-      console.error('Failed to save:', error);
-      // TODO: Implement error handling
-    }
-  };
+const handleSave = async (info: any) => {
+  try {
+    // TODO: Implement API call to save personal info
+    console.log('Saving personal info:', info);
+    router.back();
+  } catch (error: any) {
+    console.error('Failed to save:', error);
+    // TODO: Implement error handling
+  }
+};
 
-    const handleBack = () => {
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => router.back());
-  };
+  const handleBack = () => {
+  Animated.timing(slideAnim, {
+    toValue: 0,
+    duration: 200,
+    easing: Easing.out(Easing.ease), // Added easing
+    useNativeDriver: true,
+  }).start(() => router.back());
+};
 
   return (
-    <Animated.View style={[
-      styles.container,
-      {
-        transform: [
-          {
-            translateX: slideAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [300, 0], // Slide in from right
-            }),
-          },
-        ],
-      },
-    ]}>
-      <StatusBar style="auto" />
-      <Appbar.Header>
-        <Appbar.BackAction onPress={handleBack} />
-        <Appbar.Content
-          title="Personal Information"
-          titleStyle={styles.headerTitle}
-        />
-      </Appbar.Header>
-
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.subtitle}>
-          Keep your profile up to date by maintaining accurate personal information.
-        </Text>
-        <EditPersonalInfoForm
-          onSave={handleSave}
-          info={{
-            name: "",
-            email: "",
-            phoneNumber: "",
-            dateOfBirth: "",
-          }}
-        />
-      </ScrollView>
-    </Animated.View>
-  );
-}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+    >
+      <Animated.View style={[
+        styles.container,
+        {
+          transform: [
+            {
+              translateX: slideAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [300, 0], // Slide in from right
+              }),
+            },
+          ],
+        },
+      ]}>
+        <StatusBar style="auto" />
+        <CustomAppBar title="Personal Information" />
+          <ScrollView
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={styles.subtitle}>
+              Keep your profile up to date by maintaining accurate personal information.
+            </Text>
+            <EditPersonalInfoForm onSave={handleSave} info={{ name: "", email: "", phoneNumber: "", dateOfBirth: "" }} />
+          </ScrollView>
+        </Animated.View>
+      </KeyboardAvoidingView>
+    );
+  }

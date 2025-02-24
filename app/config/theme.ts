@@ -135,26 +135,34 @@ export const theme: AppTheme = {
     }
   }) as any,
   colors: {
-    primary: '#36618E',
-    onPrimary: '#FFFFFF',
-    primaryContainer: '#D1E4FF',
-    onPrimaryContainer: '#001D36',
-    secondary: '#6B538C',
+    primary: '#5DA47A',
+    background: '#F2F7F4', // 60% - Very light background
+    secondary: '#5DA47A', // 30% - Primary Green
+    tertiary: '#4C8A65', // 10% - Darker shade of primary
+
+    // Surface colors
+    surface: '#FFFFFF',
+    surfaceVariant: '#F7FAF8',
+
+    // Text colors
+    onPrimary: '#FFFFFF', // White text on primary green
     onSecondary: '#FFFFFF',
-    background: '#F8F9FF',
-    surface: '#F9F9FF',
-    surfaceVariant: '#DBE4E6',
+    onTertiary: '#FFFFFF',
+    onSurface: '#1A1A1A',
+    onSurfaceVariant: '#2D2D2D',
+    // Status Colors
     error: '#B00020',
     onError: '#FFFFFF',
+    onBackground: '#1A1A1A',
+    primaryContainer: '#B2D9C1', // Lighter shade of primary
+    onPrimaryContainer: '#1A472A', // Darker shade for text on primaryContainer
+    secondaryContainer: '#B2D9C1', // Lighter shade of secondary
+    onSecondaryContainer: '#1A472A', // Darker shade for text on secondaryContainer
+    tertiaryContainer: '#90C2A6', // Lighter shade of tertiary
+    onTertiaryContainer: '#003311', // Darker shade for text on tertiaryContainer
     errorContainer: '#F9DEDC',
     onErrorContainer: '#410002',
     outline: '#79747E',
-    secondaryContainer: '#E8DEF8',
-    onSecondaryContainer: '#21005D',
-    tertiary: '#7D5260',
-    onTertiary: '#FFFFFF',
-    tertiaryContainer: '#FFD8E4',
-    onTertiaryContainer: '#31111D',
     outlineVariant: '#CAC4D0',
     shadow: '#000000',
     scrim: '#000000',
@@ -164,9 +172,6 @@ export const theme: AppTheme = {
     surfaceDisabled: 'rgba(28, 27, 31, 0.12)',
     onSurfaceDisabled: 'rgba(28, 27, 31, 0.38)',
     backdrop: 'rgba(45, 48, 56, 0.4)',
-    onSurface: '#1C1B1F',
-    onSurfaceVariant: '#49454F',
-    onBackground: '#1C1B1F',
     elevation: {
       level0: 'transparent',
       level1: '#F7F2FA',

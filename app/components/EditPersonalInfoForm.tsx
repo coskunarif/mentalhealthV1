@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Platform, Animated } from 'react-native';
+import { View, StyleSheet, Platform, Animated, Easing } from 'react-native';
 import { Card, Text, TextInput, HelperText, Button, IconButton, Divider } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { PersonalInformation } from '../types/personalInformation';
 import { theme } from '../config/theme';
+import globalStyles from '../config/styles';
 
 interface EditPersonalInfoFormProps {
   info: PersonalInformation;
@@ -18,11 +19,12 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
   const [datePickerVisible, setDatePickerVisible] = useState(false);
     const fadeAnim = useState(new Animated.Value(0))[0]; // Initial value for opacity: 0
 
-    // Function to animate fade in
+   // Function to animate fade in
     const fadeIn = () => {
         Animated.timing(fadeAnim, {
             toValue: 1,
             duration: 200,
+            easing: Easing.out(Easing.ease), // Added easing
             useNativeDriver: true,
         }).start();
     };
@@ -32,6 +34,7 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
         Animated.timing(fadeAnim, {
             toValue: 0,
             duration: 200,
+            easing: Easing.out(Easing.ease), // Added easing
             useNativeDriver: true,
         }).start();
     };
@@ -97,43 +100,39 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
       borderRadius: theme.shape.borderRadius,
       backgroundColor: theme.colors.surface,
       // For iOS shadow:
-      shadowColor: "#000",
+      shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.2,
       shadowRadius: 2,
     },
     section: {
-      marginBottom: theme.spacing.medium, // Increased marginBottom to medium (16)
+      marginBottom: theme.spacing.medium,
     },
     sectionHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: theme.spacing.small, // Increased marginBottom to small (8)
+      marginBottom: theme.spacing.small,
     },
     sectionTitle: {
       ...theme.fonts.titleMedium,
       color: theme.colors.primary,
-      marginLeft: theme.spacing.small, // Increased marginLeft to small (8)
-      fontWeight: "600",
+      marginLeft: theme.spacing.small,
+      fontWeight: '600',
     },
     fieldGroup: {
-      marginBottom: theme.spacing.medium, // Increased marginBottom to medium (16)
+      marginBottom: theme.spacing.medium,
     },
     input: {
       backgroundColor: theme.colors.surface,
-      paddingHorizontal: theme.spacing.small, // Added horizontal padding
+      paddingHorizontal: theme.spacing.small,
     },
     divider: {
-      marginVertical: theme.spacing.medium, // Increased marginVertical to medium (16)
+      marginVertical: theme.spacing.medium,
       backgroundColor: theme.colors.surfaceVariant,
     },
     saveButton: {
-      marginTop: theme.spacing.medium, // Increased marginTop to medium (16)
+      marginTop: theme.spacing.medium,
       borderRadius: theme.shape.borderRadius,
-      elevation: 3, // Increased elevation
-    },
-    saveButtonContent: {
-      paddingVertical: theme.spacing.small, // Increased paddingVertical to small (8)
     },
   });
 
@@ -191,12 +190,10 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
         </View>
 
         <Button
-          mode="elevated"
           onPress={handleSubmit}
           loading={isSubmitting}
           disabled={isSubmitting}
-          style={styles.saveButton}
-          contentStyle={styles.saveButtonContent}
+          style={[globalStyles.button_primary, styles.saveButton]}
         >
           Save Changes
         </Button>

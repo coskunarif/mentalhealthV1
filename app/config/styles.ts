@@ -88,22 +88,26 @@ const styles = StyleSheet.create({
   } as TextStyle,
   button_primary: {
     backgroundColor: theme.colors.primary,
-    borderRadius: 12,
-    marginVertical: 8,
+    borderRadius: theme.shape.borderRadius,
+    marginVertical: theme.spacing.small,
+    contentStyle: { paddingVertical: theme.spacing.small },
+    labelStyle: { ...theme.fonts.bodyMedium, fontWeight: 'bold' },
   } as ViewStyle,
   button_secondary: {
     borderColor: theme.colors.primary,
-    borderRadius: 12,
-    marginVertical: 8,
+    borderRadius: theme.shape.borderRadius,
+    marginVertical: theme.spacing.small,
   } as ViewStyle,
-  button_contained: {
-    backgroundColor: theme.colors.primary,
-  } as ViewStyle,
-  button_outlined: {
-    borderWidth: 1,
-    borderColor: theme.colors.primary,
-    backgroundColor: 'transparent',
-  } as ViewStyle,
+    button_contained: {
+        backgroundColor: theme.colors.primary,
+        borderRadius: theme.shape.borderRadius,
+    } as ViewStyle,
+    button_outlined: {
+        borderWidth: 1,
+        borderColor: theme.colors.primary,
+        backgroundColor: 'transparent',
+        borderRadius: theme.shape.borderRadius,
+    } as ViewStyle,
   button_icon: {
     padding: 8,
     borderRadius: 20,
