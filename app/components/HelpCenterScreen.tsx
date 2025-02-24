@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { Appbar, Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { HelpCenterCard } from './HelpCenterCard';
 import { useRouter } from 'expo-router';
 import globalStyles from '../config/styles';
 import { theme } from '../config/theme';
+import { CustomAppBar } from './CustomAppBar';
 
 export default function HelpCenterScreen() {
   const router = useRouter();
@@ -16,12 +17,9 @@ export default function HelpCenterScreen() {
 
   return (
     <View style={globalStyles.layout_container}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Help Center" />
-      </Appbar.Header>
+      <CustomAppBar title="Help Center" />
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={[
           globalStyles.layout_content,
           { paddingVertical: theme.spacing.small }

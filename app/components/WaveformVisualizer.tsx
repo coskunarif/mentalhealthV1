@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, ViewStyle, Animated } from 'react-native';
+import { View, ViewStyle, Animated, Easing } from 'react-native';
 import styles from '../config/styles';
 import { useTheme } from 'react-native-paper';
 import type { AppTheme } from '../types/theme';
@@ -31,7 +31,8 @@ export default function WaveformVisualizer({
           const amplitude = amplitudes[index % amplitudes.length];
           return Animated.timing(bar, {
             toValue: 0.3 + (amplitude * 0.7),
-            duration: 500,
+            duration: 200, // Changed duration
+            easing: Easing.out(Easing.ease), // Added easing
             useNativeDriver: true,
           });
         });
@@ -42,12 +43,14 @@ export default function WaveformVisualizer({
           Animated.sequence([
             Animated.timing(bar, {
               toValue: Math.random() * 0.7 + 0.3,
-              duration: Math.random() * 1000 + 500,
+              duration: 200, // Changed duration
+              easing: Easing.out(Easing.ease), // Added easing
               useNativeDriver: true,
             }),
             Animated.timing(bar, {
               toValue: 0.3,
-              duration: Math.random() * 1000 + 500,
+              duration: 200, // Changed duration
+              easing: Easing.out(Easing.ease), // Added easing
               useNativeDriver: true,
             }),
           ])
@@ -68,7 +71,8 @@ export default function WaveformVisualizer({
       barHeights.forEach((bar) => {
         Animated.timing(bar, {
           toValue: 0.3,
-          duration: 300,
+          duration: 200, // Changed duration
+          easing: Easing.out(Easing.ease), // Added easing
           useNativeDriver: true,
         }).start();
       });

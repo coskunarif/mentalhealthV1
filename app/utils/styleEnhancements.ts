@@ -1,4 +1,4 @@
-import { Platform, ViewStyle, Animated } from 'react-native';
+import { Platform, ViewStyle, Animated, Easing } from 'react-native';
 
 // Shadow enhancements that can be spread into existing styles
 const enhanceShadow = (level: 'soft' | 'medium' = 'soft'): ViewStyle => ({
@@ -69,12 +69,14 @@ const createBackgroundAnimation = (duration = 3000) => {
       Animated.sequence([
         Animated.timing(animation, {
           toValue: 1,
-          duration,
+          duration: 200, // Changed to 200ms
+          easing: Easing.out(Easing.ease), // Added easing
           useNativeDriver: true,
         }),
         Animated.timing(animation, {
           toValue: 0,
-          duration,
+          duration: 200, // Changed to 200ms
+          easing: Easing.out(Easing.ease), // Added easing
           useNativeDriver: true,
         }),
       ])

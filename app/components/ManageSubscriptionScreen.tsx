@@ -1,21 +1,19 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { Appbar, Text, List, Button, Surface, Divider } from 'react-native-paper';
+import { Text, List, Button, Surface, Divider } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { theme } from '../config/theme';
 import globalStyles from '../config/styles';
+import { CustomAppBar } from './CustomAppBar';
 
 export default function ManageSubscriptionScreen() {
   const router = useRouter();
 
   return (
     <View style={globalStyles.layout_container}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Subscription" />
-      </Appbar.Header>
+      <CustomAppBar title="Subscription" />
 
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={[
           globalStyles.layout_content,
           { paddingVertical: theme.spacing.small }
@@ -68,8 +66,8 @@ export default function ManageSubscriptionScreen() {
           />
         </Surface>
 
-        <Button 
-          mode="outlined" 
+        <Button
+          mode="outlined"
           onPress={() => console.log('Cancel subscription')}
           style={styles.cancelButton}
         >

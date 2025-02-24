@@ -3,6 +3,7 @@ import { View, Text, ScrollView } from 'react-native';
 import { IconButton } from 'react-native-paper';
 import { router } from 'expo-router';
 import styles from '../config/styles';
+import { theme } from '../config/theme';
 
 interface LegalLayoutProps {
   title: string;
@@ -19,7 +20,7 @@ export default function LegalLayout({ title, children, lastUpdated }: LegalLayou
           size={24}
           onPress={() => router.back()}
         />
-        <Text style={styles.text_heading1}>{title}</Text>
+        <Text style={{ ...theme.fonts.titleLarge, color: theme.colors.onSurface, marginBottom: theme.spacing.small }}>{title}</Text>
       </View>
 
       <ScrollView
@@ -29,7 +30,7 @@ export default function LegalLayout({ title, children, lastUpdated }: LegalLayou
         {children}
 
         {lastUpdated && (
-          <Text style={[styles.text_caption, { marginTop: 24 }]}>
+          <Text style={{ ...theme.fonts.labelMedium, color: theme.colors.onSurfaceVariant, marginTop: theme.spacing.large }}>
             Last updated: {lastUpdated}
           </Text>
         )}

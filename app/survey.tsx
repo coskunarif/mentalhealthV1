@@ -7,10 +7,10 @@ import {
   ProgressBar,
   Surface,
   useTheme,
-  Appbar,
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import QuestionCard from './components/QuestionCard';
+import { CustomAppBar } from './components/CustomAppBar';
 
 const questions = [
   {
@@ -84,10 +84,7 @@ export default function SurveyScreen() {
 
   return (
     <>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Daily Survey" />
-      </Appbar.Header>
+      <CustomAppBar title="Daily Survey" />
 
       <ScrollView
         style={{ flex: 1, backgroundColor: theme.colors.background }}
@@ -123,8 +120,8 @@ export default function SurveyScreen() {
           />
         </Surface>
 
-        {/* 
-          "Finish Survey" button is always visible, 
+        {/*
+          "Finish Survey" button is always visible,
           allowing users to submit partial or complete answers.
         */}
         <Button

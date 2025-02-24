@@ -159,7 +159,7 @@ export default function PlayerScreen() {
         Animated.timing(spinValue, {
           toValue: 1,
           duration: 10000,
-          easing: Easing.linear,
+          easing: Easing.out(Easing.ease), // Updated easing
           useNativeDriver: true,
         })
       ).start();
