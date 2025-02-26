@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, Button, Surface, Snackbar, Dialog, Portal, List } from 'react-native-paper';
 import type { PersonalInformation } from '../types/personalInformation';
@@ -14,7 +14,35 @@ export default function ProfileScreen() {
   const [error, setError] = useState<string | null>(null);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const router = useRouter();
+  
+  // User stats - in a real app, these would come from your backend
+  const [userStats, setUserStats] = useState({
+    sessions: 12,
+    streak: 5,
+    surveys: 8
+  });
+  
+  // Subscription status - in a real app, this would come from your backend
+  const [subscriptionStatus, setSubscriptionStatus] = useState('Active');
 
+  // Simulate fetching user stats and subscription status
+  useEffect(() => {
+    // This would be an API call in a real app
+    const fetchUserData = async () => {
+      try {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // In a real app, you would fetch this data from your backend
+        // setUserStats(response.data.stats);
+        // setSubscriptionStatus(response.data.subscription.status);
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+      }
+    };
+    
+    fetchUserData();
+  }, [user?.uid]);
 
   const handleSignOut = async () => {
     setIsLoading(true);
@@ -61,15 +89,15 @@ export default function ProfileScreen() {
           {/* Mental Health Stats */}
           <View style={[styles.profile_statsContainer, { justifyContent: 'space-around' }]}>
             <View style={styles.profile_statItem}>
-              <Text style={styles.profile_statNumber}>12</Text>
+              <Text style={styles.profile_statNumber}>{userStats.sessions}</Text>
               <Text style={styles.profile_statLabel}>Sessions</Text>
             </View>
             <View style={styles.profile_statItem}>
-              <Text style={styles.profile_statNumber}>5</Text>
+              <Text style={styles.profile_statNumber}>{userStats.streak}</Text>
               <Text style={styles.profile_statLabel}>Streak</Text>
             </View>
             <View style={styles.profile_statItem}>
-              <Text style={styles.profile_statNumber}>8</Text>
+              <Text style={styles.profile_statNumber}>{userStats.surveys}</Text>
               <Text style={styles.profile_statLabel}>Surveys</Text>
             </View>
           </View>
@@ -79,9 +107,17 @@ export default function ProfileScreen() {
             <Text style={[styles.profile_statusLabel, theme.fonts.bodyMedium]}>
               Subscription Status:
             </Text>
-            <View style={[styles.profile_statusBadge, { backgroundColor: theme.colors.secondary }]}>
-              <Text style={[styles.profile_statusText, { color: theme.colors.onSecondary }]}>
-                Active
+            <View style={[styles.profile_statusBadge, { 
+              backgroundColor: subscriptionStatus === 'Active' 
+                ? theme.colors.secondary 
+                : theme.colors.surfaceVariant 
+            }]}>
+              <Text style={[styles.profile_statusText, { 
+                color: subscriptionStatus === 'Active' 
+                  ? theme.colors.onSecondary 
+                  : theme.colors.onSurfaceVariant 
+              }]}>
+                {subscriptionStatus}
               </Text>
             </View>
           </View>

@@ -18,11 +18,10 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
-
-// Helper function for phone number formatting (simple masking)
+// Improved phone number formatting - allows spaces for readability
 const formatPhoneNumber = (value: string): string => {
-  // Remove any character that is not a digit or plus sign
-  let phone = value.replace(/[^\d+]/g, '');
+  // Allow digits, plus sign, and spaces
+  let phone = value.replace(/[^\d+ ]/g, '');
   if (!phone.startsWith('+')) {
     phone = '+' + phone;
   }
@@ -30,19 +29,28 @@ const formatPhoneNumber = (value: string): string => {
   return phone.substring(0, 16);
 };
 
-  // Validate individual fields
+  // Enhanced validation for all fields
   const validateField = (field: keyof PersonalInformation, value: string | undefined): string => {
-    if (!value) {
-      return field === 'name' ? 'Name is required' : '';
+    if (!value && field !== 'email') {
+      return `${field === 'name' ? 'Name' : 'Field'} is required`;
     }
+    
     switch (field) {
       case 'name':
-        return value.trim().length < 2 ? 'Name must be at least 2 characters' : '';
+        return value && value.trim().length < 2 ? 'Name must be at least 2 characters' : '';
       case 'phoneNumber': {
-        // Remove spaces for validation and enforce international format
+        // More flexible phone validation - allows spaces and makes + optional
+        if (!value) return '';
         const normalized = value.replace(/\s+/g, '');
-        return !/^\+\d{10,15}$/.test(normalized)
-          ? 'Please enter a valid international phone number'
+        return !/^\+?\d{9,15}$/.test(normalized)
+          ? 'Enter a valid phone number (9-15 digits, optional +)'
+          : '';
+      }
+      case 'dateOfBirth': {
+        if (!value) return '';
+        const date = new Date(value);
+        return isNaN(date.getTime()) || date > new Date()
+          ? 'Enter a valid past date'
           : '';
       }
       default:
