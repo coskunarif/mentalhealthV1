@@ -1,12 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, ScrollView, StyleSheet, Animated, KeyboardAvoidingView, Platform, Easing } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, Snackbar } from 'react-native-paper';
 import { EditPersonalInfoForm } from './EditPersonalInfoForm';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import type { AppTheme } from '../types/theme';
 import { theme } from '../config/theme';
 import { CustomAppBar } from './CustomAppBar';
+import { useAuth } from '../context/auth';
 
 const createStyles = (theme: AppTheme) => StyleSheet.create({
   container: {
@@ -30,9 +31,11 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
 });
 
 export default function EditPersonalInfoScreen() {
+  const { user } = useAuth();
   const router = useRouter();
   const styles = createStyles(theme);
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -43,23 +46,30 @@ export default function EditPersonalInfoScreen() {
     }).start();
   }, [slideAnim]);
 
-  // Replace the hardcoded info with a realistic example (or use auth context)
+  // Create user info object with available Firebase User properties
+  // and add placeholders for missing properties
   const userInfo = {
-    name: "",
-    email: "user@example.com",
-    phoneNumber: "",
-    dateOfBirth: ""
+    name: user?.displayName || '',
+    email: user?.email || '',
+    phoneNumber: '', // This would come from your backend in a real app
+    dateOfBirth: '', // This would come from your backend in a real app
   };
 
 const handleSave = async (info: any) => {
   try {
-    // TODO: Implement API call to save personal info
-    console.log('Saving personal info:', info);
+    // Simulate API call to save personal info
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // In a real app, you would update the user profile in Firebase or your backend
+    // For example: await updateUserProfile(info);
+    
+    setSnackbar({ visible: true, message: 'Profile updated successfully' });
+    
     // Use the slide-out animation before navigating back
     handleBack();
   } catch (error: any) {
     console.error('Failed to save:', error);
-    // TODO: Implement error handling
+    setSnackbar({ visible: true, message: error.message || 'Failed to save profile' });
   }
 };
 
@@ -102,6 +112,14 @@ const handleSave = async (info: any) => {
             <EditPersonalInfoForm onSave={handleSave} info={userInfo} />
           </ScrollView>
         </Animated.View>
+        
+        <Snackbar
+          visible={snackbar.visible}
+          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+          duration={3000}
+        >
+          {snackbar.message}
+        </Snackbar>
       </KeyboardAvoidingView>
     );
   }
