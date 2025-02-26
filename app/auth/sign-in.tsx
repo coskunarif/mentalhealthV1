@@ -35,47 +35,43 @@ export default function SignInScreen() {
       <View style={styles.common_screen_auth_container}>
         <View style={styles.signIn_screen_auth_form}>
           <View style={styles.signIn_screen_auth_header}>
-            <Text style={styles.text_heading1}>Welcome Back</Text>
+            <Text style={styles.text_heading2}>Welcome Back</Text>
             <Text style={[styles.text_body, styles.signIn_subtitle]}>
               Sign in to continue your journey
             </Text>
           </View>
 
-          <View style={styles.component_input_container}>
-            <Text style={styles.component_input_label}>Email Address</Text>
-            <TextInput
-              mode="outlined"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              style={styles.component_input_field}
-              placeholder="Enter your email"
-              placeholderTextColor={theme.colors.onSurfaceVariant}
-            />
-          </View>
+          <TextInput
+            label="Email Address"
+            mode="outlined"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            style={styles.component_input_field}
+            placeholder="Enter your email"
+            placeholderTextColor={theme.colors.onSurfaceVariant}
+          />
 
-          <View style={styles.component_input_container}>
-            <Text style={styles.component_input_label}>Password</Text>
-            <TextInput
-              mode="outlined"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              style={styles.component_input_field}
-              placeholder="Enter your password"
-              placeholderTextColor={theme.colors.onSurfaceVariant}
-            />
-            {error ? (
-              <Text style={styles.component_input_error}>{error}</Text>
-            ) : null}
-          </View>
+          <TextInput
+            label="Password"
+            mode="outlined"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={[styles.component_input_field, { marginTop: theme.spacing.small }]}
+            placeholder="Enter your password"
+            placeholderTextColor={theme.colors.onSurfaceVariant}
+          />
+          {error ? (
+            <Text style={styles.component_input_error}>{error}</Text>
+          ) : null}
 
           <Button
             mode="contained"
             onPress={handleSignIn}
             loading={loading}
-            style={[styles.button_primary, { marginTop: 8 }]}
+            style={[styles.button_primary, { marginTop: theme.spacing.small }]}
             labelStyle={styles.text_button}
           >
             {loading ? 'Signing In...' : 'Sign In'}

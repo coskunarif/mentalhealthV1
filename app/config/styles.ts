@@ -49,9 +49,9 @@ const styles = StyleSheet.create({
   } as TextStyle,
   text_heading2: {
     ...theme.fonts.headlineMedium,
-    fontWeight: 'bold' as const,
+    fontWeight: 'bold',
     color: theme.colors.onSurface,
-    fontFamily: 'Kameron',
+    marginBottom: theme.spacing.small,
   } as TextStyle,
   text_heading3: {
     ...theme.fonts.headlineSmall,
@@ -178,12 +178,13 @@ const styles = StyleSheet.create({
     ...theme.fonts.labelMedium,
   } as TextStyle,
   component_input_field: {
-    padding: theme.spacing.medium - 4,
+    padding: theme.spacing.small, // Reduced padding for a compact look
     borderWidth: 1,
     borderColor: theme.colors.outline,
-    borderRadius: theme.spacing.medium - 4,
+    borderRadius: theme.spacing.tiny, // A slightly smaller border radius
     backgroundColor: theme.colors.surface,
-    fontSize: 16,
+    fontSize: 14,
+    marginBottom: theme.spacing.small,
   } as ViewStyle,
   component_link: {
     color: theme.colors.primary,
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
   common_screen_auth_form: {
     width: '100%',
     maxWidth: 400,
-    padding: theme.spacing.large,
+    padding: theme.spacing.medium, // Reduced from 'large' to 'medium'
   } as ViewStyle,
   common_screen_auth_header: {
     marginBottom: theme.spacing.large + theme.spacing.small,
