@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, ButtonProps } from 'react-native-paper';
 import { StyleProp, ViewStyle } from 'react-native';
-import styles from '../config/styles';
+import buttonStyles from '../config/button.styles';
 
 type ButtonStyle = StyleProp<ViewStyle>;
 
@@ -17,15 +17,18 @@ export default function EnhancedButton({
   fullWidth,
   ...props
 }: EnhancedButtonProps) {
-  const baseStyle: ButtonStyle = mode === 'contained'
-    ? styles.button_contained
-    : mode === 'outlined'
-      ? styles.button_outlined
+  const baseStyle: ButtonStyle =
+    mode === 'contained'
+      ? buttonStyles.button_contained
+      : mode === 'outlined'
+      ? buttonStyles.button_outlined
       : undefined;
 
-  const shapeStyle: ButtonStyle = mode === 'contained' || mode === 'outlined'
-    ? styles.button_primary
-    : undefined;
+  // Reuse the primary style for contained/outlined buttons
+  const shapeStyle: ButtonStyle =
+    mode === 'contained' || mode === 'outlined'
+      ? buttonStyles.button_primary
+      : undefined;
 
   const fullWidthStyle: ButtonStyle = fullWidth ? { width: '100%' } : undefined;
 
@@ -36,7 +39,5 @@ export default function EnhancedButton({
     style,
   ].filter(Boolean);
 
-  return (
-    <Button mode={mode} style={buttonStyle} {...props} />
-  );
+  return <Button mode={mode} style={buttonStyle} {...props} />;
 }

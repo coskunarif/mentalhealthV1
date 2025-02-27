@@ -4,7 +4,7 @@ import { Card, Text, TextInput, HelperText, Button, Divider } from 'react-native
 import { DatePickerModal } from 'react-native-paper-dates';
 import type { PersonalInformation } from '../types/personalInformation';
 import { theme } from '../config/theme';
-import globalStyles from '../config/global.styles';
+import buttonStyles from '../config/button.styles';
 import styles from '../config/EditPersonalInfoForm.styles';
 
 interface EditPersonalInfoFormProps {
@@ -18,7 +18,6 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
 
-  // Improved phone number formatting - allows spaces for readability
   const formatPhoneNumber = (value: string): string => {
     let phone = value.replace(/[^\d+ ]/g, '');
     if (!phone.startsWith('+')) {
@@ -27,7 +26,6 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
     return phone.substring(0, 16);
   };
 
-  // Enhanced validation for all fields
   const validateField = (field: keyof PersonalInformation, value: string | undefined): string => {
     if (!value && field !== 'email') {
       return `${field === 'name' ? 'Name' : 'Field'} is required`;
@@ -45,9 +43,7 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
       case 'dateOfBirth': {
         if (!value) return '';
         const date = new Date(value);
-        return isNaN(date.getTime()) || date > new Date()
-          ? 'Enter a valid past date'
-          : '';
+        return isNaN(date.getTime()) || date > new Date() ? 'Enter a valid past date' : '';
       }
       default:
         return '';
@@ -143,7 +139,7 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({ info
         onPress={handleSubmit}
         loading={isSubmitting}
         disabled={isSubmitting}
-        style={[globalStyles.button_primary, styles.formSaveButton]}
+        style={[buttonStyles.button_primary, styles.formSaveButton]}
       >
         Save Changes
       </Button>

@@ -1,9 +1,8 @@
-// File: app/tabs/home.tsx
 import React from 'react';
 import { ScrollView } from 'react-native';
 import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
-import styles from '../config/styles';
+import { miscStyles, typographyStyles } from '../config';
 import RadarChart from '../components/RadarChart';
 import RecentActivities from '../components/RecentActivities';
 import ExerciseProgress from '../components/ExerciseProgress';
@@ -62,20 +61,20 @@ export default function Home() {
 
   return (
     <ScrollView
-      style={styles.screen_home_container}
+      style={miscStyles.screen_home_container}
       contentContainerStyle={{ padding: 16 }}
     >
       {/* Radar Chart Section */}
-      <Surface style={styles.home_sectionSurface}>
-        <Text variant="headlineMedium" style={styles.home_sectionTitle}>
+      <Surface style={miscStyles.home_sectionSurface}>
+        <Text variant="headlineMedium" style={miscStyles.home_sectionTitle}>
           Your Progress
         </Text>
         <RadarChart data={radarData} />
       </Surface>
 
       {/* Exercise Progress Section */}
-      <Surface style={styles.home_sectionSurface}>
-        <Text variant="headlineMedium" style={styles.home_sectionTitle}>
+      <Surface style={miscStyles.home_sectionSurface}>
+        <Text variant="headlineMedium" style={miscStyles.home_sectionTitle}>
           Exercise Progress
         </Text>
         <ExerciseProgress exercises={breathExercises} currentStep={nextExercise?.id} />
@@ -84,19 +83,19 @@ export default function Home() {
             mode="contained"
             onPress={handleStartExercise}
             style={{ marginTop: 16 }}
-            labelStyle={styles.text_button}
+            labelStyle={typographyStyles.text_button}
           >
             Start {nextExercise.title}
           </Button>
         )}
       </Surface>
 
-      {/* Quick Actions Section (now replaced by the reusable component) */}
+      {/* Quick Actions Section */}
       <QuickActions />
 
-      {/* Recent Activities Section (header provided by Home) */}
-      <Surface style={styles.home_sectionSurface}>
-        <Text variant="headlineMedium" style={styles.home_sectionTitle}>
+      {/* Recent Activities Section */}
+      <Surface style={miscStyles.home_sectionSurface}>
+        <Text variant="headlineMedium" style={miscStyles.home_sectionTitle}>
           Recent Activities
         </Text>
         <RecentActivities activities={recentActivities} />

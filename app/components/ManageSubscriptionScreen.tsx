@@ -3,7 +3,7 @@ import { View, ScrollView } from 'react-native';
 import { Text, List, Button, Surface, Divider, Snackbar, Dialog, Portal } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { theme } from '../config/theme';
-import globalStyles from '../config/global.styles';
+import { layoutStyles, typographyStyles, cardStyles, buttonStyles } from '../config';
 import styles from '../config/ManageSubscriptionScreen.styles';
 import { CustomAppBar } from './CustomAppBar';
 
@@ -27,7 +27,7 @@ export default function ManageSubscriptionScreen() {
     }
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setCurrentPlan(plan);
       setCurrentPrice(price);
       setSnackbar({ visible: true, message: `Successfully switched to ${plan}` });
@@ -41,7 +41,7 @@ export default function ManageSubscriptionScreen() {
   const handleCancelSubscription = async () => {
     setIsLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setCurrentPlan('No active plan');
       setCurrentPrice('');
       setShowCancelDialog(false);
@@ -54,25 +54,25 @@ export default function ManageSubscriptionScreen() {
   };
 
   return (
-    <View style={globalStyles.layout_container}>
+    <View style={layoutStyles.layout_container}>
       <CustomAppBar title="Subscription" />
-      <ScrollView contentContainerStyle={[globalStyles.layout_content, { paddingVertical: theme.spacing.small }]}>
-        <Text style={[globalStyles.text_subtitle, { marginBottom: theme.spacing.small }]}>
+      <ScrollView contentContainerStyle={[layoutStyles.layout_content, { paddingVertical: theme.spacing.small }]}>
+        <Text style={[typographyStyles.text_subtitle, { marginBottom: theme.spacing.small }]}>
           View and manage your subscription plan and billing details.
         </Text>
         <Surface style={styles.container} elevation={1}>
-          <Text style={[globalStyles.text_heading3, styles.sectionTitle]}>Current Plan</Text>
+          <Text style={[typographyStyles.text_heading3, styles.sectionTitle]}>Current Plan</Text>
           <List.Item
             title={currentPlan}
             description={currentPrice}
-            left={props => <List.Icon {...props} icon="star" />}
+            left={(props) => <List.Icon {...props} icon="star" />}
           />
           <Divider style={styles.divider} />
-          <Text style={[globalStyles.text_heading3, styles.sectionTitle]}>Available Plans</Text>
+          <Text style={[typographyStyles.text_heading3, styles.sectionTitle]}>Available Plans</Text>
           <List.Item
             title="Monthly Plan"
             description="$9.99/month"
-            left={props => <List.Icon {...props} icon="calendar" />}
+            left={(props) => <List.Icon {...props} icon="calendar" />}
             right={() => (
               <Button
                 mode="contained"
@@ -88,7 +88,7 @@ export default function ManageSubscriptionScreen() {
           <List.Item
             title="Annual Plan"
             description="$99.99/year (Save 17%)"
-            left={props => <List.Icon {...props} icon="calendar" />}
+            left={(props) => <List.Icon {...props} icon="calendar" />}
             titleStyle={styles.planTitle}
             descriptionStyle={styles.planDescription}
             right={() => (
@@ -104,16 +104,16 @@ export default function ManageSubscriptionScreen() {
             )}
           />
           <Divider style={styles.divider} />
-          <Text style={[globalStyles.text_heading3, styles.sectionTitle]}>Billing Information</Text>
+          <Text style={[typographyStyles.text_heading3, styles.sectionTitle]}>Billing Information</Text>
           <List.Item
             title="Next billing date"
             description={billingInfo.nextBillingDate}
-            left={props => <List.Icon {...props} icon="clock-outline" />}
+            left={(props) => <List.Icon {...props} icon="clock-outline" />}
           />
           <List.Item
             title="Payment method"
             description={billingInfo.paymentMethod}
-            left={props => <List.Icon {...props} icon="credit-card" />}
+            left={(props) => <List.Icon {...props} icon="credit-card" />}
           />
         </Surface>
         <Button

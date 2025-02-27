@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { View, ScrollView, TouchableOpacity, Dimensions, ViewStyle } from 'react-native';
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+  ViewStyle,
+} from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import localStyles from '../config/MoodPyramid.styles';
-import styles from '../config/styles';
+import { typographyStyles, buttonStyles } from '../config';
 import { theme } from '../config/theme';
 
 type Emotion = {
@@ -71,7 +77,12 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
         style={[localStyles.layout_scrollView, { padding: theme.spacing.medium }]}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <Text style={[styles.header_shadow, { textAlign: 'center', color: theme.colors.primary }]}>
+        <Text
+          style={[
+            typographyStyles.header_shadow,
+            { textAlign: 'center', color: theme.colors.primary },
+          ]}
+        >
           Identify the emotions to focus on
         </Text>
         <View style={localStyles.pyramid_container}>
@@ -97,13 +108,24 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
             </TouchableOpacity>
           ))}
         </View>
-        <Text style={[
-          theme.fonts.bodySmall,
-          { textAlign: 'center', marginTop: theme.spacing.small, color: theme.colors.onSurfaceVariant },
-        ]}>
+        <Text
+          style={[
+            theme.fonts.bodySmall,
+            {
+              textAlign: 'center',
+              marginTop: theme.spacing.small,
+              color: theme.colors.onSurfaceVariant,
+            },
+          ]}
+        >
           Tap up to 3 emotions to focus on your mindfulness journey.
         </Text>
-        <Text style={[styles.header_shadow, { textAlign: 'left', color: theme.colors.primary }]}>
+        <Text
+          style={[
+            typographyStyles.header_shadow,
+            { textAlign: 'left', color: theme.colors.primary },
+          ]}
+        >
           Focus Emotions
         </Text>
         <View style={localStyles.pyramid_bubbleContainer}>
@@ -132,14 +154,25 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
               ]}
             >
               {selectedEmotions[index] ? (
-                <Text style={[localStyles.pyramid_bubbleText, { fontSize: config.fontSize }]}>
+                <Text
+                  style={[
+                    localStyles.pyramid_bubbleText,
+                    { fontSize: config.fontSize },
+                  ]}
+                >
                   {selectedEmotions[index].label}
                 </Text>
               ) : (
-                <Text style={[
-                  styles.text_heading3,
-                  { fontSize: config.fontSize * 0.8, color: theme.colors.primary, textAlign: 'center' },
-                ]}>
+                <Text
+                  style={[
+                    typographyStyles.text_heading3,
+                    {
+                      fontSize: config.fontSize * 0.8,
+                      color: theme.colors.primary,
+                      textAlign: 'center',
+                    },
+                  ]}
+                >
                   Focus{'\n'}Emotions
                 </Text>
               )}
@@ -151,7 +184,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
         <Button
           mode="outlined"
           onPress={onPrevious}
-          style={[localStyles.mood_button, styles.button_outlined, { width: '48%' }]}
+          style={[localStyles.mood_button, buttonStyles.button_outlined, { width: '48%' }]}
           labelStyle={localStyles.mood_buttonText}
           accessibilityLabel="Proceed to select focus emotions"
         >
@@ -160,7 +193,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
         <Button
           mode="contained"
           onPress={onFinish}
-          style={[localStyles.mood_button, styles.button_contained, { width: '48%' }]}
+          style={[localStyles.mood_button, buttonStyles.button_contained, { width: '48%' }]}
           labelStyle={[localStyles.mood_buttonText, { color: theme.colors.onPrimary }]}
           accessibilityLabel="Complete mood selection and return to previous screen"
         >

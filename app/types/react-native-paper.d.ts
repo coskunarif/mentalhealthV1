@@ -5,6 +5,6 @@ declare module 'react-native-paper' {
     shape: {
       borderRadius: number;
     };
-    // You can also merge any other custom properties if needed.
+    // Merge any other custom properties if needed.
   }
 }

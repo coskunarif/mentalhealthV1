@@ -6,12 +6,14 @@ import { PaperProvider } from 'react-native-paper';
 import { AuthProvider } from './context/auth';
 import { theme } from './config/theme';
 import ErrorBoundary from './components/ErrorBoundary';
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-
-// Keep the splash screen visible while we fetch resources
+import { layoutStyles } from './config';
+// Remove explicit import from '@react-navigation/native-stack'
+ 
+// Keep the splash screen visible while resources load
 SplashScreen.preventAutoHideAsync();
 
-const commonScreenOptions = {
+// Cast options as any to bypass type conflicts
+const commonScreenOptions: any = {
   headerShown: false,
 };
 
@@ -44,22 +46,10 @@ export default function RootLayout() {
       <PaperProvider theme={theme}>
         <AuthProvider>
           <Stack screenOptions={commonScreenOptions}>
-            {/* Initial Route */}
             <Stack.Screen name="index" options={{ headerShown: false }} />
-            
-            {/* Welcome Screen */}
             <Stack.Screen name="welcome" options={{ headerShown: false }} />
-            
-            {/* Auth Stack */}
             <Stack.Screen name="auth" options={{ headerShown: false }} />
-            
-            {/* Main Navigation */}
-            <Stack.Screen 
-              name="tabs" 
-              options={{ headerShown: false }}
-            />
-            
-            {/* Modal Screens */}
+            <Stack.Screen name="tabs" options={{ headerShown: false }} />
             <Stack.Screen
               name="survey"
               options={{
@@ -85,8 +75,6 @@ export default function RootLayout() {
                 presentation: 'modal',
               }}
             />
-
-            {/* Error Screen */}
             <Stack.Screen
               name="not-found"
               options={{

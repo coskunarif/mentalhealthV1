@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("Auth state changed:", {
         userId: user?.uid,
         isAuthenticated: !!user,
-        previouslyInitialized: initialized
+        previouslyInitialized: initialized,
       });
       setUser(user);
       setInitialized(true);
@@ -49,38 +49,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log("Starting sign-out process");
       console.log("Current user:", auth.currentUser?.uid);
-
-      // Sign out from Firebase
       console.log("Calling auth.signOut()");
       await auth.signOut();
       console.log("auth.signOut() completed");
-
       console.log(`Clearing AsyncStorage key: ${persistenceKey}`);
       await AsyncStorage.removeItem(persistenceKey);
       console.log("Firebase persistence key removed");
-
-      // Verify auth state
       console.log("Verifying auth state after sign-out");
       console.log("Current auth state:", {
         currentUser: auth.currentUser?.uid,
-        isSignedIn: !!auth.currentUser
+        isSignedIn: !!auth.currentUser,
       });
-
-      // Reset user state
       console.log("Resetting user state");
       setUser(null);
-      
       console.log("Sign-out process completed successfully");
-      
-    } catch (error: any) { // Type assertion for error object
+    } catch (error: any) {
       console.error('Error signing out:', error);
       console.error('Error details:', {
         name: error?.name,
         message: error?.message,
         code: error?.code,
-        stack: error?.stack
+        stack: error?.stack,
       });
-      throw error; // Propagate error to be handled by the UI
+      throw error;
     }
   };
 
@@ -99,5 +90,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export default {
   useAuth,
-  AuthProvider
-}
+  AuthProvider,
+};

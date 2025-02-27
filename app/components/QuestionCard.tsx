@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { Text, RadioButton, Surface } from 'react-native-paper';
-import styles from '../config/styles';
+import { cardStyles, typographyStyles } from '../config';
 import type { AppTheme } from '../types/theme';
 import { useTheme } from 'react-native-paper';
 
@@ -19,7 +19,7 @@ export default function QuestionCard({ options, selectedOption, onSelect }: Ques
   };
 
   return (
-    <Surface style={[styles.component_card_elevated, { marginBottom: 24 }]}>
+    <Surface style={[cardStyles.component_card_elevated, { marginBottom: 24 }]}>
       <RadioButton.Group onValueChange={handleOptionSelect} value={selectedOption}>
         {options.map(option => (
           <RadioButton.Item

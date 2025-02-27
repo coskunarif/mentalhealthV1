@@ -1,12 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import {
-  View,
-  Animated,
-  Easing,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
+import { View, Animated, Easing, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { Text, IconButton, Surface, useTheme } from 'react-native-paper';
 import { Audio, AVPlaybackStatus, AVPlaybackStatusError } from 'expo-av';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -40,17 +33,9 @@ const createStyles = (theme: AppTheme) =>
       paddingTop: 24,
       paddingBottom: 16,
     } as ViewStyle,
-    headerText: {
-      marginLeft: 16,
-    } as ViewStyle,
-    title: {
-      ...theme.fonts.headlineMedium,
-      color: theme.colors.onSurface,
-    } as TextStyle,
-    subtitle: {
-      ...theme.fonts.bodyMedium,
-      color: theme.colors.onSurfaceVariant,
-    } as TextStyle,
+    headerText: { marginLeft: 16 } as ViewStyle,
+    title: { ...theme.fonts.headlineMedium, color: theme.colors.onSurface } as TextStyle,
+    subtitle: { ...theme.fonts.bodyMedium, color: theme.colors.onSurfaceVariant } as TextStyle,
     content: {
       flex: 1,
       alignItems: 'center',
@@ -65,9 +50,7 @@ const createStyles = (theme: AppTheme) =>
       opacity: 0.8,
       marginBottom: 16,
     } as ViewStyle,
-    mandala: {
-      position: 'absolute',
-    } as ViewStyle,
+    mandala: { position: 'absolute' } as ViewStyle,
     timerContainer: {
       position: 'relative',
       width: TIMER_SIZE,
@@ -80,22 +63,10 @@ const createStyles = (theme: AppTheme) =>
       position: 'absolute',
       transform: [{ rotate: '-90deg' }],
     } as ViewStyle,
-    timerText: {
-      alignItems: 'center',
-    } as ViewStyle,
-    currentTime: {
-      ...theme.fonts.displayLarge,
-      color: theme.colors.onSurface,
-    } as TextStyle,
-    totalTime: {
-      ...theme.fonts.titleMedium,
-      color: theme.colors.onSurfaceVariant,
-      marginTop: 8,
-    } as TextStyle,
-    controls: {
-      alignItems: 'center',
-      marginTop: 8,
-    } as ViewStyle,
+    timerText: { alignItems: 'center' } as ViewStyle,
+    currentTime: { ...theme.fonts.displayLarge, color: theme.colors.onSurface } as TextStyle,
+    totalTime: { ...theme.fonts.titleMedium, color: theme.colors.onSurfaceVariant, marginTop: 8 } as TextStyle,
+    controls: { alignItems: 'center', marginTop: 8 } as ViewStyle,
     playButton: {
       backgroundColor: theme.colors.surfaceVariant,
       borderRadius: 36,
@@ -103,6 +74,7 @@ const createStyles = (theme: AppTheme) =>
       padding: 8,
     } as ViewStyle,
   });
+
 
 export default function PlayerScreen() {
   const soundRef = useRef<Audio.Sound | null>(null);

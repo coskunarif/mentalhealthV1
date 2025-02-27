@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Pressable } from 'react-native';
 import { Text, Surface, useTheme } from 'react-native-paper';
 import { Link } from 'expo-router';
-import styles from '../config/styles';
+import { cardStyles, miscStyles, typographyStyles } from '../config';
 import type { AppTheme } from '../types/theme';
 
 interface Activity {
@@ -20,17 +20,36 @@ interface RecentActivitiesProps {
 export default function RecentActivities({ activities }: RecentActivitiesProps) {
   const theme = useTheme<AppTheme>();
   return (
-    <View style={styles.recentActivities_container}>
-      <Surface style={[styles.component_card_container, styles.recentActivities_surface]}>
+    <View style={miscStyles.recentActivities_container}>
+      <Surface style={[cardStyles.component_card_container, miscStyles.recentActivities_container]}>
         {activities.map((activity, index) => (
-          <Link key={activity.id} href={{ pathname: "/player", params: { meditationId: activity.id, title: activity.title, subtitle: activity.subtitle, returnTo: 'tabs/home' }}} asChild>
+          <Link
+            key={activity.id}
+            href={{
+              pathname: "/player",
+              params: {
+                meditationId: activity.id,
+                title: activity.title,
+                subtitle: activity.subtitle,
+                returnTo: 'tabs/home',
+              },
+            }}
+            asChild
+          >
             <Pressable>
-              <View style={[styles.recentActivities_item, index < activities.length - 1 && styles.recentActivities_itemBorder]}>
+              <View style={[
+                miscStyles.recentActivities_item,
+                index < activities.length - 1 && miscStyles.recentActivities_itemBorder,
+              ]}>
                 <View>
-                  <Text style={styles.text_body}>{activity.title}</Text>
-                  <Text style={[styles.text_caption, { color: theme.colors.secondary }]}>{activity.subtitle}</Text>
+                  <Text style={typographyStyles.text_body}>{activity.title}</Text>
+                  <Text style={{ ...typographyStyles.text_caption, color: theme.colors.secondary }}>
+                    {activity.subtitle}
+                  </Text>
                 </View>
-                <Text style={[styles.text_caption, { color: theme.colors.secondary }]}>{activity.duration.toFixed(1)} min</Text>
+                <Text style={{ ...typographyStyles.text_caption, color: theme.colors.secondary }}>
+                  {activity.duration.toFixed(1)} min
+                </Text>
               </View>
             </Pressable>
           </Link>

@@ -1,16 +1,10 @@
-// File: app/survey.tsx
 import React, { useState, useEffect } from 'react';
 import { ScrollView, LayoutAnimation } from 'react-native';
-import {
-  Text,
-  Button,
-  ProgressBar,
-  Surface,
-  useTheme,
-} from 'react-native-paper';
+import { Text, Button, ProgressBar, Surface, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import QuestionCard from './components/QuestionCard';
 import { CustomAppBar } from './components/CustomAppBar';
+import { layoutStyles, typographyStyles, buttonStyles } from './config';
 
 const questions = [
   {
@@ -55,39 +49,31 @@ export default function SurveyScreen() {
   const progress = (currentQuestion + 1) / totalQuestions;
   const router = useRouter();
 
-  // Animate in on initial render
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, []);
 
-  // Handle when a user selects an option
   const handleAnswer = (answer: string) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-
-    setAnswers((prevAnswers) => {
-      const newAnswers = [...prevAnswers];
+    setAnswers((prev) => {
+      const newAnswers = [...prev];
       newAnswers[currentQuestion] = answer;
       return newAnswers;
     });
-
-    // Automatically proceed to the next question (if not at the last question)
     if (currentQuestion < totalQuestions - 1) {
       setCurrentQuestion((prev) => prev + 1);
     }
   };
 
-  // Finish the survey at any point
   const handleFinishSurvey = () => {
-    // TODO: handle partial or complete survey submission logic here
-    router.push('/tabs'); // or navigate to a "Survey Complete" screen
+    router.push('/tabs'); // Navigate to main tabs (or a dedicated "survey complete" screen)
   };
 
   return (
     <>
       <CustomAppBar title="Daily Survey" />
-
       <ScrollView
-        style={{ flex: 1, backgroundColor: theme.colors.background }}
+        style={layoutStyles.layout_container}
         contentContainerStyle={{ padding: 16 }}
       >
         <Surface
@@ -98,12 +84,9 @@ export default function SurveyScreen() {
             marginBottom: 16,
           }}
         >
-          {/* Display the current question text */}
           <Text variant="titleLarge" style={{ marginBottom: 8 }}>
             {questions[currentQuestion].text}
           </Text>
-
-          {/* Render only the options in QuestionCard */}
           <QuestionCard
             options={questions[currentQuestion].options}
             selectedOption={answers[currentQuestion]}
@@ -111,24 +94,13 @@ export default function SurveyScreen() {
               handleAnswer(questions[currentQuestion].options[index])
             }
           />
-
-          {/* Show progress bar */}
           <ProgressBar
             progress={progress}
             color={theme.colors.primary}
             style={{ marginTop: 16, height: 8, borderRadius: 4 }}
           />
         </Surface>
-
-        {/*
-          "Finish Survey" button is always visible,
-          allowing users to submit partial or complete answers.
-        */}
-        <Button
-          mode="contained"
-          onPress={handleFinishSurvey}
-          style={{ marginBottom: 16 }}
-        >
+        <Button mode="contained" onPress={handleFinishSurvey} style={{ marginBottom: 16 }}>
           Finish Survey
         </Button>
       </ScrollView>

@@ -52,60 +52,51 @@ export const LanguageRegionSettings: React.FC<LanguageRegionSettingsProps> = ({
     }
   };
 
-  const filteredLanguages = languages.filter(lang =>
+  const filteredLanguages = languages.filter((lang) =>
     lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     lang.nativeName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getCurrentLanguageName = () => {
-    const lang = languages.find(l => l.code === currentLanguage);
+    const lang = languages.find((l) => l.code === currentLanguage);
     return lang ? `${lang.name} (${lang.nativeName})` : 'English';
   };
 
   return (
     <>
-    <Surface style={styles.container} elevation={1}>
-      <List.Section>
-        <List.Item
+      <Surface style={styles.container} elevation={1}>
+        <List.Section>
+          <List.Item
             title="Language"
             description={getCurrentLanguageName()}
             onPress={showModal}
-            right={props => <List.Icon {...props} icon="chevron-right" />}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
             titleStyle={styles.itemTitle}
             descriptionStyle={styles.itemDescription}
           />
-      </List.Section>
-    </Surface>
+        </List.Section>
+      </Surface>
 
       <Portal>
-        <Modal
-          visible={modalVisible}
-          onDismiss={hideModal}
-          contentContainerStyle={styles.modalContainer}
-        >
+        <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer}>
           <Title style={styles.modalTitle}>Select Language</Title>
-          
           <Searchbar
             placeholder="Search languages..."
             onChangeText={setSearchQuery}
             value={searchQuery}
             style={styles.searchbar}
           />
-
           <RadioButton.Group
-            onValueChange={value => !isSubmitting && handleLanguageSelect(value)}
+            onValueChange={(value) => !isSubmitting && handleLanguageSelect(value)}
             value={currentLanguage}
           >
-            {filteredLanguages.map(lang => (
+            {filteredLanguages.map((lang) => (
               <List.Item
                 key={lang.code}
                 title={`${lang.name} (${lang.nativeName})`}
                 onPress={() => !isSubmitting && handleLanguageSelect(lang.code)}
                 right={() => (
-                  <RadioButton
-                    value={lang.code}
-                    disabled={isSubmitting}
-                  />
+                  <RadioButton value={lang.code} disabled={isSubmitting} />
                 )}
                 titleStyle={styles.languageItem}
               />
