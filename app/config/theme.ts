@@ -2,6 +2,15 @@ import { configureFonts, MD3Colors } from 'react-native-paper';
 import type { AppTheme } from '../types/theme';
 import { MD3Typescale, MD3Type } from 'react-native-paper/lib/typescript/types';
 
+// Helper function to create opacity variants
+const withOpacity = (color: string, opacity: number) => {
+  // Convert hex to rgba
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+};
+
 const fontConfig: Partial<Record<keyof MD3Typescale, MD3Type>> = {
   titleMedium: {
     fontFamily: 'Nunito',
@@ -173,12 +182,12 @@ export const theme: AppTheme = {
     onSurfaceDisabled: 'rgba(28, 27, 31, 0.38)',
     backdrop: 'rgba(45, 48, 56, 0.4)',
     elevation: {
-      level0: 'transparent',
-      level1: '#F7F2FA',
-      level2: '#F0F0F0', // Was using this one
-      level3: '#E7E0EC',
-      level4: '#E3DDE9',
-      level5: '#DFDAE7',
+      level0: 0,
+      level1: 1,
+      level2: 2, // Was using this one
+      level3: 3,
+      level4: 4,
+      level5: 5,
     }
   },
   spacing: {
@@ -227,4 +236,5 @@ export const theme: AppTheme = {
   dark: false,
   scaleFont: (size: number) => size,
   scaleSize: (size: number) => size,
+  withOpacity,
 };

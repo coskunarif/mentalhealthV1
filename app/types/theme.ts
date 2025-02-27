@@ -45,12 +45,12 @@ interface MD3Colors {
     onSurfaceVariant: string;
     onBackground: string;
     elevation: {
-      level0: string;
-      level1: string;
-      level2: string;
-      level3: string;
-      level4: string;
-      level5: string;
+      level0: any;
+      level1: any;
+      level2: any;
+      level3: any;
+      level4: any;
+      level5: any;
     }
 }
 
@@ -93,6 +93,7 @@ export interface AppTheme extends MD3Theme {
   };
   scaleFont: (size: number) => number;
   scaleSize: (size: number) => number;
+  withOpacity: (color: string, opacity: number) => string;
 }
 
 export interface PlayerTheme {

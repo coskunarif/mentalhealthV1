@@ -1,10 +1,8 @@
 import { StyleSheet } from 'react-native';
 import type { FlexAlignType, TextStyle, ViewStyle } from 'react-native';
 import { theme } from '../config/theme';
-import colors from './colors';
 
 const styles = StyleSheet.create({
-  // colors: theme.colors, // No need to include colors here
   layout_container: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -16,10 +14,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     paddingHorizontal: theme.spacing.medium,
     paddingVertical: theme.spacing.medium - 4,
-    elevation: 2,
+    elevation: theme.colors.elevation.level2,
     flexDirection: 'row',
     alignItems: 'center',
-  } as ViewStyle,
+  },
   layout_header: {
     flexDirection: 'row' as const,
     alignItems: 'center' as FlexAlignType,
