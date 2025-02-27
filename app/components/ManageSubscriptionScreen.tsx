@@ -135,7 +135,8 @@ export default function ManageSubscriptionScreen() {
             title="Payment method"
             description={billingInfo.paymentMethod}
             left={props => <List.Icon {...props} icon="credit-card" />}
-            onPress={() => router.push('/components/UpdatePaymentScreen')}
+            // TODO: Investigate UpdatePaymentScreen - file doesn't exist
+            // onPress={() => router.push('/components/UpdatePaymentScreen')}
           />
         </Surface>
 
