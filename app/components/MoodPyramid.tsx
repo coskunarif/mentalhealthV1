@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, ScrollView, TouchableOpacity, DimensionValue, ViewStyle, Dimensions } from 'react-native';
+import { View, ScrollView, TouchableOpacity, Dimensions, ViewStyle } from 'react-native';
 import { Text, Button } from 'react-native-paper';
-import { theme } from '../config/theme';
+import localStyles from '../config/MoodPyramid.styles';
 import styles from '../config/styles';
+import { theme } from '../config/theme';
 
 type Emotion = {
   label: string;
@@ -24,35 +25,22 @@ const getBubbleConfig = (screenWidth: number) => [
   {
     size: theme.scaleSize(162),
     fontSize: theme.scaleFont(18),
-    style: {
-      left: screenWidth * 0.07,
-      top: 1,
-      zIndex: 1,
-    }
+    style: { left: screenWidth * 0.07, top: 1, zIndex: 1 },
   },
   {
     size: theme.scaleSize(132),
     fontSize: theme.scaleFont(15),
-    style: {
-      right: screenWidth * 0.15,
-      top: 5,
-      zIndex: 1,
-    }
+    style: { right: screenWidth * 0.15, top: 5, zIndex: 1 },
   },
   {
     size: theme.scaleSize(110),
     fontSize: theme.scaleFont(13),
-    style: {
-      left: screenWidth * 0.385,
-      top: 130,
-      zIndex: 2,
-    }
+    style: { left: screenWidth * 0.385, top: 130, zIndex: 2 },
   },
 ];
 
 export function MoodPyramid({ onPrevious, onFinish }: Props) {
   const [selectedEmotions, setSelectedEmotions] = useState<EmotionSelection[]>([]);
-
   const emotions: Emotion[] = [
     { label: 'Peace', color: theme.moodColors.peace, width: '40%' },
     { label: 'Joy', color: theme.moodColors.joy, width: '55%' },
@@ -64,14 +52,10 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
   const bubbleConfig = getBubbleConfig(screenWidth);
 
   const handleEmotionSelect = (emotion: Emotion) => {
-    if (selectedEmotions.find(e => e.label === emotion.label)) {
+    if (selectedEmotions.some(e => e.label === emotion.label)) {
       setSelectedEmotions(prev => prev.filter(e => e.label !== emotion.label));
     } else if (selectedEmotions.length < 3) {
-      const newEmotion: EmotionSelection = {
-        label: emotion.label,
-        color: emotion.color
-      };
-      setSelectedEmotions(prev => [...prev, newEmotion]);
+      setSelectedEmotions(prev => [...prev, { label: emotion.label, color: emotion.color }]);
     }
   };
 
@@ -84,50 +68,57 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
-        style={[styles.layout_scrollView, { padding: theme.spacing.medium }]}
+        style={[localStyles.layout_scrollView, { padding: theme.spacing.medium }]}
         contentContainerStyle={{ paddingBottom: 100 }}
       >
-        <Text style={[styles.header_shadow, { textAlign: 'center', color: theme.colors.primary }]}>Identify the emotions to focus on</Text>
-
-        <View style={styles.pyramid_container}>
-          {emotions.map((emotion) => (
+        <Text style={[styles.header_shadow, { textAlign: 'center', color: theme.colors.primary }]}>
+          Identify the emotions to focus on
+        </Text>
+        <View style={localStyles.pyramid_container}>
+          {emotions.map(emotion => (
             <TouchableOpacity
               key={emotion.label}
               onPress={() => handleEmotionSelect(emotion)}
               accessibilityLabel={`Select emotion ${emotion.label}`}
               accessibilityRole="button"
               style={[
-                styles.pyramid_item,
+                localStyles.pyramid_item,
                 {
                   backgroundColor: emotion.color,
                   width: emotion.width,
                   ...(selectedEmotions.some(e => e.label === emotion.label) && {
                     borderWidth: 2,
-                    borderColor: '#E0E0E0'
-                  })
+                    borderColor: '#E0E0E0',
+                  }),
                 } as ViewStyle,
               ]}
             >
-              <Text style={styles.pyramid_text}>{emotion.label}</Text>
+              <Text style={localStyles.pyramid_text}>{emotion.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
-        {/* Tooltip added */}
-        <Text style={[theme.fonts.bodySmall, { textAlign: 'center', marginTop: theme.spacing.small, color: theme.colors.onSurfaceVariant }]}>
-            Tap up to 3 emotions to focus on your mindfulness journey.
+        <Text style={[
+          theme.fonts.bodySmall,
+          { textAlign: 'center', marginTop: theme.spacing.small, color: theme.colors.onSurfaceVariant },
+        ]}>
+          Tap up to 3 emotions to focus on your mindfulness journey.
         </Text>
-        <Text style={[styles.header_shadow, { textAlign: 'left', color: theme.colors.primary }]}>Focus Emotions</Text>
-        <View style={styles.pyramid_bubbleContainer}>
+        <Text style={[styles.header_shadow, { textAlign: 'left', color: theme.colors.primary }]}>
+          Focus Emotions
+        </Text>
+        <View style={localStyles.pyramid_bubbleContainer}>
           {bubbleConfig.map((config, index) => (
             <TouchableOpacity
               key={index}
               onPress={() => handleBubbleClick(index)}
-              accessibilityLabel={selectedEmotions[index] ?
-                `Remove ${selectedEmotions[index].label}` :
-                `Select focus emotion ${index + 1}`}
+              accessibilityLabel={
+                selectedEmotions[index]
+                  ? `Remove ${selectedEmotions[index].label}`
+                  : `Select focus emotion ${index + 1}`
+              }
               accessibilityRole="button"
               style={[
-                styles.pyramid_bubble,
+                localStyles.pyramid_bubble,
                 {
                   width: config.size,
                   height: config.size,
@@ -137,24 +128,17 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
                   justifyContent: 'center',
                   alignItems: 'center',
                 },
-                config.style // Use the dynamic style object
+                config.style,
               ]}
             >
               {selectedEmotions[index] ? (
-                <Text style={[
-                  styles.pyramid_bubbleText,
-                  { fontSize: config.fontSize }
-                ]}>
+                <Text style={[localStyles.pyramid_bubbleText, { fontSize: config.fontSize }]}>
                   {selectedEmotions[index].label}
                 </Text>
               ) : (
                 <Text style={[
                   styles.text_heading3,
-                  {
-                    fontSize: config.fontSize * 0.8,
-                    color: theme.colors.primary,
-                    textAlign: 'center'
-                  }
+                  { fontSize: config.fontSize * 0.8, color: theme.colors.primary, textAlign: 'center' },
                 ]}>
                   Focus{'\n'}Emotions
                 </Text>
@@ -163,20 +147,22 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
           ))}
         </View>
       </ScrollView>
-      <View style={styles.mood_buttonContainer}>
+      <View style={localStyles.mood_buttonContainer}>
         <Button
           mode="outlined"
           onPress={onPrevious}
-          style={[styles.mood_button, styles.button_outlined, { width: '48%' }]}
-          labelStyle={styles.mood_buttonText}
+          style={[localStyles.mood_button, styles.button_outlined, { width: '48%' }]}
+          labelStyle={localStyles.mood_buttonText}
+          accessibilityLabel="Proceed to select focus emotions"
         >
           Previous
         </Button>
         <Button
           mode="contained"
           onPress={onFinish}
-          style={[styles.mood_button, styles.button_contained, { width: '48%' }]}
-          labelStyle={[styles.mood_buttonText, { color: theme.colors.onPrimary }]}
+          style={[localStyles.mood_button, styles.button_contained, { width: '48%' }]}
+          labelStyle={[localStyles.mood_buttonText, { color: theme.colors.onPrimary }]}
+          accessibilityLabel="Complete mood selection and return to previous screen"
         >
           Finish
         </Button>

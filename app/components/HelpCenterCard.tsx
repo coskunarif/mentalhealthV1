@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, Linking, ViewStyle, TextStyle } from 'react-native';
+import { Linking } from 'react-native';
 import { Surface, List, Button, Text, Divider } from 'react-native-paper';
 import { theme } from '../config/theme';
+import styles from '../config/HelpCenterCard.styles';
 
 interface FAQ {
   question: string;
@@ -37,17 +38,9 @@ interface HelpCenterCardProps {
 export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({ onContactSupport }) => {
   const [expandedId, setExpandedId] = useState<string | false>(false);
 
-  const handleExpand = (id: string) => {
-    setExpandedId(expandedId === id ? false : id);
-  };
-
-  const handleEmailPress = () => {
-    Linking.openURL(`mailto:${supportEmail}`);
-  };
-
-  const handlePhonePress = () => {
-    Linking.openURL(`tel:${supportPhone}`);
-  };
+  const handleExpand = (id: string) => setExpandedId(expandedId === id ? false : id);
+  const handleEmailPress = () => Linking.openURL(`mailto:${supportEmail}`);
+  const handlePhonePress = () => Linking.openURL(`tel:${supportPhone}`);
 
   return (
     <Surface style={styles.container} elevation={1}>
@@ -67,9 +60,7 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({ onContactSupport
           </React.Fragment>
         ))}
       </List.Section>
-
       <Divider style={styles.sectionDivider} />
-
       <List.Section>
         <List.Subheader style={styles.subheader}>Contact Support</List.Subheader>
         <List.Item
@@ -90,74 +81,9 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({ onContactSupport
           descriptionStyle={styles.contactDescription}
         />
       </List.Section>
-
-      <Button
-        mode="contained"
-        onPress={onContactSupport}
-        icon="message"
-        style={styles.chatButton}
-      >
+      <Button mode="contained" onPress={onContactSupport} icon="message" style={styles.chatButton}>
         Start Live Chat
       </Button>
     </Surface>
   );
 };
-
-const styles = StyleSheet.create<{
-  container: ViewStyle;
-  subheader: TextStyle;
-  accordion: ViewStyle;
-  accordionTitle: TextStyle;
-  answerText: TextStyle;
-  contactTitle: TextStyle;
-  contactDescription: TextStyle;
-  divider: ViewStyle;
-  sectionDivider: ViewStyle;
-  chatButton: ViewStyle;
-}>({
-  container: {
-    marginHorizontal: theme.spacing.medium,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.shape.borderRadius,
-    elevation: 1,
-  },
-  subheader: {
-    ...theme.fonts.titleMedium,
-    color: theme.colors.primary,
-    paddingTop: theme.spacing.small,
-  },
-  accordion: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: theme.spacing.small,
-  },
-  accordionTitle: {
-    ...theme.fonts.bodyLarge,
-    color: theme.colors.onSurface,
-    fontWeight: '500',
-  },
-  answerText: {
-    ...theme.fonts.bodyMedium,
-    color: theme.colors.onSurfaceVariant,
-    padding: theme.spacing.small,
-    paddingTop: 0,
-    lineHeight: theme.fonts.bodyMedium.lineHeight * 0.9,
-  },
-  contactTitle: {
-    ...theme.fonts.bodyLarge,
-    color: theme.colors.onSurface,
-  },
-  contactDescription: {
-    ...theme.fonts.bodyMedium,
-    color: theme.colors.primary,
-  },
-  divider: {
-    backgroundColor: theme.colors.surfaceVariant,
-  },
-  sectionDivider: {
-    backgroundColor: theme.colors.surfaceVariant,
-    marginVertical: theme.spacing.medium,
-  },
-  chatButton: {
-    margin: theme.spacing.medium,
-  },
-});

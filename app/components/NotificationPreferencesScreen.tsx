@@ -10,11 +10,9 @@ export default function NotificationPreferencesScreen() {
 
   const handleToggle = async (settingId: string, value: boolean) => {
     try {
-      // TODO: Implement API call to update notification settings
       console.log('Updating notification setting:', settingId, value);
     } catch (error: any) {
       console.error('Failed to update notification settings:', error);
-      // You could show an error message here
     }
   };
 

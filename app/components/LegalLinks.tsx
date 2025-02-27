@@ -6,12 +6,10 @@ import { theme } from '../config/theme';
 
 export const LegalLinks: React.FC = () => {
   const router = useRouter();
-
   return (
     <Card style={styles.card}>
       <Card.Content>
         <Title style={styles.sectionTitle}>Legal Information</Title>
-
         <List.Section>
           <List.Item
             title="Privacy Policy"
@@ -20,7 +18,6 @@ export const LegalLinks: React.FC = () => {
             onPress={() => router.push('/legal/privacy')}
             titleStyle={styles.linkTitle}
           />
-          
           <List.Item
             title="Terms of Service"
             left={props => <List.Icon {...props} icon="file-document" />}
