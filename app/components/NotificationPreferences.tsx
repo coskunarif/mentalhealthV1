@@ -36,7 +36,9 @@ interface NotificationPreferencesProps {
   onToggle?: (settingId: string, value: boolean) => Promise<void>;
 }
 
-export const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({ onToggle }) => {
+export const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
+  onToggle,
+}) => {
   const [settings, setSettings] = useState<Record<string, boolean>>({
     reminders: true,
     progress: true,
@@ -47,23 +49,23 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
 
   const handleToggle = async (settingId: string) => {
     const newValue = !settings[settingId];
-    setIsSubmitting(prev => ({ ...prev, [settingId]: true }));
+    setIsSubmitting((prev) => ({ ...prev, [settingId]: true }));
     try {
       if (onToggle) {
         await onToggle(settingId, newValue);
       }
-      setSettings(prev => ({ ...prev, [settingId]: newValue }));
+      setSettings((prev) => ({ ...prev, [settingId]: newValue }));
     } catch (error) {
       // Handle error if needed
     } finally {
-      setIsSubmitting(prev => ({ ...prev, [settingId]: false }));
+      setIsSubmitting((prev) => ({ ...prev, [settingId]: false }));
     }
   };
 
   return (
     <Surface style={styles.container} elevation={1}>
       <List.Section>
-        {defaultSettings.map(setting => (
+        {defaultSettings.map((setting) => (
           <React.Fragment key={setting.id}>
             <List.Item
               title={setting.label}

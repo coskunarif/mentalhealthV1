@@ -4,7 +4,7 @@ import { Text, Button, Card, Modal } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import localStyles from '../config/MoodSelector.styles';
-import globalStyles from '../config/styles';
+import { layoutStyles, buttonStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
 import type { AppTheme } from '../types/theme';
 import { getMoodColorKey } from '../utils/helpers';
@@ -126,8 +126,12 @@ export function MoodSelector({
 
   const renderSliderCard = (mood: MoodType | null, isRelated = false) => {
     if (!mood) return null;
-    const sliderValue = isRelated ? relatedMoodValues[mood.label] || 0 : mainSliderValues[mood.label] || mood.value;
-    const sliderColor = isRelated ? relatedSliderColors[mood.label] || getSliderColor(0) : mainSliderColors[mood.label] || getSliderColor(sliderValue);
+    const sliderValue = isRelated
+      ? relatedMoodValues[mood.label] || 0
+      : mainSliderValues[mood.label] || mood.value;
+    const sliderColor = isRelated
+      ? relatedSliderColors[mood.label] || getSliderColor(0)
+      : mainSliderColors[mood.label] || getSliderColor(sliderValue);
     return (
       <Card
         key={mood.label}
@@ -137,7 +141,9 @@ export function MoodSelector({
         <Card.Content style={{ gap: theme.spacing.tiny }}>
           <View style={localStyles.mood_headerRow}>
             <MaterialCommunityIcons name={mood.icon} size={24} color={theme.moodColors[mood.key]} />
-            <Text style={[globalStyles.text_body, theme.fonts.bodyMedium]}>{mood.label}</Text>
+            <Text style={[typographyStyles.text_body, theme.fonts.bodyMedium]}>
+              {mood.label}
+            </Text>
           </View>
           <Slider
             value={sliderValue}
@@ -153,8 +159,8 @@ export function MoodSelector({
             style={{ height: theme.scaleFont(16) }}
           />
           <View style={[localStyles.mood_sliderLabels, { marginTop: -theme.spacing.tiny / 2 }]}>
-            <Text style={[globalStyles.text_caption, theme.fonts.labelSmall]}>Low</Text>
-            <Text style={[globalStyles.text_caption, theme.fonts.labelSmall]}>High</Text>
+            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>Low</Text>
+            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>High</Text>
           </View>
         </Card.Content>
       </Card>
@@ -171,7 +177,9 @@ export function MoodSelector({
         <Card.Content style={{ gap: theme.spacing.tiny }}>
           <View style={localStyles.mood_headerRow}>
             <MaterialCommunityIcons name="clock-outline" size={24} color={theme.colors.primary} />
-            <Text style={[globalStyles.text_body, theme.fonts.bodyMedium]}>How long</Text>
+            <Text style={[typographyStyles.text_body, theme.fonts.bodyMedium]}>
+              How long
+            </Text>
           </View>
           <Slider
             value={mood.duration}
@@ -185,9 +193,15 @@ export function MoodSelector({
             accessibilityLabel={`Set duration for ${mood.label}`}
           />
           <View style={[localStyles.mood_sliderLabels, { marginTop: -theme.spacing.tiny / 2 }]}>
-            <Text style={[globalStyles.text_caption, theme.fonts.labelSmall]}>{'< 3 months'}</Text>
-            <Text style={[globalStyles.text_caption, theme.fonts.labelSmall]}>6 months</Text>
-            <Text style={[globalStyles.text_caption, theme.fonts.labelSmall]}>{'> 1 year'}</Text>
+            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+              {'< 3 months'}
+            </Text>
+            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+              6 months
+            </Text>
+            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+              {'> 1 year'}
+            </Text>
           </View>
         </Card.Content>
       </Card>
@@ -197,10 +211,15 @@ export function MoodSelector({
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
-        style={[globalStyles.layout_scrollView, { padding: theme.spacing.medium }]}
+        style={[layoutStyles.layout_scrollView, { padding: theme.spacing.medium }]}
         contentContainerStyle={{ paddingBottom: theme.spacing.medium * 6.25 }}
       >
-        <Text style={[globalStyles.header_shadow, { textAlign: 'center', color: theme.colors.primary }]}>
+        <Text
+          style={[
+            typographyStyles.header_shadow,
+            { textAlign: 'center', color: theme.colors.primary },
+          ]}
+        >
           How are you feeling?
         </Text>
         <View style={localStyles.mood_gridContainer}>
@@ -227,7 +246,13 @@ export function MoodSelector({
               accessibilityState={{ selected: selectedMood?.label === mood.label }}
             >
               <MaterialCommunityIcons name={mood.icon} size={40} color={theme.moodColors[mood.key]} />
-              <Text style={[globalStyles.text_caption, theme.fonts.labelMedium, { marginTop: theme.spacing.tiny }]}>
+              <Text
+                style={[
+                  typographyStyles.text_caption,
+                  theme.fonts.labelMedium,
+                  { marginTop: theme.spacing.tiny },
+                ]}
+              >
                 {mood.label}
               </Text>
             </TouchableOpacity>
@@ -262,7 +287,7 @@ export function MoodSelector({
         <Button
           mode="outlined"
           onPress={onNext}
-          style={[localStyles.mood_button, globalStyles.button_outlined]}
+          style={[localStyles.mood_button, buttonStyles.button_outlined]}
           labelStyle={localStyles.mood_buttonText}
           accessibilityLabel="Proceed to select focus emotions"
         >
@@ -271,7 +296,7 @@ export function MoodSelector({
         <Button
           mode="contained"
           onPress={onFinish}
-          style={[localStyles.mood_button, globalStyles.button_contained]}
+          style={[localStyles.mood_button, buttonStyles.button_contained]}
           labelStyle={[localStyles.mood_buttonText, { color: theme.colors.onPrimary }]}
           accessibilityLabel="Complete mood selection and return to previous screen"
         >

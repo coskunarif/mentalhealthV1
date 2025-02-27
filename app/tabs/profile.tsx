@@ -5,7 +5,7 @@ import type { PersonalInformation } from '../types/personalInformation';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import styles from '../config/styles';
+import { layoutStyles, miscStyles, typographyStyles, buttonStyles } from '../config';
 import { theme } from '../config/theme';
 
 export default function ProfileScreen() {
@@ -14,33 +14,25 @@ export default function ProfileScreen() {
   const [error, setError] = useState<string | null>(null);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const router = useRouter();
-  
-  // User stats - in a real app, these would come from your backend
+
+  // Simulated user stats
   const [userStats, setUserStats] = useState({
     sessions: 12,
     streak: 5,
-    surveys: 8
+    surveys: 8,
   });
   
-  // Subscription status - in a real app, this would come from your backend
+  // Simulated subscription status
   const [subscriptionStatus, setSubscriptionStatus] = useState('Active');
 
-  // Simulate fetching user stats and subscription status
   useEffect(() => {
-    // This would be an API call in a real app
     const fetchUserData = async () => {
       try {
-        // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // In a real app, you would fetch this data from your backend
-        // setUserStats(response.data.stats);
-        // setSubscriptionStatus(response.data.subscription.status);
       } catch (err) {
         console.error('Error fetching user data:', err);
       }
     };
-    
     fetchUserData();
   }, [user?.uid]);
 
@@ -58,7 +50,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const personalInfo = {
+  const personalInfo: PersonalInformation = {
     name: user?.displayName || "User Name",
     email: user?.email || "user@example.com",
     phoneNumber: "555-1234",
@@ -66,57 +58,55 @@ export default function ProfileScreen() {
   };
 
   return (
-    <View style={styles.layout_container}>
-      <ScrollView style={styles.layout_scrollView}>
+    <View style={layoutStyles.layout_container}>
+      <ScrollView style={layoutStyles.layout_scrollView}>
         {/* Profile Header with Stats */}
-        <Surface style={styles.profile_header} elevation={2}>
-          <View style={styles.profile_headerContent}>
+        <Surface style={miscStyles.profile_header} elevation={2}>
+          <View style={miscStyles.profile_headerContent}>
             <MaterialCommunityIcons 
               name="account-circle" 
               size={80} 
               color={theme.colors.primary} 
             />
-            <View style={[styles.profile_headerText, { marginLeft: theme.spacing.medium }]}>
-              <Text style={[styles.text_heading2, styles.profile_name]}>
+            <View style={[miscStyles.profile_headerText, { marginLeft: theme.spacing.medium }]}>
+              <Text style={[typographyStyles.text_heading2, miscStyles.profile_name]}>
                 {personalInfo.name}
               </Text>
-              <Text style={styles.profile_email}>
+              <Text style={miscStyles.profile_email}>
                 {personalInfo.email}
               </Text>
             </View>
           </View>
 
           {/* Mental Health Stats */}
-          <View style={[styles.profile_statsContainer, { justifyContent: 'space-around' }]}>
-            <View style={styles.profile_statItem}>
-              <Text style={styles.profile_statNumber}>{userStats.sessions}</Text>
-              <Text style={styles.profile_statLabel}>Sessions</Text>
+          <View style={[miscStyles.profile_statsContainer, { justifyContent: 'space-around' }]}>
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats.sessions}</Text>
+              <Text style={miscStyles.profile_statLabel}>Sessions</Text>
             </View>
-            <View style={styles.profile_statItem}>
-              <Text style={styles.profile_statNumber}>{userStats.streak}</Text>
-              <Text style={styles.profile_statLabel}>Streak</Text>
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats.streak}</Text>
+              <Text style={miscStyles.profile_statLabel}>Streak</Text>
             </View>
-            <View style={styles.profile_statItem}>
-              <Text style={styles.profile_statNumber}>{userStats.surveys}</Text>
-              <Text style={styles.profile_statLabel}>Surveys</Text>
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats.surveys}</Text>
+              <Text style={miscStyles.profile_statLabel}>Surveys</Text>
             </View>
           </View>
 
           {/* Subscription Status */}
-          <View style={styles.profile_subscriptionStatus}>
-            <Text style={[styles.profile_statusLabel, theme.fonts.bodyMedium]}>
+          <View style={miscStyles.profile_subscriptionStatus}>
+            <Text style={[miscStyles.profile_statusLabel, theme.fonts.bodyMedium]}>
               Subscription Status:
             </Text>
-            <View style={[styles.profile_statusBadge, { 
-              backgroundColor: subscriptionStatus === 'Active' 
-                ? theme.colors.secondary 
-                : theme.colors.surfaceVariant 
-            }]}>
-              <Text style={[styles.profile_statusText, { 
-                color: subscriptionStatus === 'Active' 
-                  ? theme.colors.onSecondary 
-                  : theme.colors.onSurfaceVariant 
-              }]}>
+            <View style={[
+              miscStyles.profile_statusBadge,
+              { backgroundColor: subscriptionStatus === 'Active' ? theme.colors.secondary : theme.colors.surfaceVariant }
+            ]}>
+              <Text style={[
+                miscStyles.profile_statusText,
+                { color: subscriptionStatus === 'Active' ? theme.colors.onSecondary : theme.colors.onSurfaceVariant }
+              ]}>
                 {subscriptionStatus}
               </Text>
             </View>
@@ -124,8 +114,8 @@ export default function ProfileScreen() {
         </Surface>
 
         {/* Account Information */}
-        <Surface style={styles.profile_mainSection} elevation={1}>
-          <Text style={styles.profile_sectionTitle}>Account Information</Text>
+        <Surface style={miscStyles.profile_mainSection} elevation={1}>
+          <Text style={miscStyles.profile_sectionTitle}>Account Information</Text>
           <List.Section>
             <List.Item
               title="Edit Personal Information"
@@ -143,8 +133,8 @@ export default function ProfileScreen() {
         </Surface>
 
         {/* Options */}
-        <Surface style={styles.profile_mainSection} elevation={1}>
-          <Text style={styles.profile_sectionTitle}>Options</Text>
+        <Surface style={miscStyles.profile_mainSection} elevation={1}>
+          <Text style={miscStyles.profile_sectionTitle}>Options</Text>
           <List.Section>
             <List.Item
               title="Language & Region"
@@ -174,14 +164,14 @@ export default function ProfileScreen() {
         </Surface>
 
         {/* Sign Out Button */}
-        <Surface style={[styles.profile_mainSection, styles.profile_signOutSection]} elevation={1}>
+        <Surface style={[miscStyles.profile_mainSection, { marginBottom: 24 }]} elevation={1}>
           <Button
             mode="outlined"
             onPress={() => setShowSignOutDialog(true)}
             loading={isLoading}
             disabled={isLoading}
             icon="logout"
-            style={styles.profile_signOutButton}
+            style={{ margin: theme.spacing.medium }}
             labelStyle={theme.fonts.labelLarge}
           >
             {isLoading ? 'Signing Out...' : 'Sign Out'}
@@ -189,32 +179,24 @@ export default function ProfileScreen() {
         </Surface>
       </ScrollView>
 
-        {/* Sign Out Dialog */}
-        <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)}>
-          <Dialog.Title style={theme.fonts.titleLarge}>Sign Out</Dialog.Title>
-          <Dialog.Content>
-            <Text style={theme.fonts.bodyMedium}>
-              Are you sure you want to sign out?
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button 
-              onPress={() => setShowSignOutDialog(false)}
-              labelStyle={theme.fonts.labelLarge}
-            >
-              Cancel
-            </Button>
-            <Button 
-              onPress={() => {
-                setShowSignOutDialog(false);
-                handleSignOut();
-              }}
-              labelStyle={theme.fonts.labelLarge}
-            >
-              Sign Out
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
+      {/* Sign Out Dialog */}
+      <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)}>
+        <Dialog.Title style={theme.fonts.titleLarge}>Sign Out</Dialog.Title>
+        <Dialog.Content>
+          <Text style={theme.fonts.bodyMedium}>
+            Are you sure you want to sign out?
+          </Text>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={() => setShowSignOutDialog(false)} labelStyle={theme.fonts.labelLarge}>
+            Cancel
+          </Button>
+          <Button onPress={() => { setShowSignOutDialog(false); handleSignOut(); }} labelStyle={theme.fonts.labelLarge}>
+            Sign Out
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
+
       {/* Error Snackbar */}
       <Snackbar
         visible={!!error}

@@ -3,7 +3,7 @@ import { View, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
 import { HelpCenterCard } from './HelpCenterCard';
 import { useRouter } from 'expo-router';
-import globalStyles from '../config/styles';
+import { layoutStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
 import { CustomAppBar } from './CustomAppBar';
 
@@ -11,21 +11,24 @@ export default function HelpCenterScreen() {
   const router = useRouter();
 
   const handleContactSupport = () => {
-    // TODO: Implement live chat functionality
     console.log('Opening live chat');
   };
 
   return (
-    <View style={globalStyles.layout_container}>
+    <View style={layoutStyles.layout_container}>
       <CustomAppBar title="Help Center" />
-
       <ScrollView
         contentContainerStyle={[
-          globalStyles.layout_content,
-          { paddingVertical: theme.spacing.small }
+          layoutStyles.layout_content,
+          { paddingVertical: theme.spacing.small },
         ]}
       >
-        <Text style={[globalStyles.text_subtitle, { marginBottom: theme.spacing.small }]}>
+        <Text
+          style={[
+            typographyStyles.text_subtitle,
+            { marginBottom: theme.spacing.small },
+          ]}
+        >
           Find answers to FAQs or reach out to our support team.
         </Text>
         <HelpCenterCard onContactSupport={handleContactSupport} />

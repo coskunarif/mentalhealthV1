@@ -36,7 +36,6 @@ export default StyleSheet.create({
   mood_buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    padding: theme.spacing.medium,
   },
   mood_button: {
     borderRadius: theme.shape.borderRadius,

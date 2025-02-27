@@ -39,7 +39,9 @@ export default function RadarChart({
   const chartSize = size || Math.min(screenWidth - 32, 320);
   const chartLabels = labels || defaultLabels;
   if (data.length !== chartLabels.length) {
-    console.warn('RadarChart: data length and label length mismatch. Truncating or adjusting data.');
+    console.warn(
+      'RadarChart: data length and label length mismatch. Truncating or adjusting data.'
+    );
     data = data.slice(0, chartLabels.length);
   }
   const center = chartSize / 2;
@@ -87,7 +89,7 @@ export default function RadarChart({
     const words = chartLabels[index].split(' ');
     const lines: string[] = [];
     let currentLine = '';
-    words.forEach(word => {
+    words.forEach((word) => {
       const testLine = currentLine ? `${currentLine} ${word}` : word;
       if (testLine.length * 5 > maxWidth && currentLine) {
         lines.push(currentLine);
@@ -105,31 +107,73 @@ export default function RadarChart({
   for (let i = 1; i <= gridSteps; i++) {
     const gridRadius = (radius / gridSteps) * i;
     gridCircles.push(
-      <Circle key={`grid-circle-${i}`} cx={center} cy={center} r={gridRadius} stroke={gridColor} strokeWidth={gridStrokeWidth} fill="none" />
+      <Circle
+        key={`grid-circle-${i}`}
+        cx={center}
+        cy={center}
+        r={gridRadius}
+        stroke={gridColor}
+        strokeWidth={gridStrokeWidth}
+        fill="none"
+      />
     );
   }
 
   const radialLines = chartLabels.map((_, idx) => {
     const { x, y } = getCoordinates(1, idx);
-    return <Line key={`radial-line-${idx}`} x1={center} y1={center} x2={x} y2={y} stroke={gridColor} strokeWidth={gridStrokeWidth} />;
+    return (
+      <Line
+        key={`radial-line-${idx}`}
+        x1={center}
+        y1={center}
+        x2={x}
+        y2={y}
+        stroke={gridColor}
+        strokeWidth={gridStrokeWidth}
+      />
+    );
   });
 
   const points = data.map((item, idx) => getCoordinates(item.value, idx));
-  const pathData = points.map((p, idx) => (idx === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`)).join(' ') + ' Z';
+  const pathData =
+    points.map((p, idx) => (idx === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`)).join(' ') + ' Z';
 
   return (
     <View style={[styles.container, style]}>
       <Svg width={chartSize} height={chartSize}>
         {gridCircles}
         {radialLines}
-        <Path d={pathData} stroke={polygonStrokeColor} strokeWidth={strokeWidth} fill={polygonFillColor} fillOpacity={fillOpacity} />
+        <Path
+          d={pathData}
+          stroke={polygonStrokeColor}
+          strokeWidth={strokeWidth}
+          fill={polygonFillColor}
+          fillOpacity={fillOpacity}
+        />
         {points.map((point, idx) => (
-          <Circle key={`data-point-${idx}`} cx={point.x} cy={point.y} r={5} fill={pointColor} stroke={theme.colors.background} strokeWidth={2} accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`} />
+          <Circle
+            key={`data-point-${idx}`}
+            cx={point.x}
+            cy={point.y}
+            r={5}
+            fill={pointColor}
+            stroke={theme.colors.background}
+            strokeWidth={2}
+            accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`}
+          />
         ))}
         {chartLabels.map((_, idx) => {
           const { x, y, textAnchor, xOffset, yOffset, lines } = getLabelLayout(idx);
           return lines.map((line, lineIndex) => (
-            <SvgText key={`label-${idx}-line-${lineIndex}`} x={x + xOffset} y={y + yOffset + lineIndex * 12} fontSize={10} fill={theme.colors.onSurfaceVariant} fontFamily={theme.fonts.bodyMedium.fontFamily} textAnchor={textAnchor}>
+            <SvgText
+              key={`label-${idx}-line-${lineIndex}`}
+              x={x + xOffset}
+              y={y + yOffset + lineIndex * 12}
+              fontSize={10}
+              fill={theme.colors.onSurfaceVariant}
+              fontFamily={theme.fonts.bodyMedium.fontFamily}
+              textAnchor={textAnchor}
+            >
               {line}
             </SvgText>
           ));

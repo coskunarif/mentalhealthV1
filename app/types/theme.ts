@@ -12,48 +12,47 @@ export interface ChartColors {
 }
 
 interface MD3Colors {
-    primary: string;
-    onPrimary: string;
-    primaryContainer: string;
-    onPrimaryContainer: string;
-    secondary: string;
-    onSecondary: string;
-    background: string;
-    surface: string;
-    surfaceVariant: string;
-    error: string;
-    onError: string;
-    errorContainer: string;
-    onErrorContainer: string;
-    outline: string;
-    secondaryContainer: string;
-    onSecondaryContainer: string;
-    tertiary: string;
-    onTertiary: string;
-    tertiaryContainer: string;
-    onTertiaryContainer: string;
-    outlineVariant: string;
-    shadow: string;
-    scrim: string;
-    inverseSurface: string;
-    inverseOnSurface: string;
-    inversePrimary: string;
-    surfaceDisabled: string;
-    onSurfaceDisabled: string;
-    backdrop: string;
-    onSurface: string;
-    onSurfaceVariant: string;
-    onBackground: string;
-    elevation: {
-      level0: any;
-      level1: any;
-      level2: any;
-      level3: any;
-      level4: any;
-      level5: any;
-    }
+  primary: string;
+  onPrimary: string;
+  primaryContainer: string;
+  onPrimaryContainer: string;
+  secondary: string;
+  onSecondary: string;
+  background: string;
+  surface: string;
+  surfaceVariant: string;
+  error: string;
+  onError: string;
+  errorContainer: string;
+  onErrorContainer: string;
+  outline: string;
+  secondaryContainer: string;
+  onSecondaryContainer: string;
+  tertiary: string;
+  onTertiary: string;
+  tertiaryContainer: string;
+  onTertiaryContainer: string;
+  outlineVariant: string;
+  shadow: string;
+  scrim: string;
+  inverseSurface: string;
+  inverseOnSurface: string;
+  inversePrimary: string;
+  surfaceDisabled: string;
+  onSurfaceDisabled: string;
+  backdrop: string;
+  onSurface: string;
+  onSurfaceVariant: string;
+  onBackground: string;
+  elevation: {
+    level0: any;
+    level1: any;
+    level2: any;
+    level3: any;
+    level4: any;
+    level5: any;
+  };
 }
-
 
 export interface AppTheme extends MD3Theme {
   version: 3;
@@ -85,7 +84,7 @@ export interface AppTheme extends MD3Theme {
     hate: string;
     aggression: string;
   };
-  spacing: { // Add this back, since it's custom
+  spacing: {
     tiny: number;
     small: number;
     medium: number;

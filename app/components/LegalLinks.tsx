@@ -13,15 +13,15 @@ export const LegalLinks: React.FC = () => {
         <List.Section>
           <List.Item
             title="Privacy Policy"
-            left={props => <List.Icon {...props} icon="shield-account" />}
-            right={props => <List.Icon {...props} icon="chevron-right" />}
+            left={(props) => <List.Icon {...props} icon="shield-account" />}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
             onPress={() => router.push('/legal/privacy')}
             titleStyle={styles.linkTitle}
           />
           <List.Item
             title="Terms of Service"
-            left={props => <List.Icon {...props} icon="file-document" />}
-            right={props => <List.Icon {...props} icon="chevron-right" />}
+            left={(props) => <List.Icon {...props} icon="file-document" />}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
             onPress={() => router.push('/legal/terms')}
             titleStyle={styles.linkTitle}
           />

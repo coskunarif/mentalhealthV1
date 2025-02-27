@@ -2,8 +2,8 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { router } from 'expo-router';
-import globalStyles from '../config/global.styles';
-import localStyles from '../config/ErrorBoundary.styles';
+import { layoutStyles, typographyStyles, buttonStyles } from '../config';
+import errorBoundaryStyles from '../config/ErrorBoundary.styles';
 
 interface Props {
   children: ReactNode;
@@ -36,16 +36,18 @@ export default class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <View style={globalStyles.layout_container}>
-          <View style={globalStyles.layout_content}>
-            <Text style={globalStyles.text_heading1}>Something went wrong</Text>
-            <Text style={[globalStyles.text_body, localStyles.errorMessage]}>
+        <View style={layoutStyles.layout_container}>
+          <View style={layoutStyles.layout_content}>
+            <Text style={typographyStyles.text_heading1}>
+              Something went wrong
+            </Text>
+            <Text style={[typographyStyles.text_body, errorBoundaryStyles.errorMessage]}>
               {this.state.error?.message || 'An unexpected error occurred'}
             </Text>
             <Button
               mode="contained"
               onPress={this.handleReset}
-              style={globalStyles.button_primary}
+              style={buttonStyles.button_primary}
             >
               Try Again
             </Button>

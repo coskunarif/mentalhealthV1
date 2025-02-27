@@ -1,13 +1,14 @@
 import { StyleSheet } from 'react-native';
 import { theme } from './theme';
+import typographyStyles from './typography.styles';
 
-export default StyleSheet.create({
+const customAppBarStyles = StyleSheet.create({
   header: {
     backgroundColor: theme.colors.surface,
   },
   title: {
-    ...theme.fonts.headlineMedium,
-    color: theme.colors.onSurface,
-    marginLeft: theme.spacing.small,
+    ...typographyStyles.text_heading2,
   },
 });
+
+export default customAppBarStyles;
