@@ -1,3 +1,4 @@
+/* TODO: Remove this file if no issues arise after testing. It appears to be unused.
 import { ViewStyle, TextStyle } from 'react-native';
 
 // Core Layout Styles
@@ -155,3 +156,4 @@ export interface StyleSystem {
   // Theme
   colors: ThemeColors;
 }
+*/
