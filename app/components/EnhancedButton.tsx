@@ -27,9 +27,7 @@ export default function EnhancedButton({
     ? styles.button_primary
     : undefined;
 
-  const fullWidthStyle: ButtonStyle = fullWidth
-    ? { width: '100%' }
-    : undefined;
+  const fullWidthStyle: ButtonStyle = fullWidth ? { width: '100%' } : undefined;
 
   const buttonStyle: ButtonStyle = [
     baseStyle,
@@ -39,10 +37,6 @@ export default function EnhancedButton({
   ].filter(Boolean);
 
   return (
-    <Button
-      mode={mode}
-      style={buttonStyle}
-      {...props}
-    />
+    <Button mode={mode} style={buttonStyle} {...props} />
   );
 }

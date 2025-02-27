@@ -1,42 +1,44 @@
-// File: app/components/QuickActions.styles.ts
 import { StyleSheet } from 'react-native';
-import { theme } from '../config/theme';
-
-const spacing = {
-  xSmall: 4,
-  small: 8,
-  medium: 16,
-};
-
-const shape = {
-  borderRadius: 8,
-};
+import { theme } from './theme';
 
 export default StyleSheet.create({
-  surface: {
-    marginBottom: spacing.medium,
-    padding: spacing.medium,
-    borderRadius: shape.borderRadius,
-    elevation: 2, // Directly using a number for elevation
+  container: {
+    padding: theme.spacing.medium,
     backgroundColor: theme.colors.surface,
+    borderRadius: theme.shape.borderRadius,
+    marginBottom: theme.spacing.medium,
   },
-  headerText: {
-    marginBottom: spacing.small,
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
     color: theme.colors.onSurface,
+    marginBottom: theme.spacing.small,
+    textAlign: 'center',
   },
-  actionsContainer: {
+  grid: {
     flexDirection: 'row',
-    flexWrap: 'wrap', // allows wrap on smaller screens
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
-  button: {
+  card: {
     flexBasis: '48%',
-    marginVertical: spacing.xSmall,
-    borderRadius: shape.borderRadius,
+    marginBottom: theme.spacing.small,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing.small,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  buttonLabel: {
-    fontSize: 14, // example
-    textTransform: 'none',
+  cardIcon: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
+    marginBottom: theme.spacing.tiny,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: theme.colors.onSurface,
+    textAlign: 'center',
   },
 });

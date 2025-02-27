@@ -15,20 +15,13 @@ export default function LegalLayout({ title, children, lastUpdated }: LegalLayou
   return (
     <View style={styles.layout_container}>
       <View style={styles.screen_legal_header}>
-        <IconButton
-          icon="arrow-left"
-          size={24}
-          onPress={() => router.back()}
-        />
-        <Text style={{ ...theme.fonts.titleLarge, color: theme.colors.onSurface, marginBottom: theme.spacing.small }}>{title}</Text>
+        <IconButton icon="arrow-left" size={24} onPress={() => router.back()} />
+        <Text style={{ ...theme.fonts.titleLarge, color: theme.colors.onSurface, marginBottom: theme.spacing.small }}>
+          {title}
+        </Text>
       </View>
-
-      <ScrollView
-        style={styles.layout_scrollView}
-        contentContainerStyle={styles.layout_content}
-      >
+      <ScrollView style={styles.layout_scrollView} contentContainerStyle={styles.layout_content}>
         {children}
-
         {lastUpdated && (
           <Text style={{ ...theme.fonts.labelMedium, color: theme.colors.onSurfaceVariant, marginTop: theme.spacing.large }}>
             Last updated: {lastUpdated}

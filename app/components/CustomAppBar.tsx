@@ -1,16 +1,16 @@
 import React from 'react';
 import { Appbar } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { theme } from '../config/theme';
+import styles from '../config/CustomAppBar.styles';
 
 export const CustomAppBar: React.FC<{ title: string }> = ({ title }) => {
   const router = useRouter();
   return (
-    <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+    <Appbar.Header style={styles.header}>
       <Appbar.BackAction onPress={() => router.back()} />
       <Appbar.Content
         title={title}
-        titleStyle={{ ...theme.fonts.titleLarge, color: theme.colors.onSurface, marginLeft: theme.spacing.small }}
+        titleStyle={styles.title}
       />
     </Appbar.Header>
   );

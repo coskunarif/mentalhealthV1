@@ -41,46 +41,37 @@ export default function EditPersonalInfoScreen() {
     Animated.timing(slideAnim, {
       toValue: 1,
       duration: 200,
-      easing: Easing.out(Easing.ease), // Added easing
+      easing: Easing.out(Easing.ease),
       useNativeDriver: true,
     }).start();
   }, [slideAnim]);
 
-  // Create user info object with available Firebase User properties
-  // and add placeholders for missing properties
   const userInfo = {
     name: user?.displayName || '',
     email: user?.email || '',
-    phoneNumber: '', // This would come from your backend in a real app
-    dateOfBirth: '', // This would come from your backend in a real app
+    phoneNumber: '',
+    dateOfBirth: '',
   };
 
-const handleSave = async (info: any) => {
-  try {
-    // Simulate API call to save personal info
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // In a real app, you would update the user profile in Firebase or your backend
-    // For example: await updateUserProfile(info);
-    
-    setSnackbar({ visible: true, message: 'Profile updated successfully' });
-    
-    // Use the slide-out animation before navigating back
-    handleBack();
-  } catch (error: any) {
-    console.error('Failed to save:', error);
-    setSnackbar({ visible: true, message: error.message || 'Failed to save profile' });
-  }
-};
+  const handleSave = async (info: any) => {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSnackbar({ visible: true, message: 'Profile updated successfully' });
+      handleBack();
+    } catch (error: any) {
+      console.error('Failed to save:', error);
+      setSnackbar({ visible: true, message: error.message || 'Failed to save profile' });
+    }
+  };
 
   const handleBack = () => {
-  Animated.timing(slideAnim, {
-    toValue: 0,
-    duration: 200,
-    easing: Easing.out(Easing.ease), // Added easing
-    useNativeDriver: true,
-  }).start(() => router.back());
-};
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 200,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start(() => router.back());
+  };
 
   return (
     <KeyboardAvoidingView
@@ -94,7 +85,7 @@ const handleSave = async (info: any) => {
             {
               translateX: slideAnim.interpolate({
                 inputRange: [0, 1],
-                outputRange: [300, 0], // Slide in from right
+                outputRange: [300, 0],
               }),
             },
           ],
@@ -102,24 +93,23 @@ const handleSave = async (info: any) => {
       ]}>
         <StatusBar style="auto" />
         <CustomAppBar title="Personal Information" />
-          <ScrollView
-            contentContainerStyle={styles.content}
-            showsVerticalScrollIndicator={false}
-          >
-            <Text style={styles.subtitle}>
-              Keep your profile up to date by maintaining accurate personal information.
-            </Text>
-            <EditPersonalInfoForm onSave={handleSave} info={userInfo} />
-          </ScrollView>
-        </Animated.View>
-        
-        <Snackbar
-          visible={snackbar.visible}
-          onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
-          duration={3000}
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
         >
-          {snackbar.message}
-        </Snackbar>
-      </KeyboardAvoidingView>
-    );
-  }
+          <Text style={styles.subtitle}>
+            Keep your profile up to date by maintaining accurate personal information.
+          </Text>
+          <EditPersonalInfoForm onSave={handleSave} info={userInfo} />
+        </ScrollView>
+      </Animated.View>
+      <Snackbar
+        visible={snackbar.visible}
+        onDismiss={() => setSnackbar({ ...snackbar, visible: false })}
+        duration={3000}
+      >
+        {snackbar.message}
+      </Snackbar>
+    </KeyboardAvoidingView>
+  );
+}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
 import { Surface, List, Switch, Divider } from 'react-native-paper';
 import { theme } from '../config/theme';
+import styles from '../config/NotificationPreferences.styles';
 
 interface NotificationSetting {
   id: string;
@@ -47,7 +47,6 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
 
   const handleToggle = async (settingId: string) => {
     const newValue = !settings[settingId];
-    
     setIsSubmitting(prev => ({ ...prev, [settingId]: true }));
     try {
       if (onToggle) {
@@ -89,25 +88,3 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
     </Surface>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    margin: theme.spacing.medium,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.shape.borderRadius,
-  },
-  itemTitle: {
-    ...theme.fonts.bodyLarge,
-    color: theme.colors.onSurface,
-  },
-  itemDescription: {
-    ...theme.fonts.bodyMedium,
-    color: theme.colors.onSurfaceVariant,
-  },
-  listItem: {
-    paddingVertical: theme.spacing.small,
-  },
-  divider: {
-    backgroundColor: theme.colors.surfaceVariant,
-  },
-});
