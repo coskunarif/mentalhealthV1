@@ -11,16 +11,12 @@ import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
-const commonScreenOptions: NativeStackNavigationOptions = {
+const commonScreenOptions = {
   headerShown: false,
-  animation: 'slide_from_right',
 };
 
-const modalScreenOptions: NativeStackNavigationOptions = {
-  presentation: 'modal',
-  animation: 'slide_from_bottom',
+const modalScreenOptions = {
   gestureEnabled: true,
-  gestureDirection: 'vertical',
 };
 
 export default function RootLayout() {
@@ -69,6 +65,8 @@ export default function RootLayout() {
               options={{
                 ...modalScreenOptions,
                 title: 'Daily Check-in',
+                headerBackTitle: 'Back',
+                presentation: 'modal',
               }}
             />
             <Stack.Screen
@@ -76,6 +74,7 @@ export default function RootLayout() {
               options={{
                 ...modalScreenOptions,
                 title: 'Mood Check',
+                presentation: 'modal',
               }}
             />
             <Stack.Screen
@@ -83,6 +82,7 @@ export default function RootLayout() {
               options={{
                 ...modalScreenOptions,
                 title: 'Meditation',
+                presentation: 'modal',
               }}
             />
 

@@ -3,9 +3,8 @@ import { Stack } from 'expo-router';
 import styles from '../config/styles';
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
-const screenOptions: NativeStackNavigationOptions = {
+const screenOptions = {
   headerShown: false,
-  animation: 'default',
   contentStyle: { backgroundColor: 'transparent' },
 };
 
