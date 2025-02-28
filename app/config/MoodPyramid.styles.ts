@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { theme } from './theme';
+import typographyStyles from './typography.styles';
 
 export default StyleSheet.create({
   tooltip: {
@@ -22,15 +23,16 @@ export default StyleSheet.create({
     marginTop: theme.spacing.medium,
   },
   pyramid_item: {
-    padding: theme.spacing.small,
+    padding: theme.spacing.medium, // Increased to 16dp
     borderRadius: theme.shape.borderRadius,
-    marginBottom: theme.spacing.tiny,
+    marginBottom: theme.spacing.small, // 8dp between items
     alignItems: 'center',
     justifyContent: 'center',
   },
   pyramid_text: {
     color: theme.colors.onPrimary,
-    fontWeight: 'bold',
+    ...typographyStyles.text_body, // Use defined body style
+    fontWeight: '600', // Slightly bolder for emphasis
   },
   pyramid_bubbleContainer: {
     flexDirection: 'row',
@@ -51,7 +53,7 @@ export default StyleSheet.create({
   },
   mood_buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between', // Changed from 'space-around'
     padding: theme.spacing.medium,
   },
   mood_button: {

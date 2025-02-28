@@ -191,7 +191,7 @@ export function MoodSelector({
     <View style={{ flex: 1 }}>
       <ScrollView
         style={[layoutStyles.layout_scrollView, { padding: theme.spacing.medium }]}
-        contentContainerStyle={{ paddingBottom: theme.spacing.medium * 6.25 }}
+        contentContainerStyle={{ paddingBottom: theme.spacing.large }}
       >
         <Text
           style={[
@@ -244,7 +244,7 @@ export function MoodSelector({
         onDismiss={() => setShowModal(false)}
         contentContainerStyle={{
           backgroundColor: theme.colors.background,
-          padding: theme.spacing.medium,
+          padding: theme.spacing.large,
           borderRadius: theme.shape.borderRadius,
           elevation: 4,
         }}

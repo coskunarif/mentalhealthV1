@@ -118,6 +118,7 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
     <View style={styles.formFieldGroup}>
       <TextInput
         mode="outlined"
+        dense
         label={label}
         value={formData[field] || ''}
         onChangeText={(value) => handleChange(field, value)}
@@ -132,14 +133,14 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
             <TextInput.Icon
               icon={icon}
               onPress={onIconPress}
-              color={theme.colors.onSurface}
+              color={errors[field] ? theme.colors.error : theme.colors.onSurface}
             />
           ) : undefined
         }
         {...(field === 'phoneNumber' ? { maxLength: 16 } : {})}
       />
       {errors[field] && (
-        <HelperText type="error" visible={!!errors[field]}>
+        <HelperText type="error" visible={!!errors[field]} style={{ marginTop: -theme.spacing.tiny }}>
           {errors[field]}
         </HelperText>
       )}
@@ -172,8 +173,15 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
         loading={isSubmitting}
         disabled={isSubmitting}
         style={[buttonStyles.button_primary, styles.formSaveButton]}
+        theme={{
+          colors: {
+            primary: theme.colors.primary,
+            onPrimary: theme.colors.onPrimary,
+            disabled: theme.colors.surfaceDisabled,
+          }
+        }}
       >
-        Save Changes
+        {isSubmitting ? 'Saving...' : 'Save Changes'}
       </Button>
 
       <DatePickerModal
