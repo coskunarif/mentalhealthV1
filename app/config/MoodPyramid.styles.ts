@@ -40,9 +40,10 @@ export default StyleSheet.create({
   pyramid_bubble: {
     borderRadius: 100,
     borderWidth: 2,
-    borderColor: '#E0E0E0',
+    borderColor: theme.colors.outline,
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 3,
   },
   pyramid_bubbleText: {
     fontWeight: 'bold',

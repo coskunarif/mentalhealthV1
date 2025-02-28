@@ -100,7 +100,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
                   width: emotion.width,
                   ...(selectedEmotions.some(e => e.label === emotion.label) && {
                     borderWidth: 2,
-                    borderColor: '#E0E0E0',
+                    borderColor: theme.colors.outline,
                   }),
                 } as ViewStyle,
               ]}
@@ -145,11 +145,12 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
                 {
                   width: config.size,
                   height: config.size,
-                  backgroundColor: selectedEmotions[index]?.color || '#F5F5F5',
+                  backgroundColor: selectedEmotions[index]?.color || theme.colors.background,
                   borderWidth: 2,
-                  borderColor: '#E0E0E0',
+                  borderColor: theme.colors.outline,
                   justifyContent: 'center',
                   alignItems: 'center',
+                  elevation: 3,
                 },
                 config.style,
               ]}
