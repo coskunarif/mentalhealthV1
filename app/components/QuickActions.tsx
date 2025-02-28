@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, TouchableOpacity, Image } from 'react-native';
-import { Text } from 'react-native-paper';
+import { View, Image } from 'react-native';
+import { Text, TouchableRipple } from 'react-native-paper';
 import { Link } from 'expo-router';
 import styles from '../config/quickActions.styles';
 
@@ -24,10 +24,15 @@ export default function QuickActions() {
       <View style={styles.grid}>
         {actions.map((action, index) => (
           <Link key={index} href={action.href} asChild>
-            <TouchableOpacity style={styles.card}>
-              <Image source={action.icon} style={styles.cardIcon} />
-              <Text style={styles.cardTitle}>{action.title}</Text>
-            </TouchableOpacity>
+            <TouchableRipple
+              style={styles.card}
+              rippleColor="rgba(0, 0, 0, .1)"
+            >
+              <View style={styles.cardContent}>
+                <Image source={action.icon} style={styles.cardIcon} />
+                <Text style={styles.cardTitle}>{action.title}</Text>
+              </View>
+            </TouchableRipple>
           </Link>
         ))}
       </View>
