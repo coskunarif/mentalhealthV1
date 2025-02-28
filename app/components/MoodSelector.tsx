@@ -217,7 +217,8 @@ export function MoodSelector({
                 selectedMood?.label === mood.label && {
                   backgroundColor: theme.moodColors[mood.key] + '20',
                   borderWidth: 2,
-                  borderColor: theme.colors.surfaceVariant,
+                  borderColor: theme.colors.outline,
+                  elevation: 2,
                 },
               ]}
               accessibilityLabel={`Select mood ${mood.label}`}
@@ -241,7 +242,12 @@ export function MoodSelector({
       <Modal
         visible={showModal}
         onDismiss={() => setShowModal(false)}
-        contentContainerStyle={{ backgroundColor: '#fff', padding: 20 }}
+        contentContainerStyle={{
+          backgroundColor: theme.colors.background,
+          padding: theme.spacing.medium,
+          borderRadius: theme.shape.borderRadius,
+          elevation: 4,
+        }}
       >
         <Card>
           <Card.Title title={selectedMood?.label} />
@@ -255,7 +261,7 @@ export function MoodSelector({
                   const relatedMood: MoodType = {
                     label: rKey.charAt(0).toUpperCase() + rKey.slice(1),
                     key: rKey,
-                    icon: 'emoticon-sad', // You could map actual icons if desired
+                    icon: 'emoticon-sad', // Map actual icons if desired
                     value: relatedMoodValues[rKey] || 0,
                     duration: selectedMood.duration,
                     isSelected: false,

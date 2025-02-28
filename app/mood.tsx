@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, ScrollView, Dimensions } from 'react-native';
+import { View, ScrollView, Dimensions, SafeAreaView } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import type { RootStackParamList } from './types/navigation';
 import { layoutStyles, miscStyles } from './config';
@@ -124,7 +124,7 @@ export default function MoodScreen() {
   }, [activeScreen, screenWidth]);
 
   return (
-    <View style={layoutStyles.layout_container}>
+    <SafeAreaView style={layoutStyles.layout_container}>
       <ProgressDots activeScreen={activeScreen} />
       <ScrollView
         ref={scrollViewRef}
@@ -149,6 +149,6 @@ export default function MoodScreen() {
           <MoodPyramid onPrevious={handlePrevious} onFinish={handleFinish} />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
