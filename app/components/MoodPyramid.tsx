@@ -28,23 +28,25 @@ type Props = {
   onFinish: () => void;
 };
 
-const getBubbleConfig = (screenWidth: number) => [
-  {
-    size: theme.scaleSize(162),
-    fontSize: theme.scaleFont(18),
-    style: { left: screenWidth * 0.07, top: 1, zIndex: 1 },
-  },
-  {
-    size: theme.scaleSize(132),
-    fontSize: theme.scaleFont(15),
-    style: { right: screenWidth * 0.15, top: 5, zIndex: 1 },
-  },
-  {
-    size: theme.scaleSize(110),
-    fontSize: theme.scaleFont(13),
-    style: { left: screenWidth * 0.385, top: 130, zIndex: 2 },
-  },
-];
+    const screenHeight = Dimensions.get('window').height;
+
+    const getBubbleConfig = (screenWidth: number) => [
+      {
+        size: theme.scaleSize(162),
+        fontSize: theme.scaleFont(18),
+        style: { left: screenWidth * 0.07, top: screenHeight * 0.002, zIndex: 1 },
+      },
+      {
+        size: theme.scaleSize(132),
+        fontSize: theme.scaleFont(15),
+        style: { right: screenWidth * 0.15, top: screenHeight * 0.01, zIndex: 1 },
+      },
+      {
+        size: theme.scaleSize(110),
+        fontSize: theme.scaleFont(13),
+        style: { left: screenWidth * 0.385, top: screenHeight * 0.2, zIndex: 2 },
+      },
+    ];
 
 export function MoodPyramid({ onPrevious, onFinish }: Props) {
   const [selectedEmotions, setSelectedEmotions] = useState<EmotionSelection[]>([]);
@@ -76,7 +78,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
     <View style={{ flex: 1 }}>
       <ScrollView
         style={[localStyles.layout_scrollView, { padding: theme.spacing.medium }]}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: theme.spacing.large }}
       >
         <Text
           style={[
@@ -172,6 +174,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
                       fontSize: config.fontSize * 0.8,
                       color: theme.colors.primary,
                       textAlign: 'center',
+                      fontWeight: 'bold', // Added for emphasis
                     },
                   ]}
                 >

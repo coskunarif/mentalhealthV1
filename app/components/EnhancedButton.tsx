@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, ButtonProps } from 'react-native-paper';
 import { StyleProp, ViewStyle } from 'react-native';
 import buttonStyles from '../config/button.styles';
+import { theme } from '../config/theme';
 
 type ButtonStyle = StyleProp<ViewStyle>;
 
@@ -39,5 +40,16 @@ export default function EnhancedButton({
     style,
   ].filter(Boolean);
 
-  return <Button mode={mode} style={buttonStyle} {...props} />;
+  return (
+    <Button
+      mode={mode}
+      style={buttonStyle}
+      labelStyle={{
+        fontWeight: '600',
+        fontSize: theme.scaleFont(16),
+        color: mode === 'contained' ? theme.colors.onPrimary : theme.colors.primary,
+      }}
+      {...props}
+    />
+  );
 }

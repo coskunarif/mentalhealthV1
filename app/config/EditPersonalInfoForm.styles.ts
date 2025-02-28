@@ -24,5 +24,7 @@ export default StyleSheet.create({
   },
   formSaveButton: {
     marginTop: theme.spacing.medium,
+    height: 48,
+    justifyContent: 'center',
   },
 });
