@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, Button, Card, Modal } from 'react-native-paper';
+import { Text, Card, Modal } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import localStyles from '../config/MoodSelector.styles';
-import { layoutStyles, buttonStyles, typographyStyles } from '../config';
+import { layoutStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
 import type { AppTheme } from '../types/theme';
-import { getMoodColorKey } from '../utils/helpers';
+import EnhancedButton from './EnhancedButton';
 
 export type IconName =
   | 'emoticon-sad'
@@ -39,28 +39,6 @@ type Props = {
   onDurationChange: (value: number) => void;
   onNext: () => void;
   onFinish: () => void;
-};
-
-const moodIcons: Record<keyof AppTheme['moodColors'], IconName> = {
-  shame: 'emoticon-sad',
-  guilt: 'emoticon-confused',
-  fear: 'emoticon-frown',
-  anger: 'emoticon-angry',
-  humiliation: 'emoticon-sad',
-  grief: 'emoticon-cry',
-  regret: 'emoticon-confused',
-  anxiety: 'emoticon-frown',
-  hate: 'emoticon-angry',
-  aggression: 'emoticon-angry',
-  peace: 'emoticon-happy',
-  joy: 'emoticon-excited',
-  love: 'emoticon-cool',
-  reason: 'emoticon-neutral',
-  acceptance: 'emoticon-happy',
-  apathy: 'emoticon-neutral',
-  desire: 'emoticon-excited',
-  pride: 'emoticon-cool',
-  willfulness: 'emoticon-cool',
 };
 
 const relatedMoods: { [key: string]: (keyof AppTheme['moodColors'])[] } = {
@@ -132,6 +110,7 @@ export function MoodSelector({
     const sliderColor = isRelated
       ? relatedSliderColors[mood.label] || getSliderColor(0)
       : mainSliderColors[mood.label] || getSliderColor(sliderValue);
+
     return (
       <Card
         key={mood.label}
@@ -216,8 +195,8 @@ export function MoodSelector({
       >
         <Text
           style={[
-            typographyStyles.header_shadow,
-            { textAlign: 'center', color: theme.colors.primary },
+            typographyStyles.text_heading2,
+            { textAlign: 'center', color: theme.colors.primary, marginBottom: theme.spacing.medium },
           ]}
         >
           How are you feeling?
@@ -259,7 +238,11 @@ export function MoodSelector({
           ))}
         </View>
       </ScrollView>
-      <Modal visible={showModal} onDismiss={() => setShowModal(false)} contentContainerStyle={{ backgroundColor: '#fff', padding: 20 }}>
+      <Modal
+        visible={showModal}
+        onDismiss={() => setShowModal(false)}
+        contentContainerStyle={{ backgroundColor: '#fff', padding: 20 }}
+      >
         <Card>
           <Card.Title title={selectedMood?.label} />
           <Card.Content>
@@ -272,7 +255,7 @@ export function MoodSelector({
                   const relatedMood: MoodType = {
                     label: rKey.charAt(0).toUpperCase() + rKey.slice(1),
                     key: rKey,
-                    icon: moodIcons[rKey],
+                    icon: 'emoticon-sad', // You could map actual icons if desired
                     value: relatedMoodValues[rKey] || 0,
                     duration: selectedMood.duration,
                     isSelected: false,
@@ -284,24 +267,22 @@ export function MoodSelector({
         </Card>
       </Modal>
       <View style={localStyles.mood_buttonContainer}>
-        <Button
+        <EnhancedButton
           mode="outlined"
           onPress={onNext}
-          style={[localStyles.mood_button, buttonStyles.button_outlined]}
-          labelStyle={localStyles.mood_buttonText}
+          style={[localStyles.mood_button]}
           accessibilityLabel="Proceed to select focus emotions"
         >
           Next: Focus Emotions
-        </Button>
-        <Button
+        </EnhancedButton>
+        <EnhancedButton
           mode="contained"
           onPress={onFinish}
-          style={[localStyles.mood_button, buttonStyles.button_contained]}
-          labelStyle={[localStyles.mood_buttonText, { color: theme.colors.onPrimary }]}
+          style={[localStyles.mood_button]}
           accessibilityLabel="Complete mood selection and return to previous screen"
         >
           Finish
-        </Button>
+        </EnhancedButton>
       </View>
     </View>
   );
