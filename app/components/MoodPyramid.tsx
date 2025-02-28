@@ -6,10 +6,11 @@ import {
   Dimensions,
   ViewStyle,
 } from 'react-native';
-import { Text, Button } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import localStyles from '../config/MoodPyramid.styles';
-import { typographyStyles, buttonStyles } from '../config';
+import { typographyStyles } from '../config';
 import { theme } from '../config/theme';
+import EnhancedButton from './EnhancedButton';
 
 type Emotion = {
   label: string;
@@ -79,8 +80,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       >
         <Text
           style={[
-            typographyStyles.header_shadow,
-            { textAlign: 'center', color: theme.colors.primary },
+            typographyStyles.text_heading2,
+            { textAlign: 'center', color: theme.colors.primary, marginBottom: theme.spacing.medium },
           ]}
         >
           Identify the emotions to focus on
@@ -122,8 +123,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
         </Text>
         <Text
           style={[
-            typographyStyles.header_shadow,
-            { textAlign: 'left', color: theme.colors.primary },
+            typographyStyles.text_heading3,
+            { textAlign: 'left', color: theme.colors.primary, marginTop: theme.spacing.medium },
           ]}
         >
           Focus Emotions
@@ -181,24 +182,22 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
         </View>
       </ScrollView>
       <View style={localStyles.mood_buttonContainer}>
-        <Button
+        <EnhancedButton
           mode="outlined"
           onPress={onPrevious}
-          style={[localStyles.mood_button, buttonStyles.button_outlined, { width: '48%' }]}
-          labelStyle={localStyles.mood_buttonText}
-          accessibilityLabel="Proceed to select focus emotions"
+          style={[localStyles.mood_button]}
+          accessibilityLabel="Return to previous mood selection screen"
         >
           Previous
-        </Button>
-        <Button
+        </EnhancedButton>
+        <EnhancedButton
           mode="contained"
           onPress={onFinish}
-          style={[localStyles.mood_button, buttonStyles.button_contained, { width: '48%' }]}
-          labelStyle={[localStyles.mood_buttonText, { color: theme.colors.onPrimary }]}
-          accessibilityLabel="Complete mood selection and return to previous screen"
+          style={[localStyles.mood_button]}
+          accessibilityLabel="Complete mood selection and return to the previous screen"
         >
           Finish
-        </Button>
+        </EnhancedButton>
       </View>
     </View>
   );
