@@ -25,6 +25,14 @@ export default StyleSheet.create({
     marginBottom: theme.spacing.small,
     backgroundColor: theme.colors.surface,
     borderRadius: theme.shape.borderRadius,
+    // Material-like elevation/shadow
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  cardContent: {
     padding: theme.spacing.small,
     alignItems: 'center',
     justifyContent: 'center',
