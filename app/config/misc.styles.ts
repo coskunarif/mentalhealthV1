@@ -4,7 +4,10 @@ import type { ViewStyle, TextStyle } from 'react-native';
 
 const miscStyles = StyleSheet.create({
   // Home & Sections
-  screen_home_container: { flex: 1, backgroundColor: theme.colors.background } as ViewStyle,
+  screen_home_container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  } as ViewStyle,
   home_sectionSurface: {
     marginBottom: theme.spacing.medium,
     padding: theme.spacing.medium,
@@ -17,44 +20,73 @@ const miscStyles = StyleSheet.create({
     color: theme.colors.onSurface,
     ...theme.fonts.headlineMedium,
   } as TextStyle,
+
   // Not Found
-  notFound_text: { marginTop: 16, ...theme.fonts.bodyMedium } as TextStyle,
-  notFound_button: { marginTop: 24 } as ViewStyle,
+  notFound_text: {
+    marginTop: 16,
+    ...theme.fonts.bodyMedium,
+  } as TextStyle,
+  notFound_button: {
+    marginTop: 24,
+  } as ViewStyle,
+
   // Profile
   profile_header: {
-    paddingVertical: theme.spacing.large,
+    paddingVertical: theme.spacing.medium,
     paddingHorizontal: theme.spacing.medium,
     backgroundColor: theme.colors.surface,
-    borderRadius: 12,
-    marginBottom: theme.spacing.small,
+    borderRadius: 8,
+    marginBottom: theme.spacing.medium,
   } as ViewStyle,
   profile_headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
   } as ViewStyle,
-  profile_headerText: { marginLeft: theme.spacing.medium, flex: 1 } as ViewStyle,
-  profile_name: { color: theme.colors.onSurface } as TextStyle,
-  profile_email: { color: theme.colors.onSurfaceVariant } as TextStyle,
-  profile_mainSection: {
+  profile_avatarContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: theme.colors.primaryContainer,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: theme.spacing.medium,
+  } as ViewStyle,
+  profile_headerText: {
+    flex: 1,
+  } as ViewStyle,
+  profile_name: {
+    color: theme.colors.onSurface,
+  } as TextStyle,
+  profile_email: {
+    color: theme.colors.onSurfaceVariant,
+    ...theme.fonts.bodyMedium,
+  } as TextStyle,
+
+  // Each card-like section under the header
+  profile_sectionCard: {
     marginHorizontal: theme.spacing.medium,
-    marginVertical: theme.spacing.small,
-    borderRadius: 12,
-    overflow: 'hidden',
+    marginBottom: theme.spacing.medium,
+    borderRadius: 8,
+    backgroundColor: theme.colors.surface,
+    paddingHorizontal: theme.spacing.medium,
+    paddingVertical: theme.spacing.small,
   } as ViewStyle,
   profile_sectionTitle: {
-    marginLeft: theme.spacing.medium,
     marginTop: theme.spacing.small,
     marginBottom: theme.spacing.small,
     color: theme.colors.onSurface,
     ...theme.fonts.headlineSmall,
   } as TextStyle,
+
   profile_subscriptionStatus: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: theme.spacing.medium,
     paddingBottom: theme.spacing.small,
   } as ViewStyle,
-  profile_statusLabel: { color: theme.colors.onSurfaceVariant } as TextStyle,
+  profile_statusLabel: {
+    color: theme.colors.onSurfaceVariant,
+  } as TextStyle,
   profile_statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
@@ -65,13 +97,16 @@ const miscStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   } as TextStyle,
+
   profile_statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: theme.spacing.medium,
     paddingHorizontal: theme.spacing.medium,
   } as ViewStyle,
-  profile_statItem: { alignItems: 'center' } as ViewStyle,
+  profile_statItem: {
+    alignItems: 'center',
+  } as ViewStyle,
   profile_statNumber: {
     ...theme.fonts.titleLarge,
     color: theme.colors.onSurface,
@@ -82,8 +117,11 @@ const miscStyles = StyleSheet.create({
     color: theme.colors.onSurfaceVariant,
     marginTop: 4,
   } as TextStyle,
+
   // Recent Activities
-  recentActivities_container: { marginBottom: 24 } as ViewStyle,
+  recentActivities_container: {
+    marginBottom: 24,
+  } as ViewStyle,
   recentActivities_item: {
     padding: theme.spacing.medium,
     flexDirection: 'row',
@@ -94,6 +132,7 @@ const miscStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.surfaceVariant,
   } as ViewStyle,
+
   // Mood (common container for Mood screens)
   mood_gridContainer: {
     flexDirection: 'row',
