@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button, Surface, Snackbar, Dialog, Portal, List } from 'react-native-paper';
+import { Text, Button, Surface, Snackbar, Dialog, List } from 'react-native-paper';
 import type { PersonalInformation } from '../types/personalInformation';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { layoutStyles, miscStyles, typographyStyles, buttonStyles } from '../config';
+import { layoutStyles, miscStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
 
 export default function ProfileScreen() {
@@ -63,12 +63,14 @@ export default function ProfileScreen() {
         {/* Profile Header with Stats */}
         <Surface style={miscStyles.profile_header} elevation={2}>
           <View style={miscStyles.profile_headerContent}>
-            <MaterialCommunityIcons 
-              name="account-circle" 
-              size={80} 
-              color={theme.colors.primary} 
-            />
-            <View style={[miscStyles.profile_headerText, { marginLeft: theme.spacing.medium }]}>
+            <View style={miscStyles.profile_avatarContainer}>
+              <MaterialCommunityIcons 
+                name="account-circle"
+                size={40}
+                color={theme.colors.primary}
+              />
+            </View>
+            <View style={miscStyles.profile_headerText}>
               <Text style={[typographyStyles.text_heading2, miscStyles.profile_name]}>
                 {personalInfo.name}
               </Text>
@@ -79,7 +81,7 @@ export default function ProfileScreen() {
           </View>
 
           {/* Mental Health Stats */}
-          <View style={[miscStyles.profile_statsContainer, { justifyContent: 'space-around' }]}>
+          <View style={miscStyles.profile_statsContainer}>
             <View style={miscStyles.profile_statItem}>
               <Text style={miscStyles.profile_statNumber}>{userStats.sessions}</Text>
               <Text style={miscStyles.profile_statLabel}>Sessions</Text>
@@ -99,14 +101,28 @@ export default function ProfileScreen() {
             <Text style={[miscStyles.profile_statusLabel, theme.fonts.bodyMedium]}>
               Subscription Status:
             </Text>
-            <View style={[
-              miscStyles.profile_statusBadge,
-              { backgroundColor: subscriptionStatus === 'Active' ? theme.colors.secondary : theme.colors.surfaceVariant }
-            ]}>
-              <Text style={[
-                miscStyles.profile_statusText,
-                { color: subscriptionStatus === 'Active' ? theme.colors.onSecondary : theme.colors.onSurfaceVariant }
-              ]}>
+            <View
+              style={[
+                miscStyles.profile_statusBadge,
+                {
+                  backgroundColor:
+                    subscriptionStatus === 'Active'
+                      ? theme.colors.secondary
+                      : theme.colors.surfaceVariant,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  miscStyles.profile_statusText,
+                  {
+                    color:
+                      subscriptionStatus === 'Active'
+                        ? theme.colors.onSecondary
+                        : theme.colors.onSurfaceVariant,
+                  },
+                ]}
+              >
                 {subscriptionStatus}
               </Text>
             </View>
@@ -114,7 +130,7 @@ export default function ProfileScreen() {
         </Surface>
 
         {/* Account Information */}
-        <Surface style={miscStyles.profile_mainSection} elevation={1}>
+        <Surface style={miscStyles.profile_sectionCard} elevation={2}>
           <Text style={miscStyles.profile_sectionTitle}>Account Information</Text>
           <List.Section>
             <List.Item
@@ -133,7 +149,7 @@ export default function ProfileScreen() {
         </Surface>
 
         {/* Options */}
-        <Surface style={miscStyles.profile_mainSection} elevation={1}>
+        <Surface style={miscStyles.profile_sectionCard} elevation={2}>
           <Text style={miscStyles.profile_sectionTitle}>Options</Text>
           <List.Section>
             <List.Item
@@ -164,14 +180,14 @@ export default function ProfileScreen() {
         </Surface>
 
         {/* Sign Out Button */}
-        <Surface style={[miscStyles.profile_mainSection, { marginBottom: 24 }]} elevation={1}>
+        <Surface style={miscStyles.profile_sectionCard} elevation={2}>
           <Button
             mode="outlined"
             onPress={() => setShowSignOutDialog(true)}
             loading={isLoading}
             disabled={isLoading}
             icon="logout"
-            style={{ margin: theme.spacing.medium }}
+            style={{ marginTop: theme.spacing.small }}
             labelStyle={theme.fonts.labelLarge}
           >
             {isLoading ? 'Signing Out...' : 'Sign Out'}
@@ -183,15 +199,19 @@ export default function ProfileScreen() {
       <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)}>
         <Dialog.Title style={theme.fonts.titleLarge}>Sign Out</Dialog.Title>
         <Dialog.Content>
-          <Text style={theme.fonts.bodyMedium}>
-            Are you sure you want to sign out?
-          </Text>
+          <Text style={theme.fonts.bodyMedium}>Are you sure you want to sign out?</Text>
         </Dialog.Content>
         <Dialog.Actions>
           <Button onPress={() => setShowSignOutDialog(false)} labelStyle={theme.fonts.labelLarge}>
             Cancel
           </Button>
-          <Button onPress={() => { setShowSignOutDialog(false); handleSignOut(); }} labelStyle={theme.fonts.labelLarge}>
+          <Button
+            onPress={() => {
+              setShowSignOutDialog(false);
+              handleSignOut();
+            }}
+            labelStyle={theme.fonts.labelLarge}
+          >
             Sign Out
           </Button>
         </Dialog.Actions>
