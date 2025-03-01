@@ -3,7 +3,7 @@ import { View, ScrollView, Dimensions, SafeAreaView } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import type { RootStackParamList } from './types/navigation';
 import { layoutStyles, miscStyles } from './config';
-import { MoodSelector } from './components/MoodSelector';
+import MoodSelector from './components/MoodSelector'; // Using default import
 import { MoodPyramid } from './components/MoodPyramid';
 import { theme } from './config/theme';
 import type { IconName } from './components/MoodSelector';
@@ -26,7 +26,8 @@ const ProgressDots = ({ activeScreen }: { activeScreen: number }) => (
           width: 8,
           height: 8,
           borderRadius: 4,
-          backgroundColor: index === activeScreen ? theme.colors.primary : theme.colors.surfaceVariant,
+          backgroundColor:
+            index === activeScreen ? theme.colors.primary : theme.colors.surfaceVariant,
           marginHorizontal: 4,
         }}
       />
@@ -37,15 +38,15 @@ const ProgressDots = ({ activeScreen }: { activeScreen: number }) => (
 export default function MoodScreen() {
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
   const [moods, setMoods] = useState<MoodType[]>([
-    { label: 'Shame', key: 'shame', icon: 'emoticon-sad' as IconName, value: 0, duration: 0, isSelected: false },
-    { label: 'Guilt', key: 'guilt', icon: 'emoticon-confused' as IconName, value: 0, duration: 0, isSelected: false },
-    { label: 'Apathy', key: 'apathy', icon: 'emoticon-neutral' as IconName, value: 0, duration: 0, isSelected: false },
-    { label: 'Grief', key: 'grief', icon: 'emoticon-cry' as IconName, value: 0, duration: 0, isSelected: false },
-    { label: 'Fear', key: 'fear', icon: 'emoticon-frown' as IconName, value: 0, duration: 0, isSelected: false },
-    { label: 'Desire', key: 'desire', icon: 'emoticon-excited' as IconName, value: 0, duration: 0, isSelected: false },
-    { label: 'Anger', key: 'anger', icon: 'emoticon-angry' as IconName, value: 0, duration: 0, isSelected: false },
-    { label: 'Pride', key: 'pride', icon: 'emoticon-cool' as IconName, value: 0, duration: 0, isSelected: false },
-    { label: 'Willfulness', key: 'willfulness', icon: 'emoticon-cool' as IconName, value: 0, duration: 0, isSelected: false },
+    { label: 'Shame', key: 'shame', icon: 'emoticon-sad', value: 0, duration: 0, isSelected: false },
+    { label: 'Guilt', key: 'guilt', icon: 'emoticon-confused', value: 0, duration: 0, isSelected: false },
+    { label: 'Apathy', key: 'apathy', icon: 'emoticon-neutral', value: 0, duration: 0, isSelected: false },
+    { label: 'Grief', key: 'grief', icon: 'emoticon-cry', value: 0, duration: 0, isSelected: false },
+    { label: 'Fear', key: 'fear', icon: 'emoticon-frown', value: 0, duration: 0, isSelected: false },
+    { label: 'Desire', key: 'desire', icon: 'emoticon-excited', value: 0, duration: 0, isSelected: false },
+    { label: 'Anger', key: 'anger', icon: 'emoticon-angry', value: 0, duration: 0, isSelected: false },
+    { label: 'Pride', key: 'pride', icon: 'emoticon-cool', value: 0, duration: 0, isSelected: false },
+    { label: 'Willfulness', key: 'willfulness', icon: 'emoticon-cool', value: 0, duration: 0, isSelected: false },
   ]);
 
   const { returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['mood']>();
@@ -116,7 +117,8 @@ export default function MoodScreen() {
   };
 
   const handleFinish = () => {
-    router.replace(returnTo as keyof RootStackParamList);
+    // Example: finalize or navigate away
+    handleSubmit();
   };
 
   useEffect(() => {
