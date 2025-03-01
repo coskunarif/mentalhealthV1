@@ -14,14 +14,12 @@ export default StyleSheet.create({
     borderRadius: theme.shape.borderRadius,
     backgroundColor: theme.colors.surface,
     position: 'relative',
-    // If not selected, keep minimal or zero elevation
-    elevation: theme.colors.elevation.level0, // <-- changed here
+    elevation: theme.colors.elevation.level0,
     shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0,
     shadowRadius: 0,
   },
-  // Badge for bubble counts
   badge: {
     position: 'absolute',
     top: 4,
@@ -39,24 +37,19 @@ export default StyleSheet.create({
     fontSize: 10,
     fontWeight: 'bold',
   },
-
-  // Slider card base
   mood_slider_card: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.shape.borderRadius,
     marginVertical: theme.spacing.tiny,
     padding: theme.spacing.small,
   },
-
-  // For cards or items that need elevation
   component_card_elevated: {
-    elevation: theme.colors.elevation.level2, // <-- changed here
+    elevation: theme.colors.elevation.level2,
     shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
-
   mood_headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -66,8 +59,6 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: theme.spacing.tiny,
   },
-
-  // Container for the two bottom buttons
   mood_buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',

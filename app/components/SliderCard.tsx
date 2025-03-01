@@ -32,8 +32,8 @@ const SliderCard: React.FC<SliderCardProps> = ({
       <Card.Content>
         <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.tiny }]}>
           <MaterialCommunityIcons name={mood.icon} size={24} color={theme.moodColors[mood.key]} />
-          <Text style={[typographyStyles.text_body, theme.fonts.bodyMedium]}>
-            {mood.label} ({mood.value})
+          <Text style={[typographyStyles.text_body, theme.fonts.bodyMedium, { marginLeft: theme.spacing.small }]}>
+            {mood.label} ({mood.value}/100)
           </Text>
         </View>
         <Slider
