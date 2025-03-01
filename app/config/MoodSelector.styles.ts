@@ -2,58 +2,78 @@ import { StyleSheet } from 'react-native';
 import { theme } from './theme';
 
 export default StyleSheet.create({
-  sliderCard: {
-    padding: theme.spacing.small,
-    marginVertical: theme.spacing.tiny / 4,
+  mood_gridContainer: {
+    paddingHorizontal: theme.spacing.small,
   },
-  component_card_elevated: {
-    elevation: 4, // Increased from 2
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+  mood_item: {
+    flex: 1,
+    margin: theme.spacing.small,
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: theme.colors.surface,
+    position: 'relative',
+    // If not selected, keep minimal or zero elevation
+    elevation: theme.colors.elevation.level0, // <-- changed here
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
+    shadowRadius: 0,
   },
+  // Badge for bubble counts
+  badge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    backgroundColor: theme.colors.primary,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    minWidth: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    color: theme.colors.onPrimary,
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+
+  // Slider card base
   mood_slider_card: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.shape.borderRadius,
+    marginVertical: theme.spacing.tiny,
+    padding: theme.spacing.small,
   },
+
+  // For cards or items that need elevation
+  component_card_elevated: {
+    elevation: theme.colors.elevation.level2, // <-- changed here
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+
   mood_headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.small,
   },
   mood_sliderLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing.tiny, // Aligns labels with slider track
+    marginTop: theme.spacing.tiny,
   },
-  mood_gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    paddingHorizontal: theme.spacing.small, // Added for edge spacing
-  },
-  mood_item: {
-    flexBasis: '30%',
-    flexGrow: 1,
-    maxWidth: '33%',
-    aspectRatio: 1,
-    padding: theme.scaleSize(16), // Scales with device
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: theme.shape.borderRadius,
-    margin: theme.spacing.tiny, // Added for spacing between items
-  },
+
+  // Container for the two bottom buttons
   mood_buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
   },
   mood_button: {
     borderRadius: theme.shape.borderRadius,
-  },
-  mood_buttonText: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    textTransform: 'none',
+    marginHorizontal: theme.spacing.small,
   },
 });

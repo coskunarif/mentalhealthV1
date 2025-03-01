@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView, TouchableOpacity } from 'react-native';
-import { Text, Card, Modal } from 'react-native-paper';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, ScrollView, Pressable, FlatList } from 'react-native';
+import { Text, Card, Modal, IconButton } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import localStyles from '../config/MoodSelector.styles';
@@ -8,6 +8,7 @@ import { layoutStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
 import type { AppTheme } from '../types/theme';
 import EnhancedButton from './EnhancedButton';
+import SliderCard from './SliderCard';
 
 export type IconName =
   | 'emoticon-sad'
@@ -29,6 +30,7 @@ type MoodType = {
   value: number;
   duration: number;
   isSelected: boolean;
+  count?: number; // Optional bubble count
 };
 
 type Props = {
@@ -48,7 +50,7 @@ const relatedMoods: { [key: string]: (keyof AppTheme['moodColors'])[] } = {
   Anger: ['hate', 'aggression'],
 };
 
-export function MoodSelector({
+function MoodSelector({
   moods,
   selectedMood,
   onMoodSelect,
@@ -57,16 +59,20 @@ export function MoodSelector({
   onNext,
   onFinish,
 }: Props) {
+  const [slidersState, setSlidersState] = useState<{
+    [label: string]: { value: number; color: string };
+  }>({});
   const [showModal, setShowModal] = useState(false);
-  const [mainSliderValues, setMainSliderValues] = useState<Record<string, number>>({});
-  const [mainSliderColors, setMainSliderColors] = useState<Record<string, string>>({});
-  const [relatedMoodValues, setRelatedMoodValues] = useState<Record<string, number>>({});
-  const [relatedSliderColors, setRelatedSliderColors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (selectedMood) {
-      setMainSliderValues(prev => ({ ...prev, [selectedMood.label]: selectedMood.value }));
-      updateSliderColor(selectedMood.value, selectedMood.label, false);
+      setSlidersState(prev => ({
+        ...prev,
+        [selectedMood.label]: {
+          value: selectedMood.value,
+          color: getSliderColor(selectedMood.value),
+        },
+      }));
     }
   }, [selectedMood]);
 
@@ -76,169 +82,134 @@ export function MoodSelector({
     return theme.colors.primary;
   };
 
-  const updateSliderColor = (value: number, label: string, isRelated: boolean) => {
+  const updateSliderState = (label: string, value: number) => {
     const color = getSliderColor(value);
-    if (isRelated) {
-      setRelatedSliderColors(prev => ({ ...prev, [label]: color }));
-    } else {
-      setMainSliderColors(prev => ({ ...prev, [label]: color }));
-    }
+    setSlidersState(prev => ({ ...prev, [label]: { value, color } }));
   };
 
-  const handleRelatedMoodChange = (value: number, label: string) => {
-    setRelatedMoodValues(prev => ({ ...prev, [label]: value }));
-    updateSliderColor(value, label, true);
-    onSliderChange(value, label);
-  };
-
-  const handleMainSliderChange = (value: number, label: string) => {
-    setMainSliderValues(prev => ({ ...prev, [label]: value }));
-    updateSliderColor(value, label, false);
-    onSliderChange(value, label);
-  };
+  const handleSliderComplete = useCallback(
+    (value: number, label: string, isRelated = false) => {
+      updateSliderState(label, value);
+      onSliderChange(value, label);
+    },
+    [onSliderChange]
+  );
 
   const handleSelectMood = (index: number) => {
     onMoodSelect(index);
     setShowModal(true);
   };
 
-  const renderSliderCard = (mood: MoodType | null, isRelated = false) => {
-    if (!mood) return null;
-    const sliderValue = isRelated
-      ? relatedMoodValues[mood.label] || 0
-      : mainSliderValues[mood.label] || mood.value;
-    const sliderColor = isRelated
-      ? relatedSliderColors[mood.label] || getSliderColor(0)
-      : mainSliderColors[mood.label] || getSliderColor(sliderValue);
-
+  const renderMainSliderCard = () => {
+    if (!selectedMood) return null;
+    const sliderState = slidersState[selectedMood.label] || {
+      value: selectedMood.value,
+      color: getSliderColor(selectedMood.value),
+    };
     return (
-      <Card
-        key={mood.label}
-        style={[localStyles.component_card_elevated, localStyles.mood_slider_card, { padding: theme.spacing.small }]}
-        accessibilityLabel={`${isRelated ? 'Related ' : ''}Intensity slider for ${mood.label}`}
-      >
-        <Card.Content style={{ gap: theme.spacing.tiny }}>
-          <View style={localStyles.mood_headerRow}>
-            <MaterialCommunityIcons name={mood.icon} size={24} color={theme.moodColors[mood.key]} />
-            <Text style={[typographyStyles.text_body, theme.fonts.bodyMedium]}>
-              {mood.label}
-            </Text>
-          </View>
-          <Slider
-            value={sliderValue}
-            minimumValue={0}
-            maximumValue={100}
-            step={1}
-            thumbTintColor={sliderColor}
-            minimumTrackTintColor={sliderColor}
-            maximumTrackTintColor={theme.colors.surfaceVariant}
-            onValueChange={(val) => {
-              isRelated ? handleRelatedMoodChange(val, mood.label) : handleMainSliderChange(val, mood.label);
-            }}
-            style={{ height: theme.scaleFont(16) }}
-          />
-          <View style={[localStyles.mood_sliderLabels, { marginTop: -theme.spacing.tiny / 2 }]}>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>Low</Text>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>High</Text>
-          </View>
-        </Card.Content>
-      </Card>
+      <SliderCard
+        key={selectedMood.label}
+        mood={{ ...selectedMood, value: sliderState.value }}
+        sliderColor={sliderState.color}
+        onSlidingComplete={(val, label) => handleSliderComplete(val, label, false)}
+      />
     );
   };
 
-  const renderDurationSlider = (mood: MoodType | null) => {
-    if (!mood) return null;
-    return (
-      <Card
-        style={[localStyles.component_card_elevated, localStyles.mood_slider_card, { padding: theme.spacing.small }]}
-        accessibilityLabel={`Duration slider for ${mood.label}`}
-      >
-        <Card.Content style={{ gap: theme.spacing.tiny }}>
-          <View style={localStyles.mood_headerRow}>
-            <MaterialCommunityIcons name="clock-outline" size={24} color={theme.colors.primary} />
-            <Text style={[typographyStyles.text_body, theme.fonts.bodyMedium]}>
-              How long
-            </Text>
-          </View>
-          <Slider
-            value={mood.duration}
-            minimumValue={0}
-            maximumValue={100}
-            step={33}
-            thumbTintColor={theme.colors.primary}
-            minimumTrackTintColor={theme.colors.primary}
-            onValueChange={onDurationChange}
-            style={{ height: theme.scaleFont(16) }}
-            accessibilityLabel={`Set duration for ${mood.label}`}
+  const renderRelatedMoodSliders = () => {
+    if (!selectedMood) return null;
+    return Object.entries(relatedMoods).flatMap(([moodKey, relatedKeys]) => {
+      if (selectedMood.key !== moodKey.toLowerCase()) return [];
+      return relatedKeys.map(rKey => {
+        const relatedMood: MoodType = {
+          label: rKey.charAt(0).toUpperCase() + rKey.slice(1),
+          key: rKey,
+          icon: 'emoticon-sad',
+          value: slidersState[rKey]?.value || 0,
+          duration: selectedMood.duration,
+          isSelected: false,
+        };
+        const sliderState = slidersState[rKey] || {
+          value: relatedMood.value,
+          color: getSliderColor(relatedMood.value),
+        };
+        return (
+          <SliderCard
+            key={relatedMood.label}
+            mood={relatedMood}
+            sliderColor={sliderState.color}
+            isRelated
+            onSlidingComplete={(val, label) => handleSliderComplete(val, label, true)}
           />
-          <View style={[localStyles.mood_sliderLabels, { marginTop: -theme.spacing.tiny / 2 }]}>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
-              {'< 3 months'}
-            </Text>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
-              6 months
-            </Text>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
-              {'> 1 year'}
-            </Text>
-          </View>
-        </Card.Content>
-      </Card>
+        );
+      });
+    });
+  };
+
+  const renderMoodItem = ({ item, index }: { item: MoodType; index: number }) => {
+    const isSelected = selectedMood?.label === item.label;
+    return (
+      <Pressable
+        onPress={() => handleSelectMood(index)}
+        style={({ pressed }) => [
+          localStyles.mood_item,
+          pressed && { opacity: 0.8 },
+          isSelected && {
+            backgroundColor: theme.moodColors[item.key] + '20',
+            borderWidth: 2,
+            borderColor: theme.colors.outline,
+            elevation: theme.colors.elevation.level2, // <-- changed here
+            shadowColor: theme.colors.shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+          },
+        ]}
+        accessibilityLabel={`Select mood ${item.label}`}
+        accessibilityRole="button"
+        accessibilityState={{ selected: isSelected }}
+      >
+        <MaterialCommunityIcons name={item.icon} size={40} color={theme.moodColors[item.key]} />
+        <Text
+          style={[
+            typographyStyles.text_caption,
+            theme.fonts.labelMedium,
+            { marginTop: theme.spacing.tiny },
+          ]}
+        >
+          {item.label}
+        </Text>
+      </Pressable>
     );
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
       <ScrollView
-        style={[layoutStyles.layout_scrollView, { padding: theme.spacing.medium }]}
-        contentContainerStyle={{ paddingBottom: theme.spacing.large }}
+        style={[layoutStyles.layout_scrollView, { paddingHorizontal: theme.spacing.medium }]}
+        contentContainerStyle={{ paddingTop: theme.spacing.medium, paddingBottom: theme.spacing.large }}
       >
         <Text
           style={[
             typographyStyles.text_heading2,
-            { textAlign: 'center', color: theme.colors.primary, marginBottom: theme.spacing.medium },
+            {
+              textAlign: 'center',
+              color: theme.colors.primary,
+              marginBottom: theme.spacing.medium,
+            },
           ]}
         >
           How are you feeling?
         </Text>
-        <View style={localStyles.mood_gridContainer}>
-          {moods.map((mood, index) => (
-            <TouchableOpacity
-              key={mood.label}
-              onPress={() => handleSelectMood(index)}
-              style={[
-                localStyles.mood_item,
-                {
-                  flexBasis: '30%',
-                  flexGrow: 1,
-                  maxWidth: '33%',
-                  aspectRatio: 1,
-                },
-                selectedMood?.label === mood.label && {
-                  backgroundColor: theme.moodColors[mood.key] + '20',
-                  borderWidth: 2,
-                  borderColor: theme.colors.outline,
-                  elevation: 2,
-                },
-              ]}
-              accessibilityLabel={`Select mood ${mood.label}`}
-              accessibilityRole="button"
-              accessibilityState={{ selected: selectedMood?.label === mood.label }}
-            >
-              <MaterialCommunityIcons name={mood.icon} size={40} color={theme.moodColors[mood.key]} />
-              <Text
-                style={[
-                  typographyStyles.text_caption,
-                  theme.fonts.labelMedium,
-                  { marginTop: theme.spacing.tiny },
-                ]}
-              >
-                {mood.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <FlatList
+          data={moods}
+          renderItem={renderMoodItem}
+          keyExtractor={(item) => item.label}
+          numColumns={3}
+          contentContainerStyle={localStyles.mood_gridContainer}
+        />
       </ScrollView>
+
       <Modal
         visible={showModal}
         onDismiss={() => setShowModal(false)}
@@ -246,50 +217,93 @@ export function MoodSelector({
           backgroundColor: theme.colors.background,
           padding: theme.spacing.large,
           borderRadius: theme.shape.borderRadius,
-          elevation: 4,
+          elevation: theme.colors.elevation.level4, // <-- changed here
+          shadowColor: theme.colors.shadow,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 6,
         }}
       >
-        <Card>
-          <Card.Title title={selectedMood?.label} />
+        <Card style={{ borderRadius: theme.shape.borderRadius, elevation: 0 }}>
+          <Card.Title
+            title={selectedMood?.label}
+            titleStyle={{ color: theme.colors.primary }}
+            right={(props) => (
+              <IconButton {...props} icon="close" onPress={() => setShowModal(false)} />
+            )}
+          />
           <Card.Content>
-            {renderDurationSlider(selectedMood)}
-            {renderSliderCard(selectedMood)}
-            {selectedMood &&
-              Object.entries(relatedMoods).map(([moodKey, relatedKeys]) => {
-                if (selectedMood.key !== moodKey.toLowerCase()) return null;
-                return relatedKeys.map(rKey => {
-                  const relatedMood: MoodType = {
-                    label: rKey.charAt(0).toUpperCase() + rKey.slice(1),
-                    key: rKey,
-                    icon: 'emoticon-sad', // Map actual icons if desired
-                    value: relatedMoodValues[rKey] || 0,
-                    duration: selectedMood.duration,
-                    isSelected: false,
-                  };
-                  return renderSliderCard(relatedMood, true);
-                });
-              })}
+            <Card
+              style={[
+                localStyles.mood_slider_card,
+                localStyles.component_card_elevated,
+                { marginBottom: theme.spacing.small },
+              ]}
+            >
+              <Card.Content>
+                <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.tiny }]}>
+                  <MaterialCommunityIcons
+                    name="clock-outline"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={[typographyStyles.text_body, theme.fonts.bodyMedium]}>
+                    How long
+                  </Text>
+                </View>
+                <Slider
+                  value={selectedMood?.duration || 0}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={33}
+                  thumbTintColor={theme.colors.primary}
+                  minimumTrackTintColor={theme.colors.primary}
+                  maximumTrackTintColor={theme.colors.surfaceVariant}
+                  onSlidingComplete={onDurationChange}
+                  style={{ height: theme.scaleFont(20) }}
+                  accessibilityLabel={`Set duration for ${selectedMood?.label}`}
+                />
+                <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.tiny }]}>
+                  <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+                    {'< 3 months'}
+                  </Text>
+                  <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+                    6 months
+                  </Text>
+                  <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+                    {'> 1 year'}
+                  </Text>
+                </View>
+              </Card.Content>
+            </Card>
+            {renderMainSliderCard()}
+            {renderRelatedMoodSliders()}
           </Card.Content>
         </Card>
       </Modal>
-      <View style={localStyles.mood_buttonContainer}>
+
+      <View style={[localStyles.mood_buttonContainer, { margin: theme.spacing.medium }]}>
         <EnhancedButton
           mode="outlined"
           onPress={onNext}
-          style={[localStyles.mood_button]}
+          style={localStyles.mood_button}
           accessibilityLabel="Proceed to select focus emotions"
+          fullWidth
         >
-          Next: Focus Emotions
+          NEXT: FOCUS EMOTIONS
         </EnhancedButton>
         <EnhancedButton
           mode="contained"
           onPress={onFinish}
-          style={[localStyles.mood_button]}
+          style={localStyles.mood_button}
           accessibilityLabel="Complete mood selection and return to previous screen"
+          fullWidth
         >
-          Finish
+          FINISH
         </EnhancedButton>
       </View>
     </View>
   );
 }
+
+export default MoodSelector;

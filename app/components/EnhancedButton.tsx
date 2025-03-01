@@ -25,7 +25,6 @@ export default function EnhancedButton({
       ? buttonStyles.button_outlined
       : undefined;
 
-  // Reuse the primary style for contained/outlined buttons
   const shapeStyle: ButtonStyle =
     mode === 'contained' || mode === 'outlined'
       ? buttonStyles.button_primary
@@ -33,12 +32,7 @@ export default function EnhancedButton({
 
   const fullWidthStyle: ButtonStyle = fullWidth ? { width: '100%' } : undefined;
 
-  const buttonStyle: ButtonStyle = [
-    baseStyle,
-    shapeStyle,
-    fullWidthStyle,
-    style,
-  ].filter(Boolean);
+  const buttonStyle: ButtonStyle = [baseStyle, shapeStyle, fullWidthStyle, style].filter(Boolean);
 
   return (
     <Button
@@ -48,6 +42,7 @@ export default function EnhancedButton({
         fontWeight: '600',
         fontSize: theme.scaleFont(16),
         color: mode === 'contained' ? theme.colors.onPrimary : theme.colors.primary,
+        textTransform: 'uppercase',
       }}
       {...props}
     />
