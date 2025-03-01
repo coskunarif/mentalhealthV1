@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, ScrollView, Pressable, FlatList } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Pressable, FlatList, ScrollView } from 'react-native';
 import { Text, Card, Modal, IconButton } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import localStyles from '../config/MoodSelector.styles';
-import { layoutStyles, typographyStyles } from '../config';
+import { typographyStyles } from '../config';
 import { theme } from '../config/theme';
 import type { AppTheme } from '../types/theme';
 import EnhancedButton from './EnhancedButton';
@@ -119,7 +119,7 @@ function MoodSelector({
   const renderRelatedMoodSliders = () => {
     if (!selectedMood) return null;
     return Object.entries(relatedMoods).flatMap(([moodKey, relatedKeys]) => {
-      if (selectedMood.key !== moodKey.toLowerCase()) return [];
+      if (selectedMood.label.toLowerCase() !== moodKey.toLowerCase()) return [];
       return relatedKeys.map(rKey => {
         const relatedMood: MoodType = {
           label: rKey.charAt(0).toUpperCase() + rKey.slice(1),
@@ -156,9 +156,8 @@ function MoodSelector({
           pressed && { opacity: 0.8 },
           isSelected && {
             backgroundColor: theme.moodColors[item.key] + '20',
-            borderWidth: 2,
-            borderColor: theme.colors.outline,
-            elevation: theme.colors.elevation.level2, // <-- changed here
+            borderWidth: 0,
+            elevation: theme.colors.elevation.level2,
             shadowColor: theme.colors.shadow,
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.2,
@@ -185,122 +184,139 @@ function MoodSelector({
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <ScrollView
-        style={[layoutStyles.layout_scrollView, { paddingHorizontal: theme.spacing.medium }]}
-        contentContainerStyle={{ paddingTop: theme.spacing.medium, paddingBottom: theme.spacing.large }}
-      >
-        <Text
-          style={[
-            typographyStyles.text_heading2,
-            {
-              textAlign: 'center',
-              color: theme.colors.primary,
-              marginBottom: theme.spacing.medium,
-            },
-          ]}
-        >
-          How are you feeling?
-        </Text>
-        <FlatList
-          data={moods}
-          renderItem={renderMoodItem}
-          keyExtractor={(item) => item.label}
-          numColumns={3}
-          contentContainerStyle={localStyles.mood_gridContainer}
-        />
-      </ScrollView>
+      <FlatList
+        data={moods}
+        ListHeaderComponent={
+          <Text
+            style={[
+              typographyStyles.text_heading2,
+              {
+                textAlign: 'center',
+                color: theme.colors.primary,
+                marginTop: theme.spacing.medium,
+                marginBottom: theme.spacing.medium,
+              },
+            ]}
+          >
+            How are you feeling?
+          </Text>
+        }
+        renderItem={renderMoodItem}
+        keyExtractor={(item) => item.label}
+        numColumns={3}
+        contentContainerStyle={localStyles.mood_gridContainer}
+        ListFooterComponent={<View style={{ height: theme.spacing.large }} />}
+      />
 
+      {/* Fixed Modal Implementation */}
       <Modal
         visible={showModal}
         onDismiss={() => setShowModal(false)}
         contentContainerStyle={{
           backgroundColor: theme.colors.background,
           padding: theme.spacing.large,
+          margin: theme.spacing.medium,
           borderRadius: theme.shape.borderRadius,
-          elevation: theme.colors.elevation.level4, // <-- changed here
+          elevation: theme.colors.elevation.level4,
           shadowColor: theme.colors.shadow,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 6,
+          maxHeight: '80%',
         }}
       >
-        <Card style={{ borderRadius: theme.shape.borderRadius, elevation: 0 }}>
-          <Card.Title
-            title={selectedMood?.label}
-            titleStyle={{ color: theme.colors.primary }}
-            right={(props) => (
-              <IconButton {...props} icon="close" onPress={() => setShowModal(false)} />
-            )}
-          />
-          <Card.Content>
-            <Card
-              style={[
-                localStyles.mood_slider_card,
-                localStyles.component_card_elevated,
-                { marginBottom: theme.spacing.small },
-              ]}
-            >
-              <Card.Content>
-                <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.tiny }]}>
-                  <MaterialCommunityIcons
-                    name="clock-outline"
-                    size={24}
-                    color={theme.colors.primary}
-                  />
-                  <Text style={[typographyStyles.text_body, theme.fonts.bodyMedium]}>
-                    How long
-                  </Text>
-                </View>
-                <Slider
-                  value={selectedMood?.duration || 0}
-                  minimumValue={0}
-                  maximumValue={100}
-                  step={33}
-                  thumbTintColor={theme.colors.primary}
-                  minimumTrackTintColor={theme.colors.primary}
-                  maximumTrackTintColor={theme.colors.surfaceVariant}
-                  onSlidingComplete={onDurationChange}
-                  style={{ height: theme.scaleFont(20) }}
-                  accessibilityLabel={`Set duration for ${selectedMood?.label}`}
+        <ScrollView contentContainerStyle={{ paddingBottom: theme.spacing.large }}>
+          <Card style={{ borderRadius: theme.shape.borderRadius, elevation: 0, borderWidth: 0 }}>
+            <Card.Title
+              title={selectedMood?.label}
+              titleStyle={{ color: theme.colors.primary }}
+              right={(props) => (
+                <IconButton
+                  {...props}
+                  icon="close"
+                  onPress={() => setShowModal(false)}
+                  style={{ padding: theme.spacing.small }}
+                  accessibilityLabel="Close modal"
                 />
-                <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.tiny }]}>
-                  <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
-                    {'< 3 months'}
-                  </Text>
-                  <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
-                    6 months
-                  </Text>
-                  <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
-                    {'> 1 year'}
-                  </Text>
-                </View>
-              </Card.Content>
-            </Card>
-            {renderMainSliderCard()}
-            {renderRelatedMoodSliders()}
-          </Card.Content>
-        </Card>
+              )}
+            />
+            <Card.Content>
+              <Card
+                style={[
+                  localStyles.mood_slider_card,
+                  localStyles.component_card_elevated,
+                  { marginBottom: theme.spacing.small, borderWidth: 0 },
+                ]}
+              >
+                <Card.Content>
+                  <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.tiny }]}>
+                    <MaterialCommunityIcons
+                      name="clock-outline"
+                      size={24}
+                      color={theme.colors.primary}
+                    />
+                    <Text style={[
+                      typographyStyles.text_body,
+                      theme.fonts.bodyMedium,
+                      { marginLeft: theme.spacing.small, color: theme.colors.onSurface }
+                    ]}>
+                      How long
+                    </Text>
+                  </View>
+                  <Slider
+                    value={selectedMood?.duration || 0}
+                    minimumValue={0}
+                    maximumValue={100}
+                    step={33}
+                    thumbTintColor={theme.colors.primary}
+                    minimumTrackTintColor={theme.colors.primary}
+                    maximumTrackTintColor={theme.colors.surfaceVariant}
+                    onSlidingComplete={onDurationChange}
+                    style={{ height: theme.scaleFont(20) }}
+                    accessibilityLabel={`Set duration for ${selectedMood?.label}`}
+                  />
+                  <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.tiny }]}>
+                    <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+                      {'< 3 months'}
+                    </Text>
+                    <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+                      6 months
+                    </Text>
+                    <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+                      {'> 1 year'}
+                    </Text>
+                  </View>
+                </Card.Content>
+              </Card>
+              {renderMainSliderCard()}
+              {renderRelatedMoodSliders()}
+            </Card.Content>
+          </Card>
+        </ScrollView>
       </Modal>
 
+      {/* Fixed button container */}
       <View style={[localStyles.mood_buttonContainer, { margin: theme.spacing.medium }]}>
-        <EnhancedButton
-          mode="outlined"
-          onPress={onNext}
-          style={localStyles.mood_button}
-          accessibilityLabel="Proceed to select focus emotions"
-          fullWidth
-        >
-          NEXT: FOCUS EMOTIONS
-        </EnhancedButton>
-        <EnhancedButton
-          mode="contained"
-          onPress={onFinish}
-          style={localStyles.mood_button}
-          accessibilityLabel="Complete mood selection and return to previous screen"
-          fullWidth
-        >
-          FINISH
-        </EnhancedButton>
+        <View style={{ flex: 1, marginHorizontal: theme.spacing.small }}>
+          <EnhancedButton
+            mode="outlined"
+            onPress={onNext}
+            accessibilityLabel="Proceed to select focus emotions"
+            fullWidth
+          >
+            NEXT: FOCUS EMOTIONS
+          </EnhancedButton>
+        </View>
+        <View style={{ flex: 1, marginHorizontal: theme.spacing.small }}>
+          <EnhancedButton
+            mode="contained"
+            onPress={onFinish}
+            accessibilityLabel="Complete mood selection and return to previous screen"
+            fullWidth
+          >
+            FINISH
+          </EnhancedButton>
+        </View>
       </View>
     </View>
   );
