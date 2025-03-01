@@ -1,3 +1,6 @@
+// File: app\components\MoodSelector.tsx
+// Updates to fix button design, selection highlight, and modal styling
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Pressable, FlatList, ScrollView } from 'react-native';
 import { Text, Card, Modal, IconButton } from 'react-native-paper';
@@ -155,13 +158,15 @@ function MoodSelector({
           localStyles.mood_item,
           pressed && { opacity: 0.8 },
           isSelected && {
-            backgroundColor: theme.moodColors[item.key] + '20',
-            borderWidth: 0,
+            // Enhanced selection highlight with a soft tint of the emotion color
+            backgroundColor: theme.moodColors[item.key] + '15',
+            borderWidth: 1,
+            borderColor: theme.moodColors[item.key] + '40',
             elevation: theme.colors.elevation.level2,
-            shadowColor: theme.colors.shadow,
+            shadowColor: theme.moodColors[item.key],
             shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
+            shadowOpacity: 0.25,
+            shadowRadius: 3.5,
           },
         ]}
         accessibilityLabel={`Select mood ${item.label}`}
@@ -173,7 +178,11 @@ function MoodSelector({
           style={[
             typographyStyles.text_caption,
             theme.fonts.labelMedium,
-            { marginTop: theme.spacing.tiny },
+            { 
+              marginTop: theme.spacing.tiny,
+              color: isSelected ? theme.moodColors[item.key] : theme.colors.onSurfaceVariant,
+              fontWeight: isSelected ? '600' : '400'
+            },
           ]}
         >
           {item.label}
@@ -193,8 +202,8 @@ function MoodSelector({
               {
                 textAlign: 'center',
                 color: theme.colors.primary,
-                marginTop: theme.spacing.medium,
-                marginBottom: theme.spacing.medium,
+                marginTop: theme.spacing.large,
+                marginBottom: theme.spacing.large,
               },
             ]}
           >
@@ -205,10 +214,10 @@ function MoodSelector({
         keyExtractor={(item) => item.label}
         numColumns={3}
         contentContainerStyle={localStyles.mood_gridContainer}
-        ListFooterComponent={<View style={{ height: theme.spacing.large }} />}
+        ListFooterComponent={<View style={{ height: theme.spacing.large * 2 }} />}
       />
 
-      {/* Fixed Modal Implementation */}
+      {/* Enhanced Modal Implementation */}
       <Modal
         visible={showModal}
         onDismiss={() => setShowModal(false)}
@@ -229,27 +238,36 @@ function MoodSelector({
           <Card style={{ borderRadius: theme.shape.borderRadius, elevation: 0, borderWidth: 0 }}>
             <Card.Title
               title={selectedMood?.label}
-              titleStyle={{ color: theme.colors.primary }}
+              titleStyle={{ 
+                color: selectedMood ? theme.moodColors[selectedMood.key] : theme.colors.primary,
+                fontWeight: '600',
+                fontSize: theme.scaleFont(18) 
+              }}
               right={(props) => (
                 <IconButton
                   {...props}
                   icon="close"
+                  iconColor={theme.colors.onSurfaceVariant}
+                  size={24}
                   onPress={() => setShowModal(false)}
-                  style={{ padding: theme.spacing.small }}
+                  style={{ 
+                    padding: theme.spacing.medium,
+                    margin: theme.spacing.small 
+                  }}
                   accessibilityLabel="Close modal"
                 />
               )}
             />
-            <Card.Content>
+            <Card.Content style={{ marginTop: theme.spacing.medium }}>
               <Card
                 style={[
                   localStyles.mood_slider_card,
                   localStyles.component_card_elevated,
-                  { marginBottom: theme.spacing.small, borderWidth: 0 },
+                  { marginBottom: theme.spacing.medium, borderWidth: 0 },
                 ]}
               >
                 <Card.Content>
-                  <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.tiny }]}>
+                  <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.small }]}>
                     <MaterialCommunityIcons
                       name="clock-outline"
                       size={24}
@@ -260,7 +278,7 @@ function MoodSelector({
                       theme.fonts.bodyMedium,
                       { marginLeft: theme.spacing.small, color: theme.colors.onSurface }
                     ]}>
-                      How long
+                      How long have you felt this way?
                     </Text>
                   </View>
                   <Slider
@@ -275,7 +293,7 @@ function MoodSelector({
                     style={{ height: theme.scaleFont(20) }}
                     accessibilityLabel={`Set duration for ${selectedMood?.label}`}
                   />
-                  <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.tiny }]}>
+                  <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.small }]}>
                     <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
                       {'< 3 months'}
                     </Text>
@@ -295,16 +313,16 @@ function MoodSelector({
         </ScrollView>
       </Modal>
 
-      {/* Fixed button container */}
-      <View style={[localStyles.mood_buttonContainer, { margin: theme.spacing.medium }]}>
+      {/* Enhanced button container */}
+      <View style={[localStyles.mood_buttonContainer, { padding: theme.spacing.medium }]}>
         <View style={{ flex: 1, marginHorizontal: theme.spacing.small }}>
           <EnhancedButton
             mode="outlined"
             onPress={onNext}
-            accessibilityLabel="Proceed to select focus emotions"
+            accessibilityLabel="Proceed to focus emotions screen"
             fullWidth
           >
-            NEXT: FOCUS EMOTIONS
+            NEXT
           </EnhancedButton>
         </View>
         <View style={{ flex: 1, marginHorizontal: theme.spacing.small }}>
