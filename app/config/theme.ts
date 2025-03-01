@@ -63,7 +63,7 @@ export const theme: AppTheme = {
     inversePrimary: '#9ECAFF',
     surfaceDisabled: 'rgba(28, 27, 31, 0.12)',
     onSurfaceDisabled: 'rgba(28, 27, 31, 0.38)',
-    backdrop: 'rgba(45, 48, 56, 0.4)',
+    backdrop: 'rgba(45, 48, 56, 0.3)',
     elevation: { level0: 0, level1: 1, level2: 2, level3: 3, level4: 4, level5: 5 },
   },
   spacing: {

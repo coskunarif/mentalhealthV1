@@ -1,4 +1,3 @@
-// File: app\components\MoodSelector.tsx
 // Updates to fix button design, selection highlight, and modal styling
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -221,17 +220,22 @@ function MoodSelector({
       <Modal
         visible={showModal}
         onDismiss={() => setShowModal(false)}
+        style={{ 
+          zIndex: 3 // Ensure modal stays below button container
+        }}
         contentContainerStyle={{
           backgroundColor: theme.colors.background,
           padding: theme.spacing.large,
+          paddingTop: theme.spacing.large * 1.5,
           margin: theme.spacing.medium,
+          marginTop: theme.spacing.large,
           borderRadius: theme.shape.borderRadius,
           elevation: theme.colors.elevation.level4,
           shadowColor: theme.colors.shadow,
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 6,
-          maxHeight: '80%',
+          maxHeight: '75%', // Slightly smaller to avoid covering buttons
         }}
       >
         <ScrollView contentContainerStyle={{ paddingBottom: theme.spacing.large }}>
@@ -258,12 +262,12 @@ function MoodSelector({
                 />
               )}
             />
-            <Card.Content style={{ marginTop: theme.spacing.medium }}>
+            <Card.Content style={{ marginTop: theme.spacing.large }}>
               <Card
                 style={[
                   localStyles.mood_slider_card,
                   localStyles.component_card_elevated,
-                  { marginBottom: theme.spacing.medium, borderWidth: 0 },
+                  { marginBottom: theme.spacing.large, borderWidth: 0, paddingVertical: theme.spacing.small },
                 ]}
               >
                 <Card.Content>
@@ -321,8 +325,14 @@ function MoodSelector({
             onPress={onNext}
             accessibilityLabel="Proceed to focus emotions screen"
             fullWidth
+            labelStyle={{
+              fontWeight: '600',
+              fontSize: theme.scaleFont(16),
+              color: theme.colors.primary,
+              textTransform: 'uppercase',
+            }}
           >
-            NEXT
+            NEXT: EMOTIONS
           </EnhancedButton>
         </View>
         <View style={{ flex: 1, marginHorizontal: theme.spacing.small }}>
@@ -330,10 +340,16 @@ function MoodSelector({
             mode="contained"
             onPress={onFinish}
             accessibilityLabel="Complete mood selection and return to previous screen"
-            fullWidth
-          >
-            FINISH
-          </EnhancedButton>
+  fullWidth
+  labelStyle={{
+    fontWeight: '600',
+    fontSize: theme.scaleFont(16),
+    color: theme.colors.primary,
+    textTransform: 'uppercase',
+  }}
+>
+  NEXT: EMOTIONS
+</EnhancedButton>
         </View>
       </View>
     </View>

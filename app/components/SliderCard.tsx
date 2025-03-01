@@ -1,4 +1,3 @@
-// File: app\components\SliderCard.tsx
 // Updated SliderCard component with improved scale indicators and visual feedback
 
 import React from 'react';
@@ -49,11 +48,11 @@ const SliderCard: React.FC<SliderCardProps> = ({
       ]}
       accessibilityLabel={`${isRelated ? 'Related ' : ''}Intensity slider for ${mood.label}`}
     >
-      <Card.Content>
-        <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.small }]}>
+      <Card.Content style={{ padding: theme.spacing.medium * 1.25 }}>
+        <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.medium }]}>
           <MaterialCommunityIcons 
             name={mood.icon} 
-            size={24} 
+            size={26} 
             color={theme.moodColors[mood.key]} 
           />
           <Text style={[
@@ -62,7 +61,8 @@ const SliderCard: React.FC<SliderCardProps> = ({
             { 
               marginLeft: theme.spacing.small,
               color: theme.colors.onSurface,
-              flex: 1
+              flex: 1,
+              fontWeight: '500'
             }
           ]}>
             {mood.label}
@@ -103,17 +103,153 @@ const SliderCard: React.FC<SliderCardProps> = ({
           </View>
           
           <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.tiny }]}>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>0</Text>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>25</Text>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>50</Text>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>75</Text>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>100</Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              0
+            </Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              25
+            </Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              50
+            </Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              75
+            </Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              100
+            </Text>
           </View>
           
           <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.small }]}>
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>Low Intensity</Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+  theme.fonts.labelSmall, 
+  { 
+    color: theme.colors.onSurface,
+    fontWeight: '600', // Increased weight
+    opacity: 0.9 // Ensures contrast without changing color system
+  }
+]}>
+              Low Intensity
+            </Text>
             <View style={{ flex: 1 }} />
-            <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>High Intensity</Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { 
+                color: theme.colors.onSurface, 
+                fontWeight: '500' 
+              }
+            ]}>
+              High Intensity
+            </Text>
+          </View>
+        </View>
+      </Card.Content>
+      <Card.Content style={{ padding: theme.spacing.medium * 1.25 }}>
+        <View style={{ paddingHorizontal: theme.spacing.tiny }}>
+          <Slider
+            value={mood.value}
+            minimumValue={0}
+            maximumValue={100}
+            step={1}
+            thumbTintColor={sliderColor}
+            minimumTrackTintColor={sliderColor}
+            maximumTrackTintColor={theme.colors.surfaceVariant}
+            onSlidingComplete={(val) => onSlidingComplete(val, mood.label)}
+            style={{ height: theme.scaleFont(20) }}
+          />
+          
+          {/* Scale indicators with tick marks */}
+          <View style={[
+            localStyles.mood_sliderTicksContainer,
+            { marginTop: -theme.spacing.tiny }
+          ]}>
+            {[0, 25, 50, 75, 100].map(tick => (
+              <View key={tick} style={localStyles.mood_sliderTick} />
+            ))}
+          </View>
+          
+          <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.tiny }]}>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              0
+            </Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              25
+            </Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              50
+            </Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              75
+            </Text>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { color: theme.colors.onSurface }
+            ]}>
+              100
+            </Text>
+          </View>
+          
+          <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.small }]}>
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { 
+                color: theme.colors.onSurface, 
+                fontWeight: '500' 
+              }
+            ]}>
+              Low Intensity
+            </Text>
+            <View style={{ flex: 1 }} />
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { 
+                color: theme.colors.onSurface, 
+                fontWeight: '500' 
+              }
+            ]}>
+              High Intensity
+            </Text>
           </View>
         </View>
       </Card.Content>
