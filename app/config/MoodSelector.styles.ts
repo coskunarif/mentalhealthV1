@@ -10,7 +10,7 @@ export default StyleSheet.create({
   },
   mood_item: {
     flex: 1,
-    margin: theme.spacing.small,
+    margin: theme.spacing.medium, // Increased to 16 units
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -82,11 +82,17 @@ export default StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: theme.withOpacity(theme.colors.background, 0.95),
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.outlineVariant,
+    backgroundColor: theme.withOpacity(theme.colors.background, 0.98),
+    // Removed divider line
     paddingTop: theme.spacing.medium,
     paddingBottom: theme.spacing.large,
+    // Added elevation and shadow for better separation instead of border
+    elevation: 8,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 2 }, // Changed to downward shadow
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    zIndex: 5,
   },
   modalBackdrop: {
     backgroundColor: theme.withOpacity(theme.colors.backdrop, 0.8),
@@ -96,9 +102,16 @@ export default StyleSheet.create({
   },
   modalContent: {
     backgroundColor: theme.colors.background,
-    borderRadius: theme.shape.borderRadius,
-    width: '90%',
-    maxHeight: '80%',
     padding: theme.spacing.large,
+    paddingTop: theme.spacing.large * 1.5, // Increased top padding (36 units)
+    margin: theme.spacing.medium,
+    marginTop: theme.spacing.large,
+    borderRadius: theme.shape.borderRadius,
+    elevation: theme.colors.elevation.level4,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    maxHeight: '75%',
   },
 });
