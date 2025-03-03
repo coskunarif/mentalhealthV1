@@ -10,7 +10,7 @@ export default StyleSheet.create({
   },
   mood_item: {
     flex: 1,
-    margin: theme.spacing.small, // Reduced from medium to small for more space
+    margin: theme.spacing.small,
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -18,7 +18,7 @@ export default StyleSheet.create({
     backgroundColor: theme.colors.surface,
     position: 'relative',
     padding: theme.spacing.small,
-    // Light elevation for all mood items
+    // Standardized elevation for all mood items
     elevation: theme.colors.elevation.level1,
     shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 1 },
@@ -82,19 +82,21 @@ export default StyleSheet.create({
   bottom: 0,
   left: 0,
   right: 0,
-  backgroundColor: theme.colors.background, // Changed from withOpacity to solid color
-  paddingTop: theme.spacing.medium,
-  paddingBottom: theme.spacing.large,
-  // Reduced elevation for a more integrated look
+  backgroundColor: theme.colors.background,
+  paddingVertical: theme.spacing.medium, // Consistent vertical padding
+  paddingHorizontal: theme.spacing.large, // More horizontal padding for better spacing
+  // Improved elevation for better visual hierarchy
   elevation: 4,
   shadowColor: theme.colors.shadow,
-  shadowOffset: { width: 0, height: -1 }, // Changed to upward shadow for subtler effect
-  shadowOpacity: 0.05,
-  shadowRadius: 2,
+  shadowOffset: { width: 0, height: -2 }, // Stronger upward shadow
+  shadowOpacity: 0.08, // Slightly increased for better visibility
+  shadowRadius: 3,
   zIndex: 5,
+  borderTopWidth: 1, // Add subtle top border
+  borderTopColor: theme.colors.outlineVariant,
 },
   modalBackdrop: {
-    backgroundColor: theme.withOpacity(theme.colors.backdrop, 0.8),
+    backgroundColor: theme.withOpacity(theme.colors.backdrop, 0.9), // Increased from 0.8 to 0.9
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
