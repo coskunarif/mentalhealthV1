@@ -7,44 +7,39 @@ import { ViewStyle } from 'react-native';
 export default StyleSheet.create({
   button_contained: {
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.shape.borderRadius,
-    // Add subtle inner shadow for depth
-    borderBottomWidth: 1,
-    borderBottomColor: theme.withOpacity(theme.colors.shadow, 0.2),
+    borderRadius: 20, // Material Design M3 filled button radius
+    // Remove inner shadow - not part of Material Design
   } as ViewStyle,
 
   button_primary: {
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.shape.borderRadius,
+    borderRadius: 20, // Material Design M3 filled button radius
     marginVertical: theme.spacing.small,
-    height: 48, // Fixed height for consistency
+    height: 40, // Material Design button height
     justifyContent: 'center',
     alignItems: 'center',
-    // Enhanced elevation for better visual hierarchy
-    elevation: theme.colors.elevation.level2,
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 2 },
+    // Material Design elevation
+    elevation: 2,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
-    shadowRadius: 3,
-    // Add tap state styling
+    shadowRadius: 1.5,
+    // Material Design state layer
     position: 'relative',
-    overflow: 'hidden', // Ensure ripple stays within bounds
+    overflow: 'hidden',
   } as ViewStyle,
 
   button_outlined: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: 'transparent', // Outlined buttons have transparent bg in Material Design
     borderColor: theme.colors.primary,
-    borderWidth: 1.5, // Slightly thicker border for better visibility
-    borderRadius: theme.shape.borderRadius,
+    borderWidth: 1, // Standard border width
+    borderRadius: 20, // Material Design M3 outlined button radius
     marginVertical: theme.spacing.small,
-    height: 48, // Fixed height for consistency
+    height: 40, // Material Design button height
     justifyContent: 'center',
     alignItems: 'center',
-    // Add subtle elevation for depth
-    elevation: 1,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
+    // Remove elevation from outlined buttons per Material Design
+    elevation: 0,
+    shadowOpacity: 0,
   } as ViewStyle,
 });

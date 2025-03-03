@@ -162,47 +162,62 @@ function MoodSelector({
 
   const renderMoodItem = ({ item, index }: { item: MoodType; index: number }) => {
     const isSelected = selectedMood?.label === item.label;
+    const moodColor = theme.moodColors[item.key];
+    
     return (
       <Pressable
         onPress={() => handleSelectMood(index)}
         style={({ pressed }) => [
           localStyles.mood_item,
-          pressed && { opacity: 0.8 },
+          pressed && { opacity: 0.7 }, // More subtle press state
           isSelected && {
-            // More consistent selection highlight with Material Design principles
-            backgroundColor: theme.colors.surface, // Keep background light
-            borderWidth: 2, // Use thicker border for selection
-            borderColor: theme.moodColors[item.key], // Use the mood color directly
+            // Proper Material Design selection state
+            backgroundColor: theme.withOpacity(moodColor, 0.08), // Light background tint
+            borderWidth: 0, // Remove border
+            // Consistent elevation for selected state
             elevation: theme.colors.elevation.level2,
-            shadowColor: theme.moodColors[item.key],
+            shadowColor: theme.colors.shadow,
             shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.5,
+            shadowOpacity: 0.2,
+            shadowRadius: 2,
           },
         ]}
         accessibilityLabel={`Select mood ${item.label}`}
         accessibilityRole="button"
         accessibilityState={{ selected: isSelected }}
       >
+        {/* Optional selection ring around the icon for clearer state */}
+        {isSelected && (
+          <View 
+            style={{
+              position: 'absolute',
+              top: 0, left: 0, right: 0, bottom: 0,
+              borderRadius: theme.shape.borderRadius,
+              borderWidth: 2,
+              borderColor: moodColor,
+              opacity: 0.5,
+            }}
+          />
+        )}
+        
         <MaterialCommunityIcons 
           name={item.icon} 
-          size={40} 
-          color={theme.moodColors[item.key]} 
+          size={36} // Slightly smaller for better proportion
+          color={moodColor} 
         />
+        
         <Text
           style={[
             typographyStyles.text_caption,
             theme.fonts.labelMedium,
             { 
               marginTop: theme.spacing.tiny,
-              color: isSelected ? theme.moodColors[item.key] : theme.colors.onSurfaceVariant,
+              color: isSelected ? moodColor : theme.colors.onSurfaceVariant,
               fontWeight: isSelected ? '600' : '400',
               textAlign: 'center',
               flexShrink: 1,
-              // Prevent long text from wrapping awkwardly
-              ...(item.label.length > 8 ? { 
-                fontSize: theme.scaleFont(10),
-              } : {})
+              letterSpacing: 0.25, // Better readability
+              ...(item.label.length > 8 ? { fontSize: theme.scaleFont(10) } : {})
             },
           ]}
           numberOfLines={1}
@@ -210,16 +225,16 @@ function MoodSelector({
           {item.label}
         </Text>
         
-        {/* Add selection indicator dot for better accessibility */}
+        {/* Material Design ripple indicator - a simple dot */}
         {isSelected && (
           <View 
             style={{
               position: 'absolute',
               bottom: 4,
-              width: 6,
-              height: 6,
-              borderRadius: 3,
-              backgroundColor: theme.moodColors[item.key],
+              width: 4,
+              height: 4,
+              borderRadius: 2,
+              backgroundColor: moodColor,
             }}
           />
         )}
@@ -237,9 +252,11 @@ function MoodSelector({
               typographyStyles.text_heading2,
               {
                 textAlign: 'center',
-                color: theme.colors.primary,
+                color: theme.colors.onSurface, // Use semantic color role
                 marginTop: theme.spacing.large,
                 marginBottom: theme.spacing.large,
+                fontWeight: '500', // Medium weight for headings
+                letterSpacing: 0, // Material Design spec for headlines
               },
             ]}
           >
@@ -362,10 +379,154 @@ function MoodSelector({
         </ScrollView>
       </Modal>
 
+<Modal
+  visible={showModal}
+  onDismiss={() => setShowModal(false)}
+  style={{ 
+    margin: 0, // Ensure full width on mobile
+    justifyContent: 'flex-end', // Material Design bottom sheets
+  }}
+  contentContainerStyle={{
+    backgroundColor: theme.colors.surface,
+    borderTopLeftRadius: 28, // Material Design M3 spec for bottom sheets
+    borderTopRightRadius: 28, // Material Design M3 spec for bottom sheets
+    paddingTop: theme.spacing.large,
+    paddingBottom: theme.spacing.large,
+    maxHeight: '80%', // Ensure enough room for content
+    // Material Design elevation
+    elevation: theme.colors.elevation.level3,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  }}
+>
+  {/* Material Design Bottom Sheet handle */}
+  <View 
+    style={{ 
+      width: 32,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: theme.colors.outlineVariant,
+      alignSelf: 'center',
+      marginBottom: 24,
+    }} 
+  />
+  <ScrollView 
+    contentContainerStyle={{ 
+      paddingHorizontal: 24, // Material Design standard padding
+      paddingBottom: theme.spacing.large 
+    }}
+  >
+    <Card style={{ borderRadius: 0, elevation: 0, borderWidth: 0 }}>
+      <Card.Title
+        title={selectedMood?.label}
+        titleStyle={{ 
+          color: selectedMood 
+            ? theme.moodColors[selectedMood.key]
+            : theme.colors.onSurface,
+          fontWeight: '500', // Medium weight per Material Design
+          fontSize: 22, // Material Design headline small
+          letterSpacing: 0, // Material Design headline spec
+        }}
+        right={(props) => (
+          <IconButton
+            {...props}
+            icon="close"
+            iconColor={theme.colors.onSurfaceVariant}
+            size={24}
+            onPress={() => setShowModal(false)}
+            style={{ margin: 0 }}
+            accessibilityLabel="Close modal"
+          />
+        )}
+      />
+      
+      <Card.Content style={{ marginTop: 24 }}>
+        {/* ISSUE: Slider Implementation - Update to Material Design slider */}
+        <Card
+          style={[
+            {
+              marginBottom: 16,
+              borderRadius: 16, // Material Design M3 card radius
+              // Material Design card elevation
+              elevation: 1,
+              backgroundColor: theme.colors.surfaceVariant,
+            },
+          ]}
+        >
+          <Card.Content style={{ padding: 16 }}>
+            <View style={[localStyles.mood_headerRow, { marginBottom: 16 }]}>
+              <MaterialCommunityIcons
+                name="clock-outline"
+                size={24}
+                color={theme.colors.primary} // Consistent with app's primary color
+              />
+              <Text style={[
+                typographyStyles.text_body,
+                theme.fonts.bodyMedium,
+                { 
+                  marginLeft: 12, 
+                  color: theme.colors.onSurface,
+                  flex: 1,
+                }
+              ]}>
+                How long have you felt this way?
+              </Text>
+            </View>
+            
+            {/* Improved Material Design slider with thumb label */}
+            <Slider
+              value={selectedMood?.duration || 0}
+              minimumValue={0}
+              maximumValue={100}
+              step={33}
+              thumbTintColor={theme.colors.primary}
+              minimumTrackTintColor={theme.colors.primary}
+              maximumTrackTintColor={theme.withOpacity(theme.colors.onSurfaceVariant, 0.38)}
+              onSlidingComplete={onDurationChange}
+              style={{ height: 40 }} // Increased touch target
+              accessibilityLabel={`Set duration for ${selectedMood?.label}`}
+            />
+            
+            {/* Material Design slider label layout */}
+            <View style={[localStyles.mood_sliderLabels, { marginTop: 4 }]}>
+              <Text style={[
+                typographyStyles.text_caption, 
+                theme.fonts.labelSmall,
+                { color: theme.colors.onSurfaceVariant }
+              ]}>
+                {'< 3 months'}
+              </Text>
+              <Text style={[
+                typographyStyles.text_caption, 
+                theme.fonts.labelSmall,
+                { color: theme.colors.onSurfaceVariant }
+              ]}>
+                6 months
+              </Text>
+              <Text style={[
+                typographyStyles.text_caption, 
+                theme.fonts.labelSmall,
+                { color: theme.colors.onSurfaceVariant }
+              ]}>
+                {'> 1 year'}
+              </Text>
+            </View>
+          </Card.Content>
+        </Card>
+        
+        {renderMainSliderCard()}
+        {renderRelatedMoodSliders()}
+      </Card.Content>
+    </Card>
+  </ScrollView>
+</Modal>
+
       {/* Enhanced button container */}
       <View style={[
         localStyles.mood_buttonContainer,
-        isSmallScreen && { flexDirection: 'column' } // Stack buttons on small screens
+        isSmallScreen && { flexDirection: 'column' }
       ]}>
         <View style={{ 
           flex: 1, 
@@ -378,14 +539,16 @@ function MoodSelector({
             accessibilityLabel="Proceed to focus emotions screen"
             fullWidth
             labelStyle={{
-              fontWeight: '500',
+              fontWeight: '500', // Use Medium weight per Material Design
               fontSize: theme.scaleFont(14),
-              color: theme.colors.primary,
+              letterSpacing: 0.1, // Material Design label spec
               textTransform: 'uppercase',
-              letterSpacing: 0.5, // Add letter spacing for better readability
+              color: theme.colors.primary,
             }}
+            // Add icon prop for clearer action button
+            icon="arrow-right"
           >
-            NEXT: EMOTIONS
+            NEXT
           </EnhancedButton>
         </View>
         <View style={{ 
@@ -395,15 +558,17 @@ function MoodSelector({
           <EnhancedButton
             mode="contained"
             onPress={onFinish}
-            accessibilityLabel="Complete mood selection and return to previous screen"
+            accessibilityLabel="Complete mood selection"
             fullWidth
             labelStyle={{
-              fontWeight: '500',
+              fontWeight: '500', // Use Medium weight per Material Design
               fontSize: theme.scaleFont(14),
-              color: theme.colors.onPrimary,
+              letterSpacing: 0.1, // Material Design label spec
               textTransform: 'uppercase',
-              letterSpacing: 0.5, // Add letter spacing for better readability
+              color: theme.colors.onPrimary,
             }}
+            // Add icon for clearer action
+            icon="check"
           >
             FINISH
           </EnhancedButton>

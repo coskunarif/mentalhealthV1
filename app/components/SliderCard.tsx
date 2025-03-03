@@ -20,132 +20,163 @@ const SliderCard: React.FC<SliderCardProps> = ({
   onSlidingComplete,
   isRelated = false,
 }) => {
-  // Get a softer background color based on the mood color for better visual hierarchy
-  const getBackgroundColor = () => {
-    return theme.moodColors[mood.key] + '10'; // 10% opacity
-  };
-
-  // Determine text color based on intensity for better feedback
-  const getValueTextColor = () => {
-    if (mood.value >= 70) return theme.colors.error;
-    if (mood.value >= 40) return theme.colors.primary;
+  // Determine state color based on Material Design state layering
+  const stateColor = theme.moodColors[mood.key];
+  
+  // Linear interpolation helper for color based on value
+  const getValueColor = () => {
+    if (mood.value >= 75) return theme.colors.error;
+    if (mood.value >= 50) return theme.colors.secondary;
+    if (mood.value >= 25) return theme.colors.primary;
     return theme.colors.onSurfaceVariant;
   };
 
   return (
     <Card
       style={[
-        localStyles.component_card_elevated,
-        localStyles.mood_slider_card,
-        { 
-          marginBottom: theme.spacing.medium,
-          backgroundColor: isRelated ? theme.colors.surface : getBackgroundColor(),
-          borderLeftWidth: 4,
-          borderLeftColor: theme.moodColors[mood.key],
-          // Remove default padding to let Card.Content handle it consistently
-          padding: 0,
+        {
+          marginBottom: 16,
+          borderRadius: 16, // Material Design M3 card radius
+          // Material Design card elevation
+          elevation: isRelated ? 1 : 2,
+          backgroundColor: isRelated 
+            ? theme.colors.surface 
+            : theme.withOpacity(stateColor, 0.05), // Subtle background tint
         },
       ]}
       accessibilityLabel={`${isRelated ? 'Related ' : ''}Intensity slider for ${mood.label}`}
     >
-      <Card.Content style={{ 
-        padding: theme.spacing.medium,
-        paddingVertical: theme.spacing.medium + 4, // Increase vertical padding for better spacing
-      }}>
-        <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.medium }]}>
+      <Card.Content style={{ padding: 16 }}>
+        <View style={[{ 
+          flexDirection: 'row', 
+          alignItems: 'center', 
+          marginBottom: 16 
+        }]}>
           <MaterialCommunityIcons 
             name={mood.icon} 
-            size={26} 
-            color={theme.moodColors[mood.key]} 
+            size={24} 
+            color={stateColor} 
           />
+          
           <Text style={[
             typographyStyles.text_body, 
-            theme.fonts.bodyMedium, 
             { 
-              marginLeft: theme.spacing.small,
+              marginLeft: 12,
               color: theme.colors.onSurface,
+              fontWeight: '500', // Medium weight per Material Design
               flex: 1,
-              fontWeight: '500'
             }
           ]}>
             {mood.label}
           </Text>
-          <Text style={[
-            typographyStyles.text_body,
-            theme.fonts.bodyMedium,
-            {
-              fontWeight: '600',
-              color: getValueTextColor()
-            }
-          ]}>
-            {mood.value}/100
-          </Text>
+          
+          {/* Material Design chip-like value indicator */}
+          <View style={{
+            backgroundColor: theme.withOpacity(getValueColor(), 0.08),
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            borderRadius: 16,
+            borderWidth: 1,
+            borderColor: theme.withOpacity(getValueColor(), 0.12),
+          }}>
+            <Text style={[
+              {
+                fontWeight: '500', // Medium weight per Material Design
+                fontSize: 14,
+                color: getValueColor(),
+              }
+            ]}>
+              {mood.value}/100
+            </Text>
+          </View>
         </View>
         
-        <View style={{ paddingHorizontal: theme.spacing.tiny }}>
+        <View style={{ paddingHorizontal: 8 }}>
           <Slider
             value={mood.value}
             minimumValue={0}
             maximumValue={100}
             step={1}
-            thumbTintColor={sliderColor}
-            minimumTrackTintColor={sliderColor}
-            maximumTrackTintColor={theme.colors.surfaceVariant}
+            thumbTintColor={stateColor}
+            minimumTrackTintColor={stateColor}
+            maximumTrackTintColor={theme.withOpacity(theme.colors.onSurfaceVariant, 0.38)}
             onSlidingComplete={(val) => onSlidingComplete(val, mood.label)}
-            style={{ height: theme.scaleFont(20) }}
+            style={{ height: 40 }} // Increased touch target
           />
           
-          {/* Scale indicators with tick marks */}
+          {/* Material Design tick marks with proper alignment */}
           <View style={[
-            localStyles.mood_sliderTicksContainer,
-            { marginTop: -theme.spacing.tiny }
+            {
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 7, // Align with slider thumb edges
+              marginTop: -4,
+            }
           ]}>
             {[0, 25, 50, 75, 100].map(tick => (
-              <View key={tick} style={localStyles.mood_sliderTick} />
+              <View 
+                key={tick} 
+                style={{
+                  width: 2,
+                  height: 8,
+                  backgroundColor: tick <= mood.value 
+                    ? theme.withOpacity(stateColor, 0.5) // Colored for active range
+                    : theme.withOpacity(theme.colors.onSurfaceVariant, 0.38), // Subtle for inactive range
+                }} 
+              />
             ))}
           </View>
           
-          <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.tiny }]}>
+          {/* Material Design value labels with proper alignment */}
+          <View style={[
+            { 
+              flexDirection: 'row', 
+              justifyContent: 'space-between', 
+              marginTop: 4 
+            }
+          ]}>
             {[0, 25, 50, 75, 100].map(tick => (
-                <Text 
-                  key={tick}
-                  style={[
-                    typographyStyles.text_caption, 
-                    theme.fonts.labelSmall, 
-                    { 
-                      color: theme.colors.onSurface,
-                      opacity: 0.8, // Increased opacity for better visibility
-                      fontWeight: tick === mood.value ? '600' : '400', // Highlight current value
-                    }
-                  ]}
-                >
-                  {tick}
-                </Text>
-              ))}
+              <Text 
+                key={tick}
+                style={[
+                  { 
+                    fontSize: 12,
+                    fontWeight: tick === Math.round(mood.value / 25) * 25 ? '500' : '400',
+                    color: tick <= mood.value 
+                      ? theme.withOpacity(stateColor, 0.7) // Colored for active range
+                      : theme.colors.onSurfaceVariant, // Standard text for inactive
+                    width: 24, // Fixed width for better alignment
+                    textAlign: 'center',
+                  }
+                ]}
+              >
+                {tick}
+              </Text>
+            ))}
           </View>
           
-          <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.small }]}>
+          {/* Material Design helper text */}
+          <View style={[
+            { 
+              flexDirection: 'row', 
+              justifyContent: 'space-between', 
+              marginTop: 12 
+            }
+          ]}>
             <Text style={[
-              typographyStyles.text_caption, 
-              theme.fonts.labelSmall, 
               { 
-                color: theme.colors.onSurface,
-                fontWeight: '600', // Increased weight for better visibility
-                opacity: 0.9, // Increased opacity for better contrast
-                fontSize: theme.scaleFont(12), // Increased size for better readability
+                fontSize: 12,
+                color: theme.colors.onSurfaceVariant,
+                fontWeight: mood.value <= 25 ? '500' : '400',
               }
             ]}>
               Low Intensity
             </Text>
-            <View style={{ flex: 1 }} />
             <Text style={[
-              typographyStyles.text_caption, 
-              theme.fonts.labelSmall, 
               { 
-                color: theme.colors.onSurface, 
-                fontWeight: '600',
-                opacity: 0.9, // Increased opacity for better contrast
-                fontSize: theme.scaleFont(12), // Increased size for better readability
+                fontSize: 12,
+                color: theme.colors.onSurfaceVariant,
+                fontWeight: mood.value >= 75 ? '500' : '400',
               }
             ]}>
               High Intensity

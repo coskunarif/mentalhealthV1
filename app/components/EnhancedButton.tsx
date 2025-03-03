@@ -10,12 +10,14 @@ interface EnhancedButtonProps extends Omit<ButtonProps, 'style'> {
   loading?: boolean;
   fullWidth?: boolean;
   style?: ButtonStyle;
+  icon?: string; // Add icon support
 }
 
 export default function EnhancedButton({
   style,
   mode = 'text',
   fullWidth,
+  icon, // Allow icon prop
   ...props
 }: EnhancedButtonProps) {
   const baseStyle: ButtonStyle =
@@ -38,11 +40,13 @@ export default function EnhancedButton({
     <Button
       mode={mode}
       style={buttonStyle}
+      icon={icon} // Set the icon
       labelStyle={{
-        fontWeight: '600',
-        fontSize: theme.scaleFont(16),
-        color: mode === 'contained' ? theme.colors.onPrimary : theme.colors.primary,
+        fontWeight: '500', // Medium weight per Material Design
+        fontSize: theme.scaleFont(14),
+        letterSpacing: 0.1, // Material Design button label spec
         textTransform: 'uppercase',
+        color: mode === 'contained' ? theme.colors.onPrimary : theme.colors.primary,
       }}
       {...props}
     />
