@@ -180,9 +180,16 @@ function MoodSelector({
             { 
               marginTop: theme.spacing.tiny,
               color: isSelected ? theme.moodColors[item.key] : theme.colors.onSurfaceVariant,
-              fontWeight: isSelected ? '600' : '400'
+              fontWeight: isSelected ? '600' : '400',
+              textAlign: 'center', // Ensure text is centered
+              flexShrink: 1, // Allow text to shrink if needed
+              // Prevent long text from wrapping awkwardly
+              ...(item.label.length > 8 ? { 
+                fontSize: theme.scaleFont(10), // Smaller font for longer words
+              } : {})
             },
           ]}
+          numberOfLines={1} // Prevent wrapping for consistency
         >
           {item.label}
         </Text>
@@ -221,7 +228,7 @@ function MoodSelector({
         visible={showModal}
         onDismiss={() => setShowModal(false)}
         style={{ 
-          zIndex: 3 // Ensure modal stays below button container
+          zIndex: 10 // Increased from 3 to ensure proper layering
         }}
         contentContainerStyle={{
           backgroundColor: theme.colors.background,
@@ -235,7 +242,7 @@ function MoodSelector({
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 6,
-          maxHeight: '75%', // Slightly smaller to avoid covering buttons
+          maxHeight: '70%', // Reduced from 75% to ensure buttons remain visible
         }}
       >
         <ScrollView contentContainerStyle={{ paddingBottom: theme.spacing.large }}>
@@ -344,13 +351,13 @@ function MoodSelector({
   labelStyle={{
     fontWeight: '600',
     fontSize: theme.scaleFont(16),
-    color: theme.colors.primary,
+    color: theme.colors.onPrimary, // Fixed color - was "primary" which would be green on green
     textTransform: 'uppercase',
   }}
 >
-  NEXT: EMOTIONS
-</EnhancedButton>
-        </View>
+    FINISH
+  </EnhancedButton>
+</View>
       </View>
     </View>
   );
