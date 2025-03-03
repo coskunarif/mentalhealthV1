@@ -6,7 +6,8 @@ import { theme } from './theme';
 export default StyleSheet.create({
   mood_gridContainer: {
     paddingHorizontal: theme.spacing.medium,
-    paddingBottom: theme.spacing.large * 2, // Extra padding at bottom for fixed buttons
+    paddingBottom: theme.spacing.large * 3, // Increased bottom padding for button container
+    alignItems: 'stretch', // Ensure items stretch properly
   },
   mood_item: {
     flex: 1,
@@ -83,16 +84,17 @@ export default StyleSheet.create({
   left: 0,
   right: 0,
   backgroundColor: theme.colors.background,
-  paddingVertical: theme.spacing.medium, // Consistent vertical padding
-  paddingHorizontal: theme.spacing.large, // More horizontal padding for better spacing
-  // Improved elevation for better visual hierarchy
-  elevation: 4,
+  paddingVertical: 16, // Material Design standard padding
+  paddingHorizontal: 16, // Material Design standard padding
+  // Material Design elevation overlay
+  elevation: 8, // Higher elevation for more prominence
   shadowColor: theme.colors.shadow,
-  shadowOffset: { width: 0, height: -2 }, // Stronger upward shadow
-  shadowOpacity: 0.08, // Slightly increased for better visibility
-  shadowRadius: 3,
+  shadowOffset: { width: 0, height: -1 },
+  shadowOpacity: 0.14,
+  shadowRadius: 4,
   zIndex: 5,
-  borderTopWidth: 1, // Add subtle top border
+  // Material Design divider
+  borderTopWidth: 1,
   borderTopColor: theme.colors.outlineVariant,
 },
   modalBackdrop: {
