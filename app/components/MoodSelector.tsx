@@ -1,7 +1,5 @@
-// Updates to fix button design, selection highlight, and modal styling
-
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Pressable, FlatList, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Pressable, FlatList, ScrollView, Dimensions } from 'react-native';
 import { Text, Card, Modal, IconButton } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
@@ -11,6 +9,20 @@ import { theme } from '../config/theme';
 import type { AppTheme } from '../types/theme';
 import EnhancedButton from './EnhancedButton';
 import SliderCard from './SliderCard';
+
+// Add brightness calculation function to determine text color
+const getBrightness = (hexColor: string): number => {
+  // Convert hex to RGB
+  const r = parseInt(hexColor.substr(1, 2), 16);
+  const g = parseInt(hexColor.substr(3, 2), 16);
+  const b = parseInt(hexColor.substr(5, 2), 16);
+  // Calculate brightness (perceived luminance)
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+};
+
+// Add responsive button sizing based on screen width
+const windowWidth = Dimensions.get('window').width;
+const isSmallScreen = windowWidth < 360;
 
 export type IconName =
   | 'emoticon-sad'
@@ -157,10 +169,10 @@ function MoodSelector({
           localStyles.mood_item,
           pressed && { opacity: 0.8 },
           isSelected && {
-            // Enhanced selection highlight with a soft tint of the emotion color
-            backgroundColor: theme.moodColors[item.key] + '15',
-            borderWidth: 1,
-            borderColor: theme.moodColors[item.key] + '40',
+            // More consistent selection highlight with Material Design principles
+            backgroundColor: theme.colors.surface, // Keep background light
+            borderWidth: 2, // Use thicker border for selection
+            borderColor: theme.moodColors[item.key], // Use the mood color directly
             elevation: theme.colors.elevation.level2,
             shadowColor: theme.moodColors[item.key],
             shadowOffset: { width: 0, height: 2 },
@@ -172,7 +184,11 @@ function MoodSelector({
         accessibilityRole="button"
         accessibilityState={{ selected: isSelected }}
       >
-        <MaterialCommunityIcons name={item.icon} size={40} color={theme.moodColors[item.key]} />
+        <MaterialCommunityIcons 
+          name={item.icon} 
+          size={40} 
+          color={theme.moodColors[item.key]} 
+        />
         <Text
           style={[
             typographyStyles.text_caption,
@@ -181,18 +197,32 @@ function MoodSelector({
               marginTop: theme.spacing.tiny,
               color: isSelected ? theme.moodColors[item.key] : theme.colors.onSurfaceVariant,
               fontWeight: isSelected ? '600' : '400',
-              textAlign: 'center', // Ensure text is centered
-              flexShrink: 1, // Allow text to shrink if needed
+              textAlign: 'center',
+              flexShrink: 1,
               // Prevent long text from wrapping awkwardly
               ...(item.label.length > 8 ? { 
-                fontSize: theme.scaleFont(10), // Smaller font for longer words
+                fontSize: theme.scaleFont(10),
               } : {})
             },
           ]}
-          numberOfLines={1} // Prevent wrapping for consistency
+          numberOfLines={1}
         >
           {item.label}
         </Text>
+        
+        {/* Add selection indicator dot for better accessibility */}
+        {isSelected && (
+          <View 
+            style={{
+              position: 'absolute',
+              bottom: 4,
+              width: 6,
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: theme.moodColors[item.key],
+            }}
+          />
+        )}
       </Pressable>
     );
   };
@@ -242,7 +272,9 @@ function MoodSelector({
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 6,
-          maxHeight: '70%', // Reduced from 75% to ensure buttons remain visible
+          maxHeight: '65%', // Reduced to ensure buttons remain visible
+          maxWidth: 550, // Add maximum width for better appearance on larger screens
+          alignSelf: 'center', // Center the modal
         }}
       >
         <ScrollView contentContainerStyle={{ paddingBottom: theme.spacing.large }}>
@@ -250,9 +282,15 @@ function MoodSelector({
             <Card.Title
               title={selectedMood?.label}
               titleStyle={{ 
-                color: selectedMood ? theme.moodColors[selectedMood.key] : theme.colors.primary,
+                // Dynamically set text color based on mood color brightness
+                color: selectedMood 
+                  ? getBrightness(theme.moodColors[selectedMood.key]) > 0.6 
+                    ? theme.colors.onSurface 
+                    : theme.moodColors[selectedMood.key]
+                  : theme.colors.primary,
                 fontWeight: '600',
-                fontSize: theme.scaleFont(18) 
+                fontSize: theme.scaleFont(20), // Increased from 18 for better visibility
+                letterSpacing: 0.15, // Add letter spacing for better readability
               }}
               right={(props) => (
                 <IconButton
@@ -325,39 +363,51 @@ function MoodSelector({
       </Modal>
 
       {/* Enhanced button container */}
-      <View style={[localStyles.mood_buttonContainer, { padding: theme.spacing.medium }]}>
-        <View style={{ flex: 1, marginHorizontal: theme.spacing.small }}>
+      <View style={[
+        localStyles.mood_buttonContainer,
+        isSmallScreen && { flexDirection: 'column' } // Stack buttons on small screens
+      ]}>
+        <View style={{ 
+          flex: 1, 
+          marginRight: isSmallScreen ? 0 : theme.spacing.small,
+          marginBottom: isSmallScreen ? theme.spacing.small : 0
+        }}>
           <EnhancedButton
             mode="outlined"
             onPress={onNext}
             accessibilityLabel="Proceed to focus emotions screen"
             fullWidth
             labelStyle={{
-              fontWeight: '600',
-              fontSize: theme.scaleFont(16),
+              fontWeight: '500',
+              fontSize: theme.scaleFont(14),
               color: theme.colors.primary,
               textTransform: 'uppercase',
+              letterSpacing: 0.5, // Add letter spacing for better readability
             }}
           >
             NEXT: EMOTIONS
           </EnhancedButton>
         </View>
-        <View style={{ flex: 1, marginHorizontal: theme.spacing.small }}>
+        <View style={{ 
+          flex: 1, 
+          marginLeft: isSmallScreen ? 0 : theme.spacing.small 
+        }}>
           <EnhancedButton
             mode="contained"
             onPress={onFinish}
             accessibilityLabel="Complete mood selection and return to previous screen"
-  fullWidth
-  labelStyle={{
-    fontWeight: '600',
-    fontSize: theme.scaleFont(16),
-    color: theme.colors.onPrimary, // Fixed color - was "primary" which would be green on green
-    textTransform: 'uppercase',
-  }}
->
-    FINISH
-  </EnhancedButton>
-</View>
+            fullWidth
+            labelStyle={{
+              fontWeight: '500',
+              fontSize: theme.scaleFont(14),
+              color: theme.colors.onPrimary,
+              textTransform: 'uppercase',
+              letterSpacing: 0.5, // Add letter spacing for better readability
+            }}
+          >
+            FINISH
+          </EnhancedButton>
+        </View>
       </View>
     </View>
   );

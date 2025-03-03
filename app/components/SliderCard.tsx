@@ -1,5 +1,3 @@
-// Updated SliderCard component with improved scale indicators and visual feedback
-
 import React from 'react';
 import { View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
@@ -44,13 +42,16 @@ const SliderCard: React.FC<SliderCardProps> = ({
           backgroundColor: isRelated ? theme.colors.surface : getBackgroundColor(),
           borderLeftWidth: 4,
           borderLeftColor: theme.moodColors[mood.key],
-          // Standardized padding
-          padding: 0, // Remove default padding to let Card.Content handle it consistently
+          // Remove default padding to let Card.Content handle it consistently
+          padding: 0,
         },
       ]}
       accessibilityLabel={`${isRelated ? 'Related ' : ''}Intensity slider for ${mood.label}`}
     >
-      <Card.Content style={{ padding: theme.spacing.medium }}>
+      <Card.Content style={{ 
+        padding: theme.spacing.medium,
+        paddingVertical: theme.spacing.medium + 4, // Increase vertical padding for better spacing
+      }}>
         <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.medium }]}>
           <MaterialCommunityIcons 
             name={mood.icon} 
@@ -105,67 +106,51 @@ const SliderCard: React.FC<SliderCardProps> = ({
           </View>
           
           <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.tiny }]}>
-            <Text style={[
-              typographyStyles.text_caption, 
-              theme.fonts.labelSmall, 
-              { color: theme.colors.onSurface }
-            ]}>
-              0
-            </Text>
-            <Text style={[
-              typographyStyles.text_caption, 
-              theme.fonts.labelSmall, 
-              { color: theme.colors.onSurface }
-            ]}>
-              25
-            </Text>
-            <Text style={[
-              typographyStyles.text_caption, 
-              theme.fonts.labelSmall, 
-              { color: theme.colors.onSurface }
-            ]}>
-              50
-            </Text>
-            <Text style={[
-              typographyStyles.text_caption, 
-              theme.fonts.labelSmall, 
-              { color: theme.colors.onSurface }
-            ]}>
-              75
-            </Text>
-            <Text style={[
-              typographyStyles.text_caption, 
-              theme.fonts.labelSmall, 
-              { color: theme.colors.onSurface }
-            ]}>
-              100
-            </Text>
+            {[0, 25, 50, 75, 100].map(tick => (
+                <Text 
+                  key={tick}
+                  style={[
+                    typographyStyles.text_caption, 
+                    theme.fonts.labelSmall, 
+                    { 
+                      color: theme.colors.onSurface,
+                      opacity: 0.8, // Increased opacity for better visibility
+                      fontWeight: tick === mood.value ? '600' : '400', // Highlight current value
+                    }
+                  ]}
+                >
+                  {tick}
+                </Text>
+              ))}
           </View>
           
           <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.small }]}>
             <Text style={[
               typographyStyles.text_caption, 
-  theme.fonts.labelSmall, 
-  { 
-    color: theme.colors.onSurface,
-    fontWeight: '600', // Increased weight for better visibility
-    opacity: 1 // Full opacity for maximum contrast
-  }
-]}>
-    Low Intensity
-  </Text>
-  <View style={{ flex: 1 }} />
-  <Text style={[
-    typographyStyles.text_caption, 
-    theme.fonts.labelSmall, 
-    { 
-      color: theme.colors.onSurface, 
-      fontWeight: '600' // Increased weight for better visibility
-    }
-  ]}>
-    High Intensity
-  </Text>
-</View>
+              theme.fonts.labelSmall, 
+              { 
+                color: theme.colors.onSurface,
+                fontWeight: '600', // Increased weight for better visibility
+                opacity: 0.9, // Increased opacity for better contrast
+                fontSize: theme.scaleFont(12), // Increased size for better readability
+              }
+            ]}>
+              Low Intensity
+            </Text>
+            <View style={{ flex: 1 }} />
+            <Text style={[
+              typographyStyles.text_caption, 
+              theme.fonts.labelSmall, 
+              { 
+                color: theme.colors.onSurface, 
+                fontWeight: '600',
+                opacity: 0.9, // Increased opacity for better contrast
+                fontSize: theme.scaleFont(12), // Increased size for better readability
+              }
+            ]}>
+              High Intensity
+            </Text>
+          </View>
         </View>
       </Card.Content>
     </Card>
