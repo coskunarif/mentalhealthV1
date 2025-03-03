@@ -10,7 +10,7 @@ export default StyleSheet.create({
   },
   mood_item: {
     flex: 1,
-    margin: theme.spacing.medium, // Increased to 16 units
+    margin: theme.spacing.small, // Reduced from medium to small for more space
     aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -76,24 +76,23 @@ export default StyleSheet.create({
     backgroundColor: theme.colors.outlineVariant,
   },
   mood_buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: theme.withOpacity(theme.colors.background, 0.98),
-    // Removed divider line
-    paddingTop: theme.spacing.medium,
-    paddingBottom: theme.spacing.large,
-    // Added elevation and shadow for better separation instead of border
-    elevation: 8,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: 2 }, // Changed to downward shadow
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    zIndex: 5,
-  },
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  backgroundColor: theme.colors.background, // Changed from withOpacity to solid color
+  paddingTop: theme.spacing.medium,
+  paddingBottom: theme.spacing.large,
+  // Reduced elevation for a more integrated look
+  elevation: 4,
+  shadowColor: theme.colors.shadow,
+  shadowOffset: { width: 0, height: -1 }, // Changed to upward shadow for subtler effect
+  shadowOpacity: 0.05,
+  shadowRadius: 2,
+  zIndex: 5,
+},
   modalBackdrop: {
     backgroundColor: theme.withOpacity(theme.colors.backdrop, 0.8),
     flex: 1,
