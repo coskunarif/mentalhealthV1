@@ -3,7 +3,7 @@ import { View, ScrollView, Dimensions, SafeAreaView } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import type { RootStackParamList } from './types/navigation';
 import { layoutStyles, miscStyles } from './config';
-import MoodSelector from './components/MoodSelector'; // Using default import
+import MoodSelector from './components/MoodSelector';
 import { MoodPyramid } from './components/MoodPyramid';
 import { theme } from './config/theme';
 import type { IconName } from './components/MoodSelector';
@@ -53,6 +53,7 @@ export default function MoodScreen() {
 
   const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
   const [activeScreen, setActiveScreen] = useState(0);
+  const [isSliding, setIsSliding] = useState(false);
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', () => {
@@ -117,7 +118,6 @@ export default function MoodScreen() {
   };
 
   const handleFinish = () => {
-    // Example: finalize or navigate away
     handleSubmit();
   };
 
@@ -135,8 +135,10 @@ export default function MoodScreen() {
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
+        style={{ flex: 1 }}
+        scrollEnabled={!isSliding}
       >
-        <View style={[miscStyles.mood_gridContainer, { width: screenWidth }]}>
+        <View style={{ width: screenWidth, flex: 1 }}>
           <MoodSelector
             moods={moods}
             selectedMood={selectedMood}
@@ -147,7 +149,7 @@ export default function MoodScreen() {
             onFinish={handleFinish}
           />
         </View>
-        <View style={[miscStyles.mood_gridContainer, { width: screenWidth }]}>
+        <View style={{ width: screenWidth, flex: 1 }}>
           <MoodPyramid onPrevious={handlePrevious} onFinish={handleFinish} />
         </View>
       </ScrollView>

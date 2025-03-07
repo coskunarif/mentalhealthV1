@@ -57,13 +57,6 @@ type Props = {
   onFinish: () => void;
 };
 
-const relatedMoods: { [key: string]: (keyof AppTheme['moodColors'])[] } = {
-  Shame: ['humiliation'],
-  Guilt: ['grief', 'regret'],
-  Fear: ['anxiety'],
-  Anger: ['hate', 'aggression'],
-};
-
 function MoodSelector({
   moods,
   selectedMood,
@@ -76,7 +69,6 @@ function MoodSelector({
   const [slidersState, setSlidersState] = useState<{
     [label: string]: { value: number; color: string };
   }>({});
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (selectedMood) {
@@ -102,17 +94,12 @@ function MoodSelector({
   };
 
   const handleSliderComplete = useCallback(
-    (value: number, label: string, isRelated = false) => {
+    (value: number, label: string) => {
       updateSliderState(label, value);
       onSliderChange(value, label);
     },
     [onSliderChange]
   );
-
-  const handleSelectMood = (index: number) => {
-    onMoodSelect(index);
-    setShowModal(true);
-  };
 
   const renderMainSliderCard = () => {
     if (!selectedMood) return null;
@@ -120,233 +107,163 @@ function MoodSelector({
       value: selectedMood.value,
       color: getSliderColor(selectedMood.value),
     };
+    
     return (
       <SliderCard
         key={selectedMood.label}
         mood={{ ...selectedMood, value: sliderState.value }}
         sliderColor={sliderState.color}
-        onSlidingComplete={(val, label) => handleSliderComplete(val, label, false)}
+        onSlidingComplete={(val) => handleSliderComplete(val, selectedMood.label)}
       />
-    );
-  };
-
-  const renderRelatedMoodSliders = () => {
-    if (!selectedMood) return null;
-    return Object.entries(relatedMoods).flatMap(([moodKey, relatedKeys]) => {
-      if (selectedMood.label.toLowerCase() !== moodKey.toLowerCase()) return [];
-      return relatedKeys.map(rKey => {
-        const relatedMood: MoodType = {
-          label: rKey.charAt(0).toUpperCase() + rKey.slice(1),
-          key: rKey,
-          icon: 'emoticon-sad',
-          value: slidersState[rKey]?.value || 0,
-          duration: selectedMood.duration,
-          isSelected: false,
-        };
-        const sliderState = slidersState[rKey] || {
-          value: relatedMood.value,
-          color: getSliderColor(relatedMood.value),
-        };
-        return (
-          <SliderCard
-            key={relatedMood.label}
-            mood={relatedMood}
-            sliderColor={sliderState.color}
-            isRelated
-            onSlidingComplete={(val, label) => handleSliderComplete(val, label, true)}
-          />
-        );
-      });
-    });
-  };
-
-  const renderMoodItem = ({ item, index }: { item: MoodType; index: number }) => {
-    const isSelected = selectedMood?.label === item.label;
-    const moodColor = theme.moodColors[item.key];
-    
-    return (
-      <Pressable
-        onPress={() => handleSelectMood(index)}
-        style={({ pressed }) => [
-          localStyles.mood_item,
-          pressed && { opacity: 0.7 }, // More subtle press state
-          isSelected && {
-            // Proper Material Design selection state
-            backgroundColor: theme.withOpacity(moodColor, 0.08), // Light background tint
-            borderWidth: 0, // Remove border
-            // Consistent elevation for selected state
-            elevation: theme.colors.elevation.level2,
-            shadowColor: theme.colors.shadow,
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 2,
-          },
-        ]}
-        accessibilityLabel={`Select mood ${item.label}`}
-        accessibilityRole="button"
-        accessibilityState={{ selected: isSelected }}
-      >
-        {/* Optional selection ring around the icon for clearer state */}
-        {isSelected && (
-          <View 
-            style={{
-              position: 'absolute',
-              top: 0, left: 0, right: 0, bottom: 0,
-              borderRadius: theme.shape.borderRadius,
-              borderWidth: 2,
-              borderColor: moodColor,
-              opacity: 0.5,
-            }}
-          />
-        )}
-        
-        <MaterialCommunityIcons 
-          name={item.icon} 
-          size={36} // Slightly smaller for better proportion
-          color={moodColor} 
-        />
-        
-        <Text
-          style={[
-            typographyStyles.text_caption,
-            theme.fonts.labelMedium,
-            { 
-              marginTop: theme.spacing.tiny,
-              color: isSelected ? moodColor : theme.colors.onSurfaceVariant,
-              fontWeight: isSelected ? '600' : '400',
-              textAlign: 'center',
-              flexShrink: 1,
-              letterSpacing: 0.25, // Better readability
-              ...(item.label.length > 8 ? { fontSize: theme.scaleFont(10) } : {})
-            },
-          ]}
-          numberOfLines={1}
-        >
-          {item.label}
-        </Text>
-        
-        {/* Material Design ripple indicator - a simple dot */}
-        {isSelected && (
-          <View 
-            style={{
-              position: 'absolute',
-              bottom: 4,
-              width: 4,
-              height: 4,
-              borderRadius: 2,
-              backgroundColor: moodColor,
-            }}
-          />
-        )}
-      </Pressable>
     );
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <FlatList
-        data={moods}
-        ListHeaderComponent={
-          <Text
-            style={[
-              typographyStyles.text_heading2,
-              {
-                textAlign: 'center',
-                color: theme.colors.onSurface, // Use semantic color role
-                marginTop: theme.spacing.large,
-                marginBottom: theme.spacing.large,
-                fontWeight: '500', // Medium weight for headings
-                letterSpacing: 0, // Material Design spec for headlines
-              },
-            ]}
-          >
-            How are you feeling?
-          </Text>
-        }
-        renderItem={renderMoodItem}
-        keyExtractor={(item) => item.label}
-        numColumns={3}
-        contentContainerStyle={localStyles.mood_gridContainer}
-        ListFooterComponent={<View style={{ height: theme.spacing.large * 2 }} />}
-      />
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 80 }}>
+        <Text
+          style={[
+            typographyStyles.text_heading2,
+            {
+              textAlign: 'center',
+              color: theme.colors.onSurface,
+              marginTop: theme.spacing.large,
+              marginBottom: theme.spacing.large,
+              fontWeight: '500',
+              letterSpacing: 0,
+            },
+          ]}
+        >
+          How are you feeling?
+        </Text>
 
-      {/* Enhanced Modal Implementation */}
-      <Modal
-        visible={showModal}
-        onDismiss={() => setShowModal(false)}
-        style={{ 
-          zIndex: 10 // Increased from 3 to ensure proper layering
-        }}
-        contentContainerStyle={{
-          backgroundColor: theme.colors.background,
-          padding: theme.spacing.large,
-          paddingTop: theme.spacing.large * 1.5,
-          margin: theme.spacing.medium,
-          marginTop: theme.spacing.large,
-          borderRadius: theme.shape.borderRadius,
-          elevation: theme.colors.elevation.level4,
-          shadowColor: theme.colors.shadow,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 6,
-          maxHeight: '65%', // Reduced to ensure buttons remain visible
-          maxWidth: 550, // Add maximum width for better appearance on larger screens
-          alignSelf: 'center', // Center the modal
-        }}
-      >
-        <ScrollView contentContainerStyle={{ paddingBottom: theme.spacing.large }}>
-          <Card style={{ borderRadius: theme.shape.borderRadius, elevation: 0, borderWidth: 0 }}>
-            <Card.Title
-              title={selectedMood?.label}
-              titleStyle={{ 
-                // Dynamically set text color based on mood color brightness
-                color: selectedMood 
-                  ? getBrightness(theme.moodColors[selectedMood.key]) > 0.6 
-                    ? theme.colors.onSurface 
-                    : theme.moodColors[selectedMood.key]
-                  : theme.colors.primary,
-                fontWeight: '600',
-                fontSize: theme.scaleFont(20), // Increased from 18 for better visibility
-                letterSpacing: 0.15, // Add letter spacing for better readability
-              }}
-              right={(props) => (
-                <IconButton
-                  {...props}
-                  icon="close"
-                  iconColor={theme.colors.onSurfaceVariant}
-                  size={24}
-                  onPress={() => setShowModal(false)}
-                  style={{ 
-                    padding: theme.spacing.medium,
-                    margin: theme.spacing.small 
-                  }}
-                  accessibilityLabel="Close modal"
-                />
-              )}
-            />
-            <Card.Content style={{ marginTop: theme.spacing.large }}>
-              <Card
-                style={[
-                  localStyles.mood_slider_card,
-                  localStyles.component_card_elevated,
-                  { marginBottom: theme.spacing.large, borderWidth: 0, paddingVertical: theme.spacing.small },
-                ]}
-              >
-                <Card.Content>
-                  <View style={[localStyles.mood_headerRow, { marginBottom: theme.spacing.small }]}>
-                    <MaterialCommunityIcons
-                      name="clock-outline"
-                      size={24}
-                      color={theme.colors.primary}
+        {/* Mood Grid */}
+        <View style={{ 
+          paddingHorizontal: 16, 
+          marginBottom: 20,
+          height: Dimensions.get('window').height * 0.33, // Ekranın 1/3'ünü kaplasın
+        }}>
+          <View style={[
+            localStyles.mood_gridContainer,
+            { 
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignContent: 'flex-start',
+            }
+          ]}>
+            {moods.map((item, index) => {
+              const isSelected = selectedMood?.label === item.label;
+              const moodColor = theme.moodColors[item.key];
+              
+              return (
+                <Pressable
+                  key={item.label}
+                  onPress={() => onMoodSelect(index)}
+                  style={({ pressed }) => [
+                    {
+                      width: '30%', // 3 sütun için
+                      aspectRatio: 1, // Kare şeklinde
+                      margin: '1.5%', // Aralarında boşluk
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: theme.shape.borderRadius,
+                      backgroundColor: theme.colors.surface,
+                      // Tüm butonlara hafif gölge ekleyelim
+                      shadowColor: theme.colors.shadow,
+                      shadowOffset: { width: 0, height: 1 },
+                      shadowOpacity: 0.1,
+                      shadowRadius: 2,
+                      elevation: 1,
+                    },
+                    pressed && { opacity: 0.8 }, // Basıldığında hafif opaklık
+                    isSelected && {
+                      // Seçildiğinde daha belirgin gölge
+                      shadowColor: moodColor,
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.3,
+                      shadowRadius: 4,
+                      elevation: 3,
+                    },
+                  ]}
+                  accessibilityLabel={`Select mood ${item.label}`}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: isSelected }}
+                >
+                  {/* Seçim göstergesi olarak ince bir çerçeve ekleyelim */}
+                  {isSelected && (
+                    <View 
+                      style={{
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        borderRadius: theme.shape.borderRadius,
+                        borderWidth: 1.5,
+                        borderColor: moodColor,
+                      }}
                     />
-                    <Text style={[
-                      typographyStyles.text_body,
-                      theme.fonts.bodyMedium,
-                      { marginLeft: theme.spacing.small, color: theme.colors.onSurface }
-                    ]}>
-                      How long have you felt this way?
-                    </Text>
-                  </View>
+                  )}
+                  
+                  <MaterialCommunityIcons 
+                    name={item.icon} 
+                    size={28}
+                    color={moodColor} 
+                  />
+                  
+                  <Text
+                    style={[
+                      typographyStyles.text_caption,
+                      theme.fonts.labelMedium,
+                      { 
+                        marginTop: theme.spacing.tiny,
+                        color: isSelected ? moodColor : theme.colors.onSurfaceVariant,
+                        fontWeight: isSelected ? '600' : '400',
+                        textAlign: 'center',
+                        fontSize: theme.scaleFont(12),
+                      },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {item.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Duration Slider */}
+        {selectedMood && (
+          <View style={{ marginTop: 20, paddingHorizontal: 16 }}>
+            <Card
+              style={{
+                borderRadius: theme.shape.borderRadius,
+                marginBottom: 16,
+                backgroundColor: theme.colors.background,
+                borderWidth: 0,
+                shadowColor: theme.colors.shadow,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 2,
+              }}
+            >
+              <Card.Content style={{ padding: 16 }}>
+                <View style={[localStyles.mood_headerRow, { marginBottom: 16 }]}>
+                  <MaterialCommunityIcons
+                    name="clock-outline"
+                    size={24}
+                    color={theme.colors.primary}
+                  />
+                  <Text style={[
+                    typographyStyles.text_body,
+                    theme.fonts.bodyMedium,
+                    { marginLeft: 12, color: theme.colors.onSurface }
+                  ]}>
+                    How long have you felt this way?
+                  </Text>
+                </View>
+                
+                <View style={{ paddingHorizontal: 8 }}>
                   <Slider
                     value={selectedMood?.duration || 0}
                     minimumValue={0}
@@ -354,176 +271,47 @@ function MoodSelector({
                     step={33}
                     thumbTintColor={theme.colors.primary}
                     minimumTrackTintColor={theme.colors.primary}
-                    maximumTrackTintColor={theme.colors.surfaceVariant}
+                    maximumTrackTintColor={theme.withOpacity(theme.colors.onSurfaceVariant, 0.2)}
                     onSlidingComplete={onDurationChange}
-                    style={{ height: theme.scaleFont(20) }}
+                    style={{ height: 40 }}
                     accessibilityLabel={`Set duration for ${selectedMood?.label}`}
+                    hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
                   />
-                  <View style={[localStyles.mood_sliderLabels, { marginTop: theme.spacing.small }]}>
-                    <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+                  
+                  <View style={[localStyles.mood_sliderLabels, { marginTop: 8 }]}>
+                    <Text style={[
+                      typographyStyles.text_caption, 
+                      theme.fonts.labelSmall,
+                      { color: theme.colors.onSurfaceVariant }
+                    ]}>
                       {'< 3 months'}
                     </Text>
-                    <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+                    <Text style={[
+                      typographyStyles.text_caption, 
+                      theme.fonts.labelSmall,
+                      { color: theme.colors.onSurfaceVariant }
+                    ]}>
                       6 months
                     </Text>
-                    <Text style={[typographyStyles.text_caption, theme.fonts.labelSmall]}>
+                    <Text style={[
+                      typographyStyles.text_caption, 
+                      theme.fonts.labelSmall,
+                      { color: theme.colors.onSurfaceVariant }
+                    ]}>
                       {'> 1 year'}
                     </Text>
                   </View>
-                </Card.Content>
-              </Card>
-              {renderMainSliderCard()}
-              {renderRelatedMoodSliders()}
-            </Card.Content>
-          </Card>
-        </ScrollView>
-      </Modal>
+                </View>
+              </Card.Content>
+            </Card>
 
-<Modal
-  visible={showModal}
-  onDismiss={() => setShowModal(false)}
-  style={{ 
-    margin: 0, // Ensure full width on mobile
-    justifyContent: 'flex-end', // Material Design bottom sheets
-  }}
-  contentContainerStyle={{
-    backgroundColor: theme.colors.surface,
-    borderTopLeftRadius: 28, // Material Design M3 spec for bottom sheets
-    borderTopRightRadius: 28, // Material Design M3 spec for bottom sheets
-    paddingTop: theme.spacing.large,
-    paddingBottom: theme.spacing.large,
-    maxHeight: '80%', // Ensure enough room for content
-    // Material Design elevation
-    elevation: theme.colors.elevation.level3,
-    shadowColor: theme.colors.shadow,
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  }}
->
-  {/* Material Design Bottom Sheet handle */}
-  <View 
-    style={{ 
-      width: 32,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: theme.colors.outlineVariant,
-      alignSelf: 'center',
-      marginBottom: 24,
-    }} 
-  />
-  <ScrollView 
-    contentContainerStyle={{ 
-      paddingHorizontal: 24, // Material Design standard padding
-      paddingBottom: theme.spacing.large 
-    }}
-  >
-    <Card style={{ borderRadius: 0, elevation: 0, borderWidth: 0 }}>
-      <Card.Title
-        title={selectedMood?.label}
-        titleStyle={{ 
-          color: selectedMood 
-            ? theme.moodColors[selectedMood.key]
-            : theme.colors.onSurface,
-          fontWeight: '500', // Medium weight per Material Design
-          fontSize: 22, // Material Design headline small
-          letterSpacing: 0, // Material Design headline spec
-        }}
-        right={(props) => (
-          <IconButton
-            {...props}
-            icon="close"
-            iconColor={theme.colors.onSurfaceVariant}
-            size={24}
-            onPress={() => setShowModal(false)}
-            style={{ margin: 0 }}
-            accessibilityLabel="Close modal"
-          />
+            {/* Main Mood Slider */}
+            {renderMainSliderCard()}
+          </View>
         )}
-      />
-      
-      <Card.Content style={{ marginTop: 24 }}>
-        {/* ISSUE: Slider Implementation - Update to Material Design slider */}
-        <Card
-          style={[
-            {
-              marginBottom: 16,
-              borderRadius: 16, // Material Design M3 card radius
-              // Material Design card elevation
-              elevation: 1,
-              backgroundColor: theme.colors.surfaceVariant,
-            },
-          ]}
-        >
-          <Card.Content style={{ padding: 16 }}>
-            <View style={[localStyles.mood_headerRow, { marginBottom: 16 }]}>
-              <MaterialCommunityIcons
-                name="clock-outline"
-                size={24}
-                color={theme.colors.primary} // Consistent with app's primary color
-              />
-              <Text style={[
-                typographyStyles.text_body,
-                theme.fonts.bodyMedium,
-                { 
-                  marginLeft: 12, 
-                  color: theme.colors.onSurface,
-                  flex: 1,
-                }
-              ]}>
-                How long have you felt this way?
-              </Text>
-            </View>
-            
-            {/* Improved Material Design slider with thumb label */}
-            <Slider
-              value={selectedMood?.duration || 0}
-              minimumValue={0}
-              maximumValue={100}
-              step={33}
-              thumbTintColor={theme.colors.primary}
-              minimumTrackTintColor={theme.colors.primary}
-              maximumTrackTintColor={theme.withOpacity(theme.colors.onSurfaceVariant, 0.38)}
-              onSlidingComplete={onDurationChange}
-              style={{ height: 40 }} // Increased touch target
-              accessibilityLabel={`Set duration for ${selectedMood?.label}`}
-            />
-            
-            {/* Material Design slider label layout */}
-            <View style={[localStyles.mood_sliderLabels, { marginTop: 4 }]}>
-              <Text style={[
-                typographyStyles.text_caption, 
-                theme.fonts.labelSmall,
-                { color: theme.colors.onSurfaceVariant }
-              ]}>
-                {'< 3 months'}
-              </Text>
-              <Text style={[
-                typographyStyles.text_caption, 
-                theme.fonts.labelSmall,
-                { color: theme.colors.onSurfaceVariant }
-              ]}>
-                6 months
-              </Text>
-              <Text style={[
-                typographyStyles.text_caption, 
-                theme.fonts.labelSmall,
-                { color: theme.colors.onSurfaceVariant }
-              ]}>
-                {'> 1 year'}
-              </Text>
-            </View>
-          </Card.Content>
-        </Card>
-        
-        {renderMainSliderCard()}
-        {renderRelatedMoodSliders()}
-      </Card.Content>
-    </Card>
-  </ScrollView>
-</Modal>
+      </ScrollView>
 
-      {/* Enhanced button container */}
+      {/* Button Container */}
       <View style={[
         localStyles.mood_buttonContainer,
         isSmallScreen && { flexDirection: 'column' }
@@ -534,18 +322,17 @@ function MoodSelector({
           marginBottom: isSmallScreen ? theme.spacing.small : 0
         }}>
           <EnhancedButton
-            mode="outlined"
+            mode="contained"
             onPress={onNext}
             accessibilityLabel="Proceed to focus emotions screen"
             fullWidth
             labelStyle={{
-              fontWeight: '500', // Use Medium weight per Material Design
+              fontWeight: '500',
               fontSize: theme.scaleFont(14),
-              letterSpacing: 0.1, // Material Design label spec
+              letterSpacing: 0.1,
               textTransform: 'uppercase',
-              color: theme.colors.primary,
+              color: theme.colors.onPrimary,
             }}
-            // Add icon prop for clearer action button
             icon="arrow-right"
           >
             NEXT
@@ -561,13 +348,12 @@ function MoodSelector({
             accessibilityLabel="Complete mood selection"
             fullWidth
             labelStyle={{
-              fontWeight: '500', // Use Medium weight per Material Design
+              fontWeight: '500',
               fontSize: theme.scaleFont(14),
-              letterSpacing: 0.1, // Material Design label spec
+              letterSpacing: 0.1,
               textTransform: 'uppercase',
               color: theme.colors.onPrimary,
             }}
-            // Add icon for clearer action
             icon="check"
           >
             FINISH

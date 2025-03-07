@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, PanResponder, GestureResponderEvent } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import Slider from '@react-native-community/slider';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -10,7 +10,7 @@ import localStyles from '../config/MoodSelector.styles';
 export type SliderCardProps = {
   mood: { label: string; icon: any; key: keyof typeof theme.moodColors; value: number };
   sliderColor: string;
-  onSlidingComplete: (value: number, label: string) => void;
+  onSlidingComplete: (value: number, label?: string) => void;
   isRelated?: boolean;
 };
 
@@ -23,28 +23,52 @@ const SliderCard: React.FC<SliderCardProps> = ({
   // Determine state color based on Material Design state layering
   const stateColor = theme.moodColors[mood.key];
   
-  // Linear interpolation helper for color based on value
-  const getValueColor = () => {
-    if (mood.value >= 75) return theme.colors.error;
-    if (mood.value >= 50) return theme.colors.secondary;
-    if (mood.value >= 25) return theme.colors.primary;
-    return theme.colors.onSurfaceVariant;
+  // Emoji icons based on value - sıralamayı değiştirdik (pozitiften negatife)
+  const getEmoji = (position: number) => {
+    const icons = [
+      'emoticon-excited-outline',  // 0 - Çok pozitif
+      'emoticon-happy-outline',    // 25 - Pozitif
+      'emoticon-neutral-outline',  // 50 - Nötr
+      'emoticon-frown-outline',    // 75 - Negatif
+      'emoticon-sad-outline',      // 100 - Çok negatif
+    ];
+    
+    return icons[position];
   };
+
+  // PanResponder to prevent screen navigation when sliding
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: (evt, gestureState) => {
+      // Only capture horizontal movements
+      return Math.abs(gestureState.dx) > Math.abs(gestureState.dy);
+    },
+    onPanResponderGrant: () => {
+      // Prevent parent scroll view from scrolling
+    },
+    onPanResponderMove: () => {
+      // Handle slider movement
+    },
+    onPanResponderRelease: () => {
+      // Release the gesture
+    },
+  });
 
   return (
     <Card
-      style={[
-        {
-          marginBottom: 16,
-          borderRadius: 16, // Material Design M3 card radius
-          // Material Design card elevation
-          elevation: isRelated ? 1 : 2,
-          backgroundColor: isRelated 
-            ? theme.colors.surface 
-            : theme.withOpacity(stateColor, 0.05), // Subtle background tint
-        },
-      ]}
-      accessibilityLabel={`${isRelated ? 'Related ' : ''}Intensity slider for ${mood.label}`}
+      style={{
+        marginBottom: 8,
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: theme.colors.background,
+        borderWidth: 0,
+        // Shadow ekleyelim
+        shadowColor: theme.colors.shadow,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 1,
+      }}
+      accessibilityLabel={`Intensity slider for ${mood.label}`}
     >
       <Card.Content style={{ padding: 16 }}>
         <View style={[{ 
@@ -69,29 +93,12 @@ const SliderCard: React.FC<SliderCardProps> = ({
           ]}>
             {mood.label}
           </Text>
-          
-          {/* Material Design chip-like value indicator */}
-          <View style={{
-            backgroundColor: theme.withOpacity(getValueColor(), 0.08),
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            borderRadius: 16,
-            borderWidth: 1,
-            borderColor: theme.withOpacity(getValueColor(), 0.12),
-          }}>
-            <Text style={[
-              {
-                fontWeight: '500', // Medium weight per Material Design
-                fontSize: 14,
-                color: getValueColor(),
-              }
-            ]}>
-              {mood.value}/100
-            </Text>
-          </View>
         </View>
         
-        <View style={{ paddingHorizontal: 8 }}>
+        <View 
+          style={{ paddingHorizontal: 8 }}
+          {...panResponder.panHandlers} // Slider hareketlerini yakala
+        >
           <Slider
             value={mood.value}
             minimumValue={0}
@@ -99,35 +106,45 @@ const SliderCard: React.FC<SliderCardProps> = ({
             step={1}
             thumbTintColor={stateColor}
             minimumTrackTintColor={stateColor}
-            maximumTrackTintColor={theme.withOpacity(theme.colors.onSurfaceVariant, 0.38)}
+            maximumTrackTintColor={theme.withOpacity(theme.colors.onSurfaceVariant, 0.2)}
             onSlidingComplete={(val) => onSlidingComplete(val, mood.label)}
-            style={{ height: 40 }} // Increased touch target
+            style={{ height: 40 }}
+            // Slider'ı daha kolay yakalanabilir yap
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+            // Slider'ı daha kalın yap
+            trackStyle={{ height: 8, borderRadius: 4 }}
+            thumbStyle={{ width: 24, height: 24, borderRadius: 12 }}
           />
           
-          {/* Material Design tick marks with proper alignment */}
+          {/* Emoji indicators instead of numbers */}
           <View style={[
             {
               flexDirection: 'row',
               justifyContent: 'space-between',
-              paddingHorizontal: 7, // Align with slider thumb edges
-              marginTop: -4,
+              paddingHorizontal: 4,
+              marginTop: 8,
             }
           ]}>
-            {[0, 25, 50, 75, 100].map(tick => (
-              <View 
-                key={tick} 
-                style={{
-                  width: 2,
-                  height: 8,
-                  backgroundColor: tick <= mood.value 
-                    ? theme.withOpacity(stateColor, 0.5) // Colored for active range
-                    : theme.withOpacity(theme.colors.onSurfaceVariant, 0.38), // Subtle for inactive range
-                }} 
-              />
-            ))}
+            {[0, 1, 2, 3, 4].map(position => {
+              // Emoji'nin aktif olup olmadığını belirle
+              const isActive = position * 25 <= mood.value;
+              // Aktif emoji'ler için mood rengini, pasif olanlar için soluk gri kullan
+              const emojiColor = isActive 
+                ? stateColor 
+                : theme.withOpacity(theme.colors.onSurfaceVariant, 0.5);
+                
+              return (
+                <MaterialCommunityIcons
+                  key={position}
+                  name={getEmoji(position)}
+                  size={20}
+                  color={emojiColor}
+                />
+              );
+            })}
           </View>
           
-          {/* Material Design value labels with proper alignment */}
+          {/* Simple Low/High labels */}
           <View style={[
             { 
               flexDirection: 'row', 
@@ -135,51 +152,21 @@ const SliderCard: React.FC<SliderCardProps> = ({
               marginTop: 4 
             }
           ]}>
-            {[0, 25, 50, 75, 100].map(tick => (
-              <Text 
-                key={tick}
-                style={[
-                  { 
-                    fontSize: 12,
-                    fontWeight: tick === Math.round(mood.value / 25) * 25 ? '500' : '400',
-                    color: tick <= mood.value 
-                      ? theme.withOpacity(stateColor, 0.7) // Colored for active range
-                      : theme.colors.onSurfaceVariant, // Standard text for inactive
-                    width: 24, // Fixed width for better alignment
-                    textAlign: 'center',
-                  }
-                ]}
-              >
-                {tick}
-              </Text>
-            ))}
-          </View>
-          
-          {/* Material Design helper text */}
-          <View style={[
-            { 
-              flexDirection: 'row', 
-              justifyContent: 'space-between', 
-              marginTop: 12 
-            }
-          ]}>
             <Text style={[
               { 
                 fontSize: 12,
                 color: theme.colors.onSurfaceVariant,
-                fontWeight: mood.value <= 25 ? '500' : '400',
               }
             ]}>
-              Low Intensity
+              Low
             </Text>
             <Text style={[
               { 
                 fontSize: 12,
                 color: theme.colors.onSurfaceVariant,
-                fontWeight: mood.value >= 75 ? '500' : '400',
               }
             ]}>
-              High Intensity
+              High
             </Text>
           </View>
         </View>
