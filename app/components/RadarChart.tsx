@@ -187,10 +187,10 @@ const gridCircles = [];
       x={point.x}
       y={point.y - 16}
       fontSize={12}
-      fontWeight="500"
-      fill={theme.colors.onSurface}
-      stroke={theme.colors.surface}
-      strokeWidth={3}
+      fontWeight="700" // Increase weight for better visibility
+      fill="#1A1A1A" // Use a dark color directly for maximum contrast
+      stroke="#FFFFFF" // White outline for contrast against the chart
+      strokeWidth={2} // Thinner stroke for better legibility
       textAnchor="middle"
     >
       {(data[idx].value * 100).toFixed(0)}%
