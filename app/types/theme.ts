@@ -90,6 +90,14 @@ export interface AppTheme extends MD3Theme {
     medium: number;
     large: number;
   };
+    componentSizes: {
+    buttonHeight: number;
+    buttonMinWidth: number;
+    iconSize: number;
+    touchableMinHeight: number;
+    cardBorderRadius: number;
+    buttonBorderRadius: number;
+  };
   scaleFont: (size: number) => number;
   scaleSize: (size: number) => number;
   withOpacity: (color: string, opacity: number) => string;
