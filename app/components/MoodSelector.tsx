@@ -3,6 +3,7 @@ import { View, Pressable, FlatList, ScrollView, Dimensions } from 'react-native'
 import { Text, Card, Modal, IconButton } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
+import { router } from 'expo-router';
 import localStyles from '../config/MoodSelector.styles';
 import { typographyStyles } from '../config';
 import { theme } from '../config/theme';
@@ -118,8 +119,37 @@ function MoodSelector({
     );
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <View style={{ 
+        flexDirection: 'row', 
+        alignItems: 'center',
+        paddingHorizontal: 4,
+        paddingTop: 8,
+        marginBottom: 8
+      }}>
+        <IconButton
+          icon="arrow-left"
+          size={24}
+          onPress={handleBack}
+          style={{ marginLeft: -8 }}
+          accessibilityLabel="Go back"
+        />
+        <Text style={[
+          typographyStyles.text_heading3,
+          {
+            color: theme.colors.onSurface,
+            marginLeft: 4,
+            fontWeight: '500'
+          }
+        ]}>
+          Mood Selection
+        </Text>
+      </View>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 80 }}>
         <Text
           style={[

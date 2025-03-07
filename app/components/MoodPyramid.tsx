@@ -6,7 +6,8 @@ import {
   Dimensions,
   ViewStyle,
 } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, IconButton } from 'react-native-paper';
+import { router } from 'expo-router';
 import localStyles from '../config/MoodPyramid.styles';
 import { typographyStyles } from '../config';
 import { theme } from '../config/theme';
@@ -104,8 +105,37 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
     }
   };
 
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <View style={{ 
+        flexDirection: 'row', 
+        alignItems: 'center',
+        paddingHorizontal: 4,
+        paddingTop: 8,
+        marginBottom: 8
+      }}>
+        <IconButton
+          icon="arrow-left"
+          size={24}
+          onPress={handleBack}
+          style={{ marginLeft: -8 }}
+          accessibilityLabel="Go back"
+        />
+        <Text style={[
+          typographyStyles.text_heading3,
+          {
+            color: theme.colors.onSurface,
+            marginLeft: 4,
+            fontWeight: '500'
+          }
+        ]}>
+          Focus Emotions
+        </Text>
+      </View>
       <ScrollView 
         style={{ flex: 1 }} 
         contentContainerStyle={{ 
