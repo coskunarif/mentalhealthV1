@@ -23,6 +23,17 @@ type EmotionSelection = {
   color: string;
 };
 
+type BubbleConfig = {
+  size: number;
+  fontSize: number;
+  style: {
+    left?: number | string;
+    right?: number;
+    top: number;
+    zIndex: number;
+  };
+};
+
 type Props = {
   onPrevious: () => void;
   onFinish: () => void;
@@ -30,23 +41,42 @@ type Props = {
 
     const screenHeight = Dimensions.get('window').height;
 
-    const getBubbleConfig = (screenWidth: number) => [
-      {
-        size: theme.scaleSize(162),
-        fontSize: theme.scaleFont(18),
-        style: { left: screenWidth * 0.07, top: screenHeight * 0.002, zIndex: 1 },
-      },
-      {
-        size: theme.scaleSize(132),
-        fontSize: theme.scaleFont(15),
-        style: { right: screenWidth * 0.15, top: screenHeight * 0.01, zIndex: 1 },
-      },
-      {
-        size: theme.scaleSize(110),
-        fontSize: theme.scaleFont(13),
-        style: { left: screenWidth * 0.385, top: screenHeight * 0.2, zIndex: 2 },
-      },
-    ];
+    const getBubbleConfig = (screenWidth: number): BubbleConfig[] => {
+      const baseSize = Math.min(screenWidth * 0.4, 160); // Ekran genişliğine göre maksimum boyut
+      
+      return [
+        {
+          // Love (pembe) - En büyük bubble, sol üstte
+          size: baseSize * 1.05,
+          fontSize: theme.scaleFont(18),
+          style: { 
+            left: screenWidth * 0.06, 
+            top: 20,
+            zIndex: 3 
+          },
+        },
+        {
+          // Joy (sarı) - Orta boy bubble, sağ üstte
+          size: baseSize * 0.95,
+          fontSize: theme.scaleFont(16),
+          style: { 
+            right: screenWidth * 0.09, 
+            top: 20,
+            zIndex: 2 
+          },
+        },
+        {
+          // Peace (mavi) - En küçük bubble, alt ortada
+          size: baseSize * 0.85,
+          fontSize: theme.scaleFont(14),
+          style: { 
+            left: screenWidth * 0.32, // İki bubble'ın ortasına konumlandır
+            top: baseSize * 1, // Üst bubble'ların biraz altında
+            zIndex: 1 
+          },
+        },
+      ];
+    };
 
 export function MoodPyramid({ onPrevious, onFinish }: Props) {
   const [selectedEmotions, setSelectedEmotions] = useState<EmotionSelection[]>([]);
@@ -75,20 +105,33 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView
-        style={[localStyles.layout_scrollView, { padding: theme.spacing.medium }]}
-        contentContainerStyle={{ paddingBottom: theme.spacing.large }}
+    <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+      <ScrollView 
+        style={{ flex: 1 }} 
+        contentContainerStyle={{ 
+          flexGrow: 1,
+          paddingBottom: 120,
+          paddingHorizontal: 16
+        }}
+        showsVerticalScrollIndicator={true}
       >
         <Text
           style={[
             typographyStyles.text_heading2,
-            { textAlign: 'center', color: theme.colors.primary, marginBottom: theme.spacing.medium },
+            {
+              textAlign: 'center',
+              color: theme.colors.onSurface,
+              marginTop: theme.spacing.large,
+              marginBottom: theme.spacing.large,
+              fontWeight: '500',
+              letterSpacing: 0,
+            },
           ]}
         >
           Identify the emotions to focus on
         </Text>
-        <View style={localStyles.pyramid_container}>
+
+        <View style={[localStyles.pyramid_container, { marginBottom: 24 }]}>
           {emotions.map(emotion => (
             <TouchableOpacity
               key={emotion.label}
@@ -126,12 +169,23 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
         <Text
           style={[
             typographyStyles.text_heading3,
-            { textAlign: 'left', color: theme.colors.primary, marginTop: theme.spacing.medium },
+            { 
+              color: theme.colors.primary, 
+              marginTop: theme.spacing.medium,
+              marginBottom: 16
+            },
           ]}
         >
           Focus Emotions
         </Text>
-        <View style={localStyles.pyramid_bubbleContainer}>
+        <View style={[
+          localStyles.pyramid_bubbleContainer,
+          { 
+            position: 'relative',
+            minHeight: 400,
+            marginBottom: 24
+          }
+        ]}>
           {bubbleConfig.map((config, index) => (
             <TouchableOpacity
               key={index}
@@ -145,6 +199,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
               style={[
                 localStyles.pyramid_bubble,
                 {
+                  position: 'absolute',
                   width: config.size,
                   height: config.size,
                   backgroundColor: selectedEmotions[index]?.color || theme.colors.background,
@@ -153,8 +208,15 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
                   justifyContent: 'center',
                   alignItems: 'center',
                   elevation: 3,
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.22,
+                  shadowRadius: 2.22,
                 },
-                config.style,
+                {
+                  ...config.style,
+                  left: typeof config.style.left === 'string' ? parseInt(config.style.left) : config.style.left
+                }
               ]}
             >
               {selectedEmotions[index] ? (
@@ -185,23 +247,63 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
           ))}
         </View>
       </ScrollView>
-      <View style={localStyles.mood_buttonContainer}>
-        <EnhancedButton
-          mode="outlined"
-          onPress={onPrevious}
-          style={[localStyles.mood_button]}
-          accessibilityLabel="Return to previous mood selection screen"
-        >
-          Previous
-        </EnhancedButton>
-        <EnhancedButton
-          mode="contained"
-          onPress={onFinish}
-          style={[localStyles.mood_button]}
-          accessibilityLabel="Complete mood selection and return to the previous screen"
-        >
-          Finish
-        </EnhancedButton>
+
+      <View style={[
+        localStyles.mood_buttonContainer,
+        {
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          flexDirection: 'row',
+          padding: 16,
+          backgroundColor: theme.colors.background,
+          borderTopWidth: 1,
+          borderTopColor: theme.withOpacity(theme.colors.outline, 0.08),
+        }
+      ]}>
+        <View style={{ 
+          flex: 1, 
+          marginRight: theme.spacing.small,
+        }}>
+          <EnhancedButton
+            mode="contained"
+            onPress={onPrevious}
+            accessibilityLabel="Return to previous screen"
+            fullWidth
+            labelStyle={{
+              fontWeight: '500',
+              fontSize: theme.scaleFont(14),
+              letterSpacing: 0.1,
+              textTransform: 'uppercase',
+              color: theme.colors.onPrimary,
+            }}
+            icon="arrow-left"
+          >
+            PREVIOUS
+          </EnhancedButton>
+        </View>
+        <View style={{ 
+          flex: 1, 
+          marginLeft: theme.spacing.small 
+        }}>
+          <EnhancedButton
+            mode="contained"
+            onPress={onFinish}
+            accessibilityLabel="Complete emotion selection"
+            fullWidth
+            labelStyle={{
+              fontWeight: '500',
+              fontSize: theme.scaleFont(14),
+              letterSpacing: 0.1,
+              textTransform: 'uppercase',
+              color: theme.colors.onPrimary,
+            }}
+            icon="check"
+          >
+            FINISH
+          </EnhancedButton>
+        </View>
       </View>
     </View>
   );
