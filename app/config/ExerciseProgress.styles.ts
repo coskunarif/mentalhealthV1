@@ -1,46 +1,48 @@
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
-  container: {
-    paddingVertical: 8,
+  container: { 
+    paddingVertical: 8
   },
-  stepContainer: {
-    marginVertical: 4,
+  stepContainer: { 
+    marginVertical: 6 // Consistent spacing
   },
-  stepContent: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: 16,
+  stepContent: { 
+    flexDirection: 'row', 
+    alignItems: 'center', // Changed from 'flex-start' for better alignment
+    paddingHorizontal: 16 
   },
-  iconContainer: {
+  iconContainer: { 
     alignItems: 'center',
-    marginRight: 16,
-    width: 24, // Fixed width for proper alignment
+    justifyContent: 'center', 
+    marginRight: 12, // Reduced from 16
+    width: 24,
+    height: 24
   },
-  connector: {
-    width: 2,
-    height: 32,
-    marginTop: 4,
-    marginBottom: 0,
+  connector: { 
+    width: 2, 
+    height: 28, // Reduced for better density
+    marginTop: 4, 
+    marginBottom: -4
   },
-  textContainer: {
-    flex: 1,
-    paddingVertical: 4, // Consistent padding
+  textContainer: { 
+    flex: 1, 
+    paddingVertical: 2
   },
-  stepNumber: {
-    fontSize: 12,
-    fontWeight: '500',
-    marginBottom: 4,
-    letterSpacing: 0.1, // Material Design typography spec
+  stepNumber: { 
+    fontSize: 12, 
+    fontWeight: '500', 
+    marginBottom: 2,
+    letterSpacing: 0.1
   },
-  stepTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 4,
-    letterSpacing: 0.15, // Material Design typography spec
+  stepTitle: { 
+    fontSize: 16, 
+    fontWeight: '500', 
+    marginBottom: 2,
+    letterSpacing: 0.15
   },
-  stepDuration: {
+  stepDuration: { 
     fontSize: 14,
-    letterSpacing: 0.25, // Material Design typography spec
-  },
+    letterSpacing: 0.25
+  }
 });

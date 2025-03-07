@@ -1,8 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Divider, Surface, useTheme, TouchableRipple } from 'react-native-paper';
-import { Link } from 'expo-router';
-import { typographyStyles } from '../config';
+import { Text, Divider, useTheme, TouchableRipple } from 'react-native-paper';
 import type { AppTheme } from '../types/theme';
 
 interface Activity {
@@ -17,98 +15,67 @@ interface RecentActivitiesProps {
   activities: Activity[];
 }
 
+const getRippleColor = (color: string, opacity: number) => {
+  // Basic implementation if withOpacity isn't available
+  if (color.startsWith('#')) {
+    const r = parseInt(color.slice(1, 3), 16);
+    const g = parseInt(color.slice(3, 5), 16);
+    const b = parseInt(color.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  }
+  return color; // Fallback to the original color
+};
+
 export default function RecentActivities({ activities }: RecentActivitiesProps) {
   const theme = useTheme<AppTheme>();
-  
+
+  const styles = React.useMemo(() => StyleSheet.create({
+    item: {
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+      minHeight: 48,
+    },
+    touchable: {
+      paddingVertical: 8,
+      paddingHorizontal: 16,
+    },
+    divider: {
+      marginHorizontal: 16,
+      opacity: 0.6,
+      height: 0.5,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '500',
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: theme.colors.onSurfaceVariant,
+    },
+  }), [theme]);
+
   return (
-    <Surface style={styles.container} elevation={1}>
+    <View>
       {activities.map((activity, index) => (
         <React.Fragment key={activity.id}>
-          <Link
-            href={{
-              pathname: "/player",
-              params: {
-                meditationId: activity.id,
-                title: activity.title,
-                subtitle: activity.subtitle,
-                returnTo: 'tabs/home',
-              },
-            }}
-            asChild
+          <TouchableRipple 
+            onPress={() => {}} 
+            rippleColor={getRippleColor(theme.colors.primary, 0.12)}
+            style={styles.touchable}
           >
-            <TouchableRipple 
-              onPress={() => {}} 
-              rippleColor={theme.withOpacity(theme.colors.primary, 0.12)}
-              style={styles.touchable}
-            >
-              <View style={styles.item}>
-                <View style={styles.contentContainer}>
-                  <Text style={[typographyStyles.text_body, styles.title]}>
-                    {activity.title}
-                  </Text>
-                  <Text style={[
-                    typographyStyles.text_caption, 
-                    styles.subtitle,
-                    { color: theme.colors.secondary }
-                  ]}>
-                    {activity.subtitle}
-                  </Text>
-                </View>
-                <Text style={[
-                  typographyStyles.text_caption,
-                  styles.duration,
-                  { color: theme.colors.secondary }
-                ]}>
-                  {activity.duration.toFixed(1)} min
-                </Text>
-              </View>
-            </TouchableRipple>
-          </Link>
+            <View style={styles.item}>
+              <Text style={styles.title}>{activity.title}</Text>
+              <Text style={styles.subtitle}>
+                {activity.subtitle} • {activity.duration} min
+              </Text>
+            </View>
+          </TouchableRipple>
           {index < activities.length - 1 && (
-            <Divider 
-              style={[
-                styles.divider, 
-                { opacity: 0.5 }
-              ]} 
-            />
+            <Divider style={styles.divider} />
           )}
         </React.Fragment>
       ))}
-    </Surface>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: 12, // Material Design M3 card radius
-    overflow: 'hidden',
-    marginVertical: 8,
-  },
-  touchable: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minHeight: 40,
-  },
-  contentContainer: {
-    flex: 1,
-    marginRight: 16,
-  },
-  title: {
-    marginBottom: 4,
-    fontWeight: '500',
-  },
-  subtitle: {
-    lineHeight: 16,
-  },
-  duration: {
-    fontWeight: '500',
-  },
-  divider: {
-    marginHorizontal: 16,
-  }
-});

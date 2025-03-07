@@ -112,35 +112,21 @@ export default function RadarChart({
     };
   };
 
-  const gridCircles = [];
+const gridCircles = [];
   const gridSteps = 5;
   for (let i = 1; i <= gridSteps; i++) {
     const gridRadius = (radius / gridSteps) * i;
-    const value = (i / gridSteps).toFixed(1);
-    const isMinorGrid = i % 2 !== 0;
     gridCircles.push(
-      <React.Fragment key={`grid-circle-${i}`}>
-        <Circle
-          cx={center}
-          cy={center}
-          r={gridRadius}
-          stroke={gridColor}
-          strokeWidth={isMinorGrid ? 0.5 : 1}
-          strokeDasharray={isMinorGrid ? '2,2' : 'none'}
-          fill="none"
-        />
-        {!isMinorGrid && (
-          <SvgText
-            x={center}
-            y={center - gridRadius - 5}
-            fontSize={8}
-            fill={theme.colors.onSurfaceVariant}
-            textAnchor="middle"
-          >
-            {value}
-          </SvgText>
-        )}
-      </React.Fragment>
+      <Circle
+        key={`grid-circle-${i}`}
+        cx={center}
+        cy={center}
+        r={gridRadius}
+        stroke={theme.colors.outlineVariant}
+        strokeWidth={1}
+        strokeOpacity={i === gridSteps ? 0.8 : 0.4} // Main outline darker
+        fill="none"
+      />
     );
   }
 
@@ -177,59 +163,56 @@ export default function RadarChart({
           fill={polygonFillColor}
           fillOpacity={fillOpacity}
         />
-        {points.map((point, idx) => (
-          <React.Fragment key={`data-point-${idx}`}>
-            <Circle
-              cx={point.x}
-              cy={point.y}
-              r={8} // Increased from 5 for better touch target
-              fill={pointColor}
-              stroke={theme.colors.background}
-              strokeWidth={2}
-              opacity={0.8} // For better visual appearance
-              accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`}
-            />
-            {/* Add value label near each point */}
-            <SvgText
-              x={point.x}
-              y={point.y - 12}
-              fontSize={10}
-              fontWeight='bold'
-              fill={theme.colors.onSurface}
-              stroke={theme.colors.surface}
-              strokeWidth={2}
-              textAnchor='middle'
-            >
-              {(data[idx].value * 100).toFixed(0)}%
-            </SvgText>
-</React.Fragment>
-        ))}
-        {chartLabels.map((_, idx) => {
-          const {
-            x,
-            y,
-            textAnchor,
-            xOffset,
-            yOffset,
-            lines,
-            fill,
-            fontWeight,
-          } = getLabelLayout(idx);
-          return lines.map((line, lineIndex) => (
-            <SvgText
-              key={`label-${idx}-line-${lineIndex}`}
-              x={x + xOffset}
-              y={y + yOffset + lineIndex * 12}
-              fontSize={11} // Slightly increased for readability
-              fill={fill}
-              fontWeight={fontWeight}
-              fontFamily={theme.fonts.bodyMedium.fontFamily}
-              textAnchor={textAnchor}
-            >
-              {line}
-            </SvgText>
-          ));
-        })}
+{points.map((point, idx) => (
+  <React.Fragment key={`data-point-${idx}`}>
+    {/* Add a larger transparent touch area */}
+    <Circle
+      cx={point.x}
+      cy={point.y}
+      r={24} // 48dp diameter touch target
+      fill="transparent"
+      accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`}
+    />
+    {/* Visible point */}
+    <Circle
+      cx={point.x}
+      cy={point.y}
+      r={8}
+      fill={pointColor}
+      stroke={theme.colors.background}
+      strokeWidth={2}
+    />
+    {/* Add percentage indicator */}
+    <SvgText
+      x={point.x}
+      y={point.y - 16}
+      fontSize={12}
+      fontWeight="500"
+      fill={theme.colors.onSurface}
+      stroke={theme.colors.surface}
+      strokeWidth={3}
+      textAnchor="middle"
+    >
+      {(data[idx].value * 100).toFixed(0)}%
+    </SvgText>
+  </React.Fragment>
+))}
+{chartLabels.map((_, idx) => {
+  const { x, y, textAnchor, xOffset, yOffset, lines } = getLabelLayout(idx);
+  return lines.map((line, lineIndex) => (
+    <SvgText
+      key={`label-${idx}-line-${lineIndex}`}
+      x={x + xOffset}
+      y={y + yOffset + lineIndex * 12}
+      fontSize={12}
+      fontWeight="500"
+      fill={theme.colors.onSurface} // Increased contrast
+      textAnchor={textAnchor}
+    >
+      {line}
+    </SvgText>
+  ));
+})}
       </Svg>
     </View>
   );

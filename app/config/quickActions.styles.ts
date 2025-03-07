@@ -23,15 +23,19 @@ export default StyleSheet.create({
     minWidth: 140,
     maxWidth: '45%',
     margin: 8,
-    borderRadius: 12,
-    elevation: 1,
+    borderRadius: theme.componentSizes.cardBorderRadius,
+    // Proper Material elevation
+    elevation: theme.colors.elevation.level1,
+    backgroundColor: theme.colors.surface,
   },
   cardContent: {
     alignItems: 'center',
     padding: 16,
+    gap: 12, // Create proper spacing between icon and text
   },
   icon: {
-    marginBottom: 8,
+    marginBottom: 4, // Reduced from 8
+    color: theme.colors.primary, // Use theme color instead of hardcoded
   },
   cardTitle: {
     textAlign: 'center',
