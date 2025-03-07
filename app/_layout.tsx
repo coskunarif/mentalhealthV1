@@ -52,6 +52,7 @@ export default function AppLayout() {
             contentStyle: {
               backgroundColor: theme.colors.background,
             },
+            headerShown: false,
           }}
         />
         </AuthProvider>
