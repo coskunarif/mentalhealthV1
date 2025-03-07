@@ -87,35 +87,39 @@ const miscStyles = StyleSheet.create({
   profile_statusLabel: {
     color: theme.colors.onSurfaceVariant,
   } as TextStyle,
-  profile_statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 12,
-    marginLeft: 8,
+profile_statusBadge: {
+    paddingHorizontal: theme.spacing.small + 4,
+    paddingVertical: theme.spacing.tiny,
+    borderRadius: 16,
+    marginLeft: theme.spacing.small,
   } as ViewStyle,
   profile_statusText: {
     fontSize: 14,
     fontWeight: '500',
   } as TextStyle,
 
-  profile_statsContainer: {
+profile_statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginVertical: theme.spacing.medium,
-    paddingHorizontal: theme.spacing.medium,
+    paddingVertical: theme.spacing.medium,
+    marginTop: theme.spacing.small,
+    backgroundColor: theme.colors.surfaceVariant,
+    borderRadius: theme.shape.borderRadius,
+    marginHorizontal: theme.spacing.small,
   } as ViewStyle,
   profile_statItem: {
     alignItems: 'center',
+    padding: theme.spacing.small,
   } as ViewStyle,
   profile_statNumber: {
-    ...theme.fonts.titleLarge,
-    color: theme.colors.onSurface,
-    fontWeight: 'bold',
+    ...theme.fonts.headlineSmall,
+    color: theme.colors.primary,
+    fontWeight: '600',
   } as TextStyle,
   profile_statLabel: {
     ...theme.fonts.labelMedium,
     color: theme.colors.onSurfaceVariant,
-    marginTop: 4,
+    marginTop: theme.spacing.tiny,
   } as TextStyle,
 
   // Recent Activities

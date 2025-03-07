@@ -61,7 +61,10 @@ export default function ProfileScreen() {
     <View style={layoutStyles.layout_container}>
       <ScrollView style={layoutStyles.layout_scrollView}>
         {/* Profile Header with Stats */}
-        <Surface style={miscStyles.profile_header} elevation={2}>
+<Surface 
+          style={[miscStyles.profile_header, { elevation: 2, marginHorizontal: theme.spacing.medium }]} 
+          elevation={2}
+        >
           <View style={miscStyles.profile_headerContent}>
             <View style={miscStyles.profile_avatarContainer}>
               <MaterialCommunityIcons 
@@ -97,36 +100,36 @@ export default function ProfileScreen() {
           </View>
 
           {/* Subscription Status */}
-          <View style={miscStyles.profile_subscriptionStatus}>
-            <Text style={[miscStyles.profile_statusLabel, theme.fonts.bodyMedium]}>
-              Subscription Status:
-            </Text>
-            <View
-              style={[
-                miscStyles.profile_statusBadge,
-                {
-                  backgroundColor:
-                    subscriptionStatus === 'Active'
-                      ? theme.colors.secondary
-                      : theme.colors.surfaceVariant,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  miscStyles.profile_statusText,
-                  {
-                    color:
-                      subscriptionStatus === 'Active'
-                        ? theme.colors.onSecondary
-                        : theme.colors.onSurfaceVariant,
-                  },
-                ]}
-              >
-                {subscriptionStatus}
-              </Text>
-            </View>
-          </View>
+<View style={miscStyles.profile_subscriptionStatus}>
+  <Text style={[miscStyles.profile_statusLabel, theme.fonts.bodyMedium]}>
+    Subscription Status:
+  </Text>
+  <View
+    style={[
+      miscStyles.profile_statusBadge,
+      {
+        backgroundColor:
+          subscriptionStatus === 'Active'
+            ? theme.colors.primaryContainer
+            : theme.colors.surfaceVariant,
+      },
+    ]}
+  >
+    <Text
+      style={[
+        miscStyles.profile_statusText,
+        {
+          color:
+            subscriptionStatus === 'Active'
+              ? theme.colors.onPrimaryContainer
+              : theme.colors.onSurfaceVariant,
+        },
+      ]}
+    >
+      {subscriptionStatus}
+    </Text>
+  </View>
+</View>
         </Surface>
 
         {/* Account Information */}
