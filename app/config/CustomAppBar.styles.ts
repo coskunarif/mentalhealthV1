@@ -7,7 +7,9 @@ const customAppBarStyles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
   },
   title: {
-    ...typographyStyles.text_heading2,
+    // Instead of using text_heading2 which is too large for an app bar
+    ...typographyStyles.text_heading3, // Or create a specific app bar title style
+    fontSize: 20, // More appropriate for app bar titles per Material Design
   },
 });
 

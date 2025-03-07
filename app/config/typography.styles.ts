@@ -12,6 +12,7 @@ const typographyStyles = StyleSheet.create({
   } as TextStyle,
   text_heading2: {
     ...theme.fonts.headlineMedium,
+    fontFamily: 'Kameron', // Add this to be consistent with heading1 and heading3
     fontWeight: 'bold',
     color: theme.colors.onSurface,
     marginBottom: theme.spacing.small,
