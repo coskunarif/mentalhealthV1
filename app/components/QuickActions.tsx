@@ -6,7 +6,14 @@ import { MaterialIcons } from '@expo/vector-icons';
 import type { AppTheme } from '../types/theme';
 import { typographyStyles } from '../config';
 
-const actions = [
+type MaterialIconName = keyof typeof MaterialIcons.glyphMap;
+
+const actions: {
+  title: string;
+  icon: MaterialIconName;
+  href: string;
+  color: string;
+}[] = [
   {
     title: 'Take Survey',
     icon: 'assignment',
@@ -32,13 +39,12 @@ export default function QuickActions() {
       <View style={styles.grid}>
         {actions.map((action, index) => (
           <Link key={index} href={action.href} asChild>
-            <Card 
+            <Card
               style={styles.card}
               mode="elevated"
-              elevation={1} // Consistent with Material Design
             >
               <Card.Content style={styles.cardContent}>
-                <MaterialIcons 
+                <MaterialIcons
                   name={action.icon}
                   size={24}
                   color={action.color}
@@ -51,7 +57,7 @@ export default function QuickActions() {
             </Card>
           </Link>
         ))}
-</View>
+      </View>
     </View>
   );
 }
@@ -76,15 +82,17 @@ const styles = StyleSheet.create({
     maxWidth: '45%', // Allow for proper spacing
     margin: 8, // Follow 8dp grid
     borderRadius: 12, // Material Design M3 card radius
+    elevation: 1,
   },
   cardContent: {
     alignItems: 'center',
     padding: 16, // MD standard padding
+    gap: 8, // Add gap between icon and text
   },
   icon: {
-    marginBottom: 8,
+    // marginBottom: 8, // Removed in favor of gap
   },
   cardTitle: {
     textAlign: 'center',
-  }
+  },
 });

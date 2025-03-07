@@ -41,9 +41,9 @@ export default function BottomNavBar() {
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
             <MaterialIcons 
-              name={focused ? "home" : "home-outlined"} 
-              size={24} 
-              color={color} 
+              name={focused ? "home" : "house"}
+              size={24}
+              color={color}
             />
           ),
         }}
@@ -54,7 +54,7 @@ export default function BottomNavBar() {
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
             <MaterialIcons 
-              name={focused ? "person" : "person-outline"}
+              name={focused ? "person" : "person-off"}
               size={24}
               color={color}
             />

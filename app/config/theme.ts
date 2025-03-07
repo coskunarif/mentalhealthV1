@@ -67,20 +67,18 @@ export const theme: AppTheme = {
     elevation: {
       level0: 0,
       level1: 1, // Cards, surfaces
-      level2: 3, // Primary buttons, FABs
-      level3: 6, // Navigation drawer
-      level4: 8, // Modal bottom sheets
+      level2: 2, // Buttons
+      level3: 4, // FABs, bottom sheets
+      level4: 8, // Navigation drawers
       level5: 12, // Dialogs
     },
   },
-
-  // Update spacing to be explicit about Material 8dp grid:
   spacing: {
-    tiny: 4,    // Half unit
-    small: 8,    // Base unit
-    medium: 16,  // 2 units
-    large: 24, // 3 units
-},
+    tiny: 4,
+    small: 8,
+    medium: 16,
+    large: 24
+  },
 
   // Add specific material design component sizes:
   componentSizes: {
@@ -93,7 +91,7 @@ export const theme: AppTheme = {
   },
   roundness: 8,
   shape: { borderRadius: 8 },
-    chartColors: {
+  chartColors: {
     grid: '#CCCCCC',
     area: '#D1E4FF',
     point: '#36618E',
