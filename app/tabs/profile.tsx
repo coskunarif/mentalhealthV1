@@ -1,36 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text, Button, Surface, Snackbar, Avatar, Divider, List, Dialog, Portal } from 'react-native-paper';
-import { PersonalInformationSection } from '../components/PersonalInformationSection';
+import { Text, Button, Surface, Snackbar, Dialog, List } from 'react-native-paper';
 import type { PersonalInformation } from '../types/personalInformation';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import styles from '../config/styles';
+import { layoutStyles, miscStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
 
-interface ProfileListItemProps {
-  title: string;
-  icon: string;
-  onPress: () => void;
-}
-
-const ProfileListItem = ({ title, icon, onPress }: ProfileListItemProps) => (
-  <List.Item
-    title={title}
-    left={props => <List.Icon {...props} icon={icon} />}
-    right={props => <List.Icon {...props} icon="chevron-right" />}
-    onPress={onPress}
-    titleStyle={theme.fonts.bodyLarge}
-  />
-);
-
 export default function ProfileScreen() {
-  const router = useRouter();
   const { user, signOut } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const router = useRouter();
+
+  // Simulated user stats
+  const [userStats, setUserStats] = useState({
+    sessions: 12,
+    streak: 5,
+    surveys: 8,
+  });
+  
+  // Simulated subscription status
+  const [subscriptionStatus, setSubscriptionStatus] = useState('Active');
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+      }
+    };
+    fetchUserData();
+  }, [user?.uid]);
 
   const handleSignOut = async () => {
     setIsLoading(true);
@@ -46,112 +50,144 @@ export default function ProfileScreen() {
     }
   };
 
+  const personalInfo: PersonalInformation = {
+    name: user?.displayName || "User Name",
+    email: user?.email || "user@example.com",
+    phoneNumber: "555-1234",
+    dateOfBirth: "1990-01-01",
+  };
+
   return (
-    <View style={styles.layout_container}>
-      <PersonalInformationSection 
-        info={{
-          name: "John Doe",
-          email: "johndoe@example.com",
-          phoneNumber: "555-1234",
-          dateOfBirth: "1990-01-01",
-        }}
-      />
-      <ScrollView style={styles.layout_scrollView}>
-        {/* Subscription Section */}
-        <Surface style={styles.profile_mainSection} elevation={1}>
-          <View style={styles.profile_sectionHeader}>
-            <MaterialCommunityIcons 
-              name="crown" 
-              size={24} 
-              color={theme.colors.secondary} 
-            />
-            <Text style={[styles.profile_sectionTitle, theme.fonts.titleMedium]}>
-              Premium Subscription
-            </Text>
-          </View>
-          <View style={styles.profile_subscriptionStatus}>
-            <Text style={[styles.profile_statusLabel, theme.fonts.bodyMedium]}>
-              Status:
-            </Text>
-            <View style={[styles.profile_statusBadge, { backgroundColor: theme.colors.secondary }]}>
-              <Text style={[styles.profile_statusText, { color: theme.colors.onSecondary }]}>
-                Active
+    <View style={layoutStyles.layout_container}>
+      <ScrollView style={layoutStyles.layout_scrollView}>
+        {/* Profile Header with Stats */}
+        <Surface style={miscStyles.profile_header} elevation={2}>
+          <View style={miscStyles.profile_headerContent}>
+            <View style={miscStyles.profile_avatarContainer}>
+              <MaterialCommunityIcons 
+                name="account-circle"
+                size={40}
+                color={theme.colors.primary}
+              />
+            </View>
+            <View style={miscStyles.profile_headerText}>
+              <Text style={[typographyStyles.text_heading2, miscStyles.profile_name]}>
+                {personalInfo.name}
+              </Text>
+              <Text style={miscStyles.profile_email}>
+                {personalInfo.email}
               </Text>
             </View>
           </View>
-          <Text style={[styles.profile_subscriptionDetails, theme.fonts.bodyMedium]}>
-            Next billing date: March 15, 2024
-          </Text>
-          <Button
-            mode="contained"
-            onPress={() => router.push('/subscription/manage')}
-            style={styles.profile_actionButton}
-            labelStyle={theme.fonts.labelLarge}
-          >
-            Manage Subscription
-          </Button>
+
+          {/* Mental Health Stats */}
+          <View style={miscStyles.profile_statsContainer}>
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats.sessions}</Text>
+              <Text style={miscStyles.profile_statLabel}>Sessions</Text>
+            </View>
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats.streak}</Text>
+              <Text style={miscStyles.profile_statLabel}>Streak</Text>
+            </View>
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats.surveys}</Text>
+              <Text style={miscStyles.profile_statLabel}>Surveys</Text>
+            </View>
+          </View>
+
+          {/* Subscription Status */}
+          <View style={miscStyles.profile_subscriptionStatus}>
+            <Text style={[miscStyles.profile_statusLabel, theme.fonts.bodyMedium]}>
+              Subscription Status:
+            </Text>
+            <View
+              style={[
+                miscStyles.profile_statusBadge,
+                {
+                  backgroundColor:
+                    subscriptionStatus === 'Active'
+                      ? theme.colors.secondary
+                      : theme.colors.surfaceVariant,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  miscStyles.profile_statusText,
+                  {
+                    color:
+                      subscriptionStatus === 'Active'
+                        ? theme.colors.onSecondary
+                        : theme.colors.onSurfaceVariant,
+                  },
+                ]}
+              >
+                {subscriptionStatus}
+              </Text>
+            </View>
+          </View>
         </Surface>
 
-        {/* Settings Sections */}
-        <Surface style={styles.profile_mainSection} elevation={1}>
+        {/* Account Information */}
+        <Surface style={miscStyles.profile_sectionCard} elevation={2}>
+          <Text style={miscStyles.profile_sectionTitle}>Account Information</Text>
           <List.Section>
-            <List.Subheader style={theme.fonts.titleMedium}>
-              Account Settings
-            </List.Subheader>
-            
-            <ProfileListItem
-              title="Personal Information"
-              icon="account"
-              onPress={() => router.push('/account/personal-info')}
+            <List.Item
+              title="Edit Personal Information"
+              onPress={() => router.push('/components/EditPersonalInfoScreen')}
+              left={() => <List.Icon icon="account-edit" />}
+              right={() => <List.Icon icon="chevron-right" />}
             />
-            
-            <ProfileListItem
-              title="Notification Preferences"
-              icon="bell"
-              onPress={() => router.push('/account/notifications')}
+            <List.Item
+              title="Manage Subscription"
+              onPress={() => router.push('/components/ManageSubscriptionScreen')}
+              left={() => <List.Icon icon="credit-card" />}
+              right={() => <List.Icon icon="chevron-right" />}
             />
-            
-            <ProfileListItem
+          </List.Section>
+        </Surface>
+
+        {/* Options */}
+        <Surface style={miscStyles.profile_sectionCard} elevation={2}>
+          <Text style={miscStyles.profile_sectionTitle}>Options</Text>
+          <List.Section>
+            <List.Item
               title="Language & Region"
-              icon="translate"
-              onPress={() => router.push('/account/language')}
+              onPress={() => router.push('/components/LanguageRegionScreen')}
+              left={() => <List.Icon icon="earth" />}
+              right={() => <List.Icon icon="chevron-right" />}
             />
-            
-            <Divider />
-            
-            <List.Subheader style={theme.fonts.titleMedium}>
-              Support & Legal
-            </List.Subheader>
-            
-            <ProfileListItem
+            <List.Item
+              title="Notification Preferences"
+              onPress={() => router.push('/components/NotificationPreferencesScreen')}
+              left={() => <List.Icon icon="bell-outline" />}
+              right={() => <List.Icon icon="chevron-right" />}
+            />
+            <List.Item
               title="Help Center"
-              icon="help-circle"
-              onPress={() => router.push('/support/help')}
+              onPress={() => router.push('/components/HelpCenterScreen')}
+              left={() => <List.Icon icon="help-circle-outline" />}
+              right={() => <List.Icon icon="chevron-right" />}
             />
-            
-            <ProfileListItem
-              title="Privacy Policy"
-              icon="shield-account"
-              onPress={() => router.push('/legal/privacy')}
-            />
-            
-            <ProfileListItem
-              title="Terms of Service"
-              icon="file-document"
-              onPress={() => router.push('/legal/terms')}
+            <List.Item
+              title="Privacy Policy & Terms of Service"
+              onPress={() => router.push('/components/LegalScreen')}
+              left={() => <List.Icon icon="file-document-outline" />}
+              right={() => <List.Icon icon="chevron-right" />}
             />
           </List.Section>
         </Surface>
 
         {/* Sign Out Button */}
-        <Surface style={[styles.profile_mainSection, styles.profile_signOutSection]} elevation={1}>
+        <Surface style={miscStyles.profile_sectionCard} elevation={2}>
           <Button
             mode="outlined"
             onPress={() => setShowSignOutDialog(true)}
             loading={isLoading}
             disabled={isLoading}
             icon="logout"
-            style={styles.profile_signOutButton}
+            style={{ marginTop: theme.spacing.small }}
             labelStyle={theme.fonts.labelLarge}
           >
             {isLoading ? 'Signing Out...' : 'Sign Out'}
@@ -159,35 +195,29 @@ export default function ProfileScreen() {
         </Surface>
       </ScrollView>
 
-      {/* Sign Out Confirmation Dialog */}
-      <Portal>
-        <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)}>
-          <Dialog.Title style={theme.fonts.titleLarge}>Sign Out</Dialog.Title>
-          <Dialog.Content>
-            <Text style={theme.fonts.bodyMedium}>
-              Are you sure you want to sign out?
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button 
-              onPress={() => setShowSignOutDialog(false)}
-              labelStyle={theme.fonts.labelLarge}
-            >
-              Cancel
-            </Button>
-            <Button 
-              onPress={() => {
-                setShowSignOutDialog(false);
-                handleSignOut();
-              }}
-              labelStyle={theme.fonts.labelLarge}
-            >
-              Sign Out
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      {/* Sign Out Dialog */}
+      <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)}>
+        <Dialog.Title style={theme.fonts.titleLarge}>Sign Out</Dialog.Title>
+        <Dialog.Content>
+          <Text style={theme.fonts.bodyMedium}>Are you sure you want to sign out?</Text>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={() => setShowSignOutDialog(false)} labelStyle={theme.fonts.labelLarge}>
+            Cancel
+          </Button>
+          <Button
+            onPress={() => {
+              setShowSignOutDialog(false);
+              handleSignOut();
+            }}
+            labelStyle={theme.fonts.labelLarge}
+          >
+            Sign Out
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
 
+      {/* Error Snackbar */}
       <Snackbar
         visible={!!error}
         onDismiss={() => setError(null)}

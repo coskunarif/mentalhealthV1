@@ -22,6 +22,8 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [initialized, setInitialized] = useState(false);
+  const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
+  const persistenceKey = `firebase:authUser:${projectId}:[DEFAULT]`;
 
   useEffect(() => {
     console.log("Setting up auth state listener");
@@ -29,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log("Auth state changed:", {
         userId: user?.uid,
         isAuthenticated: !!user,
-        previouslyInitialized: initialized
+        previouslyInitialized: initialized,
       });
       setUser(user);
       setInitialized(true);
@@ -43,52 +45,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [initialized]);
 
-  const signOut = async () => {
+  const handleSignOut = async () => {
     try {
       console.log("Starting sign-out process");
       console.log("Current user:", auth.currentUser?.uid);
-
-      // Sign out from Firebase
       console.log("Calling auth.signOut()");
       await auth.signOut();
       console.log("auth.signOut() completed");
-
-      // Clear Firebase persistence key from AsyncStorage
-      const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
-      const persistenceKey = `firebase:authUser:${projectId}:[DEFAULT]`;
       console.log(`Clearing AsyncStorage key: ${persistenceKey}`);
       await AsyncStorage.removeItem(persistenceKey);
       console.log("Firebase persistence key removed");
-
-      // Verify auth state
       console.log("Verifying auth state after sign-out");
       console.log("Current auth state:", {
         currentUser: auth.currentUser?.uid,
-        isSignedIn: !!auth.currentUser
+        isSignedIn: !!auth.currentUser,
       });
-
-      // Reset user state
       console.log("Resetting user state");
       setUser(null);
-      
       console.log("Sign-out process completed successfully");
-      
-      // Note: Navigation will be handled automatically by the root navigator
-      // when auth state changes to null
-    } catch (error: any) { // Type assertion for error object
+    } catch (error: any) {
       console.error('Error signing out:', error);
       console.error('Error details:', {
         name: error?.name,
         message: error?.message,
         code: error?.code,
-        stack: error?.stack
+        stack: error?.stack,
       });
-      throw error; // Propagate error to be handled by the UI
+      throw error;
     }
   };
 
+  const signOut = async () => {
+    await handleSignOut();
+  };
+
+  const authContextValue: AuthContextType = { user, initialized, signOut };
+
   return (
-    <AuthContext.Provider value={{ user, initialized, signOut }}>
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );
@@ -96,5 +90,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export default {
   useAuth,
-  AuthProvider
-}
+  AuthProvider,
+};

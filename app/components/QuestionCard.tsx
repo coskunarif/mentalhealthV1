@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View } from 'react-native';
-import { Text, Button, Surface, useTheme, RadioButton } from 'react-native-paper';
-import styles from '../config/styles';
+import { Text, RadioButton, Surface } from 'react-native-paper';
+import { cardStyles, typographyStyles } from '../config';
 import type { AppTheme } from '../types/theme';
+import { useTheme } from 'react-native-paper';
 
 interface QuestionCardProps {
   options: string[];
@@ -10,11 +11,7 @@ interface QuestionCardProps {
   onSelect: (index: number) => void;
 }
 
-export default function QuestionCard({
-  options,
-  selectedOption,
-  onSelect,
-}: QuestionCardProps) {
+export default function QuestionCard({ options, selectedOption, onSelect }: QuestionCardProps) {
   const theme = useTheme<AppTheme>();
 
   const handleOptionSelect = (value: string) => {
@@ -22,9 +19,9 @@ export default function QuestionCard({
   };
 
   return (
-    <Surface style={[styles.component_card_elevated, { marginBottom: 24 }]}>
+    <Surface style={[cardStyles.component_card_elevated, { marginBottom: 24 }]}>
       <RadioButton.Group onValueChange={handleOptionSelect} value={selectedOption}>
-        {options.map((option) => (
+        {options.map(option => (
           <RadioButton.Item
             key={option}
             label={option}

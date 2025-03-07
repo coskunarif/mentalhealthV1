@@ -1,119 +1,109 @@
-import { MD3LightTheme, configureFonts } from 'react-native-paper';
-import type { AppTheme, ChartColors } from '../types/theme';
-import appColors from './colors';
-import { Dimensions } from 'react-native';
+import { configureFonts } from 'react-native-paper';
+import type { AppTheme } from '../types/theme';
+import { MD3Typescale, MD3Type } from 'react-native-paper/lib/typescript/types';
 
-const { width } = Dimensions.get('window');
-
-// Scaling function based on screen width
-const scaleFont = (size: number) => {
-  const scale = width / 375; // 375 is a common base screen width
-  return Math.round(size * scale);
+const withOpacity = (color: string, opacity: number) => {
+  const r = parseInt(color.slice(1, 3), 16);
+  const g = parseInt(color.slice(3, 5), 16);
+  const b = parseInt(color.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 };
 
-const baseFont = {
-  fontFamily: 'Kameron',
+const fontConfig: Partial<Record<keyof MD3Typescale, MD3Type>> = {
+  titleMedium: { fontFamily: 'Nunito', fontWeight: "600", fontSize: 20, lineHeight: 28, letterSpacing: 0 },
+  bodyMedium: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 16, lineHeight: 24, letterSpacing: 0 },
+  displayLarge: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 57, lineHeight: 64, letterSpacing: 0 },
+  displayMedium: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 45, lineHeight: 52, letterSpacing: 0 },
+  displaySmall: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 36, lineHeight: 44, letterSpacing: 0 },
+  headlineLarge: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 32, lineHeight: 40, letterSpacing: 0 },
+  headlineMedium: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 28, lineHeight: 36, letterSpacing: 0 },
+  headlineSmall: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 24, lineHeight: 32, letterSpacing: 0 },
+  titleLarge: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 22, lineHeight: 28, letterSpacing: 0 },
+  titleSmall: { fontFamily: 'Nunito', fontWeight: "500", fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
+  bodyLarge: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 16, lineHeight: 24, letterSpacing: 0.5 },
+  bodySmall: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 12, lineHeight: 16, letterSpacing: 0.4 },
+  labelLarge: { fontFamily: 'Nunito', fontWeight: "500", fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
+  labelMedium: { fontFamily: 'Nunito', fontWeight: "500", fontSize: 12, lineHeight: 16, letterSpacing: 0.5 },
+  labelSmall: { fontFamily: 'Nunito', fontWeight: "500", fontSize: 11, lineHeight: 16, letterSpacing: 0.5 },
 };
-
-const baseBoldFont = {
-  fontFamily: 'Kameron-Bold',
-};
-
-const fontConfig = {
-  displayLarge: { ...baseBoldFont, fontSize: scaleFont(34), lineHeight: scaleFont(40) },
-  displayMedium: { ...baseBoldFont, fontSize: scaleFont(28), lineHeight: scaleFont(36) },
-  displaySmall: { ...baseBoldFont, fontSize: scaleFont(20), lineHeight: scaleFont(32) },
-  headlineLarge: { ...baseBoldFont, fontSize: scaleFont(22), lineHeight: scaleFont(28) },
-  headlineMedium: { ...baseBoldFont, fontSize: scaleFont(20), lineHeight: scaleFont(26) },
-  headlineSmall: { ...baseBoldFont, fontSize: scaleFont(18), lineHeight: scaleFont(24) },
-  titleLarge: { ...baseBoldFont, fontSize: scaleFont(18), lineHeight: scaleFont(24) },
-  titleMedium: { ...baseFont, fontSize: scaleFont(16), lineHeight: scaleFont(22) },
-  titleSmall: { ...baseFont, fontSize: scaleFont(14), lineHeight: scaleFont(20) },
-  bodyLarge: { ...baseFont, fontSize: scaleFont(16), lineHeight: scaleFont(22) },
-  bodyMedium: { ...baseFont, fontSize: scaleFont(16), lineHeight: scaleFont(22) },
-  bodySmall: { ...baseFont, fontSize: scaleFont(16), lineHeight: scaleFont(22) },
-  labelLarge: { ...baseFont, fontSize: scaleFont(14), lineHeight: scaleFont(20) },
-  labelMedium: { ...baseFont, fontSize: scaleFont(12), lineHeight: scaleFont(18) },
-  labelSmall: { ...baseFont, fontSize: scaleFont(11), lineHeight: scaleFont(16) },
-};
-
-const chartColors: ChartColors = {
-  grid: appColors.colors.dominant,
-  area: appColors.colors.secondary,
-  point: appColors.colors.accent,
-  progress: {
-    active: appColors.colors.secondary,
-    inactive: appColors.colors.dominant,
-  },
-};
-
-const customTheme = {
-  ...MD3LightTheme,
-  colors: {
-    ...MD3LightTheme.colors,
-    primary: appColors.colors.secondary,
-    primaryContainer: appColors.colors.dominant,
-    secondary: appColors.colors.secondary,
-    secondaryContainer: appColors.colors.dominant,
-    tertiary: appColors.colors.accent,
-    tertiaryContainer: appColors.colors.dominant,
-    surface: appColors.colors.surface,
-    surfaceVariant: appColors.colors.surfaceVariant,
-    surfaceDisabled: appColors.colors.surfaceVariant, // Assuming you want disabled surfaces to be the same as the variant
-    background: appColors.colors.dominant,
-    error: appColors.colors.error,
-    errorContainer: '#FDECEA', // You might want to define this in colors.ts as well
-    onPrimary: appColors.colors.onSecondary,
-    onPrimaryContainer: appColors.colors.onDominant,
-    onSecondary: appColors.colors.onSecondary,
-    onSecondaryContainer: appColors.colors.onDominant,
-    onTertiary: appColors.colors.onAccent,
-    onTertiaryContainer: appColors.colors.onDominant,
-    onSurface: appColors.colors.onSurface,
-    onSurfaceVariant: appColors.colors.onSurfaceVariant,
-    onSurfaceDisabled: appColors.colors.onSurfaceVariant, // Assuming you want disabled text to be the same as variant
-    onError: '#FFFFFF', // Standard on error color
-    onErrorContainer: '#410E0B', // Standard on error container color
-    onBackground: appColors.colors.onDominant,
-    outline: '#E5E7EB', // Keep this as is, or define in colors.ts
-    outlineVariant: '#C4C7CC', // Keep this as is, or define in colors.ts
-    inverseSurface: '#000000', // Keep
-    inverseOnSurface: '#FFFFFF', // Keep
-    inversePrimary: '#7DC69F', // Keep
-    shadow: 'rgba(0, 0, 0, 0.1)',
-    scrim: 'rgba(0, 0, 0, 0.3)',
-    backdrop: 'rgba(0, 0, 0, 0.5)',
-    elevation: {
-      level0: 'transparent',
-      level1: '#F3F4F6', // You might want to use surfaceVariant or dominant here
-      level2: '#E5E7EB',
-      level3: '#D1D5DB',
-      level4: '#9CA3AF',
-      level5: '#6B7280',
-    },
-  },
-  fonts: configureFonts({ config: fontConfig }),
-  spacing: {
-    medium: 16,
-    small: 8,
-    tiny: 4,
-  },
-  shape: {
-    borderRadius: 8,
-  },
-  elevation: {
-    level2: '#2',
-  },
-};
-
-export const colors = customTheme.colors;
 
 export const theme: AppTheme = {
-  ...customTheme,
-  chartColors,
-};
-
-export default {
-  theme,
-  colors,
+  version: 3 as const,
+  isV3: true,
+  fonts: configureFonts({ config: { ...fontConfig } }) as any,
+  colors: {
+    primary: '#5DA47A',
+    background: '#F2F7F4',
+    secondary: '#5DA47A',
+    tertiary: '#4C8A65',
+    surface: '#FFFFFF',
+    surfaceVariant: '#F7FAF8',
+    onPrimary: '#FFFFFF',
+    onSecondary: '#FFFFFF',
+    onTertiary: '#FFFFFF',
+    onSurface: '#1A1A1A',
+    onSurfaceVariant: '#2D2D2D',
+    error: '#B00020',
+    onError: '#FFFFFF',
+    onBackground: '#1A1A1A',
+    primaryContainer: '#B2D9C1',
+    onPrimaryContainer: '#1A472A',
+    secondaryContainer: '#B2D9C1',
+    onSecondaryContainer: '#1A472A',
+    tertiaryContainer: '#90C2A6',
+    onTertiaryContainer: '#003311',
+    errorContainer: '#F9DEDC',
+    onErrorContainer: '#410002',
+    outline: '#79747E',
+    outlineVariant: '#CAC4D0',
+    shadow: '#000000',
+    scrim: '#000000',
+    inverseSurface: '#2F3033',
+    inverseOnSurface: '#F1F0F4',
+    inversePrimary: '#9ECAFF',
+    surfaceDisabled: 'rgba(28, 27, 31, 0.12)',
+    onSurfaceDisabled: 'rgba(28, 27, 31, 0.38)',
+    backdrop: 'rgba(45, 48, 56, 0.3)',
+    elevation: { level0: 0, level1: 1, level2: 2, level3: 3, level4: 4, level5: 5 },
+  },
+  spacing: {
+    tiny: 4,
+    small: 8,
+    medium: 16,
+    large: 24,
+  },
+  roundness: 8,
+  shape: { borderRadius: 8 },
+  chartColors: {
+    grid: '#CCCCCC',
+    area: '#D1E4FF',
+    point: '#36618E',
+    progress: { active: '#36618E', inactive: '#D1E4FF' },
+  },
+  moodColors: {
+    peace: '#A8E6CF',
+    joy: '#F8D568',
+    love: '#FFB6C1',
+    reason: '#BDB2FF',
+    acceptance: '#AED9E0',
+    shame: '#E6B8B8',
+    guilt: '#F06292',
+    apathy: '#FFB74D',
+    grief: '#FF8A65',
+    fear: '#FFF176',
+    desire: '#A5D6A7',
+    anger: '#81D4FA',
+    pride: '#B39DDB',
+    willfulness: '#9575CD',
+    humiliation: '#E57373',
+    regret: '#F06292',
+    anxiety: '#FFF176',
+    hate: '#81D4FA',
+    aggression: '#81D4FA',
+  },
+  animation: { scale: 1.0 },
+  dark: false,
+  scaleFont: (size: number) => size,
+  scaleSize: (size: number) => size,
+  withOpacity,
 };
