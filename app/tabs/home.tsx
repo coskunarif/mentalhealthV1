@@ -83,7 +83,16 @@ export default function Home() {
           <Button
             mode="contained"
             onPress={handleStartExercise}
-            style={styles.actionButton}
+            style={{
+              marginTop: 24,
+              marginBottom: 8,
+              alignSelf: 'center',
+              minWidth: 160,
+              maxWidth: '80%',
+              borderRadius: 20,
+              height: 40,
+              elevation: 2,
+            }}
             labelStyle={typographyStyles.text_button}
           >
             Start {nextExercise.title}

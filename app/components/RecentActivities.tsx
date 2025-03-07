@@ -65,7 +65,12 @@ export default function RecentActivities({ activities }: RecentActivitiesProps) 
             </TouchableRipple>
           </Link>
           {index < activities.length - 1 && (
-            <Divider style={styles.divider} />
+            <Divider 
+              style={[
+                styles.divider, 
+                { opacity: 0.5 }
+              ]} 
+            />
           )}
         </React.Fragment>
       ))}
@@ -80,14 +85,14 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   touchable: {
-    paddingVertical: 12, // Increased for better touch target (48px min)
+    paddingVertical: 8,
     paddingHorizontal: 16,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 48, // Minimum touch target height
+    minHeight: 40,
   },
   contentContainer: {
     flex: 1,
@@ -95,6 +100,7 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 4,
+    fontWeight: '500',
   },
   subtitle: {
     lineHeight: 16,

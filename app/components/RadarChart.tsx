@@ -67,80 +67,82 @@ export default function RadarChart({
   };
 
   const getLabelLayout = (index: number) => {
-  const angle = index * angleStep - Math.PI / 2;
-  const { x, y } = getLabelCoordinates(index);
-  let textAnchor: 'start' | 'middle' | 'end' = 'middle';
-  let xOffset = 0;
-  let yOffset = 0;
-  const maxWidth = 80;
-  if (angle >= -Math.PI / 4 && angle <= Math.PI / 4) {
-    textAnchor = 'start';
-    xOffset = 8;
-  } else if (angle >= (3 * Math.PI) / 4 || angle <= -(3 * Math.PI) / 4) {
-    textAnchor = 'end';
-    xOffset = -8;
-  } else if (angle > Math.PI / 4 && angle < (3 * Math.PI) / 4) {
-    textAnchor = 'middle';
-    yOffset = 16;
-  } else {
-    textAnchor = 'middle';
-    yOffset = -16;
-  }
-  const words = chartLabels[index].split(' ');
-  const lines: string[] = [];
-  let currentLine = '';
-  words.forEach((word) => {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
-    if (testLine.length * 5 > maxWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
+    const angle = index * angleStep - Math.PI / 2;
+    const { x, y } = getLabelCoordinates(index);
+    let textAnchor: 'start' | 'middle' | 'end' = 'middle';
+    let xOffset = 0;
+    let yOffset = 0;
+    const maxWidth = 80;
+    if (angle >= -Math.PI / 4 && angle <= Math.PI / 4) {
+      textAnchor = 'start';
+      xOffset = 8;
+    } else if (angle >= (3 * Math.PI) / 4 || angle <= -(3 * Math.PI) / 4) {
+      textAnchor = 'end';
+      xOffset = -8;
+    } else if (angle > Math.PI / 4 && angle < (3 * Math.PI) / 4) {
+      textAnchor = 'middle';
+      yOffset = 16;
     } else {
-      currentLine = testLine;
+      textAnchor = 'middle';
+      yOffset = -16;
     }
-  });
-  if (currentLine) lines.push(currentLine);
-  return {
-    x,
-    y,
-    textAnchor,
-    xOffset,
-    yOffset,
-    lines,
-    // Add material design contrast colors
-    fill: theme.colors.onSurface, // Increased contrast from onSurfaceVariant
-    fontWeight: "500" // Medium weight for better readability
+    const words = chartLabels[index].split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+    words.forEach((word) => {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      if (testLine.length * 5 > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    });
+    if (currentLine) lines.push(currentLine);
+    return {
+      x,
+      y,
+      textAnchor,
+      xOffset,
+      yOffset,
+      lines,
+      // Add material design contrast colors
+      fill: theme.colors.onSurface, // Increased contrast from onSurfaceVariant
+      fontWeight: '500', // Medium weight for better readability
+    };
   };
-}
 
-const gridCircles = [];
-const gridSteps = 5;
-for (let i = 1; i <= gridSteps; i++) {
-  const gridRadius = (radius / gridSteps) * i;
-  const value = (i / gridSteps).toFixed(1);
-  
-  gridCircles.push(
-    <React.Fragment key={`grid-circle-${i}`}>
-      <Circle
-        cx={center}
-        cy={center}
-        r={gridRadius}
-        stroke={gridColor}
-        strokeWidth={gridStrokeWidth}
-        fill="none"
-      />
-      {/* Add scale value label */}
-      <SvgText
-        x={center}
-        y={center - gridRadius - 5}
-        fontSize={8}
-        fill={theme.colors.onSurfaceVariant}
-        textAnchor="middle"
-      >
-        {value}
-      </SvgText>
-    </React.Fragment>
-  );
-}
+  const gridCircles = [];
+  const gridSteps = 5;
+  for (let i = 1; i <= gridSteps; i++) {
+    const gridRadius = (radius / gridSteps) * i;
+    const value = (i / gridSteps).toFixed(1);
+    const isMinorGrid = i % 2 !== 0;
+    gridCircles.push(
+      <React.Fragment key={`grid-circle-${i}`}>
+        <Circle
+          cx={center}
+          cy={center}
+          r={gridRadius}
+          stroke={gridColor}
+          strokeWidth={isMinorGrid ? 0.5 : 1}
+          strokeDasharray={isMinorGrid ? '2,2' : 'none'}
+          fill="none"
+        />
+        {!isMinorGrid && (
+          <SvgText
+            x={center}
+            y={center - gridRadius - 5}
+            fontSize={8}
+            fill={theme.colors.onSurfaceVariant}
+            textAnchor="middle"
+          >
+            {value}
+          </SvgText>
+        )}
+      </React.Fragment>
+    );
+  }
 
   const radialLines = chartLabels.map((_, idx) => {
     const { x, y } = getCoordinates(1, idx);
@@ -159,7 +161,9 @@ for (let i = 1; i <= gridSteps; i++) {
 
   const points = data.map((item, idx) => getCoordinates(item.value, idx));
   const pathData =
-    points.map((p, idx) => (idx === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`)).join(' ') + ' Z';
+    points
+      .map((p, idx) => (idx === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`))
+      .join(' ') + ' Z';
 
   return (
     <View style={[styles.container, style]}>
@@ -190,16 +194,27 @@ for (let i = 1; i <= gridSteps; i++) {
               x={point.x}
               y={point.y - 12}
               fontSize={10}
-              fontWeight="bold"
+              fontWeight='bold'
               fill={theme.colors.onSurface}
-              textAnchor="middle"
+              stroke={theme.colors.surface}
+              strokeWidth={2}
+              textAnchor='middle'
             >
               {(data[idx].value * 100).toFixed(0)}%
             </SvgText>
-          </React.Fragment>
+</React.Fragment>
         ))}
         {chartLabels.map((_, idx) => {
-          const { x, y, textAnchor, xOffset, yOffset, lines, fill, fontWeight } = getLabelLayout(idx);
+          const {
+            x,
+            y,
+            textAnchor,
+            xOffset,
+            yOffset,
+            lines,
+            fill,
+            fontWeight,
+          } = getLabelLayout(idx);
           return lines.map((line, lineIndex) => (
             <SvgText
               key={`label-${idx}-line-${lineIndex}`}
