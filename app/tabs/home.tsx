@@ -54,6 +54,43 @@ export default function Home() {
   const nextExercise = breathExercises.find((exercise) => !exercise.isCompleted);
   const theme = useTheme<AppTheme>();
 
+  // Create styles inside the component with useMemo for performance
+  const styles = React.useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme?.colors?.background || '#F2F7F4',
+    },
+    contentContainer: {
+      padding: 16,
+      paddingBottom: 32,
+    },
+    section: {
+      borderRadius: 12, // Hardcode fallback values instead of theme?.componentSizes?.cardBorderRadius
+      marginBottom: 16,
+      padding: 16,
+      backgroundColor: theme?.colors?.surface || '#FFFFFF',
+      shadowColor: theme?.colors?.shadow || '#000000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 1.5,
+      elevation: 1,
+    },
+    sectionTitle: {
+      marginBottom: 16,
+      fontSize: 20,
+      fontWeight: '500',
+      letterSpacing: 0.15,
+    },
+    actionButton: {
+      marginTop: 24,
+      marginBottom: 8,
+      marginHorizontal: 16,
+      borderRadius: 20,
+      height: 40,
+      elevation: 2,
+    },
+  }), [theme]); // theme as dependency
+
   const handleStartExercise = () => {
     if (nextExercise) {
       router.push(`/player?meditationId=${nextExercise.id}`);
@@ -84,18 +121,30 @@ export default function Home() {
             mode="contained"
             onPress={handleStartExercise}
             style={{
-              marginTop: 24,
+              marginTop: 16,
               marginBottom: 8,
-              alignSelf: 'center',
-              minWidth: 160,
-              maxWidth: '80%',
-              borderRadius: 20,
-              height: 40,
-              elevation: 2,
+              marginHorizontal: 16,
+              borderRadius: theme.componentSizes?.buttonBorderRadius || 20, // Add fallback
+              height: theme.componentSizes?.buttonHeight || 40, // Add fallback
+              elevation: theme.colors.elevation?.level2 || 2,
+              shadowColor: theme.colors.shadow,
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.3,
+              shadowRadius: 2,
             }}
-            labelStyle={typographyStyles.text_button}
+            labelStyle={{
+              ...typographyStyles.text_button,
+              // Prevent text truncation
+              fontSize: 14,
+              lineHeight: 20,
+            }}
+            // Add content max width to prevent text truncation
+            contentStyle={{
+              maxWidth: '100%',
+              paddingHorizontal: 8,
+            }}
           >
-            Start {nextExercise.title}
+            {`Start ${nextExercise.title.split(' ').slice(-2).join(' ')}`} {/* Show only last two words if needed */}
           </Button>
         )}
       </Surface>
@@ -113,35 +162,3 @@ export default function Home() {
     </ScrollView>
   );
 }
-
-// Add consistent styles following Material Design principles
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F2F7F4', // Use theme.colors.background
-  },
-  contentContainer: {
-    padding: 16, // Follow 8dp grid (16 = 8*2)
-    paddingBottom: 32, // Additional padding at bottom for better scrolling
-  },
-  section: {
-    borderRadius: 12, // Material Design M3 card radius
-    marginBottom: 16, // Follow 8dp grid (16 = 8*2)
-    padding: 16, // Consistent internal padding
-    elevation: 1, // Consistent elevation for all cards
-  },
-  sectionTitle: {
-    marginBottom: 16, // Follow 8dp grid (16 = 8*2)
-    fontSize: 20, // Material Design title large
-    fontWeight: '500', 
-    letterSpacing: 0.15, // Material Design spec
-  },
-  actionButton: {
-    marginTop: 24,
-    marginBottom: 8,
-    marginHorizontal: 16, // Proper horizontal margins
-    borderRadius: 20, // MD3 spec for filled button
-    height: 40, // Standard button height
-    elevation: 2, // Add proper elevation
-  },
-});
