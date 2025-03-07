@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
 import { miscStyles, typographyStyles } from '../config';
@@ -9,6 +9,7 @@ import ExerciseProgress from '../components/ExerciseProgress';
 import QuickActions from '../components/QuickActions';
 import type { AppTheme } from '../types/theme';
 
+// Rest of your imports and data...
 const radarData = [
   { label: 'Balance past memories', value: 0.8 },
   { label: 'Change your opinion', value: 0.6 },
@@ -61,20 +62,20 @@ export default function Home() {
 
   return (
     <ScrollView
-      style={miscStyles.screen_home_container}
-      contentContainerStyle={{ padding: 16 }}
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
     >
       {/* Radar Chart Section */}
-      <Surface style={miscStyles.home_sectionSurface}>
-        <Text variant="headlineMedium" style={miscStyles.home_sectionTitle}>
+      <Surface style={styles.section} elevation={1}>
+        <Text variant="headlineMedium" style={styles.sectionTitle}>
           Your Progress
         </Text>
         <RadarChart data={radarData} />
       </Surface>
 
       {/* Exercise Progress Section */}
-      <Surface style={miscStyles.home_sectionSurface}>
-        <Text variant="headlineMedium" style={miscStyles.home_sectionTitle}>
+      <Surface style={styles.section} elevation={1}>
+        <Text variant="headlineMedium" style={styles.sectionTitle}>
           Exercise Progress
         </Text>
         <ExerciseProgress exercises={breathExercises} currentStep={nextExercise?.id} />
@@ -82,7 +83,7 @@ export default function Home() {
           <Button
             mode="contained"
             onPress={handleStartExercise}
-            style={{ marginTop: 16 }}
+            style={styles.actionButton}
             labelStyle={typographyStyles.text_button}
           >
             Start {nextExercise.title}
@@ -94,8 +95,8 @@ export default function Home() {
       <QuickActions />
 
       {/* Recent Activities Section */}
-      <Surface style={miscStyles.home_sectionSurface}>
-        <Text variant="headlineMedium" style={miscStyles.home_sectionTitle}>
+      <Surface style={styles.section} elevation={1}>
+        <Text variant="headlineMedium" style={styles.sectionTitle}>
           Recent Activities
         </Text>
         <RecentActivities activities={recentActivities} />
@@ -103,3 +104,35 @@ export default function Home() {
     </ScrollView>
   );
 }
+
+// Add consistent styles following Material Design principles
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F2F7F4', // Use theme.colors.background
+  },
+  contentContainer: {
+    padding: 16, // Follow 8dp grid (16 = 8*2)
+    paddingBottom: 32, // Additional padding at bottom for better scrolling
+  },
+  section: {
+    borderRadius: 12, // Material Design M3 card radius
+    marginBottom: 16, // Follow 8dp grid (16 = 8*2)
+    padding: 16, // Consistent internal padding
+    elevation: 1, // Consistent elevation for all cards
+  },
+  sectionTitle: {
+    marginBottom: 16, // Follow 8dp grid (16 = 8*2)
+    fontSize: 20, // Material Design title large
+    fontWeight: '500', 
+    letterSpacing: 0.15, // Material Design spec
+  },
+  actionButton: {
+    marginTop: 24,
+    marginBottom: 8,
+    marginHorizontal: 16, // Proper horizontal margins
+    borderRadius: 20, // MD3 spec for filled button
+    height: 40, // Standard button height
+    elevation: 2, // Add proper elevation
+  },
+});

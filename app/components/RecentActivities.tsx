@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Pressable } from 'react-native';
-import { Text, Surface, useTheme } from 'react-native-paper';
+import { View, StyleSheet } from 'react-native';
+import { Text, Divider, Surface, useTheme, TouchableRipple } from 'react-native-paper';
 import { Link } from 'expo-router';
-import { cardStyles, miscStyles, typographyStyles } from '../config';
+import { typographyStyles } from '../config';
 import type { AppTheme } from '../types/theme';
 
 interface Activity {
@@ -19,12 +19,12 @@ interface RecentActivitiesProps {
 
 export default function RecentActivities({ activities }: RecentActivitiesProps) {
   const theme = useTheme<AppTheme>();
+  
   return (
-    <View style={miscStyles.recentActivities_container}>
-      <Surface style={[cardStyles.component_card_container, miscStyles.recentActivities_container]}>
-        {activities.map((activity, index) => (
+    <Surface style={styles.container} elevation={1}>
+      {activities.map((activity, index) => (
+        <React.Fragment key={activity.id}>
           <Link
-            key={activity.id}
             href={{
               pathname: "/player",
               params: {
@@ -36,25 +36,73 @@ export default function RecentActivities({ activities }: RecentActivitiesProps) 
             }}
             asChild
           >
-            <Pressable>
-              <View style={[
-                miscStyles.recentActivities_item,
-                index < activities.length - 1 && miscStyles.recentActivities_itemBorder,
-              ]}>
-                <View>
-                  <Text style={typographyStyles.text_body}>{activity.title}</Text>
-                  <Text style={{ ...typographyStyles.text_caption, color: theme.colors.secondary }}>
+            <TouchableRipple 
+              onPress={() => {}} 
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.12)}
+              style={styles.touchable}
+            >
+              <View style={styles.item}>
+                <View style={styles.contentContainer}>
+                  <Text style={[typographyStyles.text_body, styles.title]}>
+                    {activity.title}
+                  </Text>
+                  <Text style={[
+                    typographyStyles.text_caption, 
+                    styles.subtitle,
+                    { color: theme.colors.secondary }
+                  ]}>
                     {activity.subtitle}
                   </Text>
                 </View>
-                <Text style={{ ...typographyStyles.text_caption, color: theme.colors.secondary }}>
+                <Text style={[
+                  typographyStyles.text_caption,
+                  styles.duration,
+                  { color: theme.colors.secondary }
+                ]}>
                   {activity.duration.toFixed(1)} min
                 </Text>
               </View>
-            </Pressable>
+            </TouchableRipple>
           </Link>
-        ))}
-      </Surface>
-    </View>
+          {index < activities.length - 1 && (
+            <Divider style={styles.divider} />
+          )}
+        </React.Fragment>
+      ))}
+    </Surface>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    borderRadius: 12, // Material Design M3 card radius
+    overflow: 'hidden',
+    marginVertical: 8,
+  },
+  touchable: {
+    paddingVertical: 12, // Increased for better touch target (48px min)
+    paddingHorizontal: 16,
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 48, // Minimum touch target height
+  },
+  contentContainer: {
+    flex: 1,
+    marginRight: 16,
+  },
+  title: {
+    marginBottom: 4,
+  },
+  subtitle: {
+    lineHeight: 16,
+  },
+  duration: {
+    fontWeight: '500',
+  },
+  divider: {
+    marginHorizontal: 16,
+  }
+});

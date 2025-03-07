@@ -64,17 +64,36 @@ export const theme: AppTheme = {
     surfaceDisabled: 'rgba(28, 27, 31, 0.12)',
     onSurfaceDisabled: 'rgba(28, 27, 31, 0.38)',
     backdrop: 'rgba(45, 48, 56, 0.3)',
-    elevation: { level0: 0, level1: 1, level2: 2, level3: 3, level4: 4, level5: 5 },
+    elevation: {
+      level0: 0,
+      level1: 1, // Cards, surfaces
+      level2: 3, // Primary buttons, FABs
+      level3: 6, // Navigation drawer
+      level4: 8, // Modal bottom sheets
+      level5: 12, // Dialogs
+    },
   },
+
+  // Update spacing to be explicit about Material 8dp grid:
   spacing: {
-    tiny: 4,
-    small: 8,
-    medium: 16,
-    large: 24,
+    tiny: 4,    // Half unit
+    small: 8,    // Base unit
+    medium: 16,  // 2 units
+    large: 24, // 3 units
+},
+
+  // Add specific material design component sizes:
+  componentSizes: {
+    buttonHeight: 40,
+    buttonMinWidth: 64,
+    iconSize: 24,
+    touchableMinHeight: 48,
+    cardBorderRadius: 12,
+    buttonBorderRadius: 20,
   },
   roundness: 8,
   shape: { borderRadius: 8 },
-  chartColors: {
+    chartColors: {
     grid: '#CCCCCC',
     area: '#D1E4FF',
     point: '#36618E',

@@ -39,11 +39,14 @@ const typographyStyles = StyleSheet.create({
     color: theme.colors.primary,
     textDecorationLine: 'underline',
   } as TextStyle,
-  text_button: {
-    ...theme.fonts.bodyLarge,
-    fontWeight: 'bold',
-    color: theme.colors.onSurface,
-  } as TextStyle,
+text_button: {
+  fontFamily: 'Nunito',
+  fontSize: 14,
+  fontWeight: '500',
+  letterSpacing: 0.1,
+  textTransform: 'none', // Ensures sentence case
+  lineHeight: 20,
+} as TextStyle,
   header_shadow: {
     fontSize: 20,
     color: theme.colors.onSurfaceVariant,

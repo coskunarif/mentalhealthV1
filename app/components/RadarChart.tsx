@@ -67,48 +67,60 @@ export default function RadarChart({
   };
 
   const getLabelLayout = (index: number) => {
-    const angle = index * angleStep - Math.PI / 2;
-    const { x, y } = getLabelCoordinates(index);
-    let textAnchor: 'start' | 'middle' | 'end' = 'middle';
-    let xOffset = 0;
-    let yOffset = 0;
-    const maxWidth = 80;
-    if (angle >= -Math.PI / 4 && angle <= Math.PI / 4) {
-      textAnchor = 'start';
-      xOffset = 8;
-    } else if (angle >= (3 * Math.PI) / 4 || angle <= -(3 * Math.PI) / 4) {
-      textAnchor = 'end';
-      xOffset = -8;
-    } else if (angle > Math.PI / 4 && angle < (3 * Math.PI) / 4) {
-      textAnchor = 'middle';
-      yOffset = 16;
+  const angle = index * angleStep - Math.PI / 2;
+  const { x, y } = getLabelCoordinates(index);
+  let textAnchor: 'start' | 'middle' | 'end' = 'middle';
+  let xOffset = 0;
+  let yOffset = 0;
+  const maxWidth = 80;
+  if (angle >= -Math.PI / 4 && angle <= Math.PI / 4) {
+    textAnchor = 'start';
+    xOffset = 8;
+  } else if (angle >= (3 * Math.PI) / 4 || angle <= -(3 * Math.PI) / 4) {
+    textAnchor = 'end';
+    xOffset = -8;
+  } else if (angle > Math.PI / 4 && angle < (3 * Math.PI) / 4) {
+    textAnchor = 'middle';
+    yOffset = 16;
+  } else {
+    textAnchor = 'middle';
+    yOffset = -16;
+  }
+  const words = chartLabels[index].split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+  words.forEach((word) => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    if (testLine.length * 5 > maxWidth && currentLine) {
+      lines.push(currentLine);
+      currentLine = word;
     } else {
-      textAnchor = 'middle';
-      yOffset = -16;
+      currentLine = testLine;
     }
-    const words = chartLabels[index].split(' ');
-    const lines: string[] = [];
-    let currentLine = '';
-    words.forEach((word) => {
-      const testLine = currentLine ? `${currentLine} ${word}` : word;
-      if (testLine.length * 5 > maxWidth && currentLine) {
-        lines.push(currentLine);
-        currentLine = word;
-      } else {
-        currentLine = testLine;
-      }
-    });
-    if (currentLine) lines.push(currentLine);
-    return { x, y, textAnchor, xOffset, yOffset, lines };
+  });
+  if (currentLine) lines.push(currentLine);
+  return {
+    x,
+    y,
+    textAnchor,
+    xOffset,
+    yOffset,
+    lines,
+    // Add material design contrast colors
+    fill: theme.colors.onSurface, // Increased contrast from onSurfaceVariant
+    fontWeight: "500" // Medium weight for better readability
   };
+}
 
-  const gridCircles = [];
-  const gridSteps = 5;
-  for (let i = 1; i <= gridSteps; i++) {
-    const gridRadius = (radius / gridSteps) * i;
-    gridCircles.push(
+const gridCircles = [];
+const gridSteps = 5;
+for (let i = 1; i <= gridSteps; i++) {
+  const gridRadius = (radius / gridSteps) * i;
+  const value = (i / gridSteps).toFixed(1);
+  
+  gridCircles.push(
+    <React.Fragment key={`grid-circle-${i}`}>
       <Circle
-        key={`grid-circle-${i}`}
         cx={center}
         cy={center}
         r={gridRadius}
@@ -116,8 +128,19 @@ export default function RadarChart({
         strokeWidth={gridStrokeWidth}
         fill="none"
       />
-    );
-  }
+      {/* Add scale value label */}
+      <SvgText
+        x={center}
+        y={center - gridRadius - 5}
+        fontSize={8}
+        fill={theme.colors.onSurfaceVariant}
+        textAnchor="middle"
+      >
+        {value}
+      </SvgText>
+    </React.Fragment>
+  );
+}
 
   const radialLines = chartLabels.map((_, idx) => {
     const { x, y } = getCoordinates(1, idx);
@@ -151,26 +174,40 @@ export default function RadarChart({
           fillOpacity={fillOpacity}
         />
         {points.map((point, idx) => (
-          <Circle
-            key={`data-point-${idx}`}
-            cx={point.x}
-            cy={point.y}
-            r={5}
-            fill={pointColor}
-            stroke={theme.colors.background}
-            strokeWidth={2}
-            accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`}
-          />
+          <React.Fragment key={`data-point-${idx}`}>
+            <Circle
+              cx={point.x}
+              cy={point.y}
+              r={8} // Increased from 5 for better touch target
+              fill={pointColor}
+              stroke={theme.colors.background}
+              strokeWidth={2}
+              opacity={0.8} // For better visual appearance
+              accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`}
+            />
+            {/* Add value label near each point */}
+            <SvgText
+              x={point.x}
+              y={point.y - 12}
+              fontSize={10}
+              fontWeight="bold"
+              fill={theme.colors.onSurface}
+              textAnchor="middle"
+            >
+              {(data[idx].value * 100).toFixed(0)}%
+            </SvgText>
+          </React.Fragment>
         ))}
         {chartLabels.map((_, idx) => {
-          const { x, y, textAnchor, xOffset, yOffset, lines } = getLabelLayout(idx);
+          const { x, y, textAnchor, xOffset, yOffset, lines, fill, fontWeight } = getLabelLayout(idx);
           return lines.map((line, lineIndex) => (
             <SvgText
               key={`label-${idx}-line-${lineIndex}`}
               x={x + xOffset}
               y={y + yOffset + lineIndex * 12}
-              fontSize={10}
-              fill={theme.colors.onSurfaceVariant}
+              fontSize={11} // Slightly increased for readability
+              fill={fill}
+              fontWeight={fontWeight}
               fontFamily={theme.fonts.bodyMedium.fontFamily}
               textAnchor={textAnchor}
             >
@@ -188,5 +225,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 16,
+    padding: 8, // Follow 8dp grid system
   },
 });
