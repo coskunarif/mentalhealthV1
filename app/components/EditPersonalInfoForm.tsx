@@ -118,7 +118,6 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
     <View style={styles.formFieldGroup}>
       <TextInput
         mode="outlined"
-        dense
         label={label}
         value={formData[field] || ''}
         onChangeText={(value) => handleChange(field, value)}
@@ -128,19 +127,27 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
         disabled={disabled}
         style={styles.formInput}
         error={!!errors[field]}
+        outlineColor={theme.colors.outline}
+        activeOutlineColor={theme.colors.primary}
+        theme={{
+          colors: {
+            background: theme.colors.surface,
+            onSurfaceVariant: theme.colors.onSurfaceVariant,
+          }
+        }}
         right={
           icon ? (
             <TextInput.Icon
               icon={icon}
               onPress={onIconPress}
-              color={errors[field] ? theme.colors.error : theme.colors.onSurface}
+              color={errors[field] ? theme.colors.error : theme.colors.primary}
             />
           ) : undefined
         }
         {...(field === 'phoneNumber' ? { maxLength: 16 } : {})}
       />
       {errors[field] && (
-        <HelperText type="error" visible={!!errors[field]} style={{ marginTop: -theme.spacing.tiny }}>
+        <HelperText type="error" visible={!!errors[field]} style={{ marginTop: -theme.spacing.tiny, marginBottom: theme.spacing.small }}>
           {errors[field]}
         </HelperText>
       )}
@@ -169,17 +176,13 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
       </View>
 
       <Button
+        mode="contained"
         onPress={handleSubmit}
         loading={isSubmitting}
         disabled={isSubmitting}
-        style={[buttonStyles.button_primary, styles.formSaveButton]}
-        theme={{
-          colors: {
-            primary: theme.colors.primary,
-            onPrimary: theme.colors.onPrimary,
-            disabled: theme.colors.surfaceDisabled,
-          }
-        }}
+        style={[styles.formSaveButton]}
+        contentStyle={{ height: 48 }}
+        labelStyle={{ ...theme.fonts.labelLarge, letterSpacing: 0.5 }}
       >
         {isSubmitting ? 'Saving...' : 'Save Changes'}
       </Button>

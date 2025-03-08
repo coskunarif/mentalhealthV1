@@ -3,6 +3,7 @@ import { Linking } from 'react-native';
 import { Surface, List, Button, Text, Divider } from 'react-native-paper';
 import { theme } from '../config/theme';
 import styles from '../config/HelpCenterCard.styles';
+import { miscStyles } from '../config';
 
 interface FAQ {
   question: string;
@@ -72,19 +73,23 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({
         <List.Item
           title="Email Support"
           description={supportEmail}
-          left={(props) => <List.Icon {...props} icon="email" />}
+          left={(props) => <List.Icon {...props} icon="email" color={theme.colors.primary} />}
           onPress={handleEmailPress}
-          titleStyle={styles.contactTitle}
+          titleStyle={{...styles.contactTitle, ...theme.fonts.bodyLarge}}
           descriptionStyle={styles.contactDescription}
+          style={miscStyles.list_item}
+          rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
         />
         <Divider style={styles.divider} />
         <List.Item
           title="Phone Support"
           description={supportPhone}
-          left={(props) => <List.Icon {...props} icon="phone" />}
+          left={(props) => <List.Icon {...props} icon="phone" color={theme.colors.primary} />}
           onPress={handlePhonePress}
-          titleStyle={styles.contactTitle}
+          titleStyle={{...styles.contactTitle, ...theme.fonts.bodyLarge}}
           descriptionStyle={styles.contactDescription}
+          style={miscStyles.list_item}
+          rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
         />
       </List.Section>
       <Button mode="contained" onPress={onContactSupport} icon="message" style={styles.chatButton}>

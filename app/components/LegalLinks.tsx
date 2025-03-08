@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Card, Title, List } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { theme } from '../config/theme';
+import { miscStyles } from '../config';
 
 export const LegalLinks: React.FC = () => {
   const router = useRouter();
@@ -13,17 +14,21 @@ export const LegalLinks: React.FC = () => {
         <List.Section>
           <List.Item
             title="Privacy Policy"
-            left={(props) => <List.Icon {...props} icon="shield-account" />}
-            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            left={(props) => <List.Icon {...props} icon="shield-account" color={theme.colors.primary}/>}
+            right={(props) => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
             onPress={() => router.push('/legal/privacy')}
-            titleStyle={styles.linkTitle}
+            titleStyle={{...styles.linkTitle, ...theme.fonts.bodyLarge}}
+            style={miscStyles.list_item}
+            rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
           />
           <List.Item
             title="Terms of Service"
-            left={(props) => <List.Icon {...props} icon="file-document" />}
-            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            left={(props) => <List.Icon {...props} icon="file-document" color={theme.colors.primary}/>}
+            right={(props) => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
             onPress={() => router.push('/legal/terms')}
-            titleStyle={styles.linkTitle}
+            titleStyle={{...styles.linkTitle, ...theme.fonts.bodyLarge}}
+            style={miscStyles.list_item}
+            rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
           />
         </List.Section>
       </Card.Content>

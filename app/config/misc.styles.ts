@@ -1,8 +1,13 @@
 import { StyleSheet } from 'react-native';
 import { theme } from './theme';
-import type { ViewStyle, TextStyle } from 'react-native';
+import type { ViewStyle, TextStyle, View } from 'react-native';
 
 const miscStyles = StyleSheet.create({
+  list_item: {
+    paddingVertical: theme.spacing.small,
+    borderRadius: theme.shape.borderRadius,
+  } as ViewStyle,
+
   // Home & Sections
   screen_home_container: {
     flex: 1,

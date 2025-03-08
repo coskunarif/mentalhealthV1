@@ -24,7 +24,7 @@ export default StyleSheet.create({
   },
   formSaveButton: {
     marginTop: theme.spacing.medium,
-    height: 48,
-    justifyContent: 'center',
+    borderRadius: theme.componentSizes.buttonBorderRadius, // Use consistent button radius
+    elevation: 2, // Proper elevation for primary buttons
   },
 });
