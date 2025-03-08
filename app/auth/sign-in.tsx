@@ -10,13 +10,16 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function SignInScreen() {
   const theme = useTheme<AppTheme>();
+  console.log('Theme in SignInScreen:', theme); // Debug log
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSignIn = async () => {
-    if (loading) return;
+const handleSignIn = async () => {
+  console.log('Sign in button pressed');
+  if (loading) return;
     setLoading(true);
     setError('');
 
@@ -37,7 +40,7 @@ export default function SignInScreen() {
         <View style={layoutStyles.signIn_screen_auth_form}>
           <View style={layoutStyles.signIn_screen_auth_header}>
             <Text style={typographyStyles.text_heading2}>Welcome Back</Text>
-            <Text style={[typographyStyles.text_body, { marginTop: theme.spacing.tiny }]}>
+            <Text style={[typographyStyles.text_body, { marginTop: theme.spacing?.tiny || 4 }]}>
               Sign in to continue your journey
             </Text>
           </View>
@@ -60,7 +63,7 @@ export default function SignInScreen() {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-            style={[formStyles.component_input_field, { marginTop: theme.spacing.small }]}
+            style={[formStyles.component_input_field, { marginTop: theme.spacing?.small || 8 }]}
             placeholder="Enter your password"
             placeholderTextColor={theme.colors.onSurfaceVariant}
           />
@@ -73,11 +76,11 @@ export default function SignInScreen() {
             mode="contained"
             onPress={handleSignIn}
             loading={loading}
-            style={[buttonStyles.button_primary, { marginTop: theme.spacing.small }]}
+            style={[buttonStyles.button_primary, { marginTop: theme.spacing?.small || 8 }]}
             labelStyle={typographyStyles.text_button}
           >
             {loading ? 'Signing In...' : 'Sign In'}
-          </Button>
+</Button>
 
           <View style={layoutStyles.signIn_screen_auth_footer}>
             <Text style={typographyStyles.text_body}>Don't have an account? </Text>

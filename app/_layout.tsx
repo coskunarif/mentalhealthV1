@@ -4,7 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { PaperProvider } from 'react-native-paper';
 import { Stack } from 'expo-router';
 import { AuthProvider } from './context/auth';
-import { theme } from './config/theme';
+import { theme as importedTheme } from './config/theme';
 import ErrorBoundary from './components/ErrorBoundary';
 import type { AppTheme } from './types/theme';
 import { useTheme } from 'react-native-paper';
@@ -13,7 +13,11 @@ import { useTheme } from 'react-native-paper';
 SplashScreen.preventAutoHideAsync();
 
 export default function AppLayout() {
-  const theme = useTheme<AppTheme>();
+  const appTheme = useTheme<AppTheme>();
+    console.log('Theme in AppLayout:', importedTheme);
+    if (!importedTheme.spacing) {
+      console.error('Theme is missing spacing property');
+    }
 
   const [loaded] = useFonts({
     'Kameron': require('../assets/fonts/Kameron-Regular.ttf'),
@@ -36,12 +40,12 @@ export default function AppLayout() {
 
   return (
     <ErrorBoundary>
-      <PaperProvider theme={theme}>
+      <PaperProvider theme={importedTheme}>
         <AuthProvider>
         <Stack
           screenOptions={{
             headerStyle: {
-              backgroundColor: theme.colors.surface,
+              backgroundColor: appTheme.colors.surface,
             },
             headerShadowVisible: false,
             headerTitleStyle: {
@@ -50,7 +54,7 @@ export default function AppLayout() {
               fontSize: 20,
             },
             contentStyle: {
-              backgroundColor: theme.colors.background,
+              backgroundColor: appTheme.colors.background,
             },
             headerShown: false,
           }}

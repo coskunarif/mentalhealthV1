@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Surface, Title, List, Portal, Modal, RadioButton, Searchbar, Text } from 'react-native-paper';
 import { theme } from '../config/theme';
+import { miscStyles } from '../config';
 
 interface Language {
   code: string;
@@ -64,82 +65,93 @@ export const LanguageRegionSettings: React.FC<LanguageRegionSettingsProps> = ({
 
   return (
     <>
-      <Surface style={styles.container} elevation={1}>
+      <Surface style={{
+        margin: theme.spacing.medium,
+        backgroundColor: theme.colors.surface,
+        borderRadius: theme.shape.borderRadius,
+      }} elevation={1}>
         <List.Section>
           <List.Item
             title="Language"
             description={getCurrentLanguageName()}
             onPress={showModal}
-            right={(props) => <List.Icon {...props} icon="chevron-right" />}
-            titleStyle={styles.itemTitle}
-            descriptionStyle={styles.itemDescription}
+            right={(props) => <List.Icon {...props} icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+            titleStyle={{
+              ...theme.fonts.bodyLarge,
+              color: theme.colors.onSurface,
+            }}
+            descriptionStyle={{
+              ...theme.fonts.bodyMedium,
+              color: theme.colors.onSurfaceVariant,
+            }}
+            style={miscStyles.list_item}
+            rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
           />
         </List.Section>
       </Surface>
 
       <Portal>
-        <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={styles.modalContainer}>
-          <Title style={styles.modalTitle}>Select Language</Title>
+        <Modal
+          visible={modalVisible}
+          onDismiss={hideModal}
+          contentContainerStyle={[
+            {
+              backgroundColor: theme.colors.surface,
+              padding: theme.spacing.medium,
+              margin: theme.spacing.medium,
+              maxHeight: '80%',
+              borderRadius: 28,
+              maxWidth: 560,
+              width: '90%',
+              alignSelf: 'center',
+            }
+          ]}
+        >
+          <Title style={[{
+            ...theme.fonts.headlineMedium,
+            color: theme.colors.primary,
+            marginBottom: theme.spacing.medium,
+          }, theme.fonts.headlineSmall]}>Select Language</Title>
           <Searchbar
             placeholder="Search languages..."
             onChangeText={setSearchQuery}
             value={searchQuery}
-            style={styles.searchbar}
+            style={{
+              marginBottom: theme.spacing.medium,
+              backgroundColor: theme.colors.surfaceVariant,
+            }}
+            iconColor={theme.colors.onSurfaceVariant}
           />
-          <RadioButton.Group
-            onValueChange={(value) => !isSubmitting && handleLanguageSelect(value)}
-            value={currentLanguage}
-          >
-            {filteredLanguages.map((lang) => (
-              <List.Item
-                key={lang.code}
-                title={`${lang.name} (${lang.nativeName})`}
-                onPress={() => !isSubmitting && handleLanguageSelect(lang.code)}
-                right={() => (
-                  <RadioButton value={lang.code} disabled={isSubmitting} />
-                )}
-                titleStyle={styles.languageItem}
-              />
-            ))}
-          </RadioButton.Group>
+          <View style={{ maxHeight: 400 }}>
+            <RadioButton.Group
+              onValueChange={(value) => !isSubmitting && handleLanguageSelect(value)}
+              value={currentLanguage}
+            >
+              {filteredLanguages.map((lang) => (
+                <List.Item
+                  key={lang.code}
+                  title={`${lang.name}`}
+                  description={lang.nativeName}
+                  onPress={() => !isSubmitting && handleLanguageSelect(lang.code)}
+                  right={() => (
+                    <RadioButton
+                      value={lang.code}
+                      disabled={isSubmitting}
+                      color={theme.colors.primary}
+                    />
+                  )}
+                  titleStyle={{
+                    ...theme.fonts.bodyLarge,
+                    color: theme.colors.onSurface,
+                  }}
+                  descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+                  style={{ paddingVertical: 8 }}
+                />
+              ))}
+            </RadioButton.Group>
+          </View>
         </Modal>
       </Portal>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    margin: theme.spacing.medium,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.shape.borderRadius,
-  },
-  itemTitle: {
-    ...theme.fonts.bodyLarge,
-    color: theme.colors.onSurface,
-  },
-  itemDescription: {
-    ...theme.fonts.bodyMedium,
-    color: theme.colors.onSurfaceVariant,
-  },
-  modalContainer: {
-    backgroundColor: theme.colors.surface,
-    padding: theme.spacing.medium,
-    margin: theme.spacing.medium,
-    borderRadius: theme.shape.borderRadius * 2,
-    maxHeight: '80%',
-  },
-  modalTitle: {
-    ...theme.fonts.headlineMedium,
-    color: theme.colors.primary,
-    marginBottom: theme.spacing.medium,
-  },
-  searchbar: {
-    marginBottom: theme.spacing.medium,
-    backgroundColor: theme.colors.surfaceVariant,
-  },
-  languageItem: {
-    ...theme.fonts.bodyLarge,
-    color: theme.colors.onSurface,
-  },
-});

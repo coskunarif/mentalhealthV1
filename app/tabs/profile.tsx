@@ -139,14 +139,20 @@ export default function ProfileScreen() {
             <List.Item
               title="Edit Personal Information"
               onPress={() => router.push('/components/EditPersonalInfoScreen')}
-              left={() => <List.Icon icon="account-edit" />}
-              right={() => <List.Icon icon="chevron-right" />}
+              left={() => <List.Icon icon="account-edit" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
             <List.Item
               title="Manage Subscription"
               onPress={() => router.push('/components/ManageSubscriptionScreen')}
-              left={() => <List.Icon icon="credit-card" />}
-              right={() => <List.Icon icon="chevron-right" />}
+              left={() => <List.Icon icon="credit-card" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
           </List.Section>
         </Surface>
@@ -158,26 +164,38 @@ export default function ProfileScreen() {
             <List.Item
               title="Language & Region"
               onPress={() => router.push('/components/LanguageRegionScreen')}
-              left={() => <List.Icon icon="earth" />}
-              right={() => <List.Icon icon="chevron-right" />}
+              left={() => <List.Icon icon="earth" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
             <List.Item
               title="Notification Preferences"
               onPress={() => router.push('/components/NotificationPreferencesScreen')}
-              left={() => <List.Icon icon="bell-outline" />}
-              right={() => <List.Icon icon="chevron-right" />}
+              left={() => <List.Icon icon="bell-outline" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
             <List.Item
               title="Help Center"
               onPress={() => router.push('/components/HelpCenterScreen')}
-              left={() => <List.Icon icon="help-circle-outline" />}
-              right={() => <List.Icon icon="chevron-right" />}
+              left={() => <List.Icon icon="help-circle-outline" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
             <List.Item
               title="Privacy Policy & Terms of Service"
               onPress={() => router.push('/components/LegalScreen')}
-              left={() => <List.Icon icon="file-document-outline" />}
-              right={() => <List.Icon icon="chevron-right" />}
+              left={() => <List.Icon icon="file-document-outline" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
           </List.Section>
         </Surface>
@@ -199,21 +217,36 @@ export default function ProfileScreen() {
       </ScrollView>
 
       {/* Sign Out Dialog */}
-      <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)}>
-        <Dialog.Title style={theme.fonts.titleLarge}>Sign Out</Dialog.Title>
+      <Dialog 
+        visible={showSignOutDialog} 
+        onDismiss={() => setShowSignOutDialog(false)}
+        style={{ 
+          borderRadius: 28, // Material Design 3 dialog radius
+          backgroundColor: theme.colors.surface,
+        }}
+      >
+        <Dialog.Title style={[theme.fonts.headlineSmall, { color: theme.colors.onSurface }]}>
+          Sign Out
+        </Dialog.Title>
         <Dialog.Content>
-          <Text style={theme.fonts.bodyMedium}>Are you sure you want to sign out?</Text>
+          <Text style={[theme.fonts.bodyMedium, { color: theme.colors.onSurfaceVariant }]}>
+            Are you sure you want to sign out?
+          </Text>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={() => setShowSignOutDialog(false)} labelStyle={theme.fonts.labelLarge}>
+          <Button 
+            onPress={() => setShowSignOutDialog(false)} 
+            textColor={theme.colors.primary}
+          >
             Cancel
           </Button>
           <Button
+            mode="contained"
             onPress={() => {
               setShowSignOutDialog(false);
               handleSignOut();
             }}
-            labelStyle={theme.fonts.labelLarge}
+            style={{ borderRadius: theme.componentSizes.buttonBorderRadius }}
           >
             Sign Out
           </Button>
