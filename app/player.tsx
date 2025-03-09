@@ -117,7 +117,6 @@ export default function PlayerScreen() {
   const theme = useTheme<AppTheme>();
   const styles = createStyles(theme);
 
-  const spinValue = useRef(new Animated.Value(0)).current;
   const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'exhale' | 'hold'>('inhale');
   const [breathingCycleCount, setBreathingCycleCount] = useState(0);
   const scaleValue = useRef(new Animated.Value(0.8)).current;
@@ -125,7 +124,6 @@ export default function PlayerScreen() {
 
   const inhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
   const exhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
-  const spinAnimRef = useRef<Animated.CompositeAnimation | null>(null);
   const bgInhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
   const bgExhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
 
@@ -226,23 +224,10 @@ export default function PlayerScreen() {
 
       // Start the breathing animation
       breathingAnimation();
-      
-      // Also keep the slow rotation for additional visual interest
-      spinAnimRef.current = Animated.loop(
-        Animated.timing(spinValue, {
-          toValue: 1,
-          duration: 60000, // Very slow rotation (60 seconds per cycle)
-          easing: Easing.linear,
-          useNativeDriver: true,
-        })
-      );
-      
-      spinAnimRef.current.start();
     } else {
       // Reset animations when paused
       if (inhaleAnimRef.current) inhaleAnimRef.current.stop();
       if (exhaleAnimRef.current) exhaleAnimRef.current.stop();
-      if (spinAnimRef.current) spinAnimRef.current.stop();
       if (bgInhaleAnimRef.current) bgInhaleAnimRef.current.stop();
       if (bgExhaleAnimRef.current) bgExhaleAnimRef.current.stop();
     }
@@ -251,16 +236,10 @@ export default function PlayerScreen() {
       // Cleanup animations on unmount
       if (inhaleAnimRef.current) inhaleAnimRef.current.stop();
       if (exhaleAnimRef.current) exhaleAnimRef.current.stop();
-      if (spinAnimRef.current) spinAnimRef.current.stop();
       if (bgInhaleAnimRef.current) bgInhaleAnimRef.current.stop();
       if (bgExhaleAnimRef.current) bgExhaleAnimRef.current.stop();
     };
-  }, [isPlaying, scaleValue, spinValue, backgroundIntensity]);
-
-  const spin = spinValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
+  }, [isPlaying, scaleValue, backgroundIntensity]);
 
   const handleStatusUpdate = useCallback((status: AVPlaybackStatus) => {
     if (status.isLoaded) {
@@ -401,7 +380,6 @@ export default function PlayerScreen() {
             styles.mandalaContainer, 
             { 
               transform: [
-                { rotate: spin },
                 { scale: scaleValue }
               ] 
             }
@@ -411,7 +389,7 @@ export default function PlayerScreen() {
           importantForAccessibility="yes"
         >
           <MaterialCommunityIcons
-            name="flower-outline"
+            name="circle-outline"
             size={MANDALA_SIZE}
             color={theme.colors.primary}
             style={styles.mandala}
