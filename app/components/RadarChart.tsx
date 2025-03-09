@@ -182,19 +182,28 @@ const gridCircles = [];
       stroke={theme.colors.background}
       strokeWidth={2}
     />
-    {/* Add percentage indicator */}
-    <SvgText
-      x={point.x}
-      y={point.y - 16}
-      fontSize={12}
-      fontWeight="700" // Increase weight for better visibility
-      fill="#1A1A1A" // Use a dark color directly for maximum contrast
-      stroke="#FFFFFF" // White outline for contrast against the chart
-      strokeWidth={2} // Thinner stroke for better legibility
-      textAnchor="middle"
-    >
-      {(data[idx].value * 100).toFixed(0)}%
-    </SvgText>
+{/* Add background circle for better visibility */}
+        <Circle
+          cx={point.x}
+          cy={point.y - 16}
+          r={14}
+          fill="#FFFFFF"
+          fillOpacity={0.8}
+          stroke={theme.colors.primary}
+          strokeWidth={0.5}
+        />
+        {/* Add percentage indicator */}
+        <SvgText
+          x={point.x}
+          y={point.y - 16}
+          fontSize={12}
+          fontWeight="700"
+          fill="#4A4A4A" // Darker gray for better contrast
+          textAnchor="middle"
+          dy={4} // Small vertical adjustment for centering
+        >
+          {(data[idx].value * 100).toFixed(0)}%
+        </SvgText>
   </React.Fragment>
 ))}
 {chartLabels.map((_, idx) => {
