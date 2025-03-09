@@ -24,6 +24,7 @@ const recentActivities = [
     title: 'Breath up',
     subtitle: 'Breath exercise 12',
     duration: 18.5,
+    timestamp: new Date(), // Today
   },
   {
     id: '5',
@@ -31,6 +32,7 @@ const recentActivities = [
     title: 'Support your dreams',
     subtitle: 'Dreams exercise 5',
     duration: 14.5,
+    timestamp: new Date(new Date().setDate(new Date().getDate() - 1)), // Yesterday
   },
   {
     id: '8',
@@ -38,6 +40,7 @@ const recentActivities = [
     title: 'Gain awareness',
     subtitle: 'Awareness exercise 8',
     duration: 23.5,
+    timestamp: new Date(new Date().setDate(new Date().getDate() - 4)), // 4 days ago
   },
 ];
 
