@@ -1,3 +1,4 @@
+// Update QuickActions.styles.ts
 import { StyleSheet } from 'react-native';
 import { theme } from './theme';
 
@@ -6,42 +7,35 @@ export default StyleSheet.create({
     marginVertical: 16,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '500',
     marginBottom: 16,
-    color: theme.colors.onSurface,
     paddingHorizontal: 16,
-    letterSpacing: 0.15,
   },
-  grid: {
+  fabContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: 8,
+    justifyContent: 'space-around',
+    paddingVertical: 8,
   },
-  card: {
-    flex: 1,
-    minWidth: 140,
-    maxWidth: '45%',
-    margin: 8,
-    borderRadius: theme.componentSizes.cardBorderRadius,
-    // Proper Material elevation
-    elevation: theme.colors.elevation.level1,
-    backgroundColor: theme.colors.surface,
-  },
-  cardContent: {
+  fabButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
-    gap: 12, // Create proper spacing between icon and text
+    elevation: 6, // Material Design elevation for FABs
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    backgroundColor: theme.colors.primary,
   },
-  icon: {
-    marginBottom: 4, // Reduced from 8
-    color: theme.colors.primary, // Use theme color instead of hardcoded
+  labelContainer: {
+    alignItems: 'center',
+    marginTop: 8,
   },
-  cardTitle: {
-    textAlign: 'center',
-    fontSize: 14,
+  labelText: {
+    fontSize: 12,
     fontWeight: '500',
     color: theme.colors.onSurface,
-    letterSpacing: 0.1,
+    textAlign: 'center',
   },
 });

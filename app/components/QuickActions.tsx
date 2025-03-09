@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Text, Card, useTheme } from 'react-native-paper';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, Surface, useTheme } from 'react-native-paper';
 import { Link } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import type { AppTheme } from '../types/theme';
 import { typographyStyles } from '../config';
+import styles from '../config/quickActions.styles';
 
 type MaterialIconName = keyof typeof MaterialIcons.glyphMap;
 
@@ -18,13 +19,13 @@ const actions: {
     title: 'Take Survey',
     icon: 'assignment',
     href: '/survey',
-    color: '#5DA47A', // Use theme color
+    color: '#5DA47A',
   },
   {
     title: 'Track Mood',
     icon: 'mood',
     href: '/mood',
-    color: '#5DA47A', // Use theme color
+    color: '#5DA47A',
   },
 ];
 
@@ -32,67 +33,37 @@ export default function QuickActions() {
   const theme = useTheme<AppTheme>();
   
   return (
-    <View style={styles.container}>
+    <Surface style={[styles.container, { 
+      borderRadius: theme.componentSizes.cardBorderRadius, 
+      backgroundColor: theme.colors.surface,
+      elevation: 1,
+      marginHorizontal: 16
+    }]}>
       <Text style={[typographyStyles.text_heading2, styles.title]}>
         Quick Actions
       </Text>
-      <View style={styles.grid}>
+      <View style={styles.fabContainer}>
         {actions.map((action, index) => (
           <Link key={index} href={action.href} asChild>
-            <Card
-              style={styles.card}
-              mode="elevated"
-            >
-              <Card.Content style={styles.cardContent}>
-                <MaterialIcons
-                  name={action.icon}
-                  size={24}
-                  color={action.color}
-                  style={styles.icon}
-                />
-                <Text style={[typographyStyles.text_body, styles.cardTitle]}>
-                  {action.title}
-                </Text>
-              </Card.Content>
-            </Card>
+            <TouchableOpacity>
+              <View>
+                <View style={[styles.fabButton, { backgroundColor: theme.colors.primary }]}>
+                  <MaterialIcons
+                    name={action.icon}
+                    size={24}
+                    color={theme.colors.onPrimary}
+                  />
+                </View>
+                <View style={styles.labelContainer}>
+                  <Text style={styles.labelText}>
+                    {action.title}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
           </Link>
         ))}
       </View>
-    </View>
+    </Surface>
   );
 }
-
-// Create styles for the component
-const styles = StyleSheet.create({
-  container: {
-    marginVertical: 16, // Follow 8dp grid (16 = 8*2)
-  },
-  title: {
-    marginBottom: 16,
-    paddingHorizontal: 16,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: 8, // Compensate for card margins
-  },
-  card: {
-    flex: 1,
-    minWidth: 140,
-    maxWidth: '45%', // Allow for proper spacing
-    margin: 8, // Follow 8dp grid
-    borderRadius: 12, // Material Design M3 card radius
-    elevation: 1,
-  },
-  cardContent: {
-    alignItems: 'center',
-    padding: 16, // MD standard padding
-    gap: 8, // Add gap between icon and text
-  },
-  icon: {
-    // marginBottom: 8, // Removed in favor of gap
-  },
-  cardTitle: {
-    textAlign: 'center',
-  },
-});
