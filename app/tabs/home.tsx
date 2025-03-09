@@ -6,6 +6,7 @@ import { miscStyles, typographyStyles } from '../config';
 import RadarChart from '../components/RadarChart';
 import RecentActivities from '../components/RecentActivities';
 import QuickActions from '../components/QuickActions';
+import TodaysFocus from '../components/TodaysFocus';
 import type { AppTheme } from '../types/theme';
 
 // Rest of your imports and data...
@@ -43,6 +44,11 @@ const recentActivities = [
     timestamp: new Date(new Date().setDate(new Date().getDate() - 4)), // 4 days ago
   },
 ];
+
+const todaysFocus = {
+  goal: "Complete your daily breathing exercise (15 min).",
+  affirmation: "You're capable of handling whatever comes today."
+};
 
 export default function Home() {
   const theme = useTheme<AppTheme>();
@@ -97,8 +103,15 @@ export default function Home() {
         <RadarChart data={radarData} />
       </Surface>
 
-{/* Quick Actions Section */}
-<QuickActions sectionStyle={styles.section} />
+      {/* Quick Actions Section */}
+      <QuickActions sectionStyle={styles.section} />
+
+      {/* Today's Focus Section */}
+      <TodaysFocus 
+        goal={todaysFocus.goal}
+        affirmation={todaysFocus.affirmation}
+        sectionStyle={styles.section}
+      />
 
       {/* Recent Activities Section */}
       <Surface style={styles.section} elevation={1}>
