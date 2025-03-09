@@ -73,8 +73,37 @@ const createStyles = (theme: AppTheme) =>
       elevation: 4,
       padding: 8,
     } as ViewStyle,
+    breathingGuideText: {
+      ...theme.fonts.titleMedium, 
+      color: theme.colors.primary,
+      marginBottom: 16,
+      opacity: 0.8,
+      textAlign: 'center',
+    } as TextStyle,
+    gradientContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: -1,
+    } as ViewStyle,
+    backgroundBase: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    } as ViewStyle,
+    colorLayer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: theme.colors.primary,
+    } as ViewStyle,
   });
-
 
 export default function PlayerScreen() {
   const soundRef = useRef<Audio.Sound | null>(null);
@@ -89,6 +118,16 @@ export default function PlayerScreen() {
   const styles = createStyles(theme);
 
   const spinValue = useRef(new Animated.Value(0)).current;
+  const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'exhale' | 'hold'>('inhale');
+  const [breathingCycleCount, setBreathingCycleCount] = useState(0);
+  const scaleValue = useRef(new Animated.Value(0.8)).current;
+  const backgroundIntensity = useRef(new Animated.Value(0)).current;
+
+  const inhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+  const exhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+  const spinAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+  const bgInhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+  const bgExhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -127,18 +166,96 @@ export default function PlayerScreen() {
 
   useEffect(() => {
     if (isPlaying) {
-      Animated.loop(
+      // Create breathing animation sequence
+      const breathingAnimation = () => {
+        // Inhale animation (grow)
+        inhaleAnimRef.current = Animated.timing(scaleValue, {
+          toValue: 1.2,
+          duration: 4000, // 4 seconds inhale
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        });
+
+        inhaleAnimRef.current.start(({ finished }) => {
+          // Add this parallel animation for the background
+          bgInhaleAnimRef.current = Animated.timing(backgroundIntensity, {
+            toValue: 1,
+            duration: 4000,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true, // CHANGE THIS TO TRUE
+          });
+          
+          bgInhaleAnimRef.current.start();
+          
+          if (finished) {
+            setBreathingPhase('hold');
+            
+            // Hold breath briefly
+            setTimeout(() => {
+              setBreathingPhase('exhale');
+              
+              // Exhale animation (shrink)
+              exhaleAnimRef.current = Animated.timing(scaleValue, {
+                toValue: 0.8,
+                duration: 6000, // 6 seconds exhale
+                easing: Easing.inOut(Easing.ease),
+                useNativeDriver: true,
+              });
+              
+              exhaleAnimRef.current.start(({ finished }) => {
+                // Add this parallel animation for the background
+                bgExhaleAnimRef.current = Animated.timing(backgroundIntensity, {
+                  toValue: 0,
+                  duration: 6000,
+                  easing: Easing.inOut(Easing.ease),
+                  useNativeDriver: true, // CHANGE THIS TO TRUE
+                });
+                
+                bgExhaleAnimRef.current.start();
+                
+                if (finished) {
+                  setBreathingPhase('inhale');
+                  setBreathingCycleCount(prev => prev + 1);
+                  breathingAnimation(); // Repeat the cycle
+                }
+              });
+            }, 1000); // Hold for 1 second
+          }
+        });
+      };
+
+      // Start the breathing animation
+      breathingAnimation();
+      
+      // Also keep the slow rotation for additional visual interest
+      spinAnimRef.current = Animated.loop(
         Animated.timing(spinValue, {
           toValue: 1,
-          duration: 10000,
-          easing: Easing.out(Easing.ease), // Updated easing
+          duration: 60000, // Very slow rotation (60 seconds per cycle)
+          easing: Easing.linear,
           useNativeDriver: true,
         })
-      ).start();
+      );
+      
+      spinAnimRef.current.start();
     } else {
-      spinValue.setValue(0);
+      // Reset animations when paused
+      if (inhaleAnimRef.current) inhaleAnimRef.current.stop();
+      if (exhaleAnimRef.current) exhaleAnimRef.current.stop();
+      if (spinAnimRef.current) spinAnimRef.current.stop();
+      if (bgInhaleAnimRef.current) bgInhaleAnimRef.current.stop();
+      if (bgExhaleAnimRef.current) bgExhaleAnimRef.current.stop();
     }
-  }, [isPlaying]);
+    
+    return () => {
+      // Cleanup animations on unmount
+      if (inhaleAnimRef.current) inhaleAnimRef.current.stop();
+      if (exhaleAnimRef.current) exhaleAnimRef.current.stop();
+      if (spinAnimRef.current) spinAnimRef.current.stop();
+      if (bgInhaleAnimRef.current) bgInhaleAnimRef.current.stop();
+      if (bgExhaleAnimRef.current) bgExhaleAnimRef.current.stop();
+    };
+  }, [isPlaying, scaleValue, spinValue, backgroundIntensity]);
 
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
@@ -258,11 +375,40 @@ export default function PlayerScreen() {
         </View>
       </Surface>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        bounces={false}
+      >
+        <Animated.View style={styles.gradientContainer}>
+          {/* Solid background */}
+          <View style={[styles.backgroundBase, { backgroundColor: theme.colors.background }]} />
+          
+          {/* Color overlay for breathing effect */}
+          <Animated.View 
+            style={[
+              styles.colorLayer,
+              { 
+                opacity: backgroundIntensity.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.05, 0.25]
+                })
+              }
+            ]} 
+          />
+        </Animated.View>
         <Animated.View
-          style={[styles.mandalaContainer, { transform: [{ rotate: spin }] }]}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
+          style={[
+            styles.mandalaContainer, 
+            { 
+              transform: [
+                { rotate: spin },
+                { scale: scaleValue }
+              ] 
+            }
+          ]}
+          accessibilityElementsHidden={false}
+          accessibilityLabel={`Breathing guide: ${breathingPhase} phase`}
+          importantForAccessibility="yes"
         >
           <MaterialCommunityIcons
             name="flower-outline"
@@ -271,6 +417,13 @@ export default function PlayerScreen() {
             style={styles.mandala}
           />
         </Animated.View>
+        <Text
+          style={styles.breathingGuideText}
+          accessibilityLiveRegion="polite"
+        >
+          {breathingPhase === 'inhale' ? 'Breathe in...' : 
+           breathingPhase === 'hold' ? 'Hold...' : 'Breathe out...'}
+        </Text>
 
         <View style={styles.timerContainer}>
           <Svg width={TIMER_SIZE} height={TIMER_SIZE} style={styles.svg}>
