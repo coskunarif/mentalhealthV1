@@ -97,8 +97,8 @@ export default function Home() {
         <RadarChart data={radarData} />
       </Surface>
 
-      {/* Quick Actions Section */}
-      <QuickActions />
+{/* Quick Actions Section */}
+<QuickActions sectionStyle={styles.section} />
 
       {/* Recent Activities Section */}
       <Surface style={styles.section} elevation={1}>
