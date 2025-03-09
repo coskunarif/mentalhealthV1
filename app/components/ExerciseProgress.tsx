@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { AppTheme } from '../types/theme';
 import styles from '../config/ExerciseProgress.styles';
+import { Animated, Easing } from 'react-native';
 
 interface ExerciseProgressProps {
   exercises: {
@@ -20,6 +21,24 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
   currentStep,
 }) => {
   const theme = useTheme<AppTheme>();
+
+  const [animations] = useState(() => 
+    exercises.map(() => new Animated.Value(0))
+  );
+
+  useEffect(() => {
+    // Animate completed steps
+    exercises.forEach((exercise, index) => {
+      if (exercise.isCompleted) {
+        Animated.timing(animations[index], {
+          toValue: 1,
+          duration: 800,
+          easing: Easing.elastic(1),
+          useNativeDriver: true,
+        }).start();
+      }
+    });
+  }, [exercises]);
 
   const getStepStatus = (index: number, isCompleted: boolean, isCurrent: boolean) => {
     if (isCompleted) return 'completed';
@@ -75,11 +94,20 @@ const getStepIcon = (status: 'completed' | 'current' | 'upcoming') => {
           <View key={exercise.id} style={styles.stepContainer}>
             <View style={styles.stepContent}>
               <View style={styles.iconContainer}>
-                <MaterialCommunityIcons
-                  name={getStepIcon(status)}
-                  size={24}
-                  color={colors.icon}
-                />
+                <Animated.View style={{
+                  transform: [{ 
+                    scale: animations[index].interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [1, 1.2, 1]
+                    }) 
+                  }]
+                }}>
+                  <MaterialCommunityIcons
+                    name={getStepIcon(status)}
+                    size={24}
+                    color={colors.icon}
+                  />
+                </Animated.View>
                 {!isLast && (
                   <View 
                     style={[
