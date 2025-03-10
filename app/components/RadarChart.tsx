@@ -45,7 +45,7 @@ export default function RadarChart({
     data = data.slice(0, chartLabels.length);
   }
   const center = chartSize / 2;
-  const padding = 50;
+  const padding = 50; // Increased padding
   const radius = (chartSize - padding * 2) / 2;
   const angleStep = (Math.PI * 2) / chartLabels.length;
   const polygonStrokeColor = theme.colors.primary;
@@ -62,7 +62,7 @@ export default function RadarChart({
 
   const getLabelCoordinates = (index: number) => {
     const angle = index * angleStep - Math.PI / 2;
-    const labelDistance = radius + 20;
+    const labelDistance = radius + 20; // Reduced distance
     return { x: center + labelDistance * Math.cos(angle), y: center + labelDistance * Math.sin(angle) };
   };
 
@@ -72,26 +72,29 @@ export default function RadarChart({
     let textAnchor: 'start' | 'middle' | 'end' = 'middle';
     let xOffset = 0;
     let yOffset = 0;
-    const maxWidth = 80;
-    if (angle >= -Math.PI / 4 && angle <= Math.PI / 4) {
-      textAnchor = 'start';
-      xOffset = 8;
-    } else if (angle >= (3 * Math.PI) / 4 || angle <= -(3 * Math.PI) / 4) {
-      textAnchor = 'end';
-      xOffset = -8;
-    } else if (angle > Math.PI / 4 && angle < (3 * Math.PI) / 4) {
-      textAnchor = 'middle';
-      yOffset = 16;
+    const maxWidth = 100;
+
+    //No xOffset
+
+    // Dynamic yOffset based on angle (above or below the center)
+    if (angle > 0 && angle < Math.PI) {
+      yOffset = 10; // Below the center
+    } else if (angle < 0 && angle > -Math.PI) {
+      yOffset = -8; // Above the center
     } else {
-      textAnchor = 'middle';
-      yOffset = -16;
+      yOffset = -6;
     }
+
+    if (angle === Math.PI) { //Special case for the bottom label
+      yOffset = 20;
+    }
+
     const words = chartLabels[index].split(' ');
     const lines: string[] = [];
     let currentLine = '';
     words.forEach((word) => {
       const testLine = currentLine ? `${currentLine} ${word}` : word;
-      if (testLine.length * 5 > maxWidth && currentLine) {
+      if (testLine.length * 6 > maxWidth && currentLine) {
         lines.push(currentLine);
         currentLine = word;
       } else {
@@ -106,13 +109,12 @@ export default function RadarChart({
       xOffset,
       yOffset,
       lines,
-      // Add material design contrast colors
-      fill: theme.colors.onSurface, // Increased contrast from onSurfaceVariant
-      fontWeight: '500', // Medium weight for better readability
+      fill: theme.colors.onSurface,
+      fontWeight: '500',
     };
   };
 
-const gridCircles = [];
+  const gridCircles = [];
   const gridSteps = 5;
   for (let i = 1; i <= gridSteps; i++) {
     const gridRadius = (radius / gridSteps) * i;
@@ -124,7 +126,7 @@ const gridCircles = [];
         r={gridRadius}
         stroke={theme.colors.outlineVariant}
         strokeWidth={1}
-        strokeOpacity={i === gridSteps ? 0.8 : 0.4} // Main outline darker
+        strokeOpacity={i === gridSteps ? 0.8 : 0.4}
         fill="none"
       />
     );
@@ -163,65 +165,61 @@ const gridCircles = [];
           fill={polygonFillColor}
           fillOpacity={fillOpacity}
         />
-{points.map((point, idx) => (
-  <React.Fragment key={`data-point-${idx}`}>
-    {/* Add a larger transparent touch area */}
-    <Circle
-      cx={point.x}
-      cy={point.y}
-      r={24} // 48dp diameter touch target
-      fill="transparent"
-      accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`}
-    />
-    {/* Visible point */}
-    <Circle
-      cx={point.x}
-      cy={point.y}
-      r={8}
-      fill={pointColor}
-      stroke={theme.colors.background}
-      strokeWidth={2}
-    />
-{/* Add background circle for better visibility */}
-        <Circle
-          cx={point.x}
-          cy={point.y - 16}
-          r={14}
-          fill="#FFFFFF"
-          fillOpacity={0.8}
-          stroke={theme.colors.primary}
-          strokeWidth={0.5}
-        />
-        {/* Add percentage indicator */}
-        <SvgText
-          x={point.x}
-          y={point.y - 16}
-          fontSize={12}
-          fontWeight="700"
-          fill="#4A4A4A" // Darker gray for better contrast
-          textAnchor="middle"
-          dy={4} // Small vertical adjustment for centering
-        >
-          {(data[idx].value * 100).toFixed(0)}%
-        </SvgText>
-  </React.Fragment>
-))}
-{chartLabels.map((_, idx) => {
-  const { x, y, textAnchor, xOffset, yOffset, lines } = getLabelLayout(idx);
-  return lines.map((line, lineIndex) => (
-    <SvgText
-      key={`label-${idx}-line-${lineIndex}`}
-      x={x + xOffset}
-      y={y + yOffset + lineIndex * 12}
-      fontSize={12}
-      fontWeight="500"
-      fill={theme.colors.onSurface} // Increased contrast
-      textAnchor={textAnchor}
-    >
-      {line}
-    </SvgText>
-  ));
-})}
+        {points.map((point, idx) => (
+          <React.Fragment key={`data-point-${idx}`}>
+            <Circle
+              cx={point.x}
+              cy={point.y}
+              r={24}
+              fill="transparent"
+              accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`}
+            />
+            <Circle
+              cx={point.x}
+              cy={point.y}
+              r={8}
+              fill={pointColor}
+              stroke={theme.colors.background}
+              strokeWidth={2}
+            />
+            <Circle
+              cx={point.x}
+              cy={point.y - 16}
+              r={14}
+              fill="#FFFFFF"
+              fillOpacity={0.8}
+              stroke={theme.colors.primary}
+              strokeWidth={0.5}
+            />
+            <SvgText
+              x={point.x}
+              y={point.y - 16}
+              fontSize={12}
+              fontWeight="700"
+              fill="#4A4A4A"
+              textAnchor="middle"
+              dy={4}
+            >
+              {(data[idx].value * 100).toFixed(0)}%
+            </SvgText>
+          </React.Fragment>
+        ))}
+        {chartLabels.map((_, idx) => {
+          const { x, y, textAnchor, xOffset, yOffset, lines } = getLabelLayout(idx);
+          return lines.map((line, lineIndex) => (
+            <SvgText
+              key={`label-${idx}-line-${lineIndex}`}
+              x={x + xOffset}
+              y={y + yOffset + lineIndex * 12}
+              fontSize={12}
+              fontWeight="500"
+              fill={theme.colors.onSurface}
+              textAnchor={textAnchor}
+            >
+              {line}
+            </SvgText>
+          ));
+        })}
       </Svg>
     </View>
   );
@@ -232,6 +230,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 16,
-    padding: 8, // Follow 8dp grid system
+    padding: 8,
   },
 });
