@@ -343,10 +343,10 @@ export default function PlayerScreen() {
     <SafeAreaView style={styles.container}>
       <Surface style={styles.header} elevation={0}>
         <IconButton
-          icon="chevron-down"
+          icon="chevron-left"
           size={28}
           onPress={() => router.back()}
-          accessibilityLabel="Close player"
+          accessibilityLabel="Go back"
         />
         <View style={styles.headerText}>
           <Text style={styles.title}>{title}</Text>
