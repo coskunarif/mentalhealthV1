@@ -8,6 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { RootStackParamList } from './types/navigation';
 import type { AppTheme } from './types/theme';
 import type { ViewStyle, TextStyle } from 'react-native';
+import { CustomAppBar } from './components/CustomAppBar';
 
 interface PlayerProps {
   audioUrl: string;
@@ -341,18 +342,11 @@ export default function PlayerScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Surface style={styles.header} elevation={0}>
-        <IconButton
-          icon="chevron-left"
-          size={28}
-          onPress={() => router.back()}
-          accessibilityLabel="Go back"
-        />
-        <View style={styles.headerText}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
-        </View>
-      </Surface>
+      <CustomAppBar 
+        title={title} 
+        subtitle={subtitle}
+        elevation={0}
+      />
 
       <ScrollView
         contentContainerStyle={styles.content}

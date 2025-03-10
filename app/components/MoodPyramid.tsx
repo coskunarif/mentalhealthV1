@@ -12,6 +12,7 @@ import localStyles from '../config/MoodPyramid.styles';
 import { typographyStyles } from '../config';
 import { theme } from '../config/theme';
 import EnhancedButton from './EnhancedButton';
+import { CustomAppBar } from './CustomAppBar';
 
 type Emotion = {
   label: string;
@@ -111,31 +112,10 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <View style={{ 
-        flexDirection: 'row', 
-        alignItems: 'center',
-        paddingHorizontal: 4,
-        paddingTop: 8,
-        marginBottom: 8
-      }}>
-        <IconButton
-          icon="arrow-left"
-          size={24}
-          onPress={handleBack}
-          style={{ marginLeft: -8 }}
-          accessibilityLabel="Go back"
-        />
-        <Text style={[
-          typographyStyles.text_heading3,
-          {
-            color: theme.colors.onSurface,
-            marginLeft: 4,
-            fontWeight: '500'
-          }
-        ]}>
-          Focus Emotions
-        </Text>
-      </View>
+      <CustomAppBar 
+        title="Focus Emotions" 
+        onBackPress={handleBack}
+      />
       <ScrollView 
         style={{ flex: 1 }} 
         contentContainerStyle={{ 

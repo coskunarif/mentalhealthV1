@@ -1,6 +1,5 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text } from 'react-native-paper';
 import { NotificationPreferences } from './NotificationPreferences';
 import { useRouter } from 'expo-router';
 import { layoutStyles, typographyStyles } from '../config';
@@ -19,11 +18,11 @@ export default function NotificationPreferencesScreen() {
 
   return (
     <View style={layoutStyles.layout_container}>
-      <CustomAppBar title="Notification Preferences" />
+      <CustomAppBar 
+        title="Notification Preferences" 
+        subtitle="Manage your alerts and reminders for a personalized experience."
+      />
       <ScrollView contentContainerStyle={layoutStyles.layout_content}>
-        <Text style={typographyStyles.text_subtitle}>
-          Manage your alerts and reminders for a personalized experience.
-        </Text>
         <NotificationPreferences onToggle={handleToggle} />
       </ScrollView>
     </View>

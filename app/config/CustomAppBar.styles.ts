@@ -5,12 +5,25 @@ import typographyStyles from './typography.styles';
 const customAppBarStyles = StyleSheet.create({
   header: {
     backgroundColor: theme.colors.surface,
+    height: 64, // Standard Material Design app bar height
+    paddingHorizontal: theme.spacing.small,
+  },
+  titleContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    marginLeft: theme.spacing.tiny,
   },
   title: {
-    // Instead of using text_heading2 which is too large for an app bar
-    ...typographyStyles.text_heading3, // Or create a specific app bar title style
-    fontSize: 20, // More appropriate for app bar titles per Material Design
+    ...theme.fonts.titleMedium,
+    fontSize: 20,
+    color: theme.colors.onSurface,
+    fontWeight: '500',
   },
+  subtitle: {
+    ...theme.fonts.bodyMedium,
+    color: theme.colors.onSurfaceVariant,
+    marginTop: -4,
+  }
 });
 
 export default customAppBarStyles;

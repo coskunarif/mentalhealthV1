@@ -4,6 +4,7 @@ import { IconButton } from 'react-native-paper';
 import { router } from 'expo-router';
 import { layoutStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
+import { CustomAppBar } from './CustomAppBar';
 
 interface LegalLayoutProps {
   title: string;
@@ -18,18 +19,9 @@ export default function LegalLayout({
 }: LegalLayoutProps) {
   return (
     <View style={layoutStyles.layout_container}>
-      <View style={{ marginBottom: 24 }}>
-        <IconButton icon="arrow-left" size={24} onPress={() => router.back()} />
-        <Text
-          style={{
-            ...theme.fonts.titleLarge,
-            color: theme.colors.onSurface,
-            marginBottom: theme.spacing.small,
-          }}
-        >
-          {title}
-        </Text>
-      </View>
+      <CustomAppBar 
+        title={title} 
+      />
       <ScrollView
         style={layoutStyles.layout_scrollView}
         contentContainerStyle={layoutStyles.layout_content}
