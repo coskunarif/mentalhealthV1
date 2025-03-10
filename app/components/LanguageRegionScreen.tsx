@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { Text } from 'react-native-paper';
 import { LanguageRegionSettings } from './LanguageRegionSettings';
 import { useRouter } from 'expo-router';
-import { layoutStyles, typographyStyles } from '../config';
+import { layoutStyles } from '../config';
 import { CustomAppBar } from './CustomAppBar';
 
 export default function LanguageRegionScreen() {
@@ -21,11 +20,11 @@ export default function LanguageRegionScreen() {
 
   return (
     <View style={layoutStyles.layout_container}>
-      <CustomAppBar title="Language & Region" />
+      <CustomAppBar 
+        title="Language & Region" 
+        subtitle="Select your preferred language and region settings."
+      />
       <ScrollView contentContainerStyle={layoutStyles.layout_content}>
-        <Text style={typographyStyles.text_subtitle}>
-          Select your preferred language and region settings.
-        </Text>
         <LanguageRegionSettings onLanguageChange={handleLanguageChange} />
       </ScrollView>
     </View>

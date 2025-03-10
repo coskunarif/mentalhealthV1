@@ -55,11 +55,11 @@ export default function ManageSubscriptionScreen() {
 
   return (
     <View style={layoutStyles.layout_container}>
-      <CustomAppBar title="Subscription" />
+      <CustomAppBar 
+        title="Subscription" 
+        subtitle="View and manage your subscription plan and billing details."
+      />
       <ScrollView contentContainerStyle={[layoutStyles.layout_content, { paddingVertical: theme.spacing.small }]}>
-        <Text style={[typographyStyles.text_subtitle, { marginBottom: theme.spacing.small }]}>
-          View and manage your subscription plan and billing details.
-        </Text>
         <Surface style={styles.container} elevation={1}>
           <Text style={[typographyStyles.text_heading3, styles.sectionTitle]}>Current Plan</Text>
           <List.Item

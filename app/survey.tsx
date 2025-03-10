@@ -71,7 +71,10 @@ export default function SurveyScreen() {
 
   return (
     <>
-      <CustomAppBar title="Daily Survey" />
+      <CustomAppBar 
+        title="Daily Survey" 
+        subtitle="Complete your daily mood and wellness assessment."
+      />
       <ScrollView
         style={layoutStyles.layout_container}
         contentContainerStyle={{ padding: 16 }}

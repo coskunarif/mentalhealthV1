@@ -78,12 +78,7 @@ export default function EditPersonalInfoScreen() {
   };
 
   const handleBack = () => {
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 200,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: true,
-    }).start(() => router.back());
+    router.back();
   };
 
   return (
@@ -107,7 +102,10 @@ export default function EditPersonalInfoScreen() {
         ]}
       >
         <StatusBar style="auto" />
-        <CustomAppBar title="Personal Information" />
+        <CustomAppBar 
+          title="Personal Information" 
+          onBackPress={handleBack}
+        />
         <ScrollView
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}

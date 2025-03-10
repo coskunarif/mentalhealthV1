@@ -11,21 +11,16 @@ export default function LegalScreen() {
   const router = useRouter();
   return (
     <View style={layoutStyles.layout_container}>
-      <CustomAppBar title="Legal & Privacy" />
+      <CustomAppBar 
+        title="Legal & Privacy" 
+        subtitle="Review our policies and terms governing your usage."
+      />
       <ScrollView
         contentContainerStyle={[
           layoutStyles.layout_content,
           { paddingVertical: theme.spacing.small },
         ]}
       >
-        <Text
-          style={[
-            typographyStyles.text_subtitle,
-            { marginBottom: theme.spacing.small },
-          ]}
-        >
-          Review our policies and terms governing your usage.
-        </Text>
         <LegalLinks />
       </ScrollView>
     </View>

@@ -10,6 +10,7 @@ import { theme } from '../config/theme';
 import type { AppTheme } from '../types/theme';
 import EnhancedButton from './EnhancedButton';
 import SliderCard from './SliderCard';
+import { CustomAppBar } from './CustomAppBar';
 
 // Add brightness calculation function to determine text color
 const getBrightness = (hexColor: string): number => {
@@ -125,31 +126,10 @@ function MoodSelector({
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <View style={{ 
-        flexDirection: 'row', 
-        alignItems: 'center',
-        paddingHorizontal: 4,
-        paddingTop: 8,
-        marginBottom: 8
-      }}>
-        <IconButton
-          icon="arrow-left"
-          size={24}
-          onPress={handleBack}
-          style={{ marginLeft: -8 }}
-          accessibilityLabel="Go back"
-        />
-        <Text style={[
-          typographyStyles.text_heading3,
-          {
-            color: theme.colors.onSurface,
-            marginLeft: 4,
-            fontWeight: '500'
-          }
-        ]}>
-          Mood Selection
-        </Text>
-      </View>
+      <CustomAppBar 
+        title="Mood Selection" 
+        onBackPress={handleBack}
+      />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 80 }}>
         <Text
           style={[
