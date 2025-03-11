@@ -199,12 +199,16 @@ const styles = (theme: any) => StyleSheet.create({
 const SurveyScreen = () => {
     const theme = useTheme();
     const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [answers, setAnswers] = useState<string[]>([]);
+    const [answers, setAnswers] = useState<(string | undefined)[]>([]);
     const themedStyles = React.useMemo(() => styles(theme), [theme]);
 
     const handleAnswer = (option: string) => {
         const newAnswers = [...answers];
-        newAnswers[currentQuestion] = option;
+        if (newAnswers[currentQuestion] === option) {
+            newAnswers[currentQuestion] = undefined;
+        } else {
+            newAnswers[currentQuestion] = option;
+        }
         setAnswers(newAnswers);
     };
 
