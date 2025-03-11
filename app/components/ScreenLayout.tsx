@@ -1,12 +1,10 @@
-import React, { ReactNode } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView, Platform } from 'react-native';
+import React from 'react';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import { CustomAppBar } from './CustomAppBar';
 import { theme } from '../config/theme';
 
 interface ScreenLayoutProps {
-  title: string;
-  subtitle?: string;
-  children: ReactNode;
+  children: React.ReactNode;
   showBackButton?: boolean;
   onBackPress?: () => void;
   rightContent?: React.ReactNode;
@@ -14,9 +12,22 @@ interface ScreenLayoutProps {
   contentContainerStyle?: any;
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  contentView: {
+    flex: 1,
+    paddingHorizontal: theme.spacing.medium,
+    paddingBottom: theme.spacing.large,
+  },
+});
+
 export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
-  title,
-  subtitle,
   children,
   showBackButton = true,
   onBackPress,
@@ -27,8 +38,6 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
   return (
     <View style={styles.container}>
       <CustomAppBar
-        title={title}
-        subtitle={subtitle}
         showBackButton={showBackButton}
         onBackPress={onBackPress}
         rightContent={rightContent}
@@ -38,10 +47,12 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
         <ScrollView 
           style={styles.scrollView}
           contentContainerStyle={[
-            styles.contentContainer,
+            // No top padding necessary anymore
+            { paddingHorizontal: theme.spacing.medium, paddingBottom: theme.spacing.large },
             contentContainerStyle
           ]}
         >
+          {/* Optional: Add a content header here if context is needed */}
           {children}
         </ScrollView>
       ) : (
@@ -52,22 +63,3 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: theme.spacing.medium,
-    paddingTop: theme.spacing.small, // Reduce top padding since the app bar is now more compact
-  },
-  contentView: {
-    flex: 1,
-    padding: theme.spacing.medium,
-    paddingTop: theme.spacing.small,
-  }
-});

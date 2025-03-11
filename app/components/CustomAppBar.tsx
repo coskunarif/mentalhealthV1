@@ -1,27 +1,23 @@
 import React from 'react';
-import { View, Platform, StatusBar } from 'react-native';
-import { Appbar, Text } from 'react-native-paper';
+import { View, TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { theme } from '../config/theme';
 import customAppBarStyles from '../config/CustomAppBar.styles';
+import { theme } from '../config/theme';
 
-export const CustomAppBar: React.FC<{ 
-  title: string; 
-  subtitle?: string;
-  showBackButton?: boolean; 
-  elevation?: number;
+export const CustomAppBar: React.FC<{
+  showBackButton?: boolean;
   onBackPress?: () => void;
   rightContent?: React.ReactNode;
-}> = ({ 
-  title, 
-  subtitle, 
-  showBackButton = true, 
-  elevation = 3, // Updated default to 3
+  transparent?: boolean;
+}> = ({
+  showBackButton = true,
   onBackPress,
-  rightContent 
+  rightContent,
+  transparent = false
 }) => {
   const router = useRouter();
-  
+
   const handleBack = () => {
     if (onBackPress) {
       onBackPress();
@@ -29,45 +25,33 @@ export const CustomAppBar: React.FC<{
       router.back();
     }
   };
-  
-  const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 44 : StatusBar.currentHeight || 0;
-  
+
+  // If transparent is true, we don't even need a container
+  if (!showBackButton && !rightContent && transparent) {
+    return null;
+  }
+
   return (
-    <View>
-      <View style={{ height: STATUSBAR_HEIGHT, backgroundColor: theme.colors.surface }} />
-      <Appbar.Header 
-        style={[
-          customAppBarStyles.header, 
-          { elevation: elevation }
-        ]}
-        theme={{ colors: { primary: theme.colors.surface } }}
-      >
-        {showBackButton && (
-          <Appbar.BackAction 
-            onPress={handleBack} 
+    <View style={customAppBarStyles.container}>
+      {showBackButton && (
+        <TouchableOpacity
+          style={customAppBarStyles.backButtonContainer}
+          onPress={handleBack}
+          activeOpacity={0.7}
+        >
+          <MaterialIcons
+            name="arrow-back"
             size={24}
             color={theme.colors.onSurface}
-            style={customAppBarStyles.backButton}
           />
-        )}
-        <View style={customAppBarStyles.titleContainer}>
-          <Text 
-            style={customAppBarStyles.title}
-            numberOfLines={1}
-          >
-            {title}
-          </Text>
-          {subtitle && (
-            <Text 
-              style={customAppBarStyles.subtitle}
-              numberOfLines={1}
-            >
-              {subtitle}
-            </Text>
-          )}
+        </TouchableOpacity>
+      )}
+
+      {rightContent && (
+        <View style={customAppBarStyles.rightContentContainer}>
+          {rightContent}
         </View>
-        {rightContent}
-      </Appbar.Header>
+      )}
     </View>
   );
 };
