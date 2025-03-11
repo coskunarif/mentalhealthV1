@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Appbar, Text } from 'react-native-paper';
+import { View, StyleSheet, Platform, StatusBar } from 'react-native';
+import { Appbar, Text, useTheme } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import customAppBarStyles from '../config/CustomAppBar.styles';
 import { theme } from '../config/theme';
@@ -30,31 +30,36 @@ export const CustomAppBar: React.FC<{
     }
   };
   
+  const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 44 : StatusBar.currentHeight || 0;
+  
   return (
-    <Appbar.Header 
-      style={[
-        customAppBarStyles.header, 
-        { elevation: elevation }
-      ]}
-      theme={{ colors: { primary: theme.colors.surface } }}
-    >
-      {showBackButton && (
-        <Appbar.BackAction 
-          onPress={handleBack} 
-          size={24}
-          color={theme.colors.onSurface}
-        />
-      )}
-      <View style={customAppBarStyles.titleContainer}>
-        <Appbar.Content 
-          title={title} 
-          titleStyle={customAppBarStyles.title} 
-        />
-        {subtitle && (
-          <Text style={customAppBarStyles.subtitle}>{subtitle}</Text>
+    <View>
+      <View style={{ height: STATUSBAR_HEIGHT, backgroundColor: theme.colors.surface }} />
+      <Appbar.Header 
+        style={[
+          customAppBarStyles.header, 
+          { 
+            elevation: elevation,
+            height: subtitle ? 80 : 64 // Increase height when subtitle is present
+          }
+        ]}
+        theme={{ colors: { primary: theme.colors.surface } }}
+      >
+        {showBackButton && (
+          <Appbar.BackAction 
+            onPress={handleBack} 
+            size={24}
+            color={theme.colors.onSurface}
+          />
         )}
-      </View>
-      {rightContent}
-    </Appbar.Header>
+        <View style={customAppBarStyles.titleContainer}>
+          <Text style={customAppBarStyles.title}>{title}</Text>
+          {subtitle && (
+            <Text style={customAppBarStyles.subtitle}>{subtitle}</Text>
+          )}
+        </View>
+        {rightContent}
+      </Appbar.Header>
+    </View>
   );
 };
