@@ -1,28 +1,24 @@
-import { StyleSheet } from 'react-native';
-import { theme } from './theme';
+import { StyleSheet, Platform, StatusBar } from 'react-native';
 
 export default StyleSheet.create({
-  header: {
-    height: 56, // Material Design standard
-    minHeight: 56,
-    paddingHorizontal: 0, // Use default padding
+  container: {
+    paddingTop: Platform.OS === 'ios' ? 44 : StatusBar.currentHeight || 0,
+    zIndex: 10,
   },
-  backButton: {
-    marginLeft: 0, // Default 16dp margin from Appbar.BackAction
-  },
-  titleContainer: {
-    flex: 1,
+  backButtonContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 52 : (StatusBar.currentHeight || 0) + 8,
+    left: 8,
+    width: 40,
+    height: 40,
     justifyContent: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    zIndex: 10,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: theme.colors.onSurface,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: theme.colors.onSurfaceVariant,
-    marginTop: 2,
-  },
+  rightContentContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 52 : (StatusBar.currentHeight || 0) + 8,
+    right: 8,
+    zIndex: 10,
+  }
 });
