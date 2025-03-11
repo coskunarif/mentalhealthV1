@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: theme.spacing.medium,
-    paddingTop: theme.spacing.small, // Less padding at top for better content positioning
+    paddingTop: theme.spacing.small, // Reduce top padding since the app bar is now more compact
   },
   contentView: {
     flex: 1,

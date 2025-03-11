@@ -1,37 +1,28 @@
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { theme } from './theme';
 
-const customAppBarStyles = StyleSheet.create({
+export default StyleSheet.create({
   header: {
-    backgroundColor: theme.colors.surface,
-    height: Platform.OS === 'ios' ? 56 : 60, // More compact height
-    paddingHorizontal: 4, // Reduced horizontal padding
-    justifyContent: 'center', // Ensure vertical centering
+    height: 56, // Material Design standard
+    minHeight: 56,
+    paddingHorizontal: 0, // Use default padding
   },
   backButton: {
-    marginLeft: 4, // Adjust to be closer
-    marginRight: 4, // Reduce space between arrow and title
+    marginLeft: 0, // Default 16dp margin from Appbar.BackAction
   },
   titleContainer: {
     flex: 1,
     justifyContent: 'center',
-    marginLeft: 8, // Reduced from previous value
-    height: '100%', // Ensure full height for centering
+    alignItems: 'flex-start',
   },
   title: {
-    ...theme.fonts.titleMedium,
-    fontSize: 18, // Slightly smaller for better proportion
-    color: theme.colors.onSurface,
+    fontSize: 18,
     fontWeight: '500',
-    letterSpacing: 0.15,
+    color: theme.colors.onSurface,
   },
   subtitle: {
-    ...theme.fonts.bodyMedium,
-    fontSize: 14, // Proper subtitle size
+    fontSize: 14,
     color: theme.colors.onSurfaceVariant,
-    marginTop: 2, // Closer to the title
-    letterSpacing: 0.25,
-  }
+    marginTop: 2,
+  },
 });
-
-export default customAppBarStyles;

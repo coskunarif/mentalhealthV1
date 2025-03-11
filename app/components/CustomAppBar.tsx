@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, Platform, StatusBar } from 'react-native';
-import { Appbar, Text, useTheme } from 'react-native-paper';
+import { View, Platform, StatusBar } from 'react-native';
+import { Appbar, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import customAppBarStyles from '../config/CustomAppBar.styles';
 import { theme } from '../config/theme';
+import customAppBarStyles from '../config/CustomAppBar.styles';
 
 export const CustomAppBar: React.FC<{ 
   title: string; 
@@ -16,7 +16,7 @@ export const CustomAppBar: React.FC<{
   title, 
   subtitle, 
   showBackButton = true, 
-  elevation = 1, 
+  elevation = 3, // Updated default to 3
   onBackPress,
   rightContent 
 }) => {
@@ -45,15 +45,25 @@ export const CustomAppBar: React.FC<{
         {showBackButton && (
           <Appbar.BackAction 
             onPress={handleBack} 
-            size={22} // Reduced from 24
+            size={24}
             color={theme.colors.onSurface}
             style={customAppBarStyles.backButton}
           />
         )}
         <View style={customAppBarStyles.titleContainer}>
-          <Text style={customAppBarStyles.title}>{title}</Text>
+          <Text 
+            style={customAppBarStyles.title}
+            numberOfLines={1}
+          >
+            {title}
+          </Text>
           {subtitle && (
-            <Text style={customAppBarStyles.subtitle}>{subtitle}</Text>
+            <Text 
+              style={customAppBarStyles.subtitle}
+              numberOfLines={1}
+            >
+              {subtitle}
+            </Text>
           )}
         </View>
         {rightContent}
