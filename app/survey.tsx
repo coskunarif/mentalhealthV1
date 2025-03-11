@@ -55,6 +55,41 @@ const questions = [
             { text: "Yes, a good amount", icon: 'emoticon-excited-outline' },
             { text: "Extensively", icon: 'emoticon-kiss-outline' }
         ]
+    },
+    {
+        text: "Did you take your medications today?",
+        options: [
+            { text: "Yes", icon: 'emoticon-happy-outline' },
+            { text: "No", icon: 'emoticon-sad-outline' }
+        ]
+    },
+    {
+        text: "Did you experience any negative thoughts today?",
+        options: [
+            { text: "Yes", icon: 'emoticon-sad-outline' },
+            { text: "No", icon: 'emoticon-happy-outline' }
+        ]
+    },
+    {
+        text: "Were you able to focus on your tasks today?",
+        options: [
+            { text: "Yes", icon: 'emoticon-happy-outline' },
+            { text: "No", icon: 'emoticon-confused-outline' }
+        ]
+    },
+    {
+        text: "Did you feel overwhelmed at any point today?",
+        options: [
+            { text: "Yes", icon: 'emoticon-dead-outline' },
+            { text: "No", icon: 'emoticon-cool-outline' }
+        ]
+    },
+    {
+        text: "Did you practice any relaxation techniques today?",
+        options: [
+            { text: "Yes", icon: 'emoticon-happy-outline' },
+            { text: "No", icon: 'emoticon-neutral-outline' }
+        ]
     }
 ];
 
@@ -111,10 +146,35 @@ const styles = (theme: any) => StyleSheet.create({
         color: theme.colors.onSurfaceVariant,
         flex: 1,
     },
+    selectedOptionText: {
+        color: theme.colors.onPrimary,
+    },
     bottomContainer: {
         marginTop: 32,
         paddingVertical: 16,
         gap: 16,
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        gap: 12,
+    },
+    navigationButton: {
+        flex: 1,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: theme.withOpacity(theme.colors.primary, 0.9),
+    },
+    backButton: {
+        opacity: 0.85,
+    },
+    nextButton: {
+        opacity: 1,
+    },
+    buttonLabel: {
+        fontSize: 13,
+        letterSpacing: 0.5,
+        fontWeight: '500',
+        color: theme.colors.onPrimary,
     },
     progressBar: {
         height: 8,
@@ -123,11 +183,6 @@ const styles = (theme: any) => StyleSheet.create({
     finishButton: {
         borderRadius: 12,
         height: 44,
-    },
-    nextButton: {
-        borderRadius: 12,
-        height: 40,
-        backgroundColor: theme.withOpacity(theme.colors.primary, 0.9),
     },
     finishButtonLabel: {
         fontSize: 14,
@@ -153,6 +208,12 @@ const SurveyScreen = () => {
         setAnswers(newAnswers);
     };
 
+    const handleBack = () => {
+        if (currentQuestion > 0) {
+            setCurrentQuestion(currentQuestion - 1);
+        }
+    };
+
     const handleNext = () => {
         if (currentQuestion < questions.length - 1) {
             setCurrentQuestion(currentQuestion + 1);
@@ -163,7 +224,8 @@ const SurveyScreen = () => {
     };
 
     const progress = (currentQuestion + 1) / questions.length;
-    const canProceed = answers[currentQuestion] !== undefined;
+    const isFirstQuestion = currentQuestion === 0;
+    const isLastQuestion = currentQuestion === questions.length - 1;
 
     return (
         <ScreenLayout showBackButton>
@@ -202,7 +264,7 @@ const SurveyScreen = () => {
                                     <Text
                                         style={[
                                             themedStyles.optionText,
-                                            isSelected && { color: theme.colors.onPrimary }
+                                            isSelected && themedStyles.selectedOptionText
                                         ]}
                                     >
                                         {option.text}
@@ -220,15 +282,28 @@ const SurveyScreen = () => {
                         style={themedStyles.progressBar}
                     />
                     
-                    <Button
-                        mode="contained"
-                        onPress={handleNext}
-                        disabled={!canProceed}
-                        style={currentQuestion === questions.length - 1 ? themedStyles.finishButton : themedStyles.nextButton}
-                        labelStyle={currentQuestion === questions.length - 1 ? themedStyles.finishButtonLabel : themedStyles.nextButtonLabel}
-                    >
-                        {currentQuestion === questions.length - 1 ? 'Finish Survey' : 'Next Question'}
-                    </Button>
+                    <View style={themedStyles.buttonsContainer}>
+                        {!isFirstQuestion && (
+                            <Button
+                                mode="contained"
+                                onPress={handleBack}
+                                style={[themedStyles.navigationButton, themedStyles.backButton]}
+                                labelStyle={themedStyles.buttonLabel}
+                                textColor={theme.colors.onPrimary}
+                            >
+                                Back
+                            </Button>
+                        )}
+                        <Button
+                            mode="contained"
+                            onPress={handleNext}
+                            style={[themedStyles.navigationButton, themedStyles.nextButton]}
+                            labelStyle={themedStyles.buttonLabel}
+                            textColor={theme.colors.onPrimary}
+                        >
+                            {isLastQuestion ? 'Finish Survey' : 'Next'}
+                        </Button>
+                    </View>
                 </View>
             </View>
         </ScreenLayout>
