@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { theme } from '../config/theme';
 import { layoutStyles, typographyStyles, cardStyles, buttonStyles } from '../config';
 import styles from '../config/ManageSubscriptionScreen.styles';
-import { CustomAppBar } from './CustomAppBar';
+import { ScreenLayout } from './ScreenLayout';
 
 export default function ManageSubscriptionScreen() {
   const router = useRouter();
@@ -54,11 +54,10 @@ export default function ManageSubscriptionScreen() {
   };
 
   return (
-    <View style={layoutStyles.layout_container}>
-      <CustomAppBar 
-        title="Subscription" 
-        subtitle="View and manage your subscription plan and billing details."
-      />
+    <ScreenLayout
+      title="Subscription"
+      subtitle="View and manage your subscription plan and billing details."
+    >
       <ScrollView contentContainerStyle={[layoutStyles.layout_content, { paddingVertical: theme.spacing.small }]}>
         <Surface style={styles.container} elevation={1}>
           <Text style={[typographyStyles.text_heading3, styles.sectionTitle]}>Current Plan</Text>
@@ -148,6 +147,6 @@ export default function ManageSubscriptionScreen() {
       >
         {snackbar.message}
       </Snackbar>
-    </View>
+    </ScreenLayout>
   );
 }

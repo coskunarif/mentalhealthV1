@@ -343,15 +343,15 @@ export default function PlayerScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <CustomAppBar 
-        title={title} 
-        subtitle={subtitle}
+        title={title as string} 
+        subtitle={subtitle as string}
         elevation={0}
       />
-
-      <ScrollView
-        contentContainerStyle={styles.content}
-        bounces={false}
-      >
+    
+    <ScrollView
+      contentContainerStyle={styles.content}
+      bounces={false}
+    >
         <Animated.View style={styles.gradientContainer}>
           {/* Solid background */}
           <View style={[styles.backgroundBase, { backgroundColor: theme.colors.background }]} />

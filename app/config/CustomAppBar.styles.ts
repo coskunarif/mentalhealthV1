@@ -1,11 +1,9 @@
 import { StyleSheet } from 'react-native';
 import { theme } from './theme';
-import typographyStyles from './typography.styles';
 
 const customAppBarStyles = StyleSheet.create({
   header: {
     backgroundColor: theme.colors.surface,
-    height: 64, // Standard Material Design app bar height
     paddingHorizontal: theme.spacing.small,
   },
   titleContainer: {
@@ -22,7 +20,7 @@ const customAppBarStyles = StyleSheet.create({
   subtitle: {
     ...theme.fonts.bodyMedium,
     color: theme.colors.onSurfaceVariant,
-    marginTop: -4,
+    marginTop: 2, // Changed from -4 to 2 for better spacing
   }
 });
 
