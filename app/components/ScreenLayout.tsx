@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { View, ScrollView, StyleSheet, SafeAreaView, Platform } from 'react-native';
 import { CustomAppBar } from './CustomAppBar';
-import { layoutStyles } from '../config';
 import { theme } from '../config/theme';
 
 interface ScreenLayoutProps {
@@ -26,7 +25,7 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
   contentContainerStyle
 }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <CustomAppBar
         title={title}
         subtitle={subtitle}
@@ -50,7 +49,7 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
           {children}
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -64,9 +63,11 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: theme.spacing.medium,
+    paddingTop: theme.spacing.small, // Less padding at top for better content positioning
   },
   contentView: {
     flex: 1,
     padding: theme.spacing.medium,
+    paddingTop: theme.spacing.small,
   }
 });

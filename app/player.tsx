@@ -8,7 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { RootStackParamList } from './types/navigation';
 import type { AppTheme } from './types/theme';
 import type { ViewStyle, TextStyle } from 'react-native';
-import { CustomAppBar } from './components/CustomAppBar';
+import { ScreenLayout } from './components/ScreenLayout';
 
 interface PlayerProps {
   audioUrl: string;
@@ -341,18 +341,13 @@ export default function PlayerScreen() {
   const progress = duration ? position / duration : 0;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <CustomAppBar 
-        title={title as string} 
-        subtitle={subtitle as string}
-        elevation={0}
-      />
-    
-    <ScrollView
-      contentContainerStyle={styles.content}
-      bounces={false}
+    <ScreenLayout
+      title={title as string}
+      subtitle={subtitle as string}
+      scrollable={false} // If needed for your layout
     >
-        <Animated.View style={styles.gradientContainer}>
+      <View style={styles.content}>
+      <Animated.View style={styles.gradientContainer}>
           {/* Solid background */}
           <View style={[styles.backgroundBase, { backgroundColor: theme.colors.background }]} />
           
@@ -442,7 +437,7 @@ export default function PlayerScreen() {
             }
           />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </ScreenLayout>
   );
 }
