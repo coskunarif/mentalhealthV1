@@ -16,7 +16,7 @@ export const CustomAppBar: React.FC<{
   title, 
   subtitle, 
   showBackButton = true, 
-  elevation = 2, 
+  elevation = 1, 
   onBackPress,
   rightContent 
 }) => {
@@ -38,18 +38,16 @@ export const CustomAppBar: React.FC<{
       <Appbar.Header 
         style={[
           customAppBarStyles.header, 
-          { 
-            elevation: elevation,
-            height: subtitle ? 80 : 64 // Increase height when subtitle is present
-          }
+          { elevation: elevation }
         ]}
         theme={{ colors: { primary: theme.colors.surface } }}
       >
         {showBackButton && (
           <Appbar.BackAction 
             onPress={handleBack} 
-            size={24}
+            size={22} // Reduced from 24
             color={theme.colors.onSurface}
+            style={customAppBarStyles.backButton}
           />
         )}
         <View style={customAppBarStyles.titleContainer}>
