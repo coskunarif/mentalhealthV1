@@ -14,7 +14,7 @@ export default function BottomNavBar() {
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
         tabBarStyle: {
-          height: 64, // Material Design standard
+          height: 56, // Material Design standard
           elevation: 8, // Proper elevation
           shadowColor: theme.colors.shadow,
           shadowOffset: { width: 0, height: -2 },

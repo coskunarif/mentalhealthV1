@@ -45,7 +45,7 @@ text_button: {
   fontSize: 14,
   fontWeight: '500',
   letterSpacing: 0.1,
-  textTransform: 'none', // Ensures sentence case
+  textTransform: 'uppercase', // Material Design button standard
   lineHeight: 20,
 } as TextStyle,
   header_shadow: {

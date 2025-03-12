@@ -22,9 +22,9 @@ export default function EnhancedButton({
 }: EnhancedButtonProps) {
   const baseStyle: ButtonStyle =
     mode === 'contained'
-      ? buttonStyles.button_contained
+      ? { ...buttonStyles.button_contained, height: theme.componentSizes.buttonHeight || 40 }
       : mode === 'outlined'
-      ? buttonStyles.button_outlined
+      ? { ...buttonStyles.button_outlined, height: theme.componentSizes.buttonHeight || 40 }
       : undefined;
 
   const shapeStyle: ButtonStyle =

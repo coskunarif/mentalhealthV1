@@ -1,6 +1,6 @@
 import React from 'react';
-import { TextInput, HelperText, useTheme } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
+import { TextInput, HelperText, useTheme } from 'react-native-paper';
 import type { AppTheme } from '../types/theme';
 
 interface MaterialInputProps {
@@ -27,11 +27,11 @@ const MaterialInput = ({
   style
 }: MaterialInputProps) => {
   const theme = useTheme<AppTheme>();
-  const [focused, setFocused] = React.useState(false);
-  
+
   return (
     <View style={[styles.container, style]}>
       <TextInput
+        mode="outlined"
         label={label}
         value={value}
         onChangeText={onChangeText}
@@ -39,31 +39,21 @@ const MaterialInput = ({
         keyboardType={keyboardType as any}
         autoCapitalize={autoCapitalize}
         placeholder={placeholder}
-        placeholderTextColor={theme.colors.onSurfaceVariant}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        mode="flat"
         style={[
           styles.input,
           {
-            backgroundColor: theme.colors.surfaceVariant,
-            borderRadius: theme.componentSizes.buttonBorderRadius / 2,
-          },
-          focused && {
-            elevation: 2,
-            backgroundColor: theme.withOpacity(theme.colors.primaryContainer, 0.2),
+            backgroundColor: theme.colors.surface,
+            borderRadius: 4,
           }
         ]}
+        outlineColor={theme.colors.outline}
+        activeOutlineColor={theme.colors.primary}
         theme={{
           colors: {
-            primary: theme.colors.primary,
-            background: focused ? 
-              theme.withOpacity(theme.colors.primaryContainer, 0.2) : 
-              theme.colors.surfaceVariant,
+            background: theme.colors.surface,
+            onSurfaceVariant: theme.colors.onSurfaceVariant,
           }
         }}
-        underlineColor="transparent"
-        activeUnderlineColor={theme.colors.primary}
       />
       {error ? (
         <HelperText type="error" visible={!!error}>
