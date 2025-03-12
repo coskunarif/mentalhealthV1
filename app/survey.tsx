@@ -110,9 +110,10 @@ const styles = (theme: any) => StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         gap: 12,
+        marginHorizontal: '5%',
     },
     optionButton: {
-        marginVertical: 2,
+        marginVertical: '-0.5%',
         borderRadius: 12,
         height: 56,
         backgroundColor: theme.colors.surfaceVariant,
