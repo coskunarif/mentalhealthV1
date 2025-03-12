@@ -103,9 +103,10 @@ export default function EditPersonalInfoScreen() {
       >
         <StatusBar style="auto" />
         <CustomAppBar 
-          title="Personal Information" 
-          onBackPress={handleBack}
-        />
+  title="Personal Info"
+  onBackPress={handleBack}
+  elevation={1}
+/>
         <ScrollView
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}

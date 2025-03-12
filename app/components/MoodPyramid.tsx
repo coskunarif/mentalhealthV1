@@ -115,6 +115,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       <CustomAppBar 
         title="Focus Emotions" 
         onBackPress={handleBack}
+        elevation={0}
       />
       <ScrollView 
         style={{ flex: 1 }} 

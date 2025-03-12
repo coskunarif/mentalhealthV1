@@ -233,9 +233,8 @@ const SurveyScreen = () => {
 
     return (
 <ScreenLayout 
-  showBackButton 
-  showTitle={false} // Don't show title in app bar
-  contentTopPadding={24} // More top padding
+  showBackButton
+  contentTopPadding={24}
 >
             <View style={themedStyles.container}>
                 <Text variant="headlineMedium" style={themedStyles.questionText}>

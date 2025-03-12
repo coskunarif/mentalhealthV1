@@ -127,9 +127,9 @@ function MoodSelector({
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
         <CustomAppBar 
-          title="Mood Tracking" // Shortened title
+          title="Mood Tracker"
           onBackPress={handleBack}
-          elevation={0} // Flatter design
+          elevation={0}
         />
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 80 }}>
         <Text

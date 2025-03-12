@@ -342,11 +342,10 @@ export default function PlayerScreen() {
 
   return (
 <ScreenLayout
-  title={title as string}
-  showTitle={true}
-  subtitle={undefined} // Don't use subtitle in app bar
-  scrollable={false}
->
+      title={title && (title as string).length > 20 ? `${(title as string).substring(0, 20)}...` : title as string}
+      showBackButton={true}
+      scrollable={false}
+    >
       <View style={styles.content}>
       <Animated.View style={styles.gradientContainer}>
           {/* Solid background */}
