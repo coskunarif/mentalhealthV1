@@ -232,7 +232,11 @@ const SurveyScreen = () => {
     const isLastQuestion = currentQuestion === questions.length - 1;
 
     return (
-        <ScreenLayout showBackButton>
+<ScreenLayout 
+  showBackButton 
+  showTitle={false} // Don't show title in app bar
+  contentTopPadding={24} // More top padding
+>
             <View style={themedStyles.container}>
                 <Text variant="headlineMedium" style={themedStyles.questionText}>
                     {questions[currentQuestion].text}
@@ -310,7 +314,7 @@ const SurveyScreen = () => {
                     </View>
                 </View>
             </View>
-        </ScreenLayout>
+</ScreenLayout>
     );
 };
 
