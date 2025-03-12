@@ -13,8 +13,7 @@ export default function NotificationPreferencesScreen() {
 
   return (
     <ScreenLayout
-      title="Notification Preferences"
-      subtitle="Manage your alerts and reminders for a personalized experience."
+      title="Notifications"
     >
       <NotificationPreferences onToggle={handleToggle} />
     </ScreenLayout>
