@@ -341,11 +341,12 @@ export default function PlayerScreen() {
   const progress = duration ? position / duration : 0;
 
   return (
-    <ScreenLayout
-      title={title as string}
-      subtitle={subtitle as string}
-      scrollable={false} // If needed for your layout
-    >
+<ScreenLayout
+  title={title as string}
+  showTitle={true}
+  subtitle={undefined} // Don't use subtitle in app bar
+  scrollable={false}
+>
       <View style={styles.content}>
       <Animated.View style={styles.gradientContainer}>
           {/* Solid background */}
@@ -436,8 +437,21 @@ export default function PlayerScreen() {
                 : 'Starts playing the meditation'
             }
           />
-        </View>
-      </View>
-    </ScreenLayout>
+          </View>
+    {/* If needed, you can add a smaller subtitle here */}
+    {subtitle && (
+      <Text style={{
+        fontSize: 16,
+        color: theme.colors.onSurfaceVariant,
+        marginBottom: 16,
+        textAlign: 'center'
+      }}>
+        {subtitle as string}
+      </Text>
+    )}
+    
+    {/* Rest of the content... */}
+  </View>
+</ScreenLayout>
   );
 }
