@@ -3,7 +3,7 @@ import { theme } from './theme';
 import type { ViewStyle, TextStyle, View } from 'react-native';
 
 const miscStyles = StyleSheet.create({
-  list_item: {
+    list_item: {
     paddingVertical: theme.spacing.small,
     borderRadius: theme.shape.borderRadius,
   } as ViewStyle,

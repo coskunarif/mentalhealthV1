@@ -39,7 +39,7 @@ const handleSignIn = async () => {
     <View style={layoutStyles.layout_container}>
       <View style={layoutStyles.common_screen_auth_container}>
         <View style={[
-          layoutStyles.signIn_screen_auth_form,
+          layoutStyles.common_screen_auth_form,
           {
             elevation: 1,
             backgroundColor: theme.colors.surface,
@@ -48,10 +48,13 @@ const handleSignIn = async () => {
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.1,
             shadowRadius: 3,
+            padding: theme.spacing.large,
+            width: '100%',
+            maxWidth: 400,
           }
         ]}>
           <AuthIllustration type="login" />
-          <View style={layoutStyles.signIn_screen_auth_header}>
+          <View style={layoutStyles.common_screen_auth_header}>
             <Text style={typographyStyles.text_heading2}>Welcome Back</Text>
             <Text style={[typographyStyles.text_body, { marginTop: theme.spacing?.tiny || 4 }]}>
               Sign in to continue your journey
