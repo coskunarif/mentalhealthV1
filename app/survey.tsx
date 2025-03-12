@@ -232,10 +232,11 @@ const SurveyScreen = () => {
     const isLastQuestion = currentQuestion === questions.length - 1;
 
     return (
-<ScreenLayout 
-  showBackButton
-  contentTopPadding={24}
->
+        <ScreenLayout 
+            showBackButton
+            contentTopPadding={24}
+            title="Survey"
+        >
             <View style={themedStyles.container}>
                 <Text variant="headlineMedium" style={themedStyles.questionText}>
                     {questions[currentQuestion].text}
@@ -313,7 +314,7 @@ const SurveyScreen = () => {
                     </View>
                 </View>
             </View>
-</ScreenLayout>
+        </ScreenLayout>
     );
 };
 
