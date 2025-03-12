@@ -53,8 +53,8 @@ export default function BottomNavBar() {
         options={{
           title: "Profile",
           tabBarIcon: ({ color, focused }) => (
-            <MaterialIcons 
-              name={focused ? "person" : "person-off"}
+            <MaterialIcons
+              name={focused ? "person" : "person-outline"}
               size={24}
               color={color}
             />

@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Surface, useTheme, Divider } from 'react-native-paper';
+import { Text, Surface, Divider } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
-import type { AppTheme } from '../types/theme';
 import { typographyStyles } from '../config';
+import { CARD_ELEVATION } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 interface TodaysFocusProps {
   goal: string;
@@ -12,13 +13,13 @@ interface TodaysFocusProps {
 }
 
 export default function TodaysFocus({ goal, affirmation, sectionStyle }: TodaysFocusProps) {
-  const theme = useTheme<AppTheme>();
-  
+  const theme = useAppTheme();
+
   const styles = React.useMemo(() => StyleSheet.create({
     container: {
       borderRadius: theme.componentSizes.cardBorderRadius,
       backgroundColor: theme.colors.surface,
-      elevation: 1,
+      elevation: CARD_ELEVATION.DEFAULT,
       padding: 16,
     },
     title: {
@@ -56,11 +57,11 @@ export default function TodaysFocus({ goal, affirmation, sectionStyle }: TodaysF
   }), [theme]);
 
   return (
-    <Surface style={[styles.container, sectionStyle]} elevation={1}>
+    <Surface style={[styles.container, sectionStyle]} elevation={CARD_ELEVATION.DEFAULT}>
       <Text style={[typographyStyles.text_heading2, styles.title]}>
         Today's Focus
       </Text>
-      
+
       <View style={styles.sectionContainer}>
         <View style={styles.iconContainer}>
           <MaterialIcons name="track-changes" size={24} color={theme.colors.primary} />
@@ -70,9 +71,9 @@ export default function TodaysFocus({ goal, affirmation, sectionStyle }: TodaysF
           <Text style={styles.text}>{goal}</Text>
         </View>
       </View>
-      
+
       <Divider style={styles.divider} />
-      
+
       <View style={styles.sectionContainer}>
         <View style={styles.iconContainer}>
           <MaterialIcons name="auto-awesome" size={24} color={theme.colors.primary} />

@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, List, Button, Surface, Divider, Snackbar, Dialog, Portal } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { theme } from '../config/theme';
+import { CARD_ELEVATION } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 import { layoutStyles, typographyStyles, cardStyles, buttonStyles } from '../config';
 import styles from '../config/ManageSubscriptionScreen.styles';
 import { ScreenLayout } from './ScreenLayout';
 
 export default function ManageSubscriptionScreen() {
+  const theme = useAppTheme();
   const router = useRouter();
   const [currentPlan, setCurrentPlan] = useState('Premium Plan');
   const [currentPrice, setCurrentPrice] = useState('$9.99/month');
@@ -59,7 +61,7 @@ export default function ManageSubscriptionScreen() {
       subtitle="View and manage your subscription plan and billing details."
     >
       <ScrollView contentContainerStyle={[layoutStyles.layout_content, { paddingVertical: theme.spacing.small }]}>
-        <Surface style={styles.container} elevation={1}>
+        <Surface style={styles.container} elevation={CARD_ELEVATION.DEFAULT}>
           <Text style={[typographyStyles.text_heading3, styles.sectionTitle]}>Current Plan</Text>
           <List.Item
             title={currentPlan}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Surface, List, Switch, Divider } from 'react-native-paper';
-import { theme } from '../config/theme';
+import { CARD_ELEVATION } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 import styles from '../config/NotificationPreferences.styles';
 
 interface NotificationSetting {
@@ -39,6 +40,7 @@ interface NotificationPreferencesProps {
 export const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
   onToggle,
 }) => {
+  const theme = useAppTheme();
   const [settings, setSettings] = useState<Record<string, boolean>>({
     reminders: true,
     progress: true,
@@ -63,7 +65,7 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
   };
 
   return (
-    <Surface style={styles.container} elevation={1}>
+    <Surface style={styles.container} elevation={CARD_ELEVATION.DEFAULT}>
       <List.Section>
         {defaultSettings.map((setting) => (
           <React.Fragment key={setting.id}>

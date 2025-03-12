@@ -1,4 +1,4 @@
-import { configureFonts } from 'react-native-paper';
+import { MD3LightTheme, configureFonts } from 'react-native-paper';
 import type { AppTheme } from '../types/theme';
 import { MD3Typescale, MD3Type } from 'react-native-paper/lib/typescript/types';
 
@@ -10,28 +10,30 @@ const withOpacity = (color: string, opacity: number) => {
 };
 
 const fontConfig: Partial<Record<keyof MD3Typescale, MD3Type>> = {
-  titleMedium: { fontFamily: 'Nunito', fontWeight: "600", fontSize: 20, lineHeight: 28, letterSpacing: 0 },
-  bodyMedium: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 16, lineHeight: 24, letterSpacing: 0 },
-  displayLarge: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 57, lineHeight: 64, letterSpacing: 0 },
-  displayMedium: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 45, lineHeight: 52, letterSpacing: 0 },
-  displaySmall: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 36, lineHeight: 44, letterSpacing: 0 },
-  headlineLarge: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 32, lineHeight: 40, letterSpacing: 0 },
-  headlineMedium: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 28, lineHeight: 36, letterSpacing: 0 },
-  headlineSmall: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 24, lineHeight: 32, letterSpacing: 0 },
-  titleLarge: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 22, lineHeight: 28, letterSpacing: 0 },
-  titleSmall: { fontFamily: 'Nunito', fontWeight: "500", fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
-  bodyLarge: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 16, lineHeight: 24, letterSpacing: 0.5 },
-  bodySmall: { fontFamily: 'Nunito', fontWeight: "400", fontSize: 12, lineHeight: 16, letterSpacing: 0.4 },
-  labelLarge: { fontFamily: 'Nunito', fontWeight: "500", fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
-  labelMedium: { fontFamily: 'Nunito', fontWeight: "500", fontSize: 12, lineHeight: 16, letterSpacing: 0.5 },
-  labelSmall: { fontFamily: 'Nunito', fontWeight: "500", fontSize: 11, lineHeight: 16, letterSpacing: 0.5 },
+  titleMedium: { fontFamily: 'Nunito', fontWeight: '600', fontSize: 20, lineHeight: 28, letterSpacing: 0 },
+  bodyMedium: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 16, lineHeight: 24, letterSpacing: 0 },
+  displayLarge: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 57, lineHeight: 64, letterSpacing: 0 },
+  displayMedium: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 45, lineHeight: 52, letterSpacing: 0 },
+  displaySmall: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 36, lineHeight: 44, letterSpacing: 0 },
+  headlineLarge: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 32, lineHeight: 40, letterSpacing: 0 },
+  headlineMedium: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 28, lineHeight: 36, letterSpacing: 0 },
+  headlineSmall: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 24, lineHeight: 32, letterSpacing: 0 },
+  titleLarge: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 22, lineHeight: 28, letterSpacing: 0 },
+  titleSmall: { fontFamily: 'Nunito', fontWeight: '500', fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
+  bodyLarge: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 16, lineHeight: 24, letterSpacing: 0.5 },
+  bodySmall: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 12, lineHeight: 16, letterSpacing: 0.4 },
+  labelLarge: { fontFamily: 'Nunito', fontWeight: '500', fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
+  labelMedium: { fontFamily: 'Nunito', fontWeight: '500', fontSize: 12, lineHeight: 16, letterSpacing: 0.5 },
+  labelSmall: { fontFamily: 'Nunito', fontWeight: '500', fontSize: 11, lineHeight: 16, letterSpacing: 0.5 },
 };
 
 export const theme: AppTheme = {
+  ...MD3LightTheme,
   version: 3 as const,
   isV3: true,
   fonts: configureFonts({ config: { ...fontConfig } }) as any,
   colors: {
+    ...MD3LightTheme.colors,
     primary: '#5DA47A',
     background: '#F2F7F4',
     secondary: '#5DA47A',
@@ -72,6 +74,12 @@ export const theme: AppTheme = {
       level4: 8, // Navigation drawers
       level5: 12, // Dialogs
     },
+    status: {
+      success: '#4CAF50',
+      warning: '#FFC107',
+      error: '#F44336',
+      info: '#2196F3'
+    }
   },
   spacing: {
     tiny: 4,
@@ -123,4 +131,10 @@ export const theme: AppTheme = {
   scaleFont: (size: number) => size,
   scaleSize: (size: number) => size,
   withOpacity,
+};
+
+export const CARD_ELEVATION = {
+  DEFAULT: theme.colors.elevation.level1,
+  RAISED: theme.colors.elevation.level2,
+  FLOATING: theme.colors.elevation.level3
 };
