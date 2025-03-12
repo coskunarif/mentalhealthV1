@@ -52,6 +52,12 @@ interface MD3Colors {
     level4: any;
     level5: any;
   };
+    status: {
+      success: string;
+      warning: string;
+      error: string;
+      info: string;
+    };
 }
 
 export interface AppTheme extends MD3Theme {

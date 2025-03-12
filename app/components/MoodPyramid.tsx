@@ -10,7 +10,7 @@ import { Text, IconButton } from 'react-native-paper';
 import { router } from 'expo-router';
 import localStyles from '../config/MoodPyramid.styles';
 import { typographyStyles } from '../config';
-import { theme } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 import EnhancedButton from './EnhancedButton';
 import { CustomAppBar } from './CustomAppBar';
 
@@ -29,7 +29,7 @@ type BubbleConfig = {
   size: number;
   fontSize: number;
   style: {
-    left?: number | string;
+    left?: number;
     right?: number;
     top: number;
     zIndex: number;
@@ -41,46 +41,45 @@ type Props = {
   onFinish: () => void;
 };
 
-    const screenHeight = Dimensions.get('window').height;
+const screenHeight = Dimensions.get('window').height;
 
-    const getBubbleConfig = (screenWidth: number): BubbleConfig[] => {
-      const baseSize = Math.min(screenWidth * 0.4, 160); // Ekran genişliğine göre maksimum boyut
-      
-      return [
-        {
-          // Love (pembe) - En büyük bubble, sol üstte
-          size: baseSize * 1.05,
-          fontSize: theme.scaleFont(18),
-          style: { 
-            left: screenWidth * 0.06, 
-            top: 20,
-            zIndex: 3 
-          },
-        },
-        {
-          // Joy (sarı) - Orta boy bubble, sağ üstte
-          size: baseSize * 0.95,
-          fontSize: theme.scaleFont(16),
-          style: { 
-            right: screenWidth * 0.09, 
-            top: 20,
-            zIndex: 2 
-          },
-        },
-        {
-          // Peace (mavi) - En küçük bubble, alt ortada
-          size: baseSize * 0.85,
-          fontSize: theme.scaleFont(14),
-          style: { 
-            left: screenWidth * 0.32, // İki bubble'ın ortasına konumlandır
-            top: baseSize * 1, // Üst bubble'ların biraz altında
-            zIndex: 1 
-          },
-        },
-      ];
-    };
+const getBubbleConfig = (screenWidth: number): BubbleConfig[] => {
+  const theme = useAppTheme();
+  const baseSize = Math.min(screenWidth * 0.4, 160); // Responsive base size
+  const fontSize = theme.scaleFont(Math.min(screenWidth * 0.042, 18)); // Responsive font size
+  return [
+    {
+      size: baseSize * 1.05,
+      fontSize: fontSize,
+      style: {
+        left: screenWidth * 0.06,
+        top: 20,
+        zIndex: 3,
+      },
+    },
+    {
+      size: baseSize * 0.95,
+      fontSize: theme.scaleFont(fontSize * 0.9),
+      style: {
+        right: screenWidth * 0.09,
+        top: 20,
+        zIndex: 2,
+      },
+    },
+    {
+      size: baseSize * 0.85,
+      fontSize: theme.scaleFont(fontSize * 0.8),
+      style: {
+        left: screenWidth * 0.32,
+        top: baseSize * 1,
+        zIndex: 1,
+      },
+    },
+  ];
+};
 
 export function MoodPyramid({ onPrevious, onFinish }: Props) {
+  const theme = useAppTheme();
   const [selectedEmotions, setSelectedEmotions] = useState<EmotionSelection[]>([]);
   const emotions: Emotion[] = [
     { label: 'Peace', color: theme.moodColors.peace, width: '40%' },
@@ -112,14 +111,14 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <CustomAppBar 
-        title="Focus Emotions" 
+      <CustomAppBar
+        title="Focus Emotions"
         onBackPress={handleBack}
         elevation={0}
       />
-      <ScrollView 
-        style={{ flex: 1 }} 
-        contentContainerStyle={{ 
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
           flexGrow: 1,
           paddingBottom: 120,
           paddingHorizontal: 16
@@ -180,8 +179,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
         <Text
           style={[
             typographyStyles.text_heading3,
-            { 
-              color: theme.colors.primary, 
+            {
+              color: theme.colors.primary,
               marginTop: theme.spacing.medium,
               marginBottom: 16
             },
@@ -191,7 +190,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
         </Text>
         <View style={[
           localStyles.pyramid_bubbleContainer,
-          { 
+          {
             position: 'relative',
             minHeight: 400,
             marginBottom: 24
@@ -224,10 +223,7 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
                   shadowOpacity: 0.22,
                   shadowRadius: 2.22,
                 },
-                {
-                  ...config.style,
-                  left: typeof config.style.left === 'string' ? parseInt(config.style.left) : config.style.left
-                }
+                config.style
               ]}
             >
               {selectedEmotions[index] ? (
@@ -273,8 +269,8 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
           borderTopColor: theme.withOpacity(theme.colors.outline, 0.08),
         }
       ]}>
-        <View style={{ 
-          flex: 1, 
+        <View style={{
+          flex: 1,
           marginRight: theme.spacing.small,
         }}>
           <EnhancedButton
@@ -294,9 +290,9 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
             PREVIOUS
           </EnhancedButton>
         </View>
-        <View style={{ 
-          flex: 1, 
-          marginLeft: theme.spacing.small 
+        <View style={{
+          flex: 1,
+          marginLeft: theme.spacing.small
         }}>
           <EnhancedButton
             mode="contained"

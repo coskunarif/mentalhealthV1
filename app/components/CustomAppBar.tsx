@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, TouchableOpacity, Platform, StatusBar, StyleSheet } from 'react-native';
-import { Text, useTheme } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import type { AppTheme } from '../types/theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 export const CustomAppBar: React.FC<{
   title?: string;
@@ -20,9 +20,9 @@ export const CustomAppBar: React.FC<{
   elevation = 0,
   transparent = false,
 }) => {
-  const theme = useTheme<AppTheme>();
+  const theme = useAppTheme();
   const router = useRouter();
-  
+
   const handleBack = () => {
     if (onBackPress) {
       onBackPress();
@@ -30,18 +30,18 @@ export const CustomAppBar: React.FC<{
       router.back();
     }
   };
-  
+
   // Calculate platform-specific dimensions
   const statusBarHeight = Platform.OS === 'ios' ? 44 : StatusBar.currentHeight || 0;
   const appBarHeight = 56; // Material Design standard
   const totalHeight = statusBarHeight + appBarHeight;
-  
+
   const styles = StyleSheet.create({
     container: {
       height: totalHeight,
       width: '100%',
       backgroundColor: transparent ? 'transparent' : theme.colors.surface,
-      elevation: transparent ? 0 : elevation,
+      elevation: transparent ? 0 : theme.colors.elevation.level1,
       shadowColor: theme.colors.shadow,
       shadowOffset: { width: 0, height: elevation > 0 ? 1 : 0 },
       shadowOpacity: elevation > 0 ? 0.1 : 0,
@@ -80,11 +80,11 @@ export const CustomAppBar: React.FC<{
       alignItems: 'center',
     },
   });
-  
+
   if (!showBackButton && !rightContent && transparent && !title) {
     return <View style={{ height: totalHeight }} />;
   }
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -104,7 +104,7 @@ export const CustomAppBar: React.FC<{
             />
           </TouchableOpacity>
         )}
-        
+
         {title && (
           <View style={styles.titleContainer}>
             <Text numberOfLines={1} style={styles.title}>
@@ -112,7 +112,7 @@ export const CustomAppBar: React.FC<{
             </Text>
           </View>
         )}
-        
+
         {rightContent && (
           <View style={styles.rightContentContainer}>
             {rightContent}
