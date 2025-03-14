@@ -12,16 +12,6 @@ import EnhancedButton from './EnhancedButton';
 import SliderCard from './SliderCard';
 import { CustomAppBar } from './CustomAppBar';
 
-// Add brightness calculation function to determine text color
-const getBrightness = (hexColor: string): number => {
-  // Convert hex to RGB
-  const r = parseInt(hexColor.substr(1, 2), 16);
-  const g = parseInt(hexColor.substr(3, 2), 16);
-  const b = parseInt(hexColor.substr(5, 2), 16);
-  // Calculate brightness (perceived luminance)
-  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-};
-
 // Add responsive button sizing based on screen width
 const windowWidth = Dimensions.get('window').width;
 const isSmallScreen = windowWidth < 360;

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { Text, TextInput, Button, useTheme } from 'react-native-paper';
+import { Text, Button, useTheme } from 'react-native-paper';
 import { Link, router } from 'expo-router';
 import { layoutStyles, typographyStyles, buttonStyles } from '../config';
-import formStyles from '../config/form.styles';
 import type { AppTheme } from '../types/theme';
 import { auth } from '../lib/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';

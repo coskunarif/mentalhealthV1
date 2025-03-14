@@ -3,7 +3,6 @@ import { View, StyleSheet } from 'react-native';
 import { Text, Button, useTheme } from 'react-native-paper';
 import { Link, router } from 'expo-router';
 import { layoutStyles, typographyStyles, buttonStyles } from '../config';
-import formStyles from '../config/form.styles';
 import { auth } from '../lib/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { AuthIllustration, MaterialInput } from '../components';
