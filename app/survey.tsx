@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Button, useTheme, ProgressBar, IconButton } from 'react-native-paper';
+import { Text, Button, useTheme, ProgressBar } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScreenLayout } from './components/ScreenLayout';
 import { router } from 'expo-router';
