@@ -93,23 +93,6 @@ function MoodSelector({
     [onSliderChange]
   );
 
-  const renderMainSliderCard = () => {
-    if (!selectedMood) return null;
-    const sliderState = slidersState[selectedMood.label] || {
-      value: selectedMood.value,
-      color: getSliderColor(selectedMood.value),
-    };
-    
-    return (
-      <SliderCard
-        key={selectedMood.label}
-        mood={{ ...selectedMood, value: sliderState.value }}
-        sliderColor={sliderState.color}
-        onSlidingComplete={(val) => handleSliderComplete(val, selectedMood.label)}
-      />
-    );
-  };
-
   const handleBack = () => {
     router.back();
   };
@@ -235,79 +218,25 @@ function MoodSelector({
         {/* Duration Slider */}
         {selectedMood && (
           <View style={{ marginTop: 20, paddingHorizontal: 16 }}>
-            <Card
-              style={{
-                borderRadius: theme.shape.borderRadius,
-                marginBottom: 16,
-                backgroundColor: theme.colors.background,
-                borderWidth: 0,
-                shadowColor: theme.colors.shadow,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 2,
-              }}
-            >
-              <Card.Content style={{ padding: 16 }}>
-                <View style={[localStyles.mood_headerRow, { marginBottom: 16 }]}>
-                  <MaterialCommunityIcons
-                    name="clock-outline"
-                    size={24}
-                    color={theme.colors.primary}
-                  />
-                  <Text style={[
-                    typographyStyles.text_body,
-                    theme.fonts.bodyMedium,
-                    { marginLeft: 12, color: theme.colors.onSurface }
-                  ]}>
-                    How long have you felt this way?
-                  </Text>
-                </View>
-                
-                <View style={{ paddingHorizontal: 8 }}>
-                  <Slider
-                    value={selectedMood?.duration || 0}
-                    minimumValue={0}
-                    maximumValue={100}
-                    step={33}
-                    thumbTintColor={theme.colors.primary}
-                    minimumTrackTintColor={theme.colors.primary}
-                    maximumTrackTintColor={theme.withOpacity(theme.colors.onSurfaceVariant, 0.2)}
-                    onSlidingComplete={onDurationChange}
-                    style={{ height: 40 }}
-                    accessibilityLabel={`Set duration for ${selectedMood?.label}`}
-                    hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-                  />
-                  
-                  <View style={[localStyles.mood_sliderLabels, { marginTop: 8 }]}>
-                    <Text style={[
-                      typographyStyles.text_caption, 
-                      theme.fonts.labelSmall,
-                      { color: theme.colors.onSurfaceVariant }
-                    ]}>
-                      {'< 3 months'}
-                    </Text>
-                    <Text style={[
-                      typographyStyles.text_caption, 
-                      theme.fonts.labelSmall,
-                      { color: theme.colors.onSurfaceVariant }
-                    ]}>
-                      6 months
-                    </Text>
-                    <Text style={[
-                      typographyStyles.text_caption, 
-                      theme.fonts.labelSmall,
-                      { color: theme.colors.onSurfaceVariant }
-                    ]}>
-                      {'> 1 year'}
-                    </Text>
-                  </View>
-                </View>
-              </Card.Content>
-            </Card>
+            <SliderCard
+              variant="duration"
+              icon="clock-outline"
+              label="How long have you felt this way?"
+              value={selectedMood.duration || 0}
+              onSlidingComplete={onDurationChange}
+              labels={['< 3 months', '6 months', '> 1 year']}
+              steps={33}
+            />
 
-            {/* Main Mood Slider */}
-            {renderMainSliderCard()}
+            {/* Emot Slider */}
+            <SliderCard
+              variant="emotion"
+              icon={selectedMood.icon}
+              label={selectedMood.label}
+              value={selectedMood.value}
+              moodKey={selectedMood.key}
+              onSlidingComplete={(val) => handleSliderComplete(val, selectedMood.label)}
+            />
           </View>
         )}
       </ScrollView>
