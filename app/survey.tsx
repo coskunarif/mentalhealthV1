@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Button, useTheme, ProgressBar } from 'react-native-paper';
+import { Text, useTheme, ProgressBar } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScreenLayout } from './components/ScreenLayout';
 import { router } from 'expo-router';
+import EnhancedButton from './components/EnhancedButton';
 
 const questions = [
     {
@@ -247,39 +248,21 @@ const SurveyScreen = () => {
                     {questions[currentQuestion].options.map((option, index) => {
                         const isSelected = answers[currentQuestion] === option.text;
                         return (
-                            <Button
+                            <EnhancedButton
                                 key={option.text}
-                                mode={isSelected ? "contained" : "outlined"}
+                                variant="option"
+                                selected={isSelected}
                                 onPress={() => handleAnswer(option.text)}
-                                style={[
-                                    themedStyles.optionButton,
-                                    !isSelected && themedStyles.unselectedOption,
-                                    isSelected && { 
-                                        backgroundColor: theme.colors.primary,
-                                        borderColor: 'transparent',
-                                        shadowColor: theme.colors.primary,
-                                        shadowOpacity: 0.2,
-                                        elevation: 4,
-                                    }
-                                ]}
-                                contentStyle={themedStyles.optionContent}
-                            >
-                                <View style={themedStyles.optionInnerContainer}>
+                                iconComponent={
                                     <MaterialCommunityIcons
                                         name={option.icon as keyof typeof MaterialCommunityIcons.glyphMap}
                                         size={24}
                                         color={isSelected ? theme.colors.onPrimary : theme.colors.onSurfaceVariant}
                                     />
-                                    <Text
-                                        style={[
-                                            themedStyles.optionText,
-                                            isSelected && themedStyles.selectedOptionText
-                                        ]}
-                                    >
-                                        {option.text}
-                                    </Text>
-                                </View>
-                            </Button>
+                                }
+                            >
+                                {option.text}
+                            </EnhancedButton>
                         );
                     })}
                 </View>
@@ -293,25 +276,23 @@ const SurveyScreen = () => {
                     
                     <View style={themedStyles.buttonsContainer}>
                         {!isFirstQuestion && (
-                            <Button
+                            <EnhancedButton
                                 mode="contained"
                                 onPress={handleBack}
-                                style={[themedStyles.navigationButton, themedStyles.backButton]}
-                                labelStyle={themedStyles.buttonLabel}
-                                textColor={theme.colors.onPrimary}
+                                fullWidth
+                                icon="arrow-left"
                             >
                                 Back
-                            </Button>
+                            </EnhancedButton>
                         )}
-                        <Button
+                        <EnhancedButton
                             mode="contained"
                             onPress={handleNext}
-                            style={[themedStyles.navigationButton, themedStyles.nextButton]}
-                            labelStyle={themedStyles.buttonLabel}
-                            textColor={theme.colors.onPrimary}
+                            fullWidth
+                            icon={isLastQuestion ? "check" : "arrow-right"}
                         >
                             {isLastQuestion ? 'Finish Survey' : 'Next'}
-                        </Button>
+                        </EnhancedButton>
                     </View>
                 </View>
             </View>

@@ -7,6 +7,7 @@ import { typographyStyles } from '../config';
 import ExerciseProgress from '../components/ExerciseProgress';
 import type { AppTheme } from '../types/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import EnhancedButton from '../components/EnhancedButton';
 
 // Example data - replace with your actual data source
 const breathExercises = [
@@ -131,33 +132,19 @@ export default function ExercisesScreen() {
         </Text>
         <ExerciseProgress exercises={breathExercises} currentStep={nextExercise?.id} />
         {nextExercise && (
-          <Button
+          <EnhancedButton
             mode="contained"
             onPress={handleStartExercise}
             style={{
               marginTop: 16,
               marginBottom: 8,
               marginHorizontal: 16,
-              borderRadius: theme.componentSizes?.buttonBorderRadius || 20,
-              height: theme.componentSizes?.buttonHeight || 40,
-              elevation: theme.colors.elevation?.level2 || 2,
-              shadowColor: theme.colors.shadow,
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.3,
-              shadowRadius: 2,
             }}
-            labelStyle={{
-              ...typographyStyles.text_button,
-              fontSize: 14,
-              lineHeight: 20,
-            }}
-            contentStyle={{
-              maxWidth: '100%',
-              paddingHorizontal: 8,
-            }}
+            variant="exercise"
+            icon="play-circle"
           >
             {`Start ${nextExercise.title.split(' ').slice(-2).join(' ')}`}
-          </Button>
+          </EnhancedButton>
         )}
       </Surface>
 

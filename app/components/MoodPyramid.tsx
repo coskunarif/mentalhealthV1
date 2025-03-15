@@ -278,13 +278,6 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
             onPress={onPrevious}
             accessibilityLabel="Return to previous screen"
             fullWidth
-            labelStyle={{
-              fontWeight: '500',
-              fontSize: theme.scaleFont(14),
-              letterSpacing: 0.1,
-              textTransform: 'uppercase',
-              color: theme.colors.onPrimary,
-            }}
             icon="arrow-left"
           >
             PREVIOUS
@@ -299,13 +292,6 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
             onPress={onFinish}
             accessibilityLabel="Complete emotion selection"
             fullWidth
-            labelStyle={{
-              fontWeight: '500',
-              fontSize: theme.scaleFont(14),
-              letterSpacing: 0.1,
-              textTransform: 'uppercase',
-              color: theme.colors.onPrimary,
-            }}
             icon="check"
           >
             FINISH
