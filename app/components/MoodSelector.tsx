@@ -327,13 +327,6 @@ function MoodSelector({
             onPress={onNext}
             accessibilityLabel="Proceed to focus emotions screen"
             fullWidth
-            labelStyle={{
-              fontWeight: '500',
-              fontSize: theme.scaleFont(14),
-              letterSpacing: 0.1,
-              textTransform: 'uppercase',
-              color: theme.colors.onPrimary,
-            }}
             icon="arrow-right"
           >
             NEXT
@@ -348,13 +341,6 @@ function MoodSelector({
             onPress={onFinish}
             accessibilityLabel="Complete mood selection"
             fullWidth
-            labelStyle={{
-              fontWeight: '500',
-              fontSize: theme.scaleFont(14),
-              letterSpacing: 0.1,
-              textTransform: 'uppercase',
-              color: theme.colors.onPrimary,
-            }}
             icon="check"
           >
             FINISH
