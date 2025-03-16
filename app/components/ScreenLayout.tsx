@@ -1,3 +1,4 @@
+// File: app/components/ScreenLayout.tsx - Complete component with bottomContent
 import React from 'react';
 import { View, ScrollView, StyleSheet, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
@@ -7,7 +8,7 @@ import type { AppTheme } from '../types/theme';
 interface ScreenLayoutProps {
   children: React.ReactNode;
   title?: string;
-  subtitle?: string; // Add this line
+  subtitle?: string;
   showBackButton?: boolean;
   onBackPress?: () => void;
   rightContent?: React.ReactNode;
@@ -16,12 +17,13 @@ interface ScreenLayoutProps {
   contentTopPadding?: number;
   transparent?: boolean;
   elevation?: number;
+  bottomContent?: React.ReactNode; // Added prop
 }
 
 export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
   children,
   title,
-  subtitle, // Add this parameter
+  subtitle,
   showBackButton = true,
   onBackPress,
   rightContent,
@@ -30,6 +32,7 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
   contentTopPadding = 16,
   transparent = false,
   elevation = 0,
+  bottomContent, // Added prop
 }) => {
   const theme = useTheme<AppTheme>();
   
@@ -46,12 +49,22 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
       paddingHorizontal: 16,
       paddingBottom: 24,
     },
-    subtitleText: { // Add styles for the subtitle
+    subtitleText: {
       color: theme.colors.onSurfaceVariant,
       ...theme.fonts.bodyLarge,
       marginTop: 4,
       marginBottom: 16,
       paddingHorizontal: 16,
+    },
+    bottomContentContainer: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: theme.colors.background,
+      borderTopWidth: 1,
+      borderTopColor: theme.withOpacity(theme.colors.outline, 0.08),
+      zIndex: 10,
     },
   });
 
@@ -66,7 +79,6 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
         elevation={elevation}
       />
 
-      {/* Add subtitle rendering after CustomAppBar if subtitle exists */}
       {subtitle && (
         <Text style={styles.subtitleText}>
           {subtitle}
@@ -79,8 +91,8 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
           contentContainerStyle={[
             {
               paddingHorizontal: 16,
-              paddingTop: subtitle ? contentTopPadding / 2 : contentTopPadding, // Adjust padding when subtitle exists
-              paddingBottom: 32,
+              paddingTop: subtitle ? contentTopPadding / 2 : contentTopPadding,
+              paddingBottom: bottomContent ? 80 : 32, // Added padding for bottom content
             },
             contentContainerStyle
           ]}
@@ -91,10 +103,16 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
       ) : (
         <View style={[
           styles.contentView,
-          { paddingTop: subtitle ? contentTopPadding / 2 : contentTopPadding }, // Adjust padding when subtitle exists
+          { paddingTop: subtitle ? contentTopPadding / 2 : contentTopPadding },
           contentContainerStyle
         ]}>
           {children}
+        </View>
+      )}
+
+      {bottomContent && (
+        <View style={styles.bottomContentContainer}>
+          {bottomContent}
         </View>
       )}
     </View>
