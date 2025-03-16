@@ -14,7 +14,7 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import type { AppTheme } from '../types/theme';
 import { theme } from '../config/theme';
-import { CustomAppBar } from './CustomAppBar';
+import { ScreenLayout } from './ScreenLayout'; // Import ScreenLayout
 import { useAuth } from '../context/auth';
 import { layoutStyles, typographyStyles, buttonStyles } from '../config';
 
@@ -102,21 +102,14 @@ export default function EditPersonalInfoScreen() {
         ]}
       >
         <StatusBar style="auto" />
-        <CustomAppBar 
-  title="Personal Info"
-  onBackPress={handleBack}
-  elevation={1}
-/>
-        <ScrollView
-          contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator={false}
+        <ScreenLayout
+          title="Personal Info"
+          onBackPress={handleBack}
+          elevation={1}
+          subtitle="Keep your profile up to date by maintaining accurate personal information."
         >
-          <Text style={styles.subtitle}>
-            Keep your profile up to date by maintaining accurate personal
-            information.
-          </Text>
           <EditPersonalInfoForm onSave={handleSave} info={userInfo} />
-        </ScrollView>
+        </ScreenLayout>
       </Animated.View>
       <Snackbar
         visible={snackbar.visible}
