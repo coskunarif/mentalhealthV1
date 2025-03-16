@@ -1,9 +1,7 @@
 import React, { ReactNode } from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { IconButton } from 'react-native-paper';
-import { router } from 'expo-router';
-import { layoutStyles, typographyStyles } from '../config';
+import { View, Text } from 'react-native';
 import { theme } from '../config/theme';
+import { ScreenLayout } from './ScreenLayout';
 
 interface LegalLayoutProps {
   title: string;
@@ -17,36 +15,19 @@ export default function LegalLayout({
   lastUpdated,
 }: LegalLayoutProps) {
   return (
-    <View style={layoutStyles.layout_container}>
-      <View style={{ marginBottom: 24 }}>
-        <IconButton icon="arrow-left" size={24} onPress={() => router.back()} />
+    <ScreenLayout title={title}>
+      {children}
+      {lastUpdated && (
         <Text
           style={{
-            ...theme.fonts.titleLarge,
-            color: theme.colors.onSurface,
-            marginBottom: theme.spacing.small,
+            ...theme.fonts.labelMedium,
+            color: theme.colors.onSurfaceVariant,
+            marginTop: theme.spacing.large,
           }}
         >
-          {title}
+          Last updated: {lastUpdated}
         </Text>
-      </View>
-      <ScrollView
-        style={layoutStyles.layout_scrollView}
-        contentContainerStyle={layoutStyles.layout_content}
-      >
-        {children}
-        {lastUpdated && (
-          <Text
-            style={{
-              ...theme.fonts.labelMedium,
-              color: theme.colors.onSurfaceVariant,
-              marginTop: theme.spacing.large,
-            }}
-          >
-            Last updated: {lastUpdated}
-          </Text>
-        )}
-      </ScrollView>
-    </View>
+      )}
+    </ScreenLayout>
   );
 }

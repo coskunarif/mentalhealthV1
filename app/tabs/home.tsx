@@ -1,14 +1,15 @@
 import React from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
 import { miscStyles, typographyStyles } from '../config';
 import RadarChart from '../components/RadarChart';
 import RecentActivities from '../components/RecentActivities';
-import ExerciseProgress from '../components/ExerciseProgress';
 import QuickActions from '../components/QuickActions';
+import TodaysFocus from '../components/TodaysFocus';
 import type { AppTheme } from '../types/theme';
 
+// Rest of your imports and data...
 const radarData = [
   { label: 'Balance past memories', value: 0.8 },
   { label: 'Change your opinion', value: 0.6 },
@@ -24,6 +25,7 @@ const recentActivities = [
     title: 'Breath up',
     subtitle: 'Breath exercise 12',
     duration: 18.5,
+    timestamp: new Date(), // Today
   },
   {
     id: '5',
@@ -31,6 +33,7 @@ const recentActivities = [
     title: 'Support your dreams',
     subtitle: 'Dreams exercise 5',
     duration: 14.5,
+    timestamp: new Date(new Date().setDate(new Date().getDate() - 1)), // Yesterday
   },
   {
     id: '8',
@@ -38,64 +41,81 @@ const recentActivities = [
     title: 'Gain awareness',
     subtitle: 'Awareness exercise 8',
     duration: 23.5,
+    timestamp: new Date(new Date().setDate(new Date().getDate() - 4)), // 4 days ago
   },
 ];
 
-const breathExercises = [
-  { id: 'Step 1', title: 'Breath Exercise Step 1', duration: '15 min', isCompleted: true },
-  { id: 'Step 2', title: 'Breath Exercise Step 2', duration: '20 min', isCompleted: true },
-  { id: 'Step 3', title: 'Breath Exercise Step 3', duration: '15 min', isCompleted: false },
-  { id: 'Step 4', title: 'Breath Exercise Step 4', duration: '20 min', isCompleted: false },
-  { id: 'Step 5', title: 'Breath Exercise Step 5', duration: '25 min', isCompleted: false },
-];
+const todaysFocus = {
+  goal: "Complete your daily breathing exercise (15 min).",
+  affirmation: "You're capable of handling whatever comes today."
+};
 
 export default function Home() {
-  const nextExercise = breathExercises.find((exercise) => !exercise.isCompleted);
   const theme = useTheme<AppTheme>();
 
-  const handleStartExercise = () => {
-    if (nextExercise) {
-      router.push(`/player?meditationId=${nextExercise.id}`);
-    }
-  };
+  // Create styles inside the component with useMemo for performance
+  const styles = React.useMemo(() => StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme?.colors?.background || '#F2F7F4',
+    },
+    contentContainer: {
+      padding: 16,
+      paddingBottom: 32,
+    },
+    section: {
+      borderRadius: 12, // Hardcode fallback values instead of theme?.componentSizes?.cardBorderRadius
+      marginBottom: 16,
+      padding: 16,
+      backgroundColor: theme?.colors?.surface || '#FFFFFF',
+      shadowColor: theme?.colors?.shadow || '#000000',
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.2,
+      shadowRadius: 1.5,
+      elevation: 1,
+    },
+    sectionTitle: {
+      marginBottom: 16,
+      fontSize: 20,
+      fontWeight: '500',
+      letterSpacing: 0.15,
+    },
+    actionButton: {
+      marginTop: 24,
+      marginBottom: 8,
+      marginHorizontal: 16,
+      borderRadius: 20,
+      height: 40,
+      elevation: 2,
+    },
+  }), [theme]); // theme as dependency
 
   return (
     <ScrollView
-      style={miscStyles.screen_home_container}
-      contentContainerStyle={{ padding: 16 }}
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
     >
       {/* Radar Chart Section */}
-      <Surface style={miscStyles.home_sectionSurface}>
-        <Text variant="headlineMedium" style={miscStyles.home_sectionTitle}>
+      <Surface style={styles.section} elevation={1}>
+        <Text variant="headlineMedium" style={styles.sectionTitle}>
           Your Progress
         </Text>
         <RadarChart data={radarData} />
       </Surface>
 
-      {/* Exercise Progress Section */}
-      <Surface style={miscStyles.home_sectionSurface}>
-        <Text variant="headlineMedium" style={miscStyles.home_sectionTitle}>
-          Exercise Progress
-        </Text>
-        <ExerciseProgress exercises={breathExercises} currentStep={nextExercise?.id} />
-        {nextExercise && (
-          <Button
-            mode="contained"
-            onPress={handleStartExercise}
-            style={{ marginTop: 16 }}
-            labelStyle={typographyStyles.text_button}
-          >
-            Start {nextExercise.title}
-          </Button>
-        )}
-      </Surface>
-
       {/* Quick Actions Section */}
-      <QuickActions />
+      <QuickActions sectionStyle={styles.section} />
+
+      {/* Today's Focus Section */}
+      <TodaysFocus 
+        goal={todaysFocus.goal}
+        affirmation={todaysFocus.affirmation}
+        sectionStyle={styles.section}
+      />
 
       {/* Recent Activities Section */}
-      <Surface style={miscStyles.home_sectionSurface}>
-        <Text variant="headlineMedium" style={miscStyles.home_sectionTitle}>
+      <Surface style={styles.section} elevation={1}>
+        <Text variant="headlineMedium" style={styles.sectionTitle}>
           Recent Activities
         </Text>
         <RecentActivities activities={recentActivities} />

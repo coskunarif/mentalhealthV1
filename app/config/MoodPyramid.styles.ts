@@ -20,19 +20,19 @@ export default StyleSheet.create({
   },
   pyramid_container: {
     alignItems: 'center',
-    marginTop: theme.spacing.medium,
+    gap: 3,
   },
   pyramid_item: {
-    padding: theme.spacing.medium, // Increased to 16dp
-    borderRadius: theme.shape.borderRadius,
-    marginBottom: theme.spacing.small, // 8dp between items
-    alignItems: 'center',
+    height: 42,
     justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 2,
+    borderRadius: theme.shape.borderRadius,
   },
   pyramid_text: {
     color: theme.colors.onPrimary,
-    ...typographyStyles.text_body, // Use defined body style
-    fontWeight: '600', // Slightly bolder for emphasis
+    fontSize: 14,
+    fontWeight: '500',
   },
   pyramid_bubbleContainer: {
     flexDirection: 'row',

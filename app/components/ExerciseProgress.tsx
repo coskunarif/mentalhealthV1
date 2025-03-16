@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { AppTheme } from '../types/theme';
 import styles from '../config/ExerciseProgress.styles';
+import { Animated, Easing } from 'react-native';
 
 interface ExerciseProgressProps {
   exercises: {
@@ -21,45 +22,66 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
 }) => {
   const theme = useTheme<AppTheme>();
 
+  const [animations] = useState(() => 
+    exercises.map(() => new Animated.Value(0))
+  );
+
+  useEffect(() => {
+    // Animate completed steps
+    exercises.forEach((exercise, index) => {
+      if (exercise.isCompleted) {
+        Animated.timing(animations[index], {
+          toValue: 1,
+          duration: 800,
+          easing: Easing.elastic(1),
+          useNativeDriver: true,
+        }).start();
+      }
+    });
+  }, [exercises]);
+
   const getStepStatus = (index: number, isCompleted: boolean, isCurrent: boolean) => {
     if (isCompleted) return 'completed';
     if (isCurrent) return 'current';
     return 'upcoming';
   };
 
-  const getStepIcon = (status: 'completed' | 'current' | 'upcoming') => {
-    switch (status) {
-      case 'completed':
-        return 'check-circle';
-      case 'current':
-        return 'circle-outline';
-      case 'upcoming':
-        return 'circle-outline';
-    }
-  };
+const getStepIcon = (status: 'completed' | 'current' | 'upcoming') => {
+  switch (status) {
+    case 'completed':
+      return 'check-circle';
+    case 'current':
+      return 'radiobox-marked';
+    case 'upcoming':
+      return 'radiobox-blank';
+  }
+};
 
   const getStepColors = (status: 'completed' | 'current' | 'upcoming') => {
-    switch (status) {
-      case 'completed':
-        return {
-          icon: theme.colors.secondary,
-          text: theme.colors.onSurface,
-          connector: theme.colors.secondary,
-        };
-      case 'current':
-        return {
-          icon: theme.colors.primary,
-          text: theme.colors.onSurface,
-          connector: theme.colors.outlineVariant,
-        };
-      case 'upcoming':
-        return {
-          icon: theme.colors.outlineVariant,
-          text: theme.colors.onSurfaceVariant,
-          connector: theme.colors.outlineVariant,
-        };
-    }
-  };
+  switch (status) {
+    case 'completed':
+      return {
+        icon: theme.colors.secondary,
+        text: theme.colors.onSurface,
+        connector: theme.colors.secondary,
+        connectorStyle: 'solid', // Solid line for completed
+      };
+    case 'current':
+      return {
+        icon: theme.colors.primary,
+        text: theme.colors.onSurface,
+        connector: theme.colors.primary,
+        connectorStyle: 'dashed', // Dashed for in-progress
+      };
+    case 'upcoming':
+      return {
+        icon: theme.colors.outlineVariant,
+        text: theme.colors.onSurfaceVariant,
+        connector: theme.colors.outlineVariant,
+        connectorStyle: 'dotted', // Dotted for upcoming
+      };
+  }
+};
 
   return (
     <View style={styles.container}>
@@ -72,23 +94,48 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
           <View key={exercise.id} style={styles.stepContainer}>
             <View style={styles.stepContent}>
               <View style={styles.iconContainer}>
-                <MaterialCommunityIcons
-                  name={getStepIcon(status)}
-                  size={24}
-                  color={colors.icon}
-                />
+                <Animated.View style={{
+                  transform: [{ 
+                    scale: animations[index].interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [1, 1.2, 1]
+                    }) 
+                  }]
+                }}>
+                  <MaterialCommunityIcons
+                    name={getStepIcon(status)}
+                    size={24}
+                    color={colors.icon}
+                  />
+                </Animated.View>
                 {!isLast && (
-                  <View style={[styles.connector, { backgroundColor: colors.connector }]} />
+                  <View 
+                    style={[
+                      styles.connector, 
+                      { 
+                        backgroundColor: colors.connector, 
+                        borderStyle: colors.connectorStyle as any 
+                      }
+                    ]} 
+                  />
                 )}
               </View>
               <View style={styles.textContainer}>
-                <Text style={[styles.stepNumber, { color: colors.text }]}>
+                <Text style={[styles.stepNumber, { color: colors.text, fontSize: 12, fontWeight: '500' }]}>
                   Step {index + 1}
                 </Text>
-                <Text style={[styles.stepTitle, { color: colors.text }]} numberOfLines={1}>
+                <Text style={[styles.stepTitle, { 
+                  color: colors.text, 
+                  fontSize: 16, 
+                  fontWeight: '500',
+                  marginVertical: 4 // Add proper spacing
+                }]} numberOfLines={1}>
                   {exercise.title}
                 </Text>
-                <Text style={[styles.stepDuration, { color: theme.colors.onSurfaceVariant }]}>
+                <Text style={[styles.stepDuration, { 
+                  color: theme.colors.onSurfaceVariant,
+                  fontSize: 14
+                }]}>
                   {exercise.duration}
                 </Text>
               </View>

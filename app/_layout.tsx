@@ -1,27 +1,24 @@
 import React, { useEffect, useCallback } from 'react';
-import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { PaperProvider } from 'react-native-paper';
+import { Stack } from 'expo-router';
 import { AuthProvider } from './context/auth';
-import { theme } from './config/theme';
+import { theme as importedTheme } from './config/theme';
 import ErrorBoundary from './components/ErrorBoundary';
-import { layoutStyles } from './config';
-// Remove explicit import from '@react-navigation/native-stack'
- 
+import type { AppTheme } from './types/theme';
+import { useTheme } from 'react-native-paper';
+
 // Keep the splash screen visible while resources load
 SplashScreen.preventAutoHideAsync();
 
-// Cast options as any to bypass type conflicts
-const commonScreenOptions: any = {
-  headerShown: false,
-};
+export default function AppLayout() {
+  const appTheme = useTheme<AppTheme>();
+    console.log('Theme in AppLayout:', importedTheme);
+    if (!importedTheme.spacing) {
+      console.error('Theme is missing spacing property');
+    }
 
-const modalScreenOptions = {
-  gestureEnabled: true,
-};
-
-export default function RootLayout() {
   const [loaded] = useFonts({
     'Kameron': require('../assets/fonts/Kameron-Regular.ttf'),
     'Kameron-Bold': require('../assets/fonts/Kameron-Bold.ttf'),
@@ -43,46 +40,25 @@ export default function RootLayout() {
 
   return (
     <ErrorBoundary>
-      <PaperProvider theme={theme}>
+      <PaperProvider theme={importedTheme}>
         <AuthProvider>
-          <Stack screenOptions={commonScreenOptions}>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="welcome" options={{ headerShown: false }} />
-            <Stack.Screen name="auth" options={{ headerShown: false }} />
-            <Stack.Screen name="tabs" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="survey"
-              options={{
-                ...modalScreenOptions,
-                title: 'Daily Check-in',
-                headerBackTitle: 'Back',
-                presentation: 'modal',
-              }}
-            />
-            <Stack.Screen
-              name="mood"
-              options={{
-                ...modalScreenOptions,
-                title: 'Mood Check',
-                presentation: 'modal',
-              }}
-            />
-            <Stack.Screen
-              name="player"
-              options={{
-                ...modalScreenOptions,
-                title: 'Meditation',
-                presentation: 'modal',
-              }}
-            />
-            <Stack.Screen
-              name="not-found"
-              options={{
-                title: 'Oops!',
-                presentation: 'modal',
-              }}
-            />
-          </Stack>
+        <Stack
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: appTheme.colors.surface,
+            },
+            headerShadowVisible: false,
+            headerTitleStyle: {
+              fontFamily: 'Nunito',
+              fontWeight: '600',
+              fontSize: 20,
+            },
+            contentStyle: {
+              backgroundColor: appTheme.colors.background,
+            },
+            headerShown: false,
+          }}
+        />
         </AuthProvider>
       </PaperProvider>
     </ErrorBoundary>

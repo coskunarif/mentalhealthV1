@@ -12,6 +12,7 @@ const typographyStyles = StyleSheet.create({
   } as TextStyle,
   text_heading2: {
     ...theme.fonts.headlineMedium,
+    fontFamily: 'Kameron', // Add this to be consistent with heading1 and heading3
     fontWeight: 'bold',
     color: theme.colors.onSurface,
     marginBottom: theme.spacing.small,
@@ -39,11 +40,14 @@ const typographyStyles = StyleSheet.create({
     color: theme.colors.primary,
     textDecorationLine: 'underline',
   } as TextStyle,
-  text_button: {
-    ...theme.fonts.bodyLarge,
-    fontWeight: 'bold',
-    color: theme.colors.onSurface,
-  } as TextStyle,
+text_button: {
+  fontFamily: 'Nunito',
+  fontSize: 14,
+  fontWeight: '500',
+  letterSpacing: 0.1,
+  textTransform: 'uppercase', // Material Design button standard
+  lineHeight: 20,
+} as TextStyle,
   header_shadow: {
     fontSize: 20,
     color: theme.colors.onSurfaceVariant,

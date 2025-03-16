@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Linking } from 'react-native';
 import { Surface, List, Button, Text, Divider } from 'react-native-paper';
-import { theme } from '../config/theme';
+import { CARD_ELEVATION } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme';
 import styles from '../config/HelpCenterCard.styles';
+import { miscStyles } from '../config';
 
 interface FAQ {
   question: string;
@@ -42,6 +44,7 @@ interface HelpCenterCardProps {
 export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({
   onContactSupport,
 }) => {
+  const theme = useAppTheme();
   const [expandedId, setExpandedId] = useState<string | false>(false);
 
   const handleExpand = (id: string) => setExpandedId(expandedId === id ? false : id);
@@ -49,7 +52,7 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({
   const handlePhonePress = () => Linking.openURL(`tel:${supportPhone}`);
 
   return (
-    <Surface style={styles.container} elevation={1}>
+    <Surface style={styles.container} elevation={CARD_ELEVATION.DEFAULT}>
       <List.Section>
         <List.Subheader style={styles.subheader}>Frequently Asked Questions</List.Subheader>
         {faqs.map((faq, index) => (
@@ -72,19 +75,23 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({
         <List.Item
           title="Email Support"
           description={supportEmail}
-          left={(props) => <List.Icon {...props} icon="email" />}
+          left={(props) => <List.Icon {...props} icon="email" color={theme.colors.primary} />}
           onPress={handleEmailPress}
-          titleStyle={styles.contactTitle}
+          titleStyle={{ ...styles.contactTitle, ...theme.fonts.bodyLarge }}
           descriptionStyle={styles.contactDescription}
+          style={miscStyles.list_item}
+          rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
         />
         <Divider style={styles.divider} />
         <List.Item
           title="Phone Support"
           description={supportPhone}
-          left={(props) => <List.Icon {...props} icon="phone" />}
+          left={(props) => <List.Icon {...props} icon="phone" color={theme.colors.primary} />}
           onPress={handlePhonePress}
-          titleStyle={styles.contactTitle}
+          titleStyle={{ ...styles.contactTitle, ...theme.fonts.bodyLarge }}
           descriptionStyle={styles.contactDescription}
+          style={miscStyles.list_item}
+          rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
         />
       </List.Section>
       <Button mode="contained" onPress={onContactSupport} icon="message" style={styles.chatButton}>

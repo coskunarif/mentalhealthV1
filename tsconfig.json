@@ -2,16 +2,18 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
+      "@/*": ["app/*"],
+      "@components/*": ["app/components/*"],
+      "@config/*": ["app/config/*"]
     }
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    "types/**/*.d.ts"
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

@@ -3,49 +3,43 @@ import { theme } from './theme';
 
 export default StyleSheet.create({
   container: {
-    padding: theme.spacing.medium,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.shape.borderRadius,
-    marginBottom: theme.spacing.medium,
+    marginVertical: 16, // Match the other cards' vertical spacing
+    // Remove any horizontal margins or padding that affect width
+    padding: 0, // Remove padding and handle it inside
   },
   title: {
+    marginBottom: 20,
+    paddingHorizontal: 16,
     fontSize: 20,
-    fontWeight: 'bold',
-    color: theme.colors.onSurface,
-    marginBottom: theme.spacing.small,
-    textAlign: 'center',
+    fontWeight: '500',
   },
-  grid: {
+  fabContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
+    paddingVertical: 16, // Increased from 12
+    paddingHorizontal: 16,
+    paddingBottom: 20, // Added extra bottom padding
   },
-  card: {
-    flexBasis: '48%',
-    marginBottom: theme.spacing.small,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.shape.borderRadius,
-    // Material-like elevation/shadow
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  cardContent: {
-    padding: theme.spacing.small,
-    alignItems: 'center',
+  fabButton: {
+    width: 72, // Increased from 64
+    height: 72, // Increased from 64
+    borderRadius: 36, // Half of width/height
     justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    backgroundColor: theme.colors.primary,
   },
-  cardIcon: {
-    width: 40,
-    height: 40,
-    resizeMode: 'contain',
-    marginBottom: theme.spacing.tiny,
+  labelContainer: {
+    alignItems: 'center',
+    marginTop: 14, // Increased from 10 for more spacing between button and label
   },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+  labelText: {
+    fontSize: 14, // Increased from 13
+    fontWeight: '500',
     color: theme.colors.onSurface,
     textAlign: 'center',
   },

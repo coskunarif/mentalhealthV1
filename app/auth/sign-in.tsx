@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { Text, TextInput, Button, useTheme } from 'react-native-paper';
+import { Text, Button, useTheme } from 'react-native-paper';
 import { Link, router } from 'expo-router';
 import { layoutStyles, typographyStyles, buttonStyles } from '../config';
-import formStyles from '../config/form.styles';
 import type { AppTheme } from '../types/theme';
 import { auth } from '../lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { AuthIllustration, MaterialInput } from '../components';
 
 export default function SignInScreen() {
   const theme = useTheme<AppTheme>();
+  console.log('Theme in SignInScreen:', theme); // Debug log
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSignIn = async () => {
-    if (loading) return;
+const handleSignIn = async () => {
+  console.log('Sign in button pressed');
+  if (loading) return;
     setLoading(true);
     setError('');
 
@@ -34,46 +37,60 @@ export default function SignInScreen() {
   return (
     <View style={layoutStyles.layout_container}>
       <View style={layoutStyles.common_screen_auth_container}>
-        <View style={layoutStyles.signIn_screen_auth_form}>
-          <View style={layoutStyles.signIn_screen_auth_header}>
+        <View style={[
+          layoutStyles.common_screen_auth_form,
+          {
+            elevation: 1,
+            backgroundColor: theme.colors.surface,
+            borderRadius: theme.componentSizes.cardBorderRadius,
+            shadowColor: theme.colors.shadow,
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
+            padding: theme.spacing.large,
+            width: '100%',
+            maxWidth: 400,
+          }
+        ]}>
+          <AuthIllustration type="login" />
+          <View style={layoutStyles.common_screen_auth_header}>
             <Text style={typographyStyles.text_heading2}>Welcome Back</Text>
-            <Text style={[typographyStyles.text_body, { marginTop: theme.spacing.tiny }]}>
+            <Text style={[typographyStyles.text_body, { marginTop: theme.spacing?.tiny || 4 }]}>
               Sign in to continue your journey
             </Text>
           </View>
 
-          <TextInput
+          <MaterialInput
             label="Email Address"
-            mode="outlined"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
-            style={formStyles.component_input_field}
             placeholder="Enter your email"
-            placeholderTextColor={theme.colors.onSurfaceVariant}
+            error={error ? error : undefined}
           />
 
-          <TextInput
+          <MaterialInput
             label="Password"
-            mode="outlined"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
-            style={[formStyles.component_input_field, { marginTop: theme.spacing.small }]}
             placeholder="Enter your password"
-            placeholderTextColor={theme.colors.onSurfaceVariant}
+            style={{ marginTop: theme.spacing?.small || 8 }}
           />
-
-          {error ? (
-            <Text style={formStyles.component_input_error}>{error}</Text>
-          ) : null}
 
           <Button
             mode="contained"
             onPress={handleSignIn}
             loading={loading}
-            style={[buttonStyles.button_primary, { marginTop: theme.spacing.small }]}
+            style={[
+              buttonStyles.button_primary,
+              {
+                marginTop: theme.spacing?.medium || 16,
+                elevation: 3,
+                height: 48,
+              }
+            ]}
             labelStyle={typographyStyles.text_button}
           >
             {loading ? 'Signing In...' : 'Sign In'}

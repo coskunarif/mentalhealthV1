@@ -22,6 +22,8 @@ const layoutStyles = StyleSheet.create({
     width: '100%',
     maxWidth: 400,
     padding: theme.spacing.medium,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.componentSizes.cardBorderRadius || 12,
   } as ViewStyle,
   common_screen_auth_header: {
     marginBottom: theme.spacing.large + theme.spacing.small,
@@ -49,6 +51,10 @@ const layoutStyles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 16,
     marginBottom: 8,
+  } as ViewStyle,
+  auth_screen_animation: {
+    opacity: 1,
+    transform: [{ translateY: 0 }],
   } as ViewStyle,
 });
 

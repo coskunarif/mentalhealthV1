@@ -77,26 +77,26 @@ export default StyleSheet.create({
     backgroundColor: theme.colors.outlineVariant,
   },
   mood_buttonContainer: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  position: 'absolute',
-  bottom: 0,
-  left: 0,
-  right: 0,
-  backgroundColor: theme.colors.background,
-  paddingVertical: 16, // Material Design standard padding
-  paddingHorizontal: 16, // Material Design standard padding
-  // Material Design elevation overlay
-  elevation: 8, // Higher elevation for more prominence
-  shadowColor: theme.colors.shadow,
-  shadowOffset: { width: 0, height: -1 },
-  shadowOpacity: 0.14,
-  shadowRadius: 4,
-  zIndex: 5,
-  // Material Design divider
-  borderTopWidth: 1,
-  borderTopColor: theme.colors.outlineVariant,
-},
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: theme.colors.background,
+    paddingVertical: 16, // Material Design standard padding
+    paddingHorizontal: 16, // Material Design standard padding
+    // Material Design elevation overlay
+    elevation: 8, // Higher elevation for more prominence
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: -1 },
+    shadowOpacity: 0.14,
+    shadowRadius: 4,
+    zIndex: 5,
+    // Material Design divider
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.outlineVariant,
+  },
   modalBackdrop: {
     backgroundColor: theme.withOpacity(theme.colors.backdrop, 0.9), // Increased from 0.8 to 0.9
     flex: 1,
