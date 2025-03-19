@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from 'firebase/auth';
-import { auth } from '../lib/firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth, User } from '../lib/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -26,51 +25,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const persistenceKey = `firebase:authUser:${projectId}:[DEFAULT]`;
 
   useEffect(() => {
-    console.log("Setting up auth state listener");
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      console.log("Auth state changed:", {
-        userId: user?.uid,
-        isAuthenticated: !!user,
-        previouslyInitialized: initialized,
-      });
+    const unsubscribe = auth.onAuthStateChanged((user: User | null) => {
       setUser(user);
       setInitialized(true);
-    }, (error) => {
-      console.error("Auth state change error:", error);
     });
 
-    return () => {
-      console.log("Cleaning up auth state listener");
-      unsubscribe();
-    };
-  }, [initialized]);
+    return () => unsubscribe();
+  }, []);
 
   const handleSignOut = async () => {
     try {
-      console.log("Starting sign-out process");
-      console.log("Current user:", auth.currentUser?.uid);
-      console.log("Calling auth.signOut()");
       await auth.signOut();
-      console.log("auth.signOut() completed");
-      console.log(`Clearing AsyncStorage key: ${persistenceKey}`);
       await AsyncStorage.removeItem(persistenceKey);
-      console.log("Firebase persistence key removed");
-      console.log("Verifying auth state after sign-out");
-      console.log("Current auth state:", {
-        currentUser: auth.currentUser?.uid,
-        isSignedIn: !!auth.currentUser,
-      });
-      console.log("Resetting user state");
       setUser(null);
-      console.log("Sign-out process completed successfully");
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error signing out:', error);
-      console.error('Error details:', {
-        name: error?.name,
-        message: error?.message,
-        code: error?.code,
-        stack: error?.stack,
-      });
       throw error;
     }
   };

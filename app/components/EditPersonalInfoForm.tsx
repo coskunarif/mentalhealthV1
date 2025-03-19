@@ -1,5 +1,5 @@
 // File: app\components\EditPersonalInfoForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import {
   Card,
@@ -14,15 +14,18 @@ import type { PersonalInformation } from '../types/personalInformation';
 import { theme } from '../config/theme';
 import buttonStyles from '../config/button.styles';
 import styles from '../config/EditPersonalInfoForm.styles';
+import { UserService } from '../services/user.service';
 
 interface EditPersonalInfoFormProps {
   info: PersonalInformation;
   onSave: (info: PersonalInformation) => Promise<void>;
+  userId: string;
 }
 
 export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
   info,
   onSave,
+  userId,
 }) => {
   const [formData, setFormData] = useState<PersonalInformation>(info);
   const [errors, setErrors] = useState<
@@ -30,6 +33,20 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
   >({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await UserService.getUserProfile(userId);
+        setFormData(userData);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    if (userId) {
+      fetchUserData();
+    }
+  }, [userId]);
 
   const formatPhoneNumber = (value: string): string => {
     let phone = value.replace(/[^\d+ ]/g, '');

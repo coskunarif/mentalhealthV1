@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -8,42 +8,9 @@ import RecentActivities from '../components/RecentActivities';
 import QuickActions from '../components/QuickActions';
 import TodaysFocus from '../components/TodaysFocus';
 import type { AppTheme } from '../types/theme';
+import { ExerciseService } from '../services/exercise.service';
 
 // Rest of your imports and data...
-const radarData = [
-  { label: 'Balance past memories', value: 0.8 },
-  { label: 'Change your opinion', value: 0.6 },
-  { label: 'Support dreams', value: 0.7 },
-  { label: 'Gain awareness', value: 0.9 },
-  { label: 'Breath up', value: 0.75 },
-];
-
-const recentActivities = [
-  {
-    id: '12',
-    type: 'breath' as const,
-    title: 'Breath up',
-    subtitle: 'Breath exercise 12',
-    duration: 18.5,
-    timestamp: new Date(), // Today
-  },
-  {
-    id: '5',
-    type: 'dreams' as const,
-    title: 'Support your dreams',
-    subtitle: 'Dreams exercise 5',
-    duration: 14.5,
-    timestamp: new Date(new Date().setDate(new Date().getDate() - 1)), // Yesterday
-  },
-  {
-    id: '8',
-    type: 'awareness' as const,
-    title: 'Gain awareness',
-    subtitle: 'Awareness exercise 8',
-    duration: 23.5,
-    timestamp: new Date(new Date().setDate(new Date().getDate() - 4)), // 4 days ago
-  },
-];
 
 const todaysFocus = {
   goal: "Complete your daily breathing exercise (15 min).",
@@ -52,6 +19,32 @@ const todaysFocus = {
 
 export default function Home() {
   const theme = useTheme<AppTheme>();
+  const [radarData, setRadarData] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const userId = 'user-id'; // Replace with actual user ID
+
+  useEffect(() => {
+    const fetchRadarData = async () => {
+      try {
+        const data = await ExerciseService.getRadarData(userId);
+        setRadarData(data);
+      } catch (error) {
+        console.error('Error fetching radar data:', error);
+      }
+    };
+
+    const fetchRecentActivities = async () => {
+      try {
+        const activities = await ExerciseService.getRecentActivities(userId);
+        setRecentActivities(activities);
+      } catch (error) {
+        console.error('Error fetching recent activities:', error);
+      }
+    };
+
+    fetchRadarData();
+    fetchRecentActivities();
+  }, [userId]);
 
   // Create styles inside the component with useMemo for performance
   const styles = React.useMemo(() => StyleSheet.create({

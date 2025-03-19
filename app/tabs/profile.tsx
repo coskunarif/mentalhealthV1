@@ -7,6 +7,7 @@ import { useAuth } from '../context/auth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { layoutStyles, miscStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
+import { UserService } from '../services/user.service';
 
 export default function ProfileScreen() {
   const { user, signOut } = useAuth();
@@ -34,6 +35,24 @@ export default function ProfileScreen() {
       }
     };
     fetchUserData();
+  }, [user?.uid]);
+
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      try {
+        const stats = await UserService.getUserProfile(user?.uid);
+        setUserStats({
+          sessions: stats.sessions || 0,
+          streak: stats.streak || 0,
+          surveys: stats.surveys || 0,
+        });
+      } catch (error) {
+        console.error('Error fetching user stats:', error);
+      }
+    };
+    if (user?.uid) {
+      fetchUserStats();
+    }
   }, [user?.uid]);
 
   const handleSignOut = async () => {

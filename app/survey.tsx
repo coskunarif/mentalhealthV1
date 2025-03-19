@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScreenLayout } from './components/ScreenLayout';
 import { router } from 'expo-router';
 import EnhancedButton from './components/EnhancedButton';
+import { SurveyService } from './services/survey.service';
 
 const questions = [
     {
@@ -220,18 +221,26 @@ const SurveyScreen = () => {
         }
     };
 
-    const handleNext = () => {
-        if (currentQuestion < questions.length - 1) {
-            setCurrentQuestion(currentQuestion + 1);
+    const handleNext = async () => {
+        const isLastQuestion = currentQuestion === questions.length - 1;
+        if (isLastQuestion) {
+            try {
+                await SurveyService.saveSurveyResponse({
+                    userId,
+                    timestamp: new Date(),
+                    responses: answers,
+                });
+                router.replace('/');
+            } catch (error) {
+                console.error('Error saving survey response:', error);
+            }
         } else {
-            // Survey completed, navigate to home
-            router.replace('/');
+            setCurrentQuestion(currentQuestion + 1);
         }
     };
 
     const progress = (currentQuestion + 1) / questions.length;
     const isFirstQuestion = currentQuestion === 0;
-    const isLastQuestion = currentQuestion === questions.length - 1;
 
     return (
         <ScreenLayout 
