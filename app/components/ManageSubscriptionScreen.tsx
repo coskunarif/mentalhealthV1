@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, List, Button, Surface, Divider, Snackbar, Dialog, Portal } from 'react-native-paper';
 import { useRouter } from 'expo-router';
@@ -7,10 +7,14 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { layoutStyles, typographyStyles, cardStyles, buttonStyles } from '../config';
 import styles from '../config/ManageSubscriptionScreen.styles';
 import { ScreenLayout } from './ScreenLayout';
+import { UserService } from '../services/user.service';
+import { useAuth } from '../context/auth';
 
 export default function ManageSubscriptionScreen() {
   const theme = useAppTheme();
   const router = useRouter();
+  const { user } = useAuth();
+  const userId = user?.uid;
   const [currentPlan, setCurrentPlan] = useState('Premium Plan');
   const [currentPrice, setCurrentPrice] = useState('$9.99/month');
   const [snackbar, setSnackbar] = useState({ visible: false, message: '' });
@@ -22,14 +26,30 @@ export default function ManageSubscriptionScreen() {
     paymentMethod: '•••• 4242',
   };
 
+  useEffect(() => {
+    const fetchSubscriptionStatus = async () => {
+      try {
+        if (!userId) return;
+        const status = await UserService.getSubscriptionStatus(userId);
+        setCurrentPlan(status.plan);
+        setCurrentPrice(status.price);
+      } catch (error) {
+        console.error('Error fetching subscription status:', error);
+      }
+    };
+
+    fetchSubscriptionStatus();
+  }, [userId]);
+
   const handleSelectPlan = async (plan: string, price: string) => {
+    if (!userId) return;
     if (plan === currentPlan) {
       setSnackbar({ visible: true, message: `You're already subscribed to ${plan}` });
       return;
     }
     setIsLoading(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await UserService.updateSubscription(userId, { plan, price });
       setCurrentPlan(plan);
       setCurrentPrice(price);
       setSnackbar({ visible: true, message: `Successfully switched to ${plan}` });
@@ -41,6 +61,7 @@ export default function ManageSubscriptionScreen() {
   };
 
   const handleCancelSubscription = async () => {
+    if (!userId) return;
     setIsLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));

@@ -1,0 +1,49 @@
+[debug] [2025-03-19T06:50:55.800Z] ----------------------------------------------------------------------
+[debug] [2025-03-19T06:50:55.802Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ArifCoskun\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init emulators
+[debug] [2025-03-19T06:50:55.802Z] CLI Version:   13.34.0
+[debug] [2025-03-19T06:50:55.802Z] Platform:      win32
+[debug] [2025-03-19T06:50:55.802Z] Node Version:  v23.4.0
+[debug] [2025-03-19T06:50:55.802Z] Time:          Tue Mar 18 2025 23:50:55 GMT-0700 (Pacific Daylight Time)
+[debug] [2025-03-19T06:50:55.802Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-03-19T06:50:55.943Z] Object "" in "firebase.json" has unknown property: {"additionalProperty":"$include"}
+[debug] [2025-03-19T06:50:55.947Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-03-19T06:50:55.947Z] > authorizing via signed-in user (coskun.arf@gmail.com)
+[debug] [2025-03-19T06:50:55.948Z] Object "" in "firebase.json" has unknown property: {"additionalProperty":"$include"}
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\CodiumDev\mentalhealthV1
+
+Before we get started, keep in mind:
+
+  * You are currently outside your home directory
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-03-19T06:50:57.868Z] Using project from CLI flag: mentalhealthv1
+[debug] [2025-03-19T06:50:57.869Z] Checked if tokens are valid: false, expires at: 1742350029824
+[debug] [2025-03-19T06:50:57.869Z] Checked if tokens are valid: false, expires at: 1742350029824
+[debug] [2025-03-19T06:50:57.869Z] > refreshing access token with scopes: []
+[debug] [2025-03-19T06:50:57.871Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-03-19T06:50:57.871Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-03-19T06:50:58.028Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-03-19T06:50:58.028Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-03-19T06:50:58.044Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/mentalhealthv1 [none]
+[debug] [2025-03-19T06:50:58.441Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/mentalhealthv1 200
+[debug] [2025-03-19T06:50:58.441Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/mentalhealthv1 {"projectId":"mentalhealthv1","projectNumber":"367653332774","displayName":"mentalhealthV1","name":"projects/mentalhealthv1","resources":{"hostingSite":"mentalhealthv1"},"state":"ACTIVE","etag":"1_52f9ce12-b85f-4639-9726-8f99180072fd"}
+[info] i  Using project mentalhealthv1 (mentalhealthV1) 
+[info] 
+=== Emulators Setup

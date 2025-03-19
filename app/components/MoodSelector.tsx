@@ -11,6 +11,7 @@ import type { AppTheme } from '../types/theme';
 import EnhancedButton from './EnhancedButton';
 import SliderCard from './SliderCard';
 import { ScreenLayout } from './ScreenLayout'; // Import ScreenLayout
+import { MoodService } from '../services/mood.service';
 
 // Add responsive button sizing based on screen width
 const windowWidth = Dimensions.get('window').width;
@@ -97,6 +98,22 @@ function MoodSelector({
     router.back();
   };
 
+  const handleFinish = async () => {
+    if (selectedMood) {
+      try {
+        await MoodService.saveMoodEntry({
+          userId,
+          timestamp: new Date(),
+          mood: selectedMood.label,
+          value: selectedMood.value,
+        });
+        onFinish();
+      } catch (error) {
+        console.error('Error saving mood entry:', error);
+      }
+    }
+  };
+
   return (
     <ScreenLayout
       title="Mood Tracker"
@@ -129,7 +146,7 @@ function MoodSelector({
           }}>
             <EnhancedButton
               mode="contained"
-              onPress={onFinish}
+              onPress={handleFinish}
               accessibilityLabel="Complete mood selection"
               fullWidth
               icon="check"

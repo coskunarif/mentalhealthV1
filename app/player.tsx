@@ -9,6 +9,8 @@ import type { RootStackParamList } from './types/navigation';
 import type { AppTheme } from './types/theme';
 import type { ViewStyle, TextStyle } from 'react-native';
 import { ScreenLayout } from './components/ScreenLayout';
+import { UserService } from './services/user.service';
+import { useAuth } from './context/auth';
 
 interface PlayerProps {
   audioUrl: string;
@@ -117,6 +119,9 @@ export default function PlayerScreen() {
     useLocalSearchParams<RootStackParamList['player']>();
   const theme = useTheme<AppTheme>();
   const styles = createStyles(theme);
+
+  const { user } = useAuth();
+  const userId = user?.uid;
 
   const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'exhale' | 'hold'>('inhale');
   const [breathingCycleCount, setBreathingCycleCount] = useState(0);
@@ -339,6 +344,29 @@ export default function PlayerScreen() {
   };
 
   const progress = duration ? position / duration : 0;
+
+  const handleMeditationCompletion = async () => {
+    try {
+      await UserService.trackActivity({
+        userId,
+        type: 'meditation',
+        timestamp: new Date(),
+        details: {
+          duration: duration / 60000, // Convert ms to minutes
+          title: title as string
+        }
+      });
+      console.log('Meditation activity logged successfully.');
+    } catch (error) {
+      console.error('Error logging meditation activity:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (!isPlaying && position === duration) {
+      handleMeditationCompletion();
+    }
+  }, [isPlaying, position, duration]);
 
   return (
 <ScreenLayout

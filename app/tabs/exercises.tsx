@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -8,19 +8,26 @@ import ExerciseProgress from '../components/ExerciseProgress';
 import type { AppTheme } from '../types/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import EnhancedButton from '../components/EnhancedButton';
-
-// Example data - replace with your actual data source
-const breathExercises = [
-  { id: 'Step 1', title: 'Breath Exercise Step 1', duration: '15 min', isCompleted: true },
-  { id: 'Step 2', title: 'Breath Exercise Step 2', duration: '20 min', isCompleted: true },
-  { id: 'Step 3', title: 'Breath Exercise Step 3', duration: '15 min', isCompleted: false },
-  { id: 'Step 4', title: 'Breath Exercise Step 4', duration: '20 min', isCompleted: false },
-  { id: 'Step 5', title: 'Breath Exercise Step 5', duration: '25 min', isCompleted: false },
-];
+import { ExerciseService } from '../services/exercise.service';
 
 export default function ExercisesScreen() {
+  const [breathExercises, setBreathExercises] = useState([]);
   const nextExercise = breathExercises.find((exercise) => !exercise.isCompleted);
   const theme = useTheme<AppTheme>();
+  const userId = 'user-id'; // Replace with actual user ID
+
+  useEffect(() => {
+    const fetchExercises = async () => {
+      try {
+        const exercises = await ExerciseService.getExercises(userId);
+        setBreathExercises(exercises);
+      } catch (error) {
+        console.error('Error fetching exercises:', error);
+      }
+    };
+
+    fetchExercises();
+  }, [userId]);
 
   const styles = React.useMemo(() => StyleSheet.create({
     container: {
