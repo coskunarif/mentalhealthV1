@@ -5,7 +5,7 @@ import type { AppTheme } from '../types/theme';
 
 interface Activity {
   id: string;
-  type: 'breath' | 'dreams' | 'awareness';
+  type: string; // Change from enum to string
   title: string;
   subtitle: string;
   duration: number;

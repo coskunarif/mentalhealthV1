@@ -63,6 +63,8 @@ export default function EditPersonalInfoScreen() {
     dateOfBirth: '',
   };
 
+  const userId = user?.uid || '';
+
   const handleSave = async (info: any) => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -108,7 +110,7 @@ export default function EditPersonalInfoScreen() {
           elevation={1}
           subtitle="Keep your profile up to date by maintaining accurate personal information."
         >
-          <EditPersonalInfoForm onSave={handleSave} info={userInfo} />
+          <EditPersonalInfoForm onSave={handleSave} info={userInfo} userId={userId} />
         </ScreenLayout>
       </Animated.View>
       <Snackbar

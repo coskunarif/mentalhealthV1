@@ -10,11 +10,19 @@ interface ExerciseProgressProps {
   exercises: {
     id: string;
     title: string;
-    duration: string;
+    duration: string | number; // Accept both string and number
     isCompleted: boolean;
   }[];
   currentStep: string | undefined;
 }
+
+const formatDuration = (duration: string | number): string => {
+  if (typeof duration === 'number') {
+    // Format number as needed (e.g., convert minutes to "X min")
+    return `${duration} min`;
+  }
+  return duration;
+};
 
 const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
   exercises,
@@ -135,8 +143,8 @@ const getStepIcon = (status: 'completed' | 'current' | 'upcoming') => {
                 <Text style={[styles.stepDuration, { 
                   color: theme.colors.onSurfaceVariant,
                   fontSize: 14
-                }]}>
-                  {exercise.duration}
+                }]}>                  
+                  {formatDuration(exercise.duration)}
                 </Text>
               </View>
             </View>

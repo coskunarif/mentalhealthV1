@@ -3,7 +3,7 @@ import { getAuth, initializeAuth, browserLocalPersistence, connectAuthEmulator }
 import { getFirestore, collection, enableIndexedDbPersistence, connectFirestoreEmulator } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
-import { getAnalytics, isSupported } from 'firebase/analytics';
+import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
@@ -37,7 +37,7 @@ if (Platform.OS !== 'web') {
 }
 
 // Initialize Analytics conditionally
-let firebaseAnalytics = null;
+let firebaseAnalytics: Analytics | null = null;
 isSupported().then(isSupported => {
   if (isSupported) {
     firebaseAnalytics = getAnalytics(firebaseApp);

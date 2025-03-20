@@ -6,9 +6,24 @@ import {
   signInWithPopup,
   OAuthProvider,
   User,
-  UserCredential
+  UserCredential,
+  getAuth,
+  setPersistence,
+  browserLocalPersistence
 } from 'firebase/auth';
-import { auth } from './firebase';
+
+const auth = getAuth();
+
+export const configurePersistence = async () => {
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    console.log('Auth persistence configured');
+  } catch (error) {
+    console.error('Error configuring persistence:', error);
+  }
+};
+
+export default auth;
 
 // Basic auth methods
 export async function signIn(email: string, password: string): Promise<UserCredential> {

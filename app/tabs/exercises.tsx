@@ -10,8 +10,15 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import EnhancedButton from '../components/EnhancedButton';
 import { ExerciseService } from '../services/exercise.service';
 
+interface Exercise {
+  id: string;
+  title: string;
+  duration: number;
+  isCompleted: boolean;
+}
+
 export default function ExercisesScreen() {
-  const [breathExercises, setBreathExercises] = useState([]);
+  const [breathExercises, setBreathExercises] = useState<Exercise[]>([]);
   const nextExercise = breathExercises.find((exercise) => !exercise.isCompleted);
   const theme = useTheme<AppTheme>();
   const userId = 'user-id'; // Replace with actual user ID

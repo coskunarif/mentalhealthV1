@@ -52,10 +52,10 @@ export class ExerciseService {
   static async getExercises(userId: string): Promise<any[]> {
     try {
       // First get all available exercises
-      const exercisesSnapshot = await getDocs(exercisesCollection);
+      const exercisesSnapshot = await getDocs(collection(db, 'exercises'));
       const exercises = exercisesSnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data(),
+        ...doc.data() as Record<string, any>,
         isCompleted: false
       }));
 

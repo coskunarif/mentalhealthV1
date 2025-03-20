@@ -1,7 +1,12 @@
 import { collection, addDoc, query, where, orderBy, getDocs, doc, updateDoc, deleteDoc, limit } from 'firebase/firestore';
-import { httpsCallable } from 'firebase/functions';
-import { db, moodsCollection, functions, Timestamp, queryDocuments, getDocument } from '../lib/firebase';
+import { db, functions, Timestamp, queryDocuments, getDocument } from '../lib/firebase';
 import { MoodEntry, MoodInsights } from '../models/mood.model';
+import { moodService } from './firebase-functions';
+
+// Updated to use the new client SDK
+export const moodServiceUpdated = {
+  generateInsights: moodService.generateInsights,
+};
 
 export class MoodService {
   static async saveMoodEntry(entry: {
@@ -22,7 +27,7 @@ export class MoodService {
         createdAt: Timestamp.fromDate(new Date())
       };
       
-      const docRef = await addDoc(moodsCollection, entryData);
+      const docRef = await addDoc(collection(db, 'moods'), entryData);
       return docRef.id;
     } catch (error) {
       console.error('Error saving mood entry:', error);
@@ -88,12 +93,12 @@ export class MoodService {
 
   static async generateInsights(userId: string, timeframe: 'week' | 'month' | 'year' = 'week'): Promise<MoodInsights> {
     try {
-      const generateInsightsFunction = httpsCallable<{ timeframe: string }, { success: boolean; insights: MoodInsights; message: string }>(functions, 'generateMoodInsights');
-      const result = await generateInsightsFunction({ timeframe });
-      if (result.data.success && result.data.insights) {
-        return result.data.insights;
+      // Use the moodService from firebase-functions.ts
+      const result = await moodService.generateInsights(timeframe);
+      if (result.success && result.insights) {
+        return result.insights;
       } else {
-        throw new Error(result.data.message || 'Failed to generate insights');
+        throw new Error(result.message || 'Failed to generate insights');
       }
     } catch (error) {
       console.error('Error generating mood insights:', error);

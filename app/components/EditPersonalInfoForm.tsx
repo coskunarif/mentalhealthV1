@@ -38,7 +38,15 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
     const fetchUserData = async () => {
       try {
         const userData = await UserService.getUserProfile(userId);
-        setFormData(userData);
+        if (userData) {
+          const formattedData: PersonalInformation = {
+            name: userData.displayName || '',
+            email: userData.email || '',
+            phoneNumber: userData.phoneNumber || '',
+            dateOfBirth: userData.dateOfBirth || ''
+          };
+          setFormData(formattedData);
+        }
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
