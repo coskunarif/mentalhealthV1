@@ -3,6 +3,8 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { auth, db, storage } from '../lib/firebase';
 import { UserModel, PersonalInformation, UserSettings } from '../models/user.model';
+import { UserStatsResponse } from '../models/user-stats.model';
+import { clientFunctions, userService } from './firebase-functions';
 
 // User operations
 
@@ -10,11 +12,15 @@ export class UserService {
   /**
    * Get user profile data
    */
-  static async getUserProfile(userId: string): Promise<UserModel | null> {
+  static async getUserProfile(userId: string | undefined): Promise<UserModel | null> {
     try {
+      if (!userId) {
+        return null;
+      }
+
       const userRef = doc(db, 'users', userId);
       const userDoc = await getDoc(userRef);
-      
+
       if (userDoc.exists()) {
         return userDoc.data() as UserModel;
       }
@@ -194,6 +200,26 @@ export class UserService {
       });
     } catch (error) {
       console.error('Error updating subscription:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get comprehensive user stats via Cloud Function
+   */
+static async getUserDetailedStats(userId: string): Promise<UserStatsResponse['stats']> {
+    try {
+      if (!userId) throw new Error('User ID is required');
+      
+      const result = await userService.getStats();
+      
+      if (result.success) {
+        return result.stats; // This is now correct since we're returning the stats property
+      } else {
+        throw new Error('Failed to get user stats');
+      }
+    } catch (error) {
+      console.error('Error getting user stats:', error);
       throw error;
     }
   }

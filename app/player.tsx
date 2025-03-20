@@ -121,7 +121,7 @@ export default function PlayerScreen() {
   const styles = createStyles(theme);
 
   const { user } = useAuth();
-  const userId = user?.uid;
+  const userId = user?.uid || ''; // Provide default empty string
 
   const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'exhale' | 'hold'>('inhale');
   const [breathingCycleCount, setBreathingCycleCount] = useState(0);
@@ -347,6 +347,11 @@ export default function PlayerScreen() {
 
   const handleMeditationCompletion = async () => {
     try {
+      if (!userId) {
+        console.error('User ID is required');
+        return;
+      }
+
       await UserService.trackActivity({
         userId,
         type: 'meditation',

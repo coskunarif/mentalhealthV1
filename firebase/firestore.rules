@@ -2,7 +2,7 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Common validation functions
+    // Helper functions
     function isSignedIn() {
       return request.auth != null;
     }
@@ -15,31 +15,53 @@ service cloud.firestore {
       let requiredFields = ['userId', 'timestamp', 'mood', 'value'];
       let hasAllFields = requiredFields.hasAll(request.resource.data.keys());
       let validValue = request.resource.data.value >= 0 && request.resource.data.value <= 100;
+      let validTimestamp = request.resource.data.timestamp is timestamp;
+      let futureCheck = request.resource.data.timestamp <= request.time;
+      let validUserId = request.resource.data.userId == request.auth.uid;
 
-      return hasAllFields && validValue;
+      return hasAllFields && validValue && validTimestamp && futureCheck && validUserId;
     }
 
-    // User profile data with validation
+    function isRecentTimestamp() {
+      // Ensure timestamps are within the last 5 minutes for better security
+      return request.time.toMillis() - request.resource.data.timestamp.toMillis() < 5 * 60 * 1000;
+    }
+
+    // User profile data with improved validation
     match /users/{userId} {
       allow read: if isCurrentUser(userId);
       allow create: if isCurrentUser(userId) && 
-                      request.resource.data.keys().hasAll(['email', 'displayName', 'createdAt']);
+                    request.resource.data.keys().hasAll(['email', 'displayName', 'createdAt']);
       allow update: if isCurrentUser(userId) && 
-                      request.resource.data.diff(resource.data).affectedKeys()
-                      .hasAny(['displayName', 'photoURL', 'settings', 'stats']);
+                    request.resource.data.diff(resource.data).affectedKeys()
+                    .hasAny(['displayName', 'photoURL', 'settings', 'stats']) &&
+                    // Make sure critical fields aren't modified
+                    request.resource.data.uid == resource.data.uid &&
+                    request.resource.data.email == resource.data.email;
       allow delete: if false;
     }
 
-    // Mood tracking data with validation
+    // Rate limits collection (for function rate limiting)
+    match /rateLimits/{userId}/{document=**} {
+      allow read: if isCurrentUser(userId);
+      allow write: if false; // Only server can write
+    }
+
+    // Mood tracking data with improved validation
     match /moods/{moodId} {
       allow read: if isSignedIn() && request.auth.uid == resource.data.userId;
-      allow create: if isSignedIn() && 
-                      request.auth.uid == request.resource.data.userId && 
-                      isValidMood();
+      allow create: if isSignedIn() && isValidMood() && isRecentTimestamp();
       allow update: if isSignedIn() && 
-                      request.auth.uid == resource.data.userId;
+                    request.auth.uid == resource.data.userId &&
+                    // Limit which fields can be updated
+                    request.resource.data.diff(resource.data).affectedKeys()
+                    .hasOnly(['notes', 'factors']) &&
+                    // Don't allow changing the original data
+                    request.resource.data.value == resource.data.value &&
+                    request.resource.data.timestamp == resource.data.timestamp &&
+                    request.resource.data.mood == resource.data.mood;
       allow delete: if isSignedIn() && 
-                      request.auth.uid == resource.data.userId;
+                    request.auth.uid == resource.data.userId;
     }
 
     // Exercise data
@@ -54,20 +76,63 @@ service cloud.firestore {
       allow write: if false; // Only admin can modify meditations
     }
 
-    // User progress data
+    // User progress data with improved validation
     match /users/{userId}/progress/{progressId} {
       allow read: if isCurrentUser(userId);
-      allow create: if isCurrentUser(userId);
-      allow update: if isCurrentUser(userId);
+      allow create: if isCurrentUser(userId) && 
+                    request.resource.data.userId == userId;
+      allow update: if isCurrentUser(userId) &&
+                    request.resource.data.userId == userId;
       allow delete: if false;
     }
 
-    // Survey responses
+    // Survey responses with improved validation
     match /surveys/{surveyId} {
+      // Validate survey structure
+      function isValidSurvey() {
+        let hasRequired = request.resource.data.keys().hasAll(['userId', 'timestamp', 'questions']);
+        let validUser = request.resource.data.userId == request.auth.uid;
+        let validTimestamp = request.resource.data.timestamp is timestamp && 
+                             request.resource.data.timestamp <= request.time;
+        let questionsValid = request.resource.data.questions is list;
+        
+        return hasRequired && validUser && validTimestamp && questionsValid;
+      }
+      
       allow read: if isSignedIn() && request.auth.uid == resource.data.userId;
-      allow create: if isSignedIn() && request.auth.uid == request.resource.data.userId;
-      allow update: if isSignedIn() && request.auth.uid == resource.data.userId;
+      allow create: if isSignedIn() && isValidSurvey() && isRecentTimestamp();
+      allow update: if isSignedIn() && 
+                    request.auth.uid == resource.data.userId &&
+                    // Limit what can be updated
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['answers']);
       allow delete: if false;
+    }
+
+    // User activities subcollection with improved validation
+    match /users/{userId}/activities/{activityId} {
+      function isValidActivity() {
+        let allowedTypes = ['meditation', 'exercise', 'survey'];
+        let hasRequired = request.resource.data.keys().hasAll(['userId', 'timestamp', 'type']);
+        let validType = allowedTypes.hasAny([request.resource.data.type]);
+        let validTimestamp = request.resource.data.timestamp is timestamp && 
+                             request.resource.data.timestamp <= request.time;
+        
+        return hasRequired && validType && validTimestamp;
+      }
+      
+      allow read: if isCurrentUser(userId);
+      allow create: if isCurrentUser(userId) && 
+                    request.resource.data.userId == userId &&
+                    isValidActivity();
+      allow update: if isCurrentUser(userId) &&
+                    request.resource.data.userId == userId;
+      allow delete: if isCurrentUser(userId);
+    }
+    
+    // Analytics collection for aggregated data
+    match /stats/{document=**} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only server can write
     }
   }
 }

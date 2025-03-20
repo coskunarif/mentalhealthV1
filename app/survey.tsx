@@ -6,6 +6,7 @@ import { ScreenLayout } from './components/ScreenLayout';
 import { router } from 'expo-router';
 import EnhancedButton from './components/EnhancedButton';
 import { SurveyService } from './services/survey.service';
+import { useAuth } from './context/auth';
 
 const questions = [
     {
@@ -201,6 +202,9 @@ const styles = (theme: any) => StyleSheet.create({
 
 const SurveyScreen = () => {
     const theme = useTheme();
+    const { user } = useAuth();
+    const userId = user?.uid || ''; // Provide default empty string
+
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState<(string | undefined)[]>([]);
     const themedStyles = React.useMemo(() => styles(theme), [theme]);
@@ -224,6 +228,11 @@ const SurveyScreen = () => {
     const handleNext = async () => {
         const isLastQuestion = currentQuestion === questions.length - 1;
         if (isLastQuestion) {
+            if (!userId) {
+                console.error('User ID is required');
+                return;
+            }
+
             try {
                 await SurveyService.saveSurveyResponse({
                     userId,
@@ -239,8 +248,10 @@ const SurveyScreen = () => {
         }
     };
 
-    const progress = (currentQuestion + 1) / questions.length;
+    const isLastQuestion = currentQuestion === questions.length - 1;
     const isFirstQuestion = currentQuestion === 0;
+
+    const progress = (currentQuestion + 1) / questions.length;
 
     return (
         <ScreenLayout 

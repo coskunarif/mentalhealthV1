@@ -99,6 +99,8 @@ function MoodSelector({
   };
 
   const handleFinish = async () => {
+    const userId = 'user-id'; // Replace with actual user ID
+
     if (selectedMood) {
       try {
         await MoodService.saveMoodEntry({

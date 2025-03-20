@@ -17,10 +17,23 @@ const todaysFocus = {
   affirmation: "You're capable of handling whatever comes today."
 };
 
+interface RadarData {
+  label: string;
+  value: number;
+}
+interface RecentActivity {
+  id: string;
+  type: string;
+  title: string;
+  subtitle: string;
+  duration: number;
+  timestamp: Date;
+}
+
 export default function Home() {
   const theme = useTheme<AppTheme>();
-  const [radarData, setRadarData] = useState([]);
-  const [recentActivities, setRecentActivities] = useState([]);
+  const [radarData, setRadarData] = useState<RadarData[]>([]);
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
   const userId = 'user-id'; // Replace with actual user ID
 
   useEffect(() => {

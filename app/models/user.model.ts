@@ -30,6 +30,9 @@ export interface UserModel {
   stats: UserStats;
   phoneNumber?: string;
   dateOfBirth?: string;
+  sessions?: number;
+  streak?: number;
+  surveys?: number;
 }
 
 export interface PersonalInformation {

@@ -42,9 +42,9 @@ export default function ProfileScreen() {
       try {
         const stats = await UserService.getUserProfile(user?.uid);
         setUserStats({
-          sessions: stats.sessions || 0,
-          streak: stats.streak || 0,
-          surveys: stats.surveys || 0,
+          sessions: stats?.sessions || 0,
+          streak: stats?.streak || 0,
+          surveys: stats?.surveys || 0,
         });
       } catch (error) {
         console.error('Error fetching user stats:', error);
