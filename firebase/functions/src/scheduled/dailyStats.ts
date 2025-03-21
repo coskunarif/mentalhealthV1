@@ -1,7 +1,13 @@
-import * as functions from 'firebase-functions';
+import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
+import { logger } from 'firebase-functions';
 
-export const dailyStats = functions.pubsub.schedule('every 24 hours').onRun(async (context) => {
+export const dailyStats = onSchedule({
+  schedule: 'every 24 hours',
+  timeZone: 'UTC',
+  retryCount: 3,
+  memory: '256MiB',
+}, async (event) => {
   try {
     const today = new Date();
     const yesterday = new Date(today);
@@ -101,10 +107,10 @@ export const dailyStats = functions.pubsub.schedule('every 24 hours').onRun(asyn
 
     await batch.commit();
 
-    console.log(`Daily stats processed for ${yesterdayString}`);
-    return null;
+    logger.info(`Daily stats processed for ${yesterdayString}`);
+    return;
   } catch (error) {
-    console.error('Error processing daily stats:', error);
-    return null;
+    logger.error('Error processing daily stats:', error);
+    return;
   }
 });

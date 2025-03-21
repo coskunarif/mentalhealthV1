@@ -65,3 +65,4 @@ export class SurveyService {
     }
   }
 }
+export default SurveyService;

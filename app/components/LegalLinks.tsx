@@ -56,3 +56,5 @@ const styles = StyleSheet.create({
     lineHeight: theme.fonts.bodyLarge.lineHeight * 0.9,
   },
 });
+
+export default LegalLinks;

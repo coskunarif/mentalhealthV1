@@ -8,3 +8,5 @@ declare module 'react-native-paper' {
     // Merge any other custom properties if needed.
   }
 }
+
+export default {};

@@ -1,7 +1,14 @@
 import { collection, addDoc, query, where, orderBy, getDocs, doc, updateDoc, deleteDoc, limit } from 'firebase/firestore';
-import { db, functions, Timestamp, queryDocuments, getDocument } from '../lib/firebase';
-import { MoodEntry, MoodInsights } from '../models/mood.model';
-import { moodService } from './firebase-functions';
+import { db } from '../lib/firebase';
+import { Timestamp, queryDocuments, getDocument } from '../lib/firebase/firestore';
+import { MoodEntry, MoodInsights, MoodInsightsResponse } from '../models/mood.model';
+import { getFunctions, httpsCallable, HttpsCallableResult } from '@firebase/functions';
+import { app } from '../lib/firebase';
+
+const functions = getFunctions(app!);
+const moodService = {
+  generateInsights: httpsCallable<unknown, MoodInsightsResponse>(functions, 'generateMoodInsights'),
+};
 
 // Updated to use the new client SDK
 export const moodServiceUpdated = {
@@ -93,12 +100,11 @@ export class MoodService {
 
   static async generateInsights(userId: string, timeframe: 'week' | 'month' | 'year' = 'week'): Promise<MoodInsights> {
     try {
-      // Use the moodService from firebase-functions.ts
-      const result = await moodService.generateInsights(timeframe);
-      if (result.success && result.insights) {
-        return result.insights;
+      const result = await moodService.generateInsights({ timeframe });
+      if (result.data.success && result.data.insights) {
+        return result.data.insights;
       } else {
-        throw new Error(result.message || 'Failed to generate insights');
+        throw new Error(result.data.message || 'Failed to generate insights');
       }
     } catch (error) {
       console.error('Error generating mood insights:', error);
@@ -106,3 +112,4 @@ export class MoodService {
     }
   }
 }
+export default MoodService;

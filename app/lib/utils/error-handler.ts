@@ -25,3 +25,4 @@ export const handleError = (error: any): FirebaseError => {
 
   return new FirebaseError('unknown', error.message || 'An unexpected error occurred');
 };
+export default FirebaseError;

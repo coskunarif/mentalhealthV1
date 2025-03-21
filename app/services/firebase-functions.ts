@@ -1,5 +1,5 @@
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '../lib/firebase/client';
+import { httpsCallable } from '@firebase/functions';
+import { functions } from '../lib/firebase/firebase';
 
 export interface MoodInsightsRequest {
   timeframe: 'week' | 'month' | 'year';
@@ -78,3 +78,4 @@ export const userService = {
     }
   }
 };
+export default {};

@@ -1,11 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, initializeAuth, browserLocalPersistence, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, collection, enableIndexedDbPersistence, connectFirestoreEmulator } from 'firebase/firestore';
-import { getStorage, connectStorageEmulator } from 'firebase/storage';
-import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
-import { getAnalytics, isSupported, Analytics } from 'firebase/analytics';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
+import { getAnalytics, isSupported } from 'firebase/analytics';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import { getReactNativePersistence } from 'firebase/auth/react-native';
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -18,51 +18,53 @@ const firebaseConfig = {
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase app
-const firebaseApp = initializeApp(firebaseConfig);
+// Prevent multiple initializations
+import { FirebaseApp } from 'firebase/app';
+import { Auth } from 'firebase/auth';
+import { Firestore } from 'firebase/firestore';
+import { FirebaseStorage } from 'firebase/storage';
+import { Analytics } from 'firebase/analytics';
 
-// Initialize services
-const firebaseAuth = initializeAuth(firebaseApp, {
-  persistence: browserLocalPersistence,
-});
-const firestore = getFirestore(firebaseApp);
-const firebaseStorage = getStorage(firebaseApp);
-const firebaseFunctions = getFunctions(firebaseApp);
-
-// Initialize offline persistence for Firestore (with error handling)
-if (Platform.OS !== 'web') {
-  enableIndexedDbPersistence(firestore).catch((err) => {
-    console.error("Firestore persistence error:", err.code);
-  });
-}
-
-// Initialize Analytics conditionally
+let firebaseApp: FirebaseApp | null = null;
+let firebaseAuth: Auth;
+let firestore: Firestore;
+let firebaseStorage: FirebaseStorage;
 let firebaseAnalytics: Analytics | null = null;
-isSupported().then(isSupported => {
-  if (isSupported) {
-    firebaseAnalytics = getAnalytics(firebaseApp);
+
+// Initialize Firebase if not already initialized
+if (!firebaseApp) {
+  firebaseApp = initializeApp(firebaseConfig);
+  
+  // Initialize Auth with AsyncStorage persistence
+  firebaseAuth = getAuth();
+  
+  // Set persistence separately to avoid re-initialization issues
+  if (Platform.OS !== 'web') {
+    firebaseAuth.setPersistence(getReactNativePersistence(AsyncStorage))
+      .catch(error => {
+        console.error("Error setting persistence:", error);
+      });
   }
-}).catch(error => {
-  console.error("Analytics support check failed:", error);
-});
-
-// Emulator connections for local development
-if (process.env.EXPO_PUBLIC_USE_FIREBASE_EMULATOR === 'true') {
-  const host = Platform.OS === 'web' ? 'localhost' : '10.0.2.2';
-  connectAuthEmulator(firebaseAuth, `http://${host}:9099`);
-  connectFirestoreEmulator(firestore, host, 8080);
-  connectFunctionsEmulator(firebaseFunctions, host, 5001);
-  connectStorageEmulator(firebaseStorage, host, 9199);
-
-  console.log('Using Firebase Emulators');
+  
+  // Initialize Firestore
+  firestore = getFirestore(firebaseApp);
+  
+  // Initialize other services
+  firebaseStorage = getStorage(firebaseApp);
+  
+  // Initialize Analytics conditionally
+  if (Platform.OS !== 'web') {
+    isSupported()
+      .then(supported => {
+        if (supported && firebaseApp) {
+          firebaseAnalytics = getAnalytics(firebaseApp);
+        }
+      })
+      .catch(error => {
+        console.error("Analytics support check failed:", error);
+      });
+  }
 }
-
-// Create collection references
-const usersCollection = collection(firestore, 'users');
-const moodsCollection = collection(firestore, 'moods');
-const exercisesCollection = collection(firestore, 'exercises');
-const meditationsCollection = collection(firestore, 'meditations');
-const surveysCollection = collection(firestore, 'surveys');
 
 // Export Firebase instances
 export {
@@ -70,11 +72,12 @@ export {
   firebaseAuth as auth,
   firestore as db,
   firebaseStorage as storage,
-  firebaseFunctions as functions,
-  firebaseAnalytics as analytics,
-  usersCollection,
-  moodsCollection,
-  exercisesCollection,
-  meditationsCollection,
-  surveysCollection
+  firebaseAnalytics as analytics
 };
+
+import { getFunctions } from 'firebase/functions';
+export const functions = getFunctions(firebaseApp);
+
+export type { User } from 'firebase/auth';
+
+export default {};

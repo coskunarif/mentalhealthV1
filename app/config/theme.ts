@@ -138,3 +138,5 @@ export const CARD_ELEVATION = {
   RAISED: theme.colors.elevation.level2,
   FLOATING: theme.colors.elevation.level3
 };
+
+export default {};

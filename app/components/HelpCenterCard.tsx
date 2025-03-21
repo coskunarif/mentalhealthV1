@@ -100,3 +100,5 @@ export const HelpCenterCard: React.FC<HelpCenterCardProps> = ({
     </Surface>
   );
 };
+
+export default HelpCenterCard;

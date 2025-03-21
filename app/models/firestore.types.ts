@@ -41,3 +41,4 @@ export interface MoodEntry extends FirestoreDocument {
   factors?: string[];
   notes?: string;
 }
+export default {};

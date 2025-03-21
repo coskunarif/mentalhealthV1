@@ -17,3 +17,10 @@ export {
 export * from './auth';
 export * from './firestore';
 export * from './storage';
+
+// Export type
+export type { User } from 'firebase/auth';
+
+export { Timestamp, queryDocuments, getDocument } from './firestore';
+
+export default {};

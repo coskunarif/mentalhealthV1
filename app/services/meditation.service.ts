@@ -1,2 +1,3 @@
 // Meditation content
 // ...existing code...
+export default {};

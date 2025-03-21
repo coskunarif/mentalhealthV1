@@ -1,10 +1,10 @@
 import { doc, getDoc, updateDoc, setDoc, onSnapshot, Unsubscribe, collection } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
-import { auth, db, storage } from '../lib/firebase';
+import { auth, db, storage, app } from '../lib/firebase';
 import { UserModel, PersonalInformation, UserSettings } from '../models/user.model';
+import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 import { UserStatsResponse } from '../models/user-stats.model';
-import { clientFunctions, userService } from './firebase-functions';
 
 // User operations
 
@@ -207,14 +207,16 @@ export class UserService {
   /**
    * Get comprehensive user stats via Cloud Function
    */
-static async getUserDetailedStats(userId: string): Promise<UserStatsResponse['stats']> {
+  static async getUserDetailedStats(userId: string): Promise<UserStatsResponse['stats']> {
     try {
       if (!userId) throw new Error('User ID is required');
+
+      const functions = getFunctions(app!);
+      const getStats = httpsCallable<unknown, UserStatsResponse>(functions, 'getUserStats');
       
-      const result = await userService.getStats();
-      
-      if (result.success) {
-        return result.stats; // This is now correct since we're returning the stats property
+      const result = await getStats();
+      if (result.data.success) {
+        return result.data.stats;
       } else {
         throw new Error('Failed to get user stats');
       }
@@ -224,3 +226,5 @@ static async getUserDetailedStats(userId: string): Promise<UserStatsResponse['st
     }
   }
 }
+
+export default UserService;

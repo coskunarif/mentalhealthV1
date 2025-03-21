@@ -14,10 +14,7 @@ import {
   DocumentData,
   DocumentSnapshot,
   QuerySnapshot,
-  Timestamp,
-  enableMultiTabIndexedDbPersistence,
-  disableNetwork,
-  enableNetwork
+  Timestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -81,19 +78,7 @@ export async function queryDocuments<T>(
   }
 }
 
-// Configure offline persistence
-export const configureOfflineSupport = async () => {
-  try {
-    await enableMultiTabIndexedDbPersistence(db);
-    console.log('Offline persistence enabled');
-  } catch (error) {
-    console.error('Error enabling offline support:', error);
-  }
-};
-
-// Methods to handle connectivity
-export const goOffline = () => disableNetwork(db);
-export const goOnline = () => enableNetwork(db);
-
 // Export timestamp for ease of use
 export { Timestamp };
+
+export default {};

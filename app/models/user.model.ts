@@ -41,3 +41,4 @@ export interface PersonalInformation {
   phoneNumber?: string;
   dateOfBirth?: string;
 }
+export default {};

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, User } from '../lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -8,7 +8,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
+export const AuthContext = createContext<AuthContextType>({
   user: null,
   initialized: false,
   signOut: async () => {},
@@ -21,12 +21,11 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [initialized, setInitialized] = useState(false);
-  const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
-  const persistenceKey = `firebase:authUser:${projectId}:[DEFAULT]`;
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user: User | null) => {
-      setUser(user);
+    // Only subscribe to auth state changes - don't initialize auth again
+    const unsubscribe = onAuthStateChanged(auth, (authUser: User | null) => {
+      setUser(authUser);
       setInitialized(true);
     });
 
@@ -36,7 +35,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleSignOut = async () => {
     try {
       await auth.signOut();
-      await AsyncStorage.removeItem(persistenceKey);
       setUser(null);
     } catch (error) {
       console.error('Error signing out:', error);
@@ -44,11 +42,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signOut = async () => {
-    await handleSignOut();
+  const authContextValue: AuthContextType = {
+    user,
+    initialized,
+    signOut: handleSignOut
   };
-
-  const authContextValue: AuthContextType = { user, initialized, signOut };
 
   return (
     <AuthContext.Provider value={authContextValue}>
@@ -57,7 +55,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default {
-  useAuth,
-  AuthProvider,
-};
+export default AuthProvider;

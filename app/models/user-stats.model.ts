@@ -48,3 +48,5 @@ export interface UserStatsResponse {
   success: boolean;
   stats: UserStats;
 }
+
+export default {};
