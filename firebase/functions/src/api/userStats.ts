@@ -1,6 +1,6 @@
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
-import { logger } from 'firebase-functions';
+import { logger } from 'firebase-functions/v2';
 
 interface MoodData {
   id: string;

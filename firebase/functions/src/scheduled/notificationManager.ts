@@ -1,6 +1,6 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
-import { logger } from 'firebase-functions';
+import { logger } from 'firebase-functions/v2';
 
 export const sendDailyMeditationReminder = onSchedule({
   schedule: 'every day 09:00',

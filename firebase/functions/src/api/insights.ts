@@ -1,6 +1,6 @@
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import * as admin from 'firebase-admin';
-import { logger } from 'firebase-functions';
+import { logger } from 'firebase-functions/v2';
 
 interface MoodData {
   timestamp: admin.firestore.Timestamp;
@@ -155,11 +155,10 @@ export const generateMoodInsights = onCall({
       message: 'Insights generated successfully'
     };
   } catch (error) {
-    logger.error('Error generating mood insights', {
-      userId,
-      timeframe,
-      error: error instanceof Error ? error.toString() : 'Unknown error'
-    });
+logger.error('Error generating mood insights', error, {
+  userId,
+  timeframe
+});
 
     if (error instanceof HttpsError) {
       throw error; // Re-throw if it's already a proper HttpsError
