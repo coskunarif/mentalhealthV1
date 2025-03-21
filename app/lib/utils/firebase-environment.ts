@@ -12,3 +12,5 @@ export function preventClientImport(moduleName: string): void {
     );
   }
 }
+
+export default {};

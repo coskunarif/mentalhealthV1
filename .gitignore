@@ -46,3 +46,4 @@ config/firebase.ts
 *.swp
 *.swo
 .DS_Store
+*.log

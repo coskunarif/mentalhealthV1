@@ -9,19 +9,19 @@ import ErrorBoundary from './components/ErrorBoundary';
 import type { AppTheme } from './types/theme';
 import { useTheme } from 'react-native-paper';
 
+// Initialize Firebase once at app startup before component rendering
+import './lib/firebase';
+
 // Keep the splash screen visible while resources load
 SplashScreen.preventAutoHideAsync();
 
 export default function AppLayout() {
   const appTheme = useTheme<AppTheme>();
-    console.log('Theme in AppLayout:', importedTheme);
-    if (!importedTheme.spacing) {
-      console.error('Theme is missing spacing property');
-    }
-
+  
   const [loaded] = useFonts({
     'Kameron': require('../assets/fonts/Kameron-Regular.ttf'),
     'Kameron-Bold': require('../assets/fonts/Kameron-Bold.ttf'),
+    'Nunito': require('../assets/fonts/Nunito-Regular.ttf'),
   });
 
   const onLayoutRootView = useCallback(async () => {
@@ -42,23 +42,23 @@ export default function AppLayout() {
     <ErrorBoundary>
       <PaperProvider theme={importedTheme}>
         <AuthProvider>
-        <Stack
-          screenOptions={{
-            headerStyle: {
-              backgroundColor: appTheme.colors.surface,
-            },
-            headerShadowVisible: false,
-            headerTitleStyle: {
-              fontFamily: 'Nunito',
-              fontWeight: '600',
-              fontSize: 20,
-            },
-            contentStyle: {
-              backgroundColor: appTheme.colors.background,
-            },
-            headerShown: false,
-          }}
-        />
+          <Stack
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: appTheme.colors.surface,
+              },
+              headerShadowVisible: false,
+              headerTitleStyle: {
+                fontFamily: 'Nunito',
+                fontWeight: '600',
+                fontSize: 20,
+              },
+              contentStyle: {
+                backgroundColor: appTheme.colors.background,
+              },
+              headerShown: false,
+            }}
+          />
         </AuthProvider>
       </PaperProvider>
     </ErrorBoundary>

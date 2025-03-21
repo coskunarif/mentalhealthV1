@@ -124,3 +124,5 @@ export interface PlayerTheme {
     bodyMedium: TextStyle;
   };
 }
+
+export default {};

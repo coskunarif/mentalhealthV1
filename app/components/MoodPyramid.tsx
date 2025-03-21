@@ -297,3 +297,5 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
     </ScreenLayout>
   );
 }
+
+export default MoodPyramid;

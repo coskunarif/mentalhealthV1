@@ -16,3 +16,5 @@ declare module 'react-native-paper-dates' {
 
   export const DatePickerModal: React.FC<DatePickerModalProps>;
 }
+
+export default {};

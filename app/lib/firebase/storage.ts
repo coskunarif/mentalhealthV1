@@ -46,3 +46,5 @@ export async function deleteFile(path: string): Promise<void> {
     throw error;
   }
 }
+
+export default {};

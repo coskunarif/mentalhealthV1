@@ -1,2 +1,7 @@
 // Exercise model
-// ...existing code...
+export interface Exercise {
+  id: string;
+  name: string;
+}
+
+export default {};

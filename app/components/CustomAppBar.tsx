@@ -122,3 +122,5 @@ export const CustomAppBar: React.FC<{
     </View>
   );
 };
+
+export default CustomAppBar;

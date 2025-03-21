@@ -118,3 +118,5 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
     </View>
   );
 };
+
+export default ScreenLayout;

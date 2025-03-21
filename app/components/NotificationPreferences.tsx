@@ -92,3 +92,5 @@ export const NotificationPreferences: React.FC<NotificationPreferencesProps> = (
     </Surface>
   );
 };
+
+export default NotificationPreferences;

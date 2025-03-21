@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import * as functions from 'firebase-functions';
+import { setGlobalOptions } from 'firebase-functions/v2';
 import { onUserCreate } from './auth/onUserCreate';
 import { dailyStats } from './scheduled/dailyStats';
 import { generateMoodInsights } from './api/insights';
@@ -8,6 +8,14 @@ import { sendDailyMeditationReminder } from './scheduled/notificationManager';
 
 // Initialize Firebase Admin
 admin.initializeApp();
+
+// Set global options for all functions
+setGlobalOptions({
+  region: 'us-central1',
+  maxInstances: 10,
+  minInstances: 0,
+  timeoutSeconds: 60
+});
 
 // Export all functions
 export {

@@ -21,3 +21,11 @@ export interface MoodInsights {
   lowestMood: { type: string; value: number };
   moodsByDay: { [key: string]: number };
 }
+
+export interface MoodInsightsResponse {
+  success: boolean;
+  insights: MoodInsights | null;
+  message: string;
+}
+
+export default {};

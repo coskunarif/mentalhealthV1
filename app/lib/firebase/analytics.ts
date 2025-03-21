@@ -20,3 +20,4 @@ export const logUserAction = (action: string, params?: Record<string, any>) => {
     ...params
   });
 };
+export default {};

@@ -57,3 +57,5 @@ export function handleFirebaseError(error: any): AppError {
   
   return new AppError(ErrorCode.UNKNOWN_ERROR, error.message || 'An unexpected error occurred');
 }
+
+export default AppError;

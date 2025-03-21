@@ -1,8 +1,7 @@
-import * as functions from 'firebase-functions';
+import { onUserCreated as triggerOnUserCreated } from 'firebase-functions/v2/identity';
 import * as admin from 'firebase-admin';
-import * as z from 'zod'; // Add zod for validation
+import * as z from 'zod';
 
-// Define schema for user data
 const userSchema = z.object({
   uid: z.string(),
   email: z.string().email().nullable(),
@@ -27,11 +26,13 @@ const userSchema = z.object({
   }).default({})
 });
 
-export const onUserCreate = functions.auth.user().onCreate(async (user) => {
+export const onUserCreated = triggerOnUserCreated({
+  memory: '256MiB',
+}, async (event: any) => {
+  const user = event.data;
   try {
     const timestamp = admin.firestore.FieldValue.serverTimestamp();
 
-    // Create validated user object
     const userData = userSchema.parse({
       uid: user.uid,
       email: user.email,
@@ -56,17 +57,19 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
       }
     });
 
-    // Create user profile in Firestore
     await admin.firestore().collection('users').doc(user.uid).set({
       ...userData,
       createdAt: timestamp,
       updatedAt: timestamp,
     });
 
-    // Create default progress documents
     const batch = admin.firestore().batch();
 
-    const meditationRef = admin.firestore().collection('users').doc(user.uid).collection('progress').doc('meditation');
+    const meditationRef = admin.firestore()
+      .collection('users')
+      .doc(user.uid)
+      .collection('progress')
+      .doc('meditation');
     batch.set(meditationRef, {
       userId: user.uid,
       totalTime: 0,
@@ -75,7 +78,11 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
       updatedAt: timestamp
     });
 
-    const overviewRef = admin.firestore().collection('users').doc(user.uid).collection('progress').doc('overview');
+    const overviewRef = admin.firestore()
+      .collection('users')
+      .doc(user.uid)
+      .collection('progress')
+      .doc('overview');
     batch.set(overviewRef, {
       overall: 0,
       categories: {},
@@ -84,10 +91,10 @@ export const onUserCreate = functions.auth.user().onCreate(async (user) => {
 
     await batch.commit();
 
-    functions.logger.info(`User profile created for ${user.uid}`);
+    console.log(`User profile created for ${user.uid}`);
     return null;
   } catch (error) {
-    functions.logger.error('Error creating user profile:', error);
+    console.error('Error creating user profile:', error);
     return null;
   }
 });

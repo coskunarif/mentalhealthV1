@@ -155,3 +155,5 @@ export const LanguageRegionSettings: React.FC<LanguageRegionSettingsProps> = ({
     </>
   );
 };
+
+export default LanguageRegionSettings;

@@ -232,3 +232,5 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
     </Card>
   );
 };
+
+export default EditPersonalInfoForm;

@@ -1,2 +1,3 @@
 // Survey model
 // ...existing code...
+export default {};

@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "mentalhealthv1"
-  }
+    "default": "mentalhealthv1",
+    "prod": "mentalhealthv1"
+  },
+  "targets": {},
+  "etags": {}
 }
