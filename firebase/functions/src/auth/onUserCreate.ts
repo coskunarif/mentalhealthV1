@@ -1,4 +1,4 @@
-import { onUserCreated as triggerOnUserCreated } from 'firebase-functions/v2/identity';
+import { beforeUserCreated } from 'firebase-functions/v2/identity';
 import * as admin from 'firebase-admin';
 import * as z from 'zod';
 
@@ -26,8 +26,9 @@ const userSchema = z.object({
   }).default({})
 });
 
-export const onUserCreated = triggerOnUserCreated({
-  memory: '256MiB',
+export const onUserCreate = beforeUserCreated({
+  region: 'europe-west1',
+  memory: '256MiB'
 }, async (event: any) => {
   const user = event.data;
   try {
@@ -60,7 +61,7 @@ export const onUserCreated = triggerOnUserCreated({
     await admin.firestore().collection('users').doc(user.uid).set({
       ...userData,
       createdAt: timestamp,
-      updatedAt: timestamp,
+      updatedAt: timestamp
     });
 
     const batch = admin.firestore().batch();
@@ -92,9 +93,9 @@ export const onUserCreated = triggerOnUserCreated({
     await batch.commit();
 
     console.log(`User profile created for ${user.uid}`);
-    return null;
+    return user;
   } catch (error) {
     console.error('Error creating user profile:', error);
-    return null;
+    throw error;
   }
 });

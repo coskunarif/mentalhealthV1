@@ -44,6 +44,7 @@ interface UserStats {
 export const getUserStats = onCall({
   timeoutSeconds: 30,
   memory: '256MiB',
+  region: 'europe-west1'
 }, async (request) => {
   if (!request.auth) {
     throw new HttpsError(
