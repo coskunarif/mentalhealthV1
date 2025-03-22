@@ -24,6 +24,7 @@ export const generateMoodInsights = onCall({
   memory: '256MiB',
   maxInstances: 10,
   minInstances: 0,
+  region: 'europe-west1'
 }, async (request) => {
   // Authentication check
   if (!request.auth) {

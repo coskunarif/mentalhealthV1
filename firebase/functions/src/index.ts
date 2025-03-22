@@ -2,7 +2,7 @@ import { setGlobalOptions } from 'firebase-functions/v2';
 import * as admin from 'firebase-admin';
 
 setGlobalOptions({
-  region: 'us-central1',
+  region: 'europe-west1', // Changed from 'us-central1' to 'europe-west1'
   maxInstances: 10,
   minInstances: 0,
   timeoutSeconds: 60,
@@ -10,7 +10,7 @@ setGlobalOptions({
   concurrency: 80
 });
 
-import { onUserCreated } from './auth/onUserCreate';
+import { onUserCreate } from './auth/onUserCreate';
 import { dailyStats } from './scheduled/dailyStats';
 import { generateMoodInsights } from './api/insights';
 import { getUserStats } from './api/userStats';
@@ -22,7 +22,7 @@ admin.initializeApp();
 // Export all functions
 export {
   // Auth functions
-  onUserCreated,
+  onUserCreate,
   
   // Scheduled functions
   dailyStats,
