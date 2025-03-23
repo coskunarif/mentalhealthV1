@@ -1,24 +1,46 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserStats = void 0;
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-exports.getUserStats = functions
-    .runWith({
+const https_1 = require("firebase-functions/v2/https");
+const admin = __importStar(require("firebase-admin"));
+const v2_1 = require("firebase-functions/v2");
+exports.getUserStats = (0, https_1.onCall)({
     timeoutSeconds: 30,
-    memory: '256MB'
-})
-    .https.onCall(async (data, context) => {
-    var _a, _b, _c;
-    if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'You must be logged in to access this feature');
+    memory: '256MiB',
+    region: 'europe-west1'
+}, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError('unauthenticated', 'You must be logged in to access this feature');
     }
-    const userId = context.auth.uid;
+    const userId = request.auth.uid;
     try {
         // Get user document
         const userDoc = await admin.firestore().collection('users').doc(userId).get();
         if (!userDoc.exists) {
-            throw new functions.https.HttpsError('not-found', 'User profile not found');
+            throw new https_1.HttpsError('not-found', 'User profile not found');
         }
         const userData = userDoc.data() || {};
         // Get meditation progress
@@ -42,7 +64,14 @@ exports.getUserStats = functions
         const recentMoods = [];
         moodsSnapshot.forEach(doc => {
             const data = doc.data();
-            recentMoods.push(Object.assign({ id: doc.id, mood: data.mood, value: data.value, timestamp: data.timestamp, userId: data.userId }, data));
+            recentMoods.push({
+                id: doc.id,
+                mood: data.mood,
+                value: data.value,
+                timestamp: data.timestamp,
+                userId: data.userId,
+                ...data
+            });
         });
         // Get recent activities
         const activitiesSnapshot = await admin.firestore()
@@ -55,7 +84,14 @@ exports.getUserStats = functions
         const recentActivities = [];
         activitiesSnapshot.forEach(doc => {
             const data = doc.data();
-            recentActivities.push(Object.assign({ id: doc.id, type: data.type, timestamp: data.timestamp, details: data.details, userId: data.userId }, data));
+            recentActivities.push({
+                id: doc.id,
+                type: data.type,
+                timestamp: data.timestamp,
+                details: data.details,
+                userId: data.userId,
+                ...data
+            });
         });
         // Combine all stats
         const stats = {
@@ -63,15 +99,15 @@ exports.getUserStats = functions
                 displayName: userData.displayName || '',
                 photoURL: userData.photoURL || '',
                 createdAt: userData.createdAt || admin.firestore.Timestamp.now(),
-                streak: ((_a = userData.stats) === null || _a === void 0 ? void 0 : _a.streak) || 0
+                streak: userData.stats?.streak || 0
             },
             meditation: {
                 totalTime: meditationData.totalTime || 0,
                 sessions: meditationData.sessions || 0
             },
             activities: {
-                exercisesCompleted: ((_b = userData.stats) === null || _b === void 0 ? void 0 : _b.exercisesCompleted) || 0,
-                surveysCompleted: ((_c = userData.stats) === null || _c === void 0 ? void 0 : _c.surveysCompleted) || 0,
+                exercisesCompleted: userData.stats?.exercisesCompleted || 0,
+                surveysCompleted: userData.stats?.surveysCompleted || 0,
                 recentActivities
             },
             mood: {
@@ -81,11 +117,11 @@ exports.getUserStats = functions
         return { success: true, stats };
     }
     catch (error) {
-        functions.logger.error('Error retrieving user stats:', error);
-        if (error instanceof functions.https.HttpsError) {
+        v2_1.logger.error('Error retrieving user stats:', error);
+        if (error instanceof https_1.HttpsError) {
             throw error;
         }
-        throw new functions.https.HttpsError('internal', 'An error occurred while retrieving user statistics');
+        throw new https_1.HttpsError('internal', 'An error occurred while retrieving user statistics');
     }
 });
 //# sourceMappingURL=userStats.js.map

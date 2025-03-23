@@ -1,8 +1,12 @@
-import { setGlobalOptions } from 'firebase-functions/v2';
 import * as admin from 'firebase-admin';
+import { setGlobalOptions } from 'firebase-functions/v2';
 
+// Initialize Firebase Admin first (important for hybrid approach)
+admin.initializeApp();
+
+// Set global options for v2 functions
 setGlobalOptions({
-  region: 'europe-west1', // Changed from 'us-central1' to 'europe-west1'
+  region: 'europe-west1',
   maxInstances: 10,
   minInstances: 0,
   timeoutSeconds: 60,
@@ -10,25 +14,25 @@ setGlobalOptions({
   concurrency: 80
 });
 
+// Import v1 auth function
 import { onUserCreate } from './auth/onUserCreate';
+
+// Import v2 functions
 import { dailyStats } from './scheduled/dailyStats';
 import { generateMoodInsights } from './api/insights';
 import { getUserStats } from './api/userStats';
 import { sendDailyMeditationReminder } from './scheduled/notificationManager';
 
-// Initialize Firebase Admin
-admin.initializeApp();
-
 // Export all functions
 export {
-  // Auth functions
+  // Auth function (v1)
   onUserCreate,
   
-  // Scheduled functions
+  // Scheduled functions (v2)
   dailyStats,
   sendDailyMeditationReminder,
   
-  // Callable API functions
+  // Callable API functions (v2)
   generateMoodInsights,
   getUserStats
 };

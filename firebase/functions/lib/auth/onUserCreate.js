@@ -1,10 +1,32 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.onUserCreate = void 0;
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
-const z = require("zod"); // Add zod for validation
-// Define schema for user data
+const functions = __importStar(require("firebase-functions/v1"));
+const admin = __importStar(require("firebase-admin"));
+const z = __importStar(require("zod"));
 const userSchema = z.object({
     uid: z.string(),
     email: z.string().email().nullable(),
@@ -28,10 +50,13 @@ const userSchema = z.object({
         lastActiveDate: z.any().nullable()
     }).default({})
 });
-exports.onUserCreate = functions.auth.user().onCreate(async (user) => {
+// Use v1 auth trigger with European region
+exports.onUserCreate = functions
+    .region('europe-west1')
+    .auth.user()
+    .onCreate(async (user) => {
     try {
         const timestamp = admin.firestore.FieldValue.serverTimestamp();
-        // Create validated user object
         const userData = userSchema.parse({
             uid: user.uid,
             email: user.email,
@@ -55,11 +80,17 @@ exports.onUserCreate = functions.auth.user().onCreate(async (user) => {
                 lastActiveDate: null
             }
         });
-        // Create user profile in Firestore
-        await admin.firestore().collection('users').doc(user.uid).set(Object.assign(Object.assign({}, userData), { createdAt: timestamp, updatedAt: timestamp }));
-        // Create default progress documents
+        await admin.firestore().collection('users').doc(user.uid).set({
+            ...userData,
+            createdAt: timestamp,
+            updatedAt: timestamp
+        });
         const batch = admin.firestore().batch();
-        const meditationRef = admin.firestore().collection('users').doc(user.uid).collection('progress').doc('meditation');
+        const meditationRef = admin.firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('progress')
+            .doc('meditation');
         batch.set(meditationRef, {
             userId: user.uid,
             totalTime: 0,
@@ -67,19 +98,23 @@ exports.onUserCreate = functions.auth.user().onCreate(async (user) => {
             createdAt: timestamp,
             updatedAt: timestamp
         });
-        const overviewRef = admin.firestore().collection('users').doc(user.uid).collection('progress').doc('overview');
+        const overviewRef = admin.firestore()
+            .collection('users')
+            .doc(user.uid)
+            .collection('progress')
+            .doc('overview');
         batch.set(overviewRef, {
             overall: 0,
             categories: {},
             lastUpdated: timestamp
         });
         await batch.commit();
-        functions.logger.info(`User profile created for ${user.uid}`);
+        console.log(`User profile created for ${user.uid}`);
         return null;
     }
     catch (error) {
-        functions.logger.error('Error creating user profile:', error);
-        return null;
+        console.error('Error creating user profile:', error);
+        throw error;
     }
 });
 //# sourceMappingURL=onUserCreate.js.map

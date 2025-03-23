@@ -1,12 +1,14 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler';
-import * as admin from 'firebase-admin';
 import { logger } from 'firebase-functions/v2';
+import * as admin from 'firebase-admin';
+import { getMessaging } from 'firebase-admin/messaging';
 
 export const sendDailyMeditationReminder = onSchedule({
   schedule: 'every day 09:00',
-  timeZone: 'America/New_York',
+  timeZone: 'Europe/Berlin', // Changed from America/New_York to European timezone
   retryCount: 3,
   memory: '256MiB',
+  region: 'europe-west1' // Specifying European region
 }, async (event) => {
   try {
     const usersRef = admin.firestore().collection('users');
@@ -29,7 +31,7 @@ export const sendDailyMeditationReminder = onSchedule({
     for (let i = 0; i < tokens.length; i += batchSize) {
       const batchTokens = tokens.slice(i, i + batchSize);
       if (batchTokens.length > 0) {
-        await admin.messaging().sendMulticast({
+        await getMessaging().sendMulticast({
           tokens: batchTokens,
           notification: {
             title: 'Time for your daily meditation',

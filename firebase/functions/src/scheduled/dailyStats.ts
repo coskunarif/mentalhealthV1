@@ -4,9 +4,10 @@ import { logger } from 'firebase-functions/v2';
 
 export const dailyStats = onSchedule({
   schedule: 'every 24 hours',
-  timeZone: 'UTC',
+  timeZone: 'Europe/Berlin', // Using European timezone
   retryCount: 3,
   memory: '256MiB',
+  region: 'europe-west1' // Specifying European region
 }, async (event) => {
   try {
     const today = new Date();
