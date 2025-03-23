@@ -1,5 +1,5 @@
 import { collection, query, where, getDocs, doc, getDoc, orderBy, limit } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db } from '../lib/firebase-utils';
 
 export class ExerciseService {
   // Cache for recently fetched exercises

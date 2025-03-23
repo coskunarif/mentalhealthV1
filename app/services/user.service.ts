@@ -1,7 +1,7 @@
 import { doc, getDoc, updateDoc, setDoc, onSnapshot, Unsubscribe, collection } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
-import { auth, db, storage, app } from '../lib/firebase';
+import { auth, db, storage, app } from '../lib/firebase-utils';
 import { UserModel, PersonalInformation, UserSettings } from '../models/user.model';
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 import { UserStatsResponse } from '../models/user-stats.model';

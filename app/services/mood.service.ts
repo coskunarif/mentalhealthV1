@@ -1,9 +1,9 @@
 import { collection, addDoc, query, where, orderBy, getDocs, doc, updateDoc, deleteDoc, limit } from 'firebase/firestore';
-import { db } from '../lib/firebase';
-import { Timestamp, queryDocuments, getDocument } from '../lib/firebase/firestore';
+import { db } from '../lib/firebase-utils';
+import { Timestamp, queryDocuments, getDocument } from '../lib/firebase-utils/firestore';
 import { MoodEntry, MoodInsights, MoodInsightsResponse } from '../models/mood.model';
 import { getFunctions, httpsCallable, HttpsCallableResult } from '@firebase/functions';
-import { app } from '../lib/firebase';
+import { app } from '../lib/firebase-utils';
 
 const functions = getFunctions(app!);
 const moodService = {

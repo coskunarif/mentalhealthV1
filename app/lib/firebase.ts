@@ -1,2 +1,2 @@
-export * from './firebase/index';
+export * from './firebase-utils/index';
 export default {};

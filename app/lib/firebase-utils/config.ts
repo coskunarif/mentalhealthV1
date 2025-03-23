@@ -1,4 +1,4 @@
-// app/lib/firebase/config.ts
+// app/lib/firebase-utils/config.ts
 // Firebase configuration
 export const firebaseConfig = {
   apiKey: "YOUR_API_KEY", // Replace with your actual Firebase config

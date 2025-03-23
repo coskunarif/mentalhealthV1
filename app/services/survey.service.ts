@@ -1,5 +1,5 @@
 import { collection, addDoc, query, where, orderBy, getDocs, doc, updateDoc, setDoc, increment } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db } from '../lib/firebase-utils';
 
 export class SurveyService {
   /**

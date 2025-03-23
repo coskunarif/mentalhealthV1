@@ -1,4 +1,4 @@
-// app/lib/firebase/emulator-config.ts
+// app/lib/firebase-utils/emulator-config.ts
 // This file determines whether to use the emulator
 // For production, we'll always return false
 export const shouldUseEmulator = false;

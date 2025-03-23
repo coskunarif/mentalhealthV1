@@ -1,5 +1,5 @@
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
-import { app } from '../lib/firebase';
+import { app } from '../lib/firebase-utils';
 
 const functions = getFunctions(app);
 

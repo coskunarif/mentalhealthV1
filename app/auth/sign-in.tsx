@@ -4,7 +4,7 @@ import { Text, Button, useTheme } from 'react-native-paper';
 import { Link, router } from 'expo-router';
 import { layoutStyles, typographyStyles, buttonStyles } from '../config';
 import type { AppTheme } from '../types/theme';
-import { auth } from '../lib/firebase';
+import { auth } from '../lib/firebase-utils';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { AuthIllustration, MaterialInput } from '../components';
 
