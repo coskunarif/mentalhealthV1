@@ -4,17 +4,17 @@
   "main": "expo-router/entry",
   "scripts": {
     "preinstall": "node firebase-resolver.js",
-    "prestart": "npm run fix-exports",
+    "prestart": "node exclude-firebase-functions.js && node fix-exports.js",
     "start": "expo start --config ./rn-config-override.js",
     "fix-exports": "node fix-exports.js",
-    "fix-and-start": "npm run fix-exports && npm start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
+    "fix-and-start": "node exclude-firebase-functions.js && npm run fix-exports && npm start",
+    "android": "node exclude-firebase-functions.js && expo start --android",
+    "ios": "node exclude-firebase-functions.js && expo start --ios",
+    "web": "node exclude-firebase-functions.js && expo start --web",
     "test": "jest --watchAll",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prebuild": "npm run fix-exports"
+    "prebuild": "node exclude-firebase-functions.js && npm run fix-exports"
   },
   "jest": {
     "preset": "jest-expo"

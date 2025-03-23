@@ -1,12 +1,9 @@
 // Updated implementation that only uses client-safe Firebase functions
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { app } from '../lib/firebase/firebase';
+import { app } from '../lib/firebase/client';
 
-// Initialize functions
-if (!app) {
-  throw new Error("Firebase app not initialized.");
-}
-const functions = getFunctions(app);
+// Initialize functions with region
+const functions = getFunctions(app, 'europe-west1');
 
 // Type definitions for function results
 export interface MoodInsightsRequest {
@@ -68,26 +65,56 @@ export const clientFunctions = {
 export const moodService = {
   generateInsights: async (timeframe: 'week' | 'month' | 'year'): Promise<MoodInsightsResponse> => {
     try {
+      console.log(`Calling generateMoodInsights with timeframe: ${timeframe}`);
       const result = await clientFunctions.generateMoodInsights({ timeframe });
       return result.data;
     } catch (error: any) {
       console.error('Error generating mood insights:', error);
-      throw error;
+      // Fallback to mock data for development
+      return {
+        success: false,
+        insights: null,
+        message: error.message || 'Failed to generate insights'
+      };
     }
-  },
+  }
 };
 
 // Service wrapper for user stats
 export const userService = {
   getStats: async (): Promise<UserStatsResponse> => {
     try {
+      console.log('Calling getUserStats');
       const result = await clientFunctions.getUserStats();
       return result.data;
     } catch (error: any) {
       console.error('Error getting user stats:', error);
-      throw error;
+      // Fallback to mock data for development
+      return {
+        success: false,
+        stats: {
+          profile: {
+            displayName: 'User',
+            photoURL: '',
+            createdAt: new Date(),
+            streak: 0
+          },
+          meditation: {
+            totalTime: 0,
+            sessions: 0
+          },
+          activities: {
+            exercisesCompleted: 0,
+            surveysCompleted: 0,
+            recentActivities: []
+          },
+          mood: {
+            recentMoods: []
+          }
+        }
+      };
     }
-  },
+  }
 };
 
-export default {};
+export default { moodService, userService, clientFunctions };
