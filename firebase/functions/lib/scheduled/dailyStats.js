@@ -24,9 +24,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.dailyStats = void 0;
-const scheduler_1 = require("firebase-functions/v2/scheduler");
+const scheduler_1 = require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js");
 const admin = __importStar(require("firebase-admin"));
-const v2_1 = require("firebase-functions/v2");
+const v2_1 = require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js");
 exports.dailyStats = (0, scheduler_1.onSchedule)({
     schedule: 'every 24 hours',
     timeZone: 'Europe/Berlin',

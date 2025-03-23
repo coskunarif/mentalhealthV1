@@ -24,9 +24,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserStats = void 0;
-const https_1 = require("firebase-functions/v2/https");
+const https_1 = require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js");
 const admin = __importStar(require("firebase-admin"));
-const v2_1 = require("firebase-functions/v2");
+const v2_1 = require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js");
 exports.getUserStats = (0, https_1.onCall)({
     timeoutSeconds: 30,
     memory: '256MiB',

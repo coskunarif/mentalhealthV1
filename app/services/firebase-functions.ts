@@ -4,6 +4,8 @@ import { app } from '../lib/firebase/firebase';
 
 // Get a reference to the functions service
 const functions = getFunctions(app);
+// Set the region to match your server configuration
+functions.region = 'europe-west1';
 
 // Define types for your function responses
 interface UserStatsResponse {
@@ -51,3 +53,6 @@ export const generateMoodInsights = httpsCallable<
 );
 
 // Add other functions as needed
+
+
+export default {};

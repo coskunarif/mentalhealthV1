@@ -25,7 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserStats = exports.generateMoodInsights = exports.sendDailyMeditationReminder = exports.dailyStats = exports.onUserCreate = void 0;
 const admin = __importStar(require("firebase-admin"));
-const v2_1 = require("firebase-functions/v2");
+const v2_1 = require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js");
 // Initialize Firebase Admin first (important for hybrid approach)
 admin.initializeApp();
 // Set global options for v2 functions

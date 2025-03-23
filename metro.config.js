@@ -1,41 +1,23 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const path = require('path');
 
-/** @type {import('expo/metro-config').MetroConfig} */
+// Get the default configuration
 const config = getDefaultConfig(__dirname);
 
-// Add mp3 to asset extensions
-config.resolver.assetExts.push('mp3');
+// Import module map
+const { moduleMap } = require('./metro.module-mapper');
 
-// Add additional watch folders
-config.watchFolders = [
-  ...config.watchFolders || [],
-  `${__dirname}/assets`,
-];
-
-// Block specific modules from being included in the bundle
+// Add the Firebase functions directory to the blacklist
 config.resolver.blockList = [
   /firebase\/functions\/lib\/.*/,
-  /firebase-admin\/.*/,
-  /firebase-functions\/v1\/.*/,
-  /firebase-functions\/v2\/.*/,
+  /firebase\/functions\/src\/.*/,
   /firebase\/functions\/node_modules\/.*/,
-  /firebase\/functions\/src\/.*/
 ];
 
-// Fix module resolution for Firebase
+// Use module map for resolver
 config.resolver.extraNodeModules = {
-  'path': require.resolve('path-browserify'),
-  '@firebase/auth/react-native': path.join(__dirname, 'node_modules/@firebase/auth/dist/rn'),
-  'firebase-functions': path.resolve(__dirname, 'app/lib/utils/empty-firebase-functions.js'),
-  'firebase-functions/v1': path.resolve(__dirname, 'app/lib/utils/empty-firebase-functions.js'),
-  'firebase-functions/v2': path.resolve(__dirname, 'app/lib/utils/empty-firebase-functions.js'),
-  'firebase-functions/v2/https': path.join(__dirname, 'app/lib/mocks/firebase-functions.js'),
-  'firebase-functions/v2/scheduler': path.join(__dirname, 'app/lib/mocks/firebase-functions.js'),
-  'firebase-admin': path.join(__dirname, 'app/lib/mocks/firebase-admin.js')
+  ...moduleMap,
+  // Add any other module mappings if needed
 };
-
-// Add 'cjs' to source extensions
-config.resolver.sourceExts = [...config.resolver.sourceExts, 'cjs'];
 
 module.exports = config;

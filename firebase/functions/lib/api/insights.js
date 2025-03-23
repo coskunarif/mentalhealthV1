@@ -24,9 +24,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateMoodInsights = void 0;
-const https_1 = require("firebase-functions/v2/https");
+const https_1 = require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js");
 const admin = __importStar(require("firebase-admin"));
-const v2_1 = require("firebase-functions/v2");
+const v2_1 = require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js");
 // Add rate limiting and data validation
 exports.generateMoodInsights = (0, https_1.onCall)({
     // Function configuration

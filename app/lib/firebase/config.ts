@@ -12,3 +12,6 @@ export const firebaseConfig = {
 
 // Force production mode - never use emulator
 export const useEmulator = false;
+
+
+export default {};

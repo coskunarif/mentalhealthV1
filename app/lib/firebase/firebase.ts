@@ -39,3 +39,6 @@ if (shouldUseEmulator && process.env.NODE_ENV === 'development') {
     console.error('Failed to connect to Firebase emulators:', error);
   }
 }
+
+
+export default {};

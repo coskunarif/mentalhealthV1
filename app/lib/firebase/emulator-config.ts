@@ -14,3 +14,6 @@ export const emulatorConfig = {
   storageHost: 'localhost',
   storagePort: 9199
 };
+
+
+export default {};

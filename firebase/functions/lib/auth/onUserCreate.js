@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.onUserCreate = void 0;
-const functions = __importStar(require("firebase-functions/v1"));
+const functions = __importStar(require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js"));
 const admin = __importStar(require("firebase-admin"));
 const z = __importStar(require("zod"));
 const userSchema = z.object({

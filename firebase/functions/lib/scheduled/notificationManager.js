@@ -24,8 +24,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendDailyMeditationReminder = void 0;
-const scheduler_1 = require("firebase-functions/v2/scheduler");
-const v2_1 = require("firebase-functions/v2");
+const scheduler_1 = require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js");
+const v2_1 = require("C:\\CodiumDev\\mentalhealthV1\\app\\lib\\utils\\empty-firebase-functions.js");
 const admin = __importStar(require("firebase-admin"));
 const messaging_1 = require("firebase-admin/messaging");
 exports.sendDailyMeditationReminder = (0, scheduler_1.onSchedule)({

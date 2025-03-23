@@ -1,44 +1,24 @@
+
+// This is a placeholder for Firebase Functions
+// It prevents client-side bundling of server-side code
 module.exports = {
+  // Mock implementations for client-side
   https: {
     onCall: () => () => {},
-    onRequest: () => () => {},
-    HttpsError: class HttpsError extends Error {
-      constructor(code, message, details) {
-        super(message);
-        this.code = code;
-        this.details = details;
-      }
-    },
   },
-  config: () => ({}),
-  pubsub: {
-    schedule: () => ({
-      onRun: () => () => {},
-      timeZone: () => ({
-        onRun: () => () => {},
-      }),
-    }),
-  },
-  firestore: {
-    document: () => ({
-      onCreate: () => () => {},
-      onUpdate: () => () => {},
-      onDelete: () => () => {},
-    }),
-    onWrite: () => () => {},
-  },
+  region: () => ({}),
   auth: {
-    user: () => ({
-      onCreate: () => () => {},
-      onDelete: () => () => {},
-    }),
+    user: () => ({ onCreate: () => {} }),
   },
-  // v2 namespace
   v2: {
-    scheduler: {
-      onSchedule: () => () => {},
-    },
+    https: { onCall: () => () => {} },
+    scheduler: { onSchedule: () => () => {} },
+    logger: { info: () => {}, error: () => {} }
   },
+  onSchedule: () => () => {},
+  setGlobalOptions: () => {},
+  // Add other mock implementations as needed
 };
+
 
 export default {};
