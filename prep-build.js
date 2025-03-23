@@ -30,3 +30,22 @@ execSync('node exclude-firebase-functions.js', { stdio: 'inherit' });
 runNpmScript('fix-exports');
 
 console.log('Build preparation complete.');
+
+// Temporarily move the firebase functions lib directory
+const functionsLibDir = path.join(__dirname, 'firebase', 'functions', 'lib');
+if (fs.existsSync(functionsLibDir)) {
+  console.log('Temporarily moving compiled Firebase functions...');
+  try {
+    // Check if backup exists and remove it first
+    const backupDir = path.join(__dirname, 'firebase', 'functions', 'lib.bak');
+    if (fs.existsSync(backupDir)) {
+      fs.rmSync(backupDir, { recursive: true, force: true });
+    }
+    
+    // Rename the directory
+    fs.renameSync(functionsLibDir, backupDir);
+    console.log('Compiled functions temporarily moved to lib.bak');
+  } catch (error) {
+    console.error('Error moving lib directory:', error);
+  }
+}
