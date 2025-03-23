@@ -1,30 +1,5 @@
 import * as functions from 'firebase-functions/v1';
 import * as admin from 'firebase-admin';
-import * as z from 'zod';
-
-const userSchema = z.object({
-  uid: z.string(),
-  email: z.string().email().nullable(),
-  displayName: z.string().default(''),
-  photoURL: z.string().default(''),
-  settings: z.object({
-    notifications: z.object({
-      reminders: z.boolean().default(true),
-      progress: z.boolean().default(true),
-      tips: z.boolean().default(true),
-      community: z.boolean().default(false)
-    }).default({}),
-    language: z.string().default('en'),
-    theme: z.string().default('light')
-  }).default({}),
-  stats: z.object({
-    meditationMinutes: z.number().default(0),
-    exercisesCompleted: z.number().default(0),
-    streak: z.number().default(0),
-    surveysCompleted: z.number().default(0),
-    lastActiveDate: z.any().nullable()
-  }).default({})
-});
 
 // Use v1 auth trigger with European region
 export const onUserCreate = functions
@@ -34,11 +9,14 @@ export const onUserCreate = functions
     try {
       const timestamp = admin.firestore.FieldValue.serverTimestamp();
 
-      const userData = userSchema.parse({
+      // Simple user profile creation
+      await admin.firestore().collection('users').doc(user.uid).set({
         uid: user.uid,
         email: user.email,
         displayName: user.displayName || '',
         photoURL: user.photoURL || '',
+        createdAt: timestamp,
+        updatedAt: timestamp,
         settings: {
           notifications: {
             reminders: true,
@@ -57,40 +35,6 @@ export const onUserCreate = functions
           lastActiveDate: null
         }
       });
-
-      await admin.firestore().collection('users').doc(user.uid).set({
-        ...userData,
-        createdAt: timestamp,
-        updatedAt: timestamp
-      });
-
-      const batch = admin.firestore().batch();
-
-      const meditationRef = admin.firestore()
-        .collection('users')
-        .doc(user.uid)
-        .collection('progress')
-        .doc('meditation');
-      batch.set(meditationRef, {
-        userId: user.uid,
-        totalTime: 0,
-        sessions: 0,
-        createdAt: timestamp,
-        updatedAt: timestamp
-      });
-
-      const overviewRef = admin.firestore()
-        .collection('users')
-        .doc(user.uid)
-        .collection('progress')
-        .doc('overview');
-      batch.set(overviewRef, {
-        overall: 0,
-        categories: {},
-        lastUpdated: timestamp
-      });
-
-      await batch.commit();
 
       console.log(`User profile created for ${user.uid}`);
       return null;

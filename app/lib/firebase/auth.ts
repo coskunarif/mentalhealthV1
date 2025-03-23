@@ -37,25 +37,5 @@ export async function resetPassword(email: string): Promise<void> {
   }
 }
 
-export async function signInWithGoogle(): Promise<UserCredential> {
-  try {
-    const provider = new GoogleAuthProvider();
-    return await signInWithPopup(auth, provider);
-  } catch (error: any) {
-    console.error('Google sign-in error:', error);
-    throw error;
-  }
-}
-
-export async function signInWithApple(): Promise<UserCredential> {
-  try {
-    const provider = new OAuthProvider('apple.com');
-    return await signInWithPopup(auth, provider);
-  } catch (error: any) {
-    console.error('Apple sign-in error:', error);
-    throw error;
-  }
-}
-
 export type { User, UserCredential };
 export default auth;
