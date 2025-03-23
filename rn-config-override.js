@@ -10,7 +10,6 @@ module.exports = {
   resolver: {
     sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs', 'json'],
     resolverMainFields: ['react-native', 'browser', 'main'],
-    resolverMainFields: ['react-native', 'browser', 'main'],
     // More aggressive blacklist
     blacklistRE: new RegExp(
       '(^|\\/)' + // Start of string or a forward slash

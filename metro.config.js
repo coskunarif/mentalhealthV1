@@ -5,6 +5,9 @@ const fs = require('fs');
 // Get the default configuration
 const config = getDefaultConfig(__dirname);
 
+// Explicitly add 'cjs' to sourceExts
+config.resolver.sourceExts.push('cjs');
+
 // Import module map
 const { moduleMap } = require('./metro.module-mapper');
 
