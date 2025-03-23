@@ -10,6 +10,7 @@ module.exports = {
   resolver: {
     sourceExts: ['jsx', 'js', 'ts', 'tsx', 'cjs', 'json'],
     resolverMainFields: ['react-native', 'browser', 'main'],
-    blacklistRE: /firebase[\/\\]functions[\/\\](?!package\.json$).*/,
+    // Update the blacklist regex to be more comprehensive
+    blacklistRE: /firebase[\/\\](functions|admin)[\/\\](?!package\.json$).*/,
   },
 };

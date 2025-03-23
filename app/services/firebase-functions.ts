@@ -1,6 +1,14 @@
-import { httpsCallable } from '@firebase/functions';
-import { functions } from '../lib/firebase/firebase';
+// Updated implementation that only uses client-safe Firebase functions
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { app } from '../lib/firebase/firebase';
 
+// Initialize functions
+if (!app) {
+  throw new Error("Firebase app not initialized.");
+}
+const functions = getFunctions(app);
+
+// Type definitions for function results
 export interface MoodInsightsRequest {
   timeframe: 'week' | 'month' | 'year';
 }
@@ -44,6 +52,7 @@ export interface UserStatsResponse {
   };
 }
 
+// Define callable functions with proper types
 export const clientFunctions = {
   generateMoodInsights: httpsCallable<MoodInsightsRequest, MoodInsightsResponse>(
     functions, 
@@ -55,27 +64,30 @@ export const clientFunctions = {
   )
 };
 
+// Service wrapper for mood insights
 export const moodService = {
   generateInsights: async (timeframe: 'week' | 'month' | 'year'): Promise<MoodInsightsResponse> => {
     try {
       const result = await clientFunctions.generateMoodInsights({ timeframe });
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating mood insights:', error);
       throw error;
     }
-  }
+  },
 };
 
+// Service wrapper for user stats
 export const userService = {
   getStats: async (): Promise<UserStatsResponse> => {
     try {
       const result = await clientFunctions.getUserStats();
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting user stats:', error);
       throw error;
     }
-  }
+  },
 };
+
 export default {};
