@@ -1,13 +1,16 @@
-// This file controls emulator connections for the app
-// Set to 'false' for production/direct cloud connection
-export const USE_EMULATORS = false;
+// app/lib/firebase/emulator-config.ts
+// This file determines whether to use the emulator
+// For production, we'll always return false
+export const shouldUseEmulator = false;
 
-// Define emulator hosts and ports (only used if USE_EMULATORS is true)
-export const EMULATOR_CONFIG = {
-  auth: { host: 'localhost', port: 9099 },
-  firestore: { host: 'localhost', port: 8080 },
-  functions: { host: 'localhost', port: 5001 },
-  storage: { host: 'localhost', port: 9199 }
+// Emulator configuration (only used during local development)
+export const emulatorConfig = {
+  authHost: 'localhost',
+  authPort: 9099,
+  firestoreHost: 'localhost',
+  firestorePort: 8080,
+  functionsHost: 'localhost',
+  functionsPort: 5001,
+  storageHost: 'localhost',
+  storagePort: 9199
 };
-
-export default { USE_EMULATORS, EMULATOR_CONFIG };

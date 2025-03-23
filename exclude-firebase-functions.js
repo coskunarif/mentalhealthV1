@@ -1,48 +1,78 @@
+// exclude-firebase-functions.js
 const fs = require('fs');
 const path = require('path');
 
-console.log('Running Firebase Functions exclusion script...');
+// Create a temporary file to replace Firebase Functions imports
+const createEmptyModule = (directory) => {
+  const emptyModulePath = path.join(directory, 'empty-firebase-functions.js');
+  const emptyModuleContent = `
+// This is a placeholder for Firebase Functions
+// It prevents client-side bundling of server-side code
+module.exports = {
+  // Mock implementations for client-side
+  https: {
+    onCall: () => () => {},
+  },
+  region: () => {},
+  auth: {
+    user: () => ({ onCreate: () => {} }),
+  },
+  // Add other mock implementations as needed
+};
+`;
 
-// Create empty directory to prevent Metro bundler from including firebase functions
-const functionsDir = path.join(__dirname, 'node_modules', 'firebase-functions', 'lib', 'v2');
-if (!fs.existsSync(functionsDir)) {
-  fs.mkdirSync(functionsDir, { recursive: true });
+  fs.writeFileSync(emptyModulePath, emptyModuleContent);
+  return emptyModulePath;
+};
+
+// Replace Firebase Functions imports in the specific files
+const replaceImports = (filePath, emptyModulePath) => {
+  if (fs.existsSync(filePath)) {
+    let content = fs.readFileSync(filePath, 'utf8');
+    
+    // Replace Firebase Functions v1 and v2 imports
+    content = content.replace(
+      /require\(['"]firebase-functions(?:\/v1|\/v2)?['"]\)/g,
+      `require("${emptyModulePath.replace(/\\/g, '\\\\')}")`
+    );
+    
+    content = content.replace(
+      /from ['"]firebase-functions(?:\/v1|\/v2)?['"]/g,
+      `from "${emptyModulePath.replace(/\\/g, '\\\\')}"`
+    );
+
+    fs.writeFileSync(filePath, content);
+    console.log(`Replaced Firebase Functions imports in ${filePath}`);
+  }
+};
+
+// Main execution
+console.log('Excluding Firebase Functions from client bundle...');
+
+// Create empty module
+const emptyModulePath = createEmptyModule(path.join(__dirname, 'app', 'lib', 'utils'));
+
+// Handle potential compiled JavaScript files
+const functionsLibDir = path.join(__dirname, 'firebase', 'functions', 'lib');
+if (fs.existsSync(functionsLibDir)) {
+  // Handle all compiled JS files recursively
+  const processDirectory = (directory) => {
+    fs.readdirSync(directory, { withFileTypes: true }).forEach(entry => {
+      const fullPath = path.join(directory, entry.name);
+      
+      if (entry.isDirectory()) {
+        processDirectory(fullPath);
+      } else if (entry.isFile() && entry.name.endsWith('.js')) {
+        replaceImports(fullPath, emptyModulePath);
+      }
+    });
+  };
+  
+  processDirectory(functionsLibDir);
 }
 
-// Create empty index.js file to satisfy imports
-const indexPath = path.join(functionsDir, 'index.js');
-fs.writeFileSync(indexPath, '// Mock index file to satisfy imports\n' +
-  'module.exports = {\n' +
-  '  https: {},\n' +
-  '  scheduler: {}\n' +
-  '};\n');
+// Handle the client-side Firebase service file
+const firebaseFunctionsService = path.join(__dirname, 'app', 'services', 'firebase-functions.ts');
+replaceImports(firebaseFunctionsService, emptyModulePath);
 
-console.log('Created mock firebase-functions/v2 directory:', functionsDir);
-
-// Create mock for https
-const httpsDir = path.join(functionsDir, 'https');
-if (!fs.existsSync(httpsDir)) {
-  fs.mkdirSync(httpsDir, { recursive: true });
-}
-const httpsPath = path.join(httpsDir, 'index.js');
-fs.writeFileSync(httpsPath, '// Mock https file to satisfy imports\n' +
-  'module.exports = {\n' +
-  '  onCall: function() { return function() {} }\n' +
-  '};\n');
-
-console.log('Created mock firebase-functions/v2/https directory:', httpsDir);
-
-// Create mock for scheduler
-const schedulerDir = path.join(functionsDir, 'scheduler');
-if (!fs.existsSync(schedulerDir)) {
-  fs.mkdirSync(schedulerDir, { recursive: true });
-}
-const schedulerPath = path.join(schedulerDir, 'index.js');
-fs.writeFileSync(schedulerPath, '// Mock scheduler file to satisfy imports\n' +
-  'module.exports = {\n' +
-  '  onSchedule: function() { return function() {} }\n' +
-  '};\n');
-
-console.log('Created mock firebase-functions/v2/scheduler directory:', schedulerDir);
-
-console.log('Firebase Functions exclusion script completed successfully.');
+console.log('Firebase Functions successfully excluded from client bundle.');
