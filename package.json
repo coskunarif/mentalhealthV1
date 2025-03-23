@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
-    "preinstall": "node firebase-resolver.js",
     "prestart": "node firebase-symlinks.js && node fix-exports.js && node prep-build.js",
     "start": "expo start --config ./rn-config-override.js --clear",
     "fix-exports": "node fix-exports.js",
@@ -21,12 +20,8 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
-    "@firebase/app": "^0.11.3",
     "@firebase/auth": "^1.9.1",
-    "@firebase/firestore": "^4.7.10",
-    "@firebase/functions": "^0.12.3",
-    "@firebase/storage": "^0.13.7",
-    "@react-native-async-storage/async-storage": "^1.23.1",
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-native-community/slider": "4.5.5",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
