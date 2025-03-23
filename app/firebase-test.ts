@@ -15,8 +15,8 @@ const testConfig = {
 };
 
 try {
-  const app = initializeApp(testConfig);
-  const functions = getFunctions(app);
+  // const app = initializeApp(testConfig);
+  const functions = getFunctions();
   console.log('Firebase initialization successful');
 } catch (error) {
   console.error('Firebase initialization failed:', error);
