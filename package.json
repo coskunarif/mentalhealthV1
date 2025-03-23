@@ -4,10 +4,10 @@
   "main": "expo-router/entry",
   "scripts": {
     "preinstall": "node firebase-resolver.js",
-    "prestart": "node exclude-firebase-functions.js && node fix-exports.js",
-    "start": "expo start --config ./rn-config-override.js",
+    "prestart": "node firebase-symlinks.js && node fix-exports.js",
+    "start": "expo start --config ./rn-config-override.js --clear",
     "fix-exports": "node fix-exports.js",
-    "fix-and-start": "node exclude-firebase-functions.js && npm run fix-exports && npm start",
+    "fix-and-start": "node firebase-symlinks.js && npm run fix-exports && npx expo start --clear",
     "android": "node exclude-firebase-functions.js && expo start --android",
     "ios": "node exclude-firebase-functions.js && expo start --ios",
     "web": "node exclude-firebase-functions.js && expo start --web",
