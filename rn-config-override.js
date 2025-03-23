@@ -23,5 +23,10 @@ module.exports = {
       ')',
       'g'
     ),
+    // Add explicit module resolution
+    extraNodeModules: {
+      'firebase/functions': require.resolve('firebase/functions'),
+      'firebase/app': require.resolve('firebase/app')
+    }
   },
 };

@@ -28,12 +28,15 @@ config.resolver.blockList = [
   /firebase\/functions\/lib\/.*/,
   /firebase\/functions\/src\/.*/,
   /firebase\/functions\/node_modules\/.*/,
+  /firebase-admin\/.*/,
+  /firebase-functions\/.*/,
 ];
 
 // Use module map for resolver
 config.resolver.extraNodeModules = {
   ...moduleMap,
-  // Add any other module mappings if needed
+  'firebase/functions': require.resolve('firebase/functions'),
+  'firebase/app': require.resolve('firebase/app')
 };
 
 module.exports = config;
