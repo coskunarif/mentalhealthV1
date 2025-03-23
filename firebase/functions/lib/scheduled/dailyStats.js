@@ -13,11 +13,11 @@ exports.dailyStats = (0, scheduler_1.onSchedule)({
     try {
         // Simple placeholder implementation for now
         v2_1.logger.info('Daily stats function executed');
-        return null;
+        return;
     }
     catch (error) {
         v2_1.logger.error('Error processing daily stats:', error);
-        return null;
+        return;
     }
 });
 //# sourceMappingURL=dailyStats.js.map

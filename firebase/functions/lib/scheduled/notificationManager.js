@@ -13,11 +13,11 @@ exports.sendDailyMeditationReminder = (0, scheduler_1.onSchedule)({
     try {
         // Simple placeholder implementation
         v2_1.logger.info('Notification function executed');
-        return null;
+        return;
     }
     catch (error) {
         v2_1.logger.error('Error sending meditation reminders:', error);
-        return null;
+        return;
     }
 });
 //# sourceMappingURL=notificationManager.js.map

@@ -13,9 +13,9 @@ export const sendDailyMeditationReminder = onSchedule({
   try {
     // Simple placeholder implementation
     logger.info('Notification function executed');
-    return null;
+    return;
   } catch (error) {
     logger.error('Error sending meditation reminders:', error);
-    return null;
+    return;
   }
 });

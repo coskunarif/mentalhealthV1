@@ -12,9 +12,9 @@ export const dailyStats = onSchedule({
   try {
     // Simple placeholder implementation for now
     logger.info('Daily stats function executed');
-    return null;
+    return;
   } catch (error) {
     logger.error('Error processing daily stats:', error);
-    return null;
+    return;
   }
 });
