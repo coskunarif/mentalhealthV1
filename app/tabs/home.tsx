@@ -47,8 +47,21 @@ export default function Home() {
                     const { data, labels } = await ExerciseService.getRadarData(user.uid);
                     
                     // Validate radar data before setting state
-                    console.log('🔍 [HOME DEBUG] Received radar data:', JSON.stringify(data));
-                    console.log('🔍 [HOME DEBUG] Received radar labels:', JSON.stringify(labels));
+                    // Helper for safely serializing objects with Date instances to JSON
+                    const safeJsonReplacer = (key: string, value: any): any => {
+                        // Handle Date objects
+                        if (value instanceof Date) {
+                            return value.getTime(); // Convert to milliseconds timestamp
+                        }
+                        // Handle Firestore Timestamp objects
+                        if (value && typeof value === 'object' && value.toDate && typeof value.toDate === 'function') {
+                            return value.toDate().getTime(); // Convert to milliseconds timestamp
+                        }
+                        return value;
+                    };
+                    
+                    console.log('🔍 [HOME DEBUG] Received radar data:', JSON.stringify(data, safeJsonReplacer));
+                    console.log('🔍 [HOME DEBUG] Received radar labels:', JSON.stringify(labels, safeJsonReplacer));
                     
                     // Check if data is valid
                     if (!Array.isArray(data)) {
@@ -83,7 +96,7 @@ export default function Home() {
                             return point;
                         });
                         
-                        console.log('🔍 [HOME DEBUG] Validated radar data:', JSON.stringify(validData));
+                        console.log('🔍 [HOME DEBUG] Validated radar data:', JSON.stringify(validData, safeJsonReplacer));
                         setRadarData(validData);
                     }
                     
@@ -113,7 +126,20 @@ export default function Home() {
                 console.log('🔍 [HOME DEBUG] Fetching recent activities, user:', user?.uid);
                 if (user) {
                     const activities = await ExerciseService.getRecentActivities(user.uid);
-                    console.log('🔍 [HOME DEBUG] Received activities:', JSON.stringify(activities));
+                    // Helper for safely serializing objects with Date instances to JSON
+                    const safeJsonReplacer = (key: string, value: any): any => {
+                        // Handle Date objects
+                        if (value instanceof Date) {
+                            return value.getTime(); // Convert to milliseconds timestamp
+                        }
+                        // Handle Firestore Timestamp objects
+                        if (value && typeof value === 'object' && value.toDate && typeof value.toDate === 'function') {
+                            return value.toDate().getTime(); // Convert to milliseconds timestamp
+                        }
+                        return value;
+                    };
+                    
+                    console.log('🔍 [HOME DEBUG] Received activities:', JSON.stringify(activities, safeJsonReplacer));
                     setRecentActivities(activities);
                 } else {
                     setRecentActivities([]);

@@ -38,8 +38,21 @@ export default function RadarChart({
   const { width: screenWidth } = useWindowDimensions();
   const chartSize = size || Math.min(screenWidth - 32, 320);
   
-  console.log('🔍 [CHART DEBUG] RadarChart rendering with data:', JSON.stringify(data));
-  console.log('🔍 [CHART DEBUG] RadarChart labels:', JSON.stringify(labels));
+  // Helper for safely serializing objects with Date instances to JSON
+  const safeJsonReplacer = (key: string, value: any): any => {
+    // Handle Date objects
+    if (value instanceof Date) {
+      return value.getTime(); // Convert to milliseconds timestamp
+    }
+    // Handle Firestore Timestamp objects
+    if (value && typeof value === 'object' && value.toDate && typeof value.toDate === 'function') {
+      return value.toDate().getTime(); // Convert to milliseconds timestamp
+    }
+    return value;
+  };
+  
+  console.log('🔍 [CHART DEBUG] RadarChart rendering with data:', JSON.stringify(data, safeJsonReplacer));
+  console.log('🔍 [CHART DEBUG] RadarChart labels:', JSON.stringify(labels, safeJsonReplacer));
   
   // Validate data
   let validData = data;

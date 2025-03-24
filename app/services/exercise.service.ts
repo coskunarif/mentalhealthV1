@@ -6,6 +6,19 @@ export class ExerciseService {
     // Cache for recently fetched exercises
     private static exerciseCache: Map<string, any> = new Map();
 
+    // Helper for safely serializing objects with Date instances to JSON
+    private static safeJsonReplacer(key: string, value: any): any {
+        // Handle Date objects
+        if (value instanceof Date) {
+            return value.getTime(); // Convert to milliseconds timestamp
+        }
+        // Handle Firestore Timestamp objects
+        if (value && typeof value === 'object' && value.toDate && typeof value.toDate === 'function') {
+            return value.toDate().getTime(); // Convert to milliseconds timestamp
+        }
+        return value;
+    }
+
     static async getExerciseById(exerciseId: string): Promise<any> {
         try {
             // Check cache first
@@ -103,7 +116,7 @@ export class ExerciseService {
                 console.log('🔍 [RADAR DEBUG] Basic connectivity test succeeded, found documents:', !snapshot.empty);
                 if (!snapshot.empty) {
                     const sampleDoc = snapshot.docs[0].data();
-                    console.log('🔍 [RADAR DEBUG] Sample document structure:', JSON.stringify(sampleDoc));
+                    console.log('🔍 [RADAR DEBUG] Sample document structure:', JSON.stringify(sampleDoc, this.safeJsonReplacer));
                 }
             } catch (error: any) {
                 console.error('❌ [RADAR DEBUG] Basic connectivity test failed:', error);
@@ -149,7 +162,7 @@ export class ExerciseService {
             });
             
             const categories = Array.from(categoriesSet);
-            console.log('🔍 [RADAR DEBUG] Categories extracted:', JSON.stringify(categories));
+            console.log('🔍 [RADAR DEBUG] Categories extracted:', JSON.stringify(categories, this.safeJsonReplacer));
             
             if (categories.length === 0) {
                 console.warn('⚠️ [RADAR DEBUG] No categories found in exercises');
@@ -161,7 +174,7 @@ export class ExerciseService {
             let progressData;
             try {
                 progressData = await this.getUserProgress(userId);
-                console.log('🔍 [RADAR DEBUG] Raw progress data:', JSON.stringify(progressData));
+                console.log('🔍 [RADAR DEBUG] Raw progress data:', JSON.stringify(progressData, this.safeJsonReplacer));
             } catch (error: any) {
                 console.error('❌ [RADAR DEBUG] Error fetching user progress:', error);
                 throw new Error(`Failed to fetch user progress: ${error?.message || 'Unknown error'}`);
@@ -216,8 +229,8 @@ export class ExerciseService {
                 };
             });
 
-            console.log('🔍 [RADAR DEBUG] Final radar data points:', JSON.stringify(data));
-            console.log('🔍 [RADAR DEBUG] Final radar labels:', JSON.stringify(categories));
+            console.log('🔍 [RADAR DEBUG] Final radar data points:', JSON.stringify(data, this.safeJsonReplacer));
+            console.log('🔍 [RADAR DEBUG] Final radar labels:', JSON.stringify(categories, this.safeJsonReplacer));
             
             // Validate final data structure
             if (!Array.isArray(data) || data.length === 0) {
@@ -271,16 +284,23 @@ export class ExerciseService {
           const activities = snapshot.docs.map(doc => {
               const data = doc.data();
               console.log(`getRecentActivities: Processing activity ${doc.id}:`, data);
+              
+              // Convert Firestore timestamp to Date object
+              let timestamp = new Date();
+              if (data.timestamp && typeof data.timestamp.toDate === 'function') {
+                  timestamp = data.timestamp.toDate();
+              }
+              
               return {
                   id: doc.id,
                   type: data.type,
                   title: data.details?.title || this.getActivityTitle(data.type),
                   subtitle: data.details?.subtitle || '',
                   duration: data.details?.duration || 0,
-                  timestamp: data.timestamp.toDate()
+                  timestamp: timestamp
               };
           });
-          console.log('getRecentActivities: Final activities:', activities);
+          console.log('getRecentActivities: Final activities:', JSON.stringify(activities, this.safeJsonReplacer));
           return activities;
       } catch (error) {
           console.error('getRecentActivities: Error fetching recent activities:', error);
@@ -319,7 +339,7 @@ export class ExerciseService {
             
             if (progressDoc.exists()) {
                 const data = progressDoc.data();
-                console.log('🔍 [PROGRESS DEBUG] Progress data retrieved:', JSON.stringify(data));
+                console.log('🔍 [PROGRESS DEBUG] Progress data retrieved:', JSON.stringify(data, this.safeJsonReplacer));
                 
                 // Validate data structure
                 if (!data.categories) {
@@ -340,6 +360,11 @@ export class ExerciseService {
                             console.error(`❌ [PROGRESS DEBUG] Invalid value for category ${category}:`, value);
                         }
                     });
+                }
+                
+                // Handle any timestamp fields
+                if (data.lastUpdated && typeof data.lastUpdated.toDate === 'function') {
+                    data.lastUpdated = data.lastUpdated.toDate();
                 }
                 
                 return data;
