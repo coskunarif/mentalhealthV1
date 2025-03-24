@@ -29,6 +29,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Only subscribe to auth state changes - don't initialize auth again
     const unsubscribe = onAuthStateChanged(auth, (authUser: User | null) => {
+      console.log('authUser:', authUser); // Added log
       setUser(authUser);
       setInitialized(true);
       setLoading(false); // Set loading to false after auth state is determined

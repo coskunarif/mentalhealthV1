@@ -10,7 +10,7 @@ import { theme } from '../config/theme';
 import { UserService } from '../services/user.service';
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading: authLoading } = useAuth(); // Get loading state from useAuth
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
@@ -75,6 +75,15 @@ export default function ProfileScreen() {
     phoneNumber: "555-1234",
     dateOfBirth: "1990-01-01",
   };
+
+  // Conditional rendering based on authLoading
+  if (authLoading) {
+    return (
+      <View style={layoutStyles.layout_container}>
+        <Text>Loading profile...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={layoutStyles.layout_container}>

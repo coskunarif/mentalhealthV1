@@ -78,29 +78,58 @@ export class ExerciseService {
     /**
      * Get user radar data for visualization
      */
-    static async getRadarData(userId: string): Promise<{ data: any[], labels: string[] }> { // Changed return type
+    static async getRadarData(userId: string): Promise<{ data: any[], labels: string[] }> {
         try {
             // Get all exercises
             const exercisesRef = collection(db, 'exercises');
             const exercisesSnapshot = await getDocs(exercisesRef);
             const exercises = exercisesSnapshot.docs.map(doc => doc.data());
+            
+            console.log('Exercises retrieved:', JSON.stringify(exercises));
 
             // Extract unique categories
             const categories = [...new Set(exercises.map(exercise => exercise.category))];
+            console.log('Categories extracted:', JSON.stringify(categories));
 
             // Get user progress data
             const progressData = await this.getUserProgress(userId);
+            console.log('Progress data:', JSON.stringify(progressData));
+
+            // Validate that categories is an object
+            if (!progressData.categories || typeof progressData.categories !== 'object') {
+              console.error('Invalid categories structure:', progressData.categories);
+              progressData.categories = {}; // Default to empty object
+            }
 
             // Calculate completion percentage for each category
             const data = categories.map(category => {
-                const categoryProgress = progressData.categories[category] || 0;
-                return {
-                    label: category,
-                    value: categoryProgress / 100 // Normalize to 0-1 for radar chart
-                };
+              // Ensure category is a string
+              const categoryKey = String(category);
+              
+              // Safely access the progress value, defaulting to 0
+              let categoryProgress = 0;
+              try {
+                categoryProgress = progressData.categories[categoryKey] || 0;
+                // Ensure value is a number
+                categoryProgress = Number(categoryProgress);
+                if (isNaN(categoryProgress)) {
+                  console.error(`Invalid progress value for ${categoryKey}:`, progressData.categories[categoryKey]);
+                  categoryProgress = 0;
+                }
+              } catch (e) {
+                console.error(`Error accessing progress for ${categoryKey}:`, e);
+              }
+              
+              return {
+                label: categoryKey,
+                value: Math.min(Math.max(categoryProgress / 100, 0), 1) // Ensure between 0-1
+              };
             });
 
-            return { data, labels: categories }; // Return both data and labels
+            console.log('Final data:', JSON.stringify(data));
+            console.log('Final labels:', JSON.stringify(categories));
+
+            return { data, labels: categories };
         } catch (error) {
             console.error('Error fetching radar data:', error);
             return { data: [], labels: [] }; // Return empty arrays on error

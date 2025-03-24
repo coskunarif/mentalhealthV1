@@ -37,7 +37,19 @@ export default function RadarChart({
   const theme = useTheme<AppTheme>();
   const { width: screenWidth } = useWindowDimensions();
   const chartSize = size || Math.min(screenWidth - 32, 320);
-  const chartLabels = labels || defaultLabels;
+  let chartLabels = labels || defaultLabels;
+
+  if (!data || !Array.isArray(data)) {
+    console.error('Invalid data provided to RadarChart:', data);
+    data = [];
+  }
+
+  if (!labels || !Array.isArray(labels)) {
+    console.error('Invalid labels provided to RadarChart:', labels);
+    labels = defaultLabels;
+  }
+  chartLabels = labels;
+
   if (data.length !== chartLabels.length) {
     console.warn(
       'RadarChart: data length and label length mismatch. Truncating or adjusting data.'
@@ -200,7 +212,7 @@ export default function RadarChart({
               textAnchor="middle"
               dy={4}
             >
-              {(data[idx].value * 100).toFixed(0)}%
+              {(typeof data[idx].value === 'number' ? (data[idx].value * 100).toFixed(0) : '0')}%
             </SvgText>
           </React.Fragment>
         ))}
