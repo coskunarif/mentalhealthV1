@@ -1,11 +1,12 @@
-import React from 'react';
-import { View, ViewStyle, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, ViewStyle, StyleSheet, useWindowDimensions, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
 import type { AppTheme } from '../types/theme';
+import { safeStringify } from '../lib/debug-utils';
 
-interface DataPoint {
-  label?: string;
+export interface DataPoint {
+  label: string;
   value: number;
 }
 
@@ -38,62 +39,92 @@ export default function RadarChart({
   const { width: screenWidth } = useWindowDimensions();
   const chartSize = size || Math.min(screenWidth - 32, 320);
   
-  // Helper for safely serializing objects with Date instances to JSON
-  const safeJsonReplacer = (key: string, value: any): any => {
-    // Handle Date objects
-    if (value instanceof Date) {
-      return value.getTime(); // Convert to milliseconds timestamp
-    }
-    // Handle Firestore Timestamp objects
-    if (value && typeof value === 'object' && value.toDate && typeof value.toDate === 'function') {
-      return value.toDate().getTime(); // Convert to milliseconds timestamp
-    }
-    return value;
-  };
+  console.log('🔍 [CHART DEBUG] RadarChart rendering with data:', safeStringify(data));
+  console.log('🔍 [CHART DEBUG] RadarChart labels:', safeStringify(labels));
   
-  console.log('🔍 [CHART DEBUG] RadarChart rendering with data:', JSON.stringify(data, safeJsonReplacer));
-  console.log('🔍 [CHART DEBUG] RadarChart labels:', JSON.stringify(labels, safeJsonReplacer));
-  
-  // Validate data
-  let validData = data;
-  if (!data || !Array.isArray(data)) {
-    console.error('❌ [CHART DEBUG] Invalid data provided to RadarChart:', data);
-    validData = [];
-  } else {
-    // Check each data point
-    validData.forEach((point, index) => {
-      if (!point || typeof point !== 'object') {
-        console.error(`❌ [CHART DEBUG] Invalid data point at index ${index}:`, point);
-      } else if (typeof point.value !== 'number' || isNaN(point.value)) {
-        console.error(`❌ [CHART DEBUG] Invalid value at index ${index}:`, point.value);
-      } else if (point.value < 0 || point.value > 1) {
-        console.error(`❌ [CHART DEBUG] Value out of range at index ${index}:`, point.value);
-      }
-    });
-  }
-  
-  // Validate labels
-  let chartLabels = labels || defaultLabels;
-  if (!labels || !Array.isArray(labels)) {
-    console.error('❌ [CHART DEBUG] Invalid labels provided to RadarChart:', labels);
-    chartLabels = defaultLabels;
-  }
-  
-  // Check for length mismatch
-  if (validData.length !== chartLabels.length) {
-    console.warn(
-      `⚠️ [CHART DEBUG] Data length (${validData.length}) and label length (${chartLabels.length}) mismatch. Truncating data.`
-    );
-    validData = validData.slice(0, chartLabels.length);
+  // Validate and fix data using useMemo to avoid unnecessary recalculations
+  const { validData, chartLabels, hasError } = useMemo(() => {
+    let result = {
+      validData: [] as DataPoint[],
+      chartLabels: [] as string[],
+      hasError: false
+    };
     
-    // If we have more labels than data points, log this issue
-    if (validData.length < chartLabels.length) {
-      console.warn(`⚠️ [CHART DEBUG] Not enough data points for all labels. Some axes will have no data.`);
+    // Validate data
+    if (!data || !Array.isArray(data)) {
+      console.error('❌ [CHART DEBUG] Invalid data provided to RadarChart:', data);
+      result.validData = [];
+      result.hasError = true;
+    } else {
+      // Deep copy and validate each data point
+      result.validData = data.map((point, index) => {
+        if (!point || typeof point !== 'object') {
+          console.error(`❌ [CHART DEBUG] Invalid data point at index ${index}:`, point);
+          result.hasError = true;
+          return { label: `Unknown ${index}`, value: 0 };
+        }
+        
+        if (typeof point.value !== 'number' || isNaN(point.value)) {
+          console.error(`❌ [CHART DEBUG] Invalid value at index ${index}:`, point.value);
+          result.hasError = true;
+          return { ...point, value: 0 };
+        }
+        
+        if (point.value < 0 || point.value > 1) {
+          console.warn(`⚠️ [CHART DEBUG] Value out of range at index ${index}:`, point.value);
+          return { 
+            ...point, 
+            value: Math.min(Math.max(point.value, 0), 1) 
+          };
+        }
+        
+        return { ...point };
+      });
     }
-  }
+    
+    // Validate labels
+    if (!labels || !Array.isArray(labels)) {
+      console.error('❌ [CHART DEBUG] Invalid labels provided to RadarChart:', labels);
+      result.chartLabels = [...defaultLabels];
+      result.hasError = true;
+    } else {
+      result.chartLabels = [...labels];
+    }
+    
+    // Check for length mismatch
+    if (result.validData.length !== result.chartLabels.length) {
+      console.warn(
+        `⚠️ [CHART DEBUG] Data length (${result.validData.length}) and label length (${result.chartLabels.length}) mismatch.`
+      );
+      
+      // If we have more data points than labels, truncate data
+      if (result.validData.length > result.chartLabels.length) {
+        console.warn('⚠️ [CHART DEBUG] Truncating data to match labels length');
+        result.validData = result.validData.slice(0, result.chartLabels.length);
+      }
+      
+      // If we have more labels than data points, add dummy data points
+      if (result.validData.length < result.chartLabels.length) {
+        console.warn('⚠️ [CHART DEBUG] Adding dummy data points to match labels length');
+        const dummyPoints = result.chartLabels.slice(result.validData.length).map((label, index) => ({
+          label,
+          value: 0
+        }));
+        result.validData = [...result.validData, ...dummyPoints];
+      }
+    }
+    
+    return result;
+  }, [data, labels]);
   
-  // Use the validated data for rendering
-  data = validData;
+  // If we have no valid data or labels, show a placeholder
+  if (validData.length === 0 || chartLabels.length === 0) {
+    return (
+      <View style={[styles.container, style, styles.placeholderContainer]}>
+        <Text style={styles.placeholderText}>No data available</Text>
+      </View>
+    );
+  }
   const center = chartSize / 2;
   const padding = 50; // Increased padding
   const radius = (chartSize - padding * 2) / 2;
@@ -197,24 +228,35 @@ export default function RadarChart({
     );
   });
 
-  const points = data.map((item, idx) => getCoordinates(item.value, idx));
-  const pathData =
-    points
+  const points = validData.map((item, idx) => getCoordinates(item.value, idx));
+  
+  // Only create a path if we have at least 3 points (to form a polygon)
+  let pathData = '';
+  if (points.length >= 3) {
+    pathData = points
       .map((p, idx) => (idx === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`))
       .join(' ') + ' Z';
+  }
 
   return (
     <View style={[styles.container, style]}>
+      {hasError && (
+        <Text style={styles.errorText}>
+          Some data may be incomplete or missing
+        </Text>
+      )}
       <Svg width={chartSize} height={chartSize}>
         {gridCircles}
         {radialLines}
-        <Path
-          d={pathData}
-          stroke={polygonStrokeColor}
-          strokeWidth={strokeWidth}
-          fill={polygonFillColor}
-          fillOpacity={fillOpacity}
-        />
+        {pathData && (
+          <Path
+            d={pathData}
+            stroke={polygonStrokeColor}
+            strokeWidth={strokeWidth}
+            fill={polygonFillColor}
+            fillOpacity={fillOpacity}
+          />
+        )}
         {points.map((point, idx) => (
           <React.Fragment key={`data-point-${idx}`}>
             <Circle
@@ -222,7 +264,7 @@ export default function RadarChart({
               cy={point.y}
               r={24}
               fill="transparent"
-              accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`}
+              accessibilityLabel={`${chartLabels[idx]}: ${validData[idx].value}`}
             />
             <Circle
               cx={point.x}
@@ -250,7 +292,7 @@ export default function RadarChart({
               textAnchor="middle"
               dy={4}
             >
-              {(typeof data[idx].value === 'number' ? (data[idx].value * 100).toFixed(0) : '0')}%
+              {(typeof validData[idx].value === 'number' ? (validData[idx].value * 100).toFixed(0) : '0')}%
             </SvgText>
           </React.Fragment>
         ))}
@@ -282,4 +324,21 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     padding: 8,
   },
+  placeholderContainer: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#ff6b6b',
+    marginBottom: 8,
+    textAlign: 'center',
+  }
 });

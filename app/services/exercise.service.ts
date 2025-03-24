@@ -1,6 +1,7 @@
 import { collection, query, where, getDocs, doc, getDoc, orderBy, limit, setDoc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Timestamp } from 'firebase/firestore';
+import { safeStringify, validateRadarData, validateRadarLabels, DataPoint } from '../lib/debug-utils';
 
 export class ExerciseService {
     // Cache for recently fetched exercises
@@ -91,7 +92,7 @@ export class ExerciseService {
     /**
      * Get user radar data for visualization
      */
-    static async getRadarData(userId: string): Promise<{ data: any[], labels: string[] }> {
+    static async getRadarData(userId: string): Promise<{ data: DataPoint[], labels: string[] }> {
         // Define the type for exercise data
         interface ExerciseData {
             id: string;
@@ -116,7 +117,7 @@ export class ExerciseService {
                 console.log('🔍 [RADAR DEBUG] Basic connectivity test succeeded, found documents:', !snapshot.empty);
                 if (!snapshot.empty) {
                     const sampleDoc = snapshot.docs[0].data();
-                    console.log('🔍 [RADAR DEBUG] Sample document structure:', JSON.stringify(sampleDoc, this.safeJsonReplacer));
+                    console.log('🔍 [RADAR DEBUG] Sample document structure:', safeStringify(sampleDoc));
                 }
             } catch (error: any) {
                 console.error('❌ [RADAR DEBUG] Basic connectivity test failed:', error);
@@ -162,7 +163,7 @@ export class ExerciseService {
             });
             
             const categories = Array.from(categoriesSet);
-            console.log('🔍 [RADAR DEBUG] Categories extracted:', JSON.stringify(categories, this.safeJsonReplacer));
+            console.log('🔍 [RADAR DEBUG] Categories extracted:', safeStringify(categories));
             
             if (categories.length === 0) {
                 console.warn('⚠️ [RADAR DEBUG] No categories found in exercises');
@@ -174,7 +175,7 @@ export class ExerciseService {
             let progressData;
             try {
                 progressData = await this.getUserProgress(userId);
-                console.log('🔍 [RADAR DEBUG] Raw progress data:', JSON.stringify(progressData, this.safeJsonReplacer));
+                console.log('🔍 [RADAR DEBUG] Raw progress data:', safeStringify(progressData));
             } catch (error: any) {
                 console.error('❌ [RADAR DEBUG] Error fetching user progress:', error);
                 throw new Error(`Failed to fetch user progress: ${error?.message || 'Unknown error'}`);
@@ -193,7 +194,7 @@ export class ExerciseService {
 
             // Calculate completion percentage for each category
             console.log('🔍 [RADAR DEBUG] Calculating radar data points...');
-            const data = categories.map(category => {
+            let data = categories.map(category => {
                 // Ensure category is a string
                 const categoryKey = String(category);
                 console.log(`🔍 [RADAR DEBUG] Processing category: ${categoryKey}`);
@@ -229,24 +230,61 @@ export class ExerciseService {
                 };
             });
 
-            console.log('🔍 [RADAR DEBUG] Final radar data points:', JSON.stringify(data, this.safeJsonReplacer));
-            console.log('🔍 [RADAR DEBUG] Final radar labels:', JSON.stringify(categories, this.safeJsonReplacer));
+            console.log('🔍 [RADAR DEBUG] Pre-validation radar data points:', safeStringify(data));
+            console.log('🔍 [RADAR DEBUG] Pre-validation radar labels:', safeStringify(categories));
             
-            // Validate final data structure
-            if (!Array.isArray(data) || data.length === 0) {
-                console.error('❌ [RADAR DEBUG] Generated radar data is empty or invalid');
-            } else {
-                data.forEach((point, index) => {
-                    if (typeof point.value !== 'number' || isNaN(point.value)) {
-                        console.error(`❌ [RADAR DEBUG] Invalid value at index ${index}:`, point.value);
-                    }
+            // Validate data and labels using our utility functions
+            const dataValidation = validateRadarData(data);
+            if (!dataValidation.isValid) {
+                console.error('❌ [RADAR DEBUG] Radar data validation failed:', dataValidation.errors.join(', '));
+                dataValidation.warnings.forEach(warning => {
+                    console.warn(`⚠️ [RADAR DEBUG] ${warning}`);
+                });
+                data = dataValidation.fixedData;
+            }
+            
+            const labelsValidation = validateRadarLabels(categories);
+            if (!labelsValidation.isValid) {
+                console.error('❌ [RADAR DEBUG] Radar labels validation failed:', labelsValidation.errors.join(', '));
+                labelsValidation.warnings.forEach(warning => {
+                    console.warn(`⚠️ [RADAR DEBUG] ${warning}`);
                 });
             }
-
-            return { data, labels: categories };
+            
+            // Ensure data and labels have the same length
+            if (data.length !== labelsValidation.fixedLabels.length) {
+                console.warn(`⚠️ [RADAR DEBUG] Data length (${data.length}) and label length (${labelsValidation.fixedLabels.length}) mismatch`);
+                
+                // If we have more data points than labels, truncate data
+                if (data.length > labelsValidation.fixedLabels.length) {
+                    console.warn('⚠️ [RADAR DEBUG] Truncating data to match labels length');
+                    data = data.slice(0, labelsValidation.fixedLabels.length);
+                }
+                
+                // If we have more labels than data points, add dummy data points
+                if (data.length < labelsValidation.fixedLabels.length) {
+                    console.warn('⚠️ [RADAR DEBUG] Adding dummy data points to match labels length');
+                    const dummyPoints = labelsValidation.fixedLabels.slice(data.length).map((label, index) => ({
+                        label,
+                        value: 0
+                    }));
+                    data = [...data, ...dummyPoints];
+                }
+            }
+            
+            // Final validation check
+            console.log('🔍 [RADAR DEBUG] Final radar data points:', safeStringify(data));
+            console.log('🔍 [RADAR DEBUG] Final radar labels:', safeStringify(labelsValidation.fixedLabels));
+            
+            // Ensure we always return valid arrays
+            return { 
+                data: Array.isArray(data) ? data : [], 
+                labels: Array.isArray(labelsValidation.fixedLabels) ? labelsValidation.fixedLabels : [] 
+            };
         } catch (error) {
-            console.error('getRadarData: Error fetching radar data:', error);
-            return { data: [], labels: [] }; // Return empty arrays on error
+            console.error('❌ [RADAR DEBUG] Error fetching radar data:', error);
+            // Return empty arrays on error
+            return { data: [], labels: [] }; 
         } finally {
             // Test accessing a different collection
             console.log('Testing access to users collection...');
