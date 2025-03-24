@@ -89,83 +89,146 @@ export class ExerciseService {
             order: number;
             isCompleted: boolean;
         }
+        
+        console.log('🔍 [RADAR DEBUG] getRadarData: Start of function for userId:', userId);
+        console.log('🔍 [RADAR DEBUG] Firebase project ID:', db.app.options.projectId);
+        
         try {
-            // Get all exercises
-            console.log('getRadarData: Start of function'); // Log at the very beginning
-            console.log('getRadarData: Project ID from db instance:', db.app.options.projectId);
-            console.log('getRadarData: Fetching exercises...');
-
-            // Minimal query test
+            // Test basic Firebase connectivity first
+            console.log('🔍 [RADAR DEBUG] Testing basic Firestore connectivity...');
             try {
-              console.log('Testing minimal Firestore query...');
-              const dbRef = collection(db, 'exercises');
-              const simpleQuery = query(dbRef, limit(1));
-              const snapshot = await getDocs(simpleQuery);
-              console.log('Query succeeded, found documents:', !snapshot.empty);
-            } catch (error) {
-              console.error('Simple query failed with error:', error);
+                const dbRef = collection(db, 'exercises');
+                const simpleQuery = query(dbRef, limit(1));
+                const snapshot = await getDocs(simpleQuery);
+                console.log('🔍 [RADAR DEBUG] Basic connectivity test succeeded, found documents:', !snapshot.empty);
+                if (!snapshot.empty) {
+                    const sampleDoc = snapshot.docs[0].data();
+                    console.log('🔍 [RADAR DEBUG] Sample document structure:', JSON.stringify(sampleDoc));
+                }
+            } catch (error: any) {
+                console.error('❌ [RADAR DEBUG] Basic connectivity test failed:', error);
+                // This is a critical error - if we can't even do a simple query, we should stop
+                throw new Error(`Firebase connectivity issue: ${error?.message || 'Unknown error'}`);
             }
 
+            // Fetch all exercises to get categories
+            console.log('🔍 [RADAR DEBUG] Fetching all exercises...');
             const exercisesRef = collection(db, 'exercises');
-            console.log('getRadarData: exercisesRef.path:', exercisesRef.path);
-            let exercisesSnapshot;
             let exercises: ExerciseData[] = [];
+            
             try {
-                exercisesSnapshot = await getDocs(exercisesRef);
-                exercises = exercisesSnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data(),
-                } as ExerciseData));
-            } catch (error) {
-                console.error('getRadarData: Error fetching exercises with getDocs:', error);
-                // DO NOT re-throw.  Let the function continue with an empty array.
+                const exercisesSnapshot = await getDocs(exercisesRef);
+                console.log('🔍 [RADAR DEBUG] Exercises query returned', exercisesSnapshot.size, 'documents');
+                
+                if (exercisesSnapshot.empty) {
+                    console.warn('⚠️ [RADAR DEBUG] No exercises found in database');
+                }
+                
+                exercises = exercisesSnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    console.log(`🔍 [RADAR DEBUG] Exercise ${doc.id} category:`, data.category);
+                    return {
+                        id: doc.id,
+                        ...data,
+                    } as ExerciseData;
+                });
+            } catch (error: any) {
+                console.error('❌ [RADAR DEBUG] Error fetching exercises:', error);
+                throw new Error(`Failed to fetch exercises: ${error?.message || 'Unknown error'}`);
             }
 
-
-            console.log('getRadarData: Exercises retrieved:', JSON.stringify(exercises));
-
-            // Extract unique categories
-            const categories = [...new Set(exercises.map(exercise => exercise.category))];
-            console.log('getRadarData: Categories extracted:', JSON.stringify(categories));
+            // Extract unique categories with validation
+            console.log('🔍 [RADAR DEBUG] Extracting categories from exercises...');
+            const categoriesSet = new Set<string>();
+            exercises.forEach(exercise => {
+                if (!exercise.category) {
+                    console.warn(`⚠️ [RADAR DEBUG] Exercise ${exercise.id} has no category`);
+                } else {
+                    categoriesSet.add(String(exercise.category));
+                }
+            });
+            
+            const categories = Array.from(categoriesSet);
+            console.log('🔍 [RADAR DEBUG] Categories extracted:', JSON.stringify(categories));
+            
+            if (categories.length === 0) {
+                console.warn('⚠️ [RADAR DEBUG] No categories found in exercises');
+                return { data: [], labels: [] };
+            }
 
             // Get user progress data
-            console.log('getRadarData: Fetching user progress...');
-            const progressData = await this.getUserProgress(userId);
-            console.log('getRadarData: Progress data:', JSON.stringify(progressData));
+            console.log('🔍 [RADAR DEBUG] Fetching user progress for userId:', userId);
+            let progressData;
+            try {
+                progressData = await this.getUserProgress(userId);
+                console.log('🔍 [RADAR DEBUG] Raw progress data:', JSON.stringify(progressData));
+            } catch (error: any) {
+                console.error('❌ [RADAR DEBUG] Error fetching user progress:', error);
+                throw new Error(`Failed to fetch user progress: ${error?.message || 'Unknown error'}`);
+            }
 
-            // Validate that categories is an object
-           if (!progressData.categories || typeof progressData.categories !== 'object') {
-              console.error('getRadarData: Invalid categories structure:', progressData.categories);
-              progressData.categories = {}; // Default to empty object
+            // Validate progress data structure
+            if (!progressData) {
+                console.error('❌ [RADAR DEBUG] Progress data is null or undefined');
+                progressData = { overall: 0, categories: {} };
+            }
+            
+            if (!progressData.categories || typeof progressData.categories !== 'object') {
+                console.error('❌ [RADAR DEBUG] Invalid categories structure:', progressData.categories);
+                progressData.categories = {}; // Default to empty object
             }
 
             // Calculate completion percentage for each category
+            console.log('🔍 [RADAR DEBUG] Calculating radar data points...');
             const data = categories.map(category => {
                 // Ensure category is a string
                 const categoryKey = String(category);
+                console.log(`🔍 [RADAR DEBUG] Processing category: ${categoryKey}`);
 
                 // Safely access the progress value, defaulting to 0
                 let categoryProgress = 0;
                 try {
-                    categoryProgress = progressData.categories[categoryKey] || 0;
-                    // Ensure value is a number
-                    categoryProgress = Number(categoryProgress);
-                    if (isNaN(categoryProgress)) {
-                        console.error(`getRadarData: Invalid progress value for ${categoryKey}:`, progressData.categories[categoryKey]);
-                        categoryProgress = 0;
+                    const rawProgress = progressData.categories[categoryKey];
+                    console.log(`🔍 [RADAR DEBUG] Raw progress for ${categoryKey}:`, rawProgress);
+                    
+                    if (rawProgress !== undefined && rawProgress !== null) {
+                        categoryProgress = Number(rawProgress);
+                        if (isNaN(categoryProgress)) {
+                            console.error(`❌ [RADAR DEBUG] Invalid progress value for ${categoryKey}:`, rawProgress);
+                            categoryProgress = 0;
+                        } else {
+                            console.log(`🔍 [RADAR DEBUG] Numeric progress for ${categoryKey}:`, categoryProgress);
+                        }
+                    } else {
+                        console.log(`🔍 [RADAR DEBUG] No progress data for ${categoryKey}, defaulting to 0`);
                     }
                 } catch (e) {
-                    console.error(`getRadarData: Error accessing progress for ${categoryKey}:`, e);
+                    console.error(`❌ [RADAR DEBUG] Error accessing progress for ${categoryKey}:`, e);
                 }
 
+                // Calculate normalized value (0-1)
+                const normalizedValue = Math.min(Math.max(categoryProgress / 100, 0), 1);
+                console.log(`🔍 [RADAR DEBUG] Normalized value for ${categoryKey}:`, normalizedValue);
+                
                 return {
                     label: categoryKey,
-                    value: Math.min(Math.max(categoryProgress / 100, 0), 1) // Ensure between 0-1
+                    value: normalizedValue
                 };
             });
 
-            console.log('getRadarData: Final data:', JSON.stringify(data));
-            console.log('getRadarData: Final labels:', JSON.stringify(categories));
+            console.log('🔍 [RADAR DEBUG] Final radar data points:', JSON.stringify(data));
+            console.log('🔍 [RADAR DEBUG] Final radar labels:', JSON.stringify(categories));
+            
+            // Validate final data structure
+            if (!Array.isArray(data) || data.length === 0) {
+                console.error('❌ [RADAR DEBUG] Generated radar data is empty or invalid');
+            } else {
+                data.forEach((point, index) => {
+                    if (typeof point.value !== 'number' || isNaN(point.value)) {
+                        console.error(`❌ [RADAR DEBUG] Invalid value at index ${index}:`, point.value);
+                    }
+                });
+            }
 
             return { data, labels: categories };
         } catch (error) {
@@ -245,20 +308,50 @@ export class ExerciseService {
      * Get user progress data
      */
     private static async getUserProgress(userId: string): Promise<any> {
+        console.log('🔍 [PROGRESS DEBUG] Getting user progress for userId:', userId);
+        
         try {
             const progressRef = doc(db, 'users', userId, 'progress', 'overview');
+            console.log('🔍 [PROGRESS DEBUG] Progress document path:', progressRef.path);
+            
             const progressDoc = await getDoc(progressRef);
-
+            console.log('🔍 [PROGRESS DEBUG] Progress document exists:', progressDoc.exists());
+            
             if (progressDoc.exists()) {
-                return progressDoc.data();
+                const data = progressDoc.data();
+                console.log('🔍 [PROGRESS DEBUG] Progress data retrieved:', JSON.stringify(data));
+                
+                // Validate data structure
+                if (!data.categories) {
+                    console.warn('⚠️ [PROGRESS DEBUG] Progress data missing categories property');
+                    data.categories = {};
+                }
+                
+                if (typeof data.categories !== 'object') {
+                    console.error('❌ [PROGRESS DEBUG] Categories is not an object:', typeof data.categories);
+                    data.categories = {};
+                }
+                
+                // Log each category value
+                if (data.categories) {
+                    Object.entries(data.categories).forEach(([category, value]) => {
+                        console.log(`🔍 [PROGRESS DEBUG] Category ${category} value:`, value);
+                        if (typeof value !== 'number' || isNaN(value)) {
+                            console.error(`❌ [PROGRESS DEBUG] Invalid value for category ${category}:`, value);
+                        }
+                    });
+                }
+                
+                return data;
             }
 
+            console.log('🔍 [PROGRESS DEBUG] No progress document found, returning default');
             return {
                 overall: 0,
                 categories: {}
             };
         } catch (error) {
-            console.error('Error fetching user progress:', error);
+            console.error('❌ [PROGRESS DEBUG] Error fetching user progress:', error);
             throw error;
         }
     }

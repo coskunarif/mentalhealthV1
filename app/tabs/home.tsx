@@ -42,35 +42,92 @@ export default function Home() {
     useEffect(() => {
         const fetchRadarData = async () => {
             try {
+                console.log('🔍 [HOME DEBUG] Fetching radar data, user:', user?.uid);
                 if (user) {
                     const { data, labels } = await ExerciseService.getRadarData(user.uid);
-                    setRadarData(data);
-                    setChartLabels(labels);
+                    
+                    // Validate radar data before setting state
+                    console.log('🔍 [HOME DEBUG] Received radar data:', JSON.stringify(data));
+                    console.log('🔍 [HOME DEBUG] Received radar labels:', JSON.stringify(labels));
+                    
+                    // Check if data is valid
+                    if (!Array.isArray(data)) {
+                        console.error('❌ [HOME DEBUG] Radar data is not an array:', data);
+                        setRadarData([]);
+                    } else if (data.length === 0) {
+                        console.warn('⚠️ [HOME DEBUG] Radar data array is empty');
+                        setRadarData([]);
+                    } else {
+                        // Validate each data point
+                        const validData = data.map((point, index) => {
+                            // Ensure each point has a valid value property
+                            if (typeof point !== 'object' || point === null) {
+                                console.error(`❌ [HOME DEBUG] Invalid data point at index ${index}:`, point);
+                                return { label: `Unknown ${index}`, value: 0 };
+                            }
+                            
+                            if (typeof point.value !== 'number' || isNaN(point.value)) {
+                                console.error(`❌ [HOME DEBUG] Invalid value at index ${index}:`, point.value);
+                                return { ...point, value: 0 };
+                            }
+                            
+                            // Ensure value is between 0-1
+                            if (point.value < 0 || point.value > 1) {
+                                console.warn(`⚠️ [HOME DEBUG] Value out of range at index ${index}:`, point.value);
+                                return { 
+                                    ...point, 
+                                    value: Math.min(Math.max(point.value, 0), 1) 
+                                };
+                            }
+                            
+                            return point;
+                        });
+                        
+                        console.log('🔍 [HOME DEBUG] Validated radar data:', JSON.stringify(validData));
+                        setRadarData(validData);
+                    }
+                    
+                    // Validate labels
+                    if (!Array.isArray(labels)) {
+                        console.error('❌ [HOME DEBUG] Radar labels is not an array:', labels);
+                        setChartLabels([]);
+                    } else {
+                        console.log('🔍 [HOME DEBUG] Setting chart labels:', labels);
+                        setChartLabels(labels);
+                    }
                 } else {
+                    console.log('🔍 [HOME DEBUG] No user, setting empty radar data');
                     setRadarData([]);
                     setChartLabels([]);
                 }
             } catch (error) {
-                console.error('Error fetching radar data:', error);
+                console.error('❌ [HOME DEBUG] Error fetching radar data:', error);
+                // Set default empty values on error
+                setRadarData([]);
+                setChartLabels([]);
             }
         };
 
         const fetchRecentActivities = async () => {
             try {
-              if (user) {
-                const activities = await ExerciseService.getRecentActivities(user.uid);
-                setRecentActivities(activities);
-              } else {
-                setRecentActivities([]);
-              }
+                console.log('🔍 [HOME DEBUG] Fetching recent activities, user:', user?.uid);
+                if (user) {
+                    const activities = await ExerciseService.getRecentActivities(user.uid);
+                    console.log('🔍 [HOME DEBUG] Received activities:', JSON.stringify(activities));
+                    setRecentActivities(activities);
+                } else {
+                    setRecentActivities([]);
+                }
             } catch (error) {
-                console.error('Error fetching recent activities:', error);
+                console.error('❌ [HOME DEBUG] Error fetching recent activities:', error);
+                setRecentActivities([]);
             }
         };
 
         if (!loading) {
-          fetchRadarData();
-          fetchRecentActivities();
+            console.log('🔍 [HOME DEBUG] User loaded, fetching data...');
+            fetchRadarData();
+            fetchRecentActivities();
         }
     }, [user, loading]);
 

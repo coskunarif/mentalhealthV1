@@ -37,25 +37,50 @@ export default function RadarChart({
   const theme = useTheme<AppTheme>();
   const { width: screenWidth } = useWindowDimensions();
   const chartSize = size || Math.min(screenWidth - 32, 320);
-  let chartLabels = labels || defaultLabels;
-
+  
+  console.log('🔍 [CHART DEBUG] RadarChart rendering with data:', JSON.stringify(data));
+  console.log('🔍 [CHART DEBUG] RadarChart labels:', JSON.stringify(labels));
+  
+  // Validate data
+  let validData = data;
   if (!data || !Array.isArray(data)) {
-    console.error('Invalid data provided to RadarChart:', data);
-    data = [];
+    console.error('❌ [CHART DEBUG] Invalid data provided to RadarChart:', data);
+    validData = [];
+  } else {
+    // Check each data point
+    validData.forEach((point, index) => {
+      if (!point || typeof point !== 'object') {
+        console.error(`❌ [CHART DEBUG] Invalid data point at index ${index}:`, point);
+      } else if (typeof point.value !== 'number' || isNaN(point.value)) {
+        console.error(`❌ [CHART DEBUG] Invalid value at index ${index}:`, point.value);
+      } else if (point.value < 0 || point.value > 1) {
+        console.error(`❌ [CHART DEBUG] Value out of range at index ${index}:`, point.value);
+      }
+    });
   }
-
+  
+  // Validate labels
+  let chartLabels = labels || defaultLabels;
   if (!labels || !Array.isArray(labels)) {
-    console.error('Invalid labels provided to RadarChart:', labels);
-    labels = defaultLabels;
+    console.error('❌ [CHART DEBUG] Invalid labels provided to RadarChart:', labels);
+    chartLabels = defaultLabels;
   }
-  chartLabels = labels;
-
-  if (data.length !== chartLabels.length) {
+  
+  // Check for length mismatch
+  if (validData.length !== chartLabels.length) {
     console.warn(
-      'RadarChart: data length and label length mismatch. Truncating or adjusting data.'
+      `⚠️ [CHART DEBUG] Data length (${validData.length}) and label length (${chartLabels.length}) mismatch. Truncating data.`
     );
-    data = data.slice(0, chartLabels.length);
+    validData = validData.slice(0, chartLabels.length);
+    
+    // If we have more labels than data points, log this issue
+    if (validData.length < chartLabels.length) {
+      console.warn(`⚠️ [CHART DEBUG] Not enough data points for all labels. Some axes will have no data.`);
+    }
   }
+  
+  // Use the validated data for rendering
+  data = validData;
   const center = chartSize / 2;
   const padding = 50; // Increased padding
   const radius = (chartSize - padding * 2) / 2;
