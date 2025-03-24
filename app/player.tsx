@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { View, Animated, Easing, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { View, Animated, Easing, StyleSheet } from 'react-native';
 import { Text, IconButton, Surface, useTheme } from 'react-native-paper';
 import { Audio, AVPlaybackStatus, AVPlaybackStatusError } from 'expo-av';
 import { router, useLocalSearchParams } from 'expo-router';
+import { ExerciseService } from './services/exercise.service';
 import Svg, { Circle } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { RootStackParamList } from './types/navigation';
@@ -16,6 +17,7 @@ interface PlayerProps {
   audioUrl: string;
   title: string;
   duration: string;
+  type: 'meditation' | 'exercise';
 }
 
 const MANDALA_SIZE = 200;
@@ -77,7 +79,7 @@ const createStyles = (theme: AppTheme) =>
       padding: 8,
     } as ViewStyle,
     breathingGuideText: {
-      ...theme.fonts.titleMedium, 
+      ...theme.fonts.titleMedium,
       color: theme.colors.primary,
       marginBottom: 16,
       opacity: 0.8,
@@ -115,7 +117,7 @@ export default function PlayerScreen() {
   const [position, setPosition] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { meditationId, title = 'Meditation', subtitle = 'Exercise' } =
+  const { meditationId, title = 'Meditation', subtitle = 'Exercise', type = 'meditation' } =
     useLocalSearchParams<RootStackParamList['player']>();
   const theme = useTheme<AppTheme>();
   const styles = createStyles(theme);
@@ -188,16 +190,16 @@ export default function PlayerScreen() {
             easing: Easing.inOut(Easing.ease),
             useNativeDriver: true, // CHANGE THIS TO TRUE
           });
-          
+
           bgInhaleAnimRef.current.start();
-          
+
           if (finished) {
             setBreathingPhase('hold');
-            
+
             // Hold breath briefly
             setTimeout(() => {
               setBreathingPhase('exhale');
-              
+
               // Exhale animation (shrink)
               exhaleAnimRef.current = Animated.timing(scaleValue, {
                 toValue: 0.8,
@@ -205,7 +207,7 @@ export default function PlayerScreen() {
                 easing: Easing.inOut(Easing.ease),
                 useNativeDriver: true,
               });
-              
+
               exhaleAnimRef.current.start(({ finished }) => {
                 // Add this parallel animation for the background
                 bgExhaleAnimRef.current = Animated.timing(backgroundIntensity, {
@@ -214,9 +216,9 @@ export default function PlayerScreen() {
                   easing: Easing.inOut(Easing.ease),
                   useNativeDriver: true, // CHANGE THIS TO TRUE
                 });
-                
+
                 bgExhaleAnimRef.current.start();
-                
+
                 if (finished) {
                   setBreathingPhase('inhale');
                   setBreathingCycleCount(prev => prev + 1);
@@ -237,7 +239,7 @@ export default function PlayerScreen() {
       if (bgInhaleAnimRef.current) bgInhaleAnimRef.current.stop();
       if (bgExhaleAnimRef.current) bgExhaleAnimRef.current.stop();
     }
-    
+
     return () => {
       // Cleanup animations on unmount
       if (inhaleAnimRef.current) inhaleAnimRef.current.stop();
@@ -345,66 +347,78 @@ export default function PlayerScreen() {
 
   const progress = duration ? position / duration : 0;
 
-  const handleMeditationCompletion = async () => {
+ const handleActivityCompletion = async () => {
     try {
       if (!userId) {
         console.error('User ID is required');
         return;
       }
+      if (type === 'exercise') {
+        // Assuming meditationId is the exerciseId for exercises
+        await ExerciseService.completeExercise(userId, meditationId as string);
+      } else {
+        await UserService.trackActivity({
+          userId,
+          type: 'meditation',
+          timestamp: new Date(),
+          details: {
+            duration: duration / 60000, // Convert ms to minutes
+            title: title as string,
+          },
+        });
+      }
 
-      await UserService.trackActivity({
-        userId,
-        type: 'meditation',
-        timestamp: new Date(),
-        details: {
-          duration: duration / 60000, // Convert ms to minutes
-          title: title as string
-        }
-      });
-      console.log('Meditation activity logged successfully.');
+      console.log(`${type} activity completed successfully.`);
     } catch (error) {
-      console.error('Error logging meditation activity:', error);
+      console.error(`Error logging ${type} activity:`, error);
     }
   };
 
   useEffect(() => {
-    if (!isPlaying && position === duration) {
-      handleMeditationCompletion();
+    if (!isPlaying && position === duration && duration > 0) {
+      handleActivityCompletion();
     }
-  }, [isPlaying, position, duration]);
+  }, [isPlaying, position, duration, handleActivityCompletion]);
 
   return (
-<ScreenLayout
-      title={title && (title as string).length > 20 ? `${(title as string).substring(0, 20)}...` : title as string}
+    <ScreenLayout
+      title={
+        title && (title as string).length > 20
+          ? `${(title as string).substring(0, 20)}...`
+          : (title as string)
+      }
       showBackButton={true}
       scrollable={false}
     >
       <View style={styles.content}>
-      <Animated.View style={styles.gradientContainer}>
+        <Animated.View style={styles.gradientContainer}>
           {/* Solid background */}
-          <View style={[styles.backgroundBase, { backgroundColor: theme.colors.background }]} />
-          
+          <View
+            style={[
+              styles.backgroundBase,
+              { backgroundColor: theme.colors.background },
+            ]}
+          />
+
           {/* Color overlay for breathing effect */}
-          <Animated.View 
+          <Animated.View
             style={[
               styles.colorLayer,
-              { 
+              {
                 opacity: backgroundIntensity.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [0.05, 0.25]
-                })
-              }
-            ]} 
+                  outputRange: [0.05, 0.25],
+                }),
+              },
+            ]}
           />
         </Animated.View>
         <Animated.View
           style={[
-            styles.mandalaContainer, 
-            { 
-              transform: [
-                { scale: scaleValue }
-              ] 
-            }
+            styles.mandalaContainer,
+            {
+              transform: [{ scale: scaleValue }],
+            },
           ]}
           accessibilityElementsHidden={false}
           accessibilityLabel={`Breathing guide: ${breathingPhase} phase`}
@@ -421,8 +435,11 @@ export default function PlayerScreen() {
           style={styles.breathingGuideText}
           accessibilityLiveRegion="polite"
         >
-          {breathingPhase === 'inhale' ? 'Breathe in...' : 
-           breathingPhase === 'hold' ? 'Hold...' : 'Breathe out...'}
+          {breathingPhase === 'inhale'
+            ? 'Breathe in...'
+            : breathingPhase === 'hold'
+            ? 'Hold...'
+            : 'Breathe out...'}
         </Text>
 
         <View style={styles.timerContainer}>
@@ -461,7 +478,9 @@ export default function PlayerScreen() {
             onPress={handlePlayPause}
             disabled={isLoading}
             style={styles.playButton}
-            accessibilityLabel={isPlaying ? 'Pause meditation' : 'Play meditation'}
+            accessibilityLabel={
+              isPlaying ? 'Pause meditation' : 'Play meditation'
+            }
             accessibilityState={{ disabled: isLoading, busy: isLoading }}
             accessibilityHint={
               isPlaying
@@ -469,21 +488,23 @@ export default function PlayerScreen() {
                 : 'Starts playing the meditation'
             }
           />
-          </View>
-    {/* If needed, you can add a smaller subtitle here */}
-    {subtitle && (
-      <Text style={{
-        fontSize: 16,
-        color: theme.colors.onSurfaceVariant,
-        marginBottom: 16,
-        textAlign: 'center'
-      }}>
-        {subtitle as string}
-      </Text>
-    )}
-    
-    {/* Rest of the content... */}
-  </View>
-</ScreenLayout>
+        </View>
+        {/* If needed, you can add a smaller subtitle here */}
+        {subtitle && (
+          <Text
+            style={{
+              fontSize: 16,
+              color: theme.colors.onSurfaceVariant,
+              marginBottom: 16,
+              textAlign: 'center',
+            }}
+          >
+            {subtitle as string}
+          </Text>
+        )}
+
+        {/* Rest of the content... */}
+      </View>
+    </ScreenLayout>
   );
 }

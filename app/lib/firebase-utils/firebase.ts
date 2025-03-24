@@ -4,7 +4,7 @@ import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getFunctions } from 'firebase/functions';
-import { getAnalytics } from 'firebase/analytics';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 import { firebaseConfig } from './config';
 
 // Initialize Firebase only if no apps exist
@@ -24,7 +24,13 @@ export const storage = getStorage(app);
 // Functions
 export const functions = getFunctions(app);
 
-// Analytics (with null check for SSR/testing environments)
-export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+// Analytics (initialize only if supported)
+export let analytics: any = null; // Use let to allow reassignment
+isSupported().then(supported => {
+  if (supported) {
+    analytics = getAnalytics(app);
+  }
+});
+
 
 export default { app, auth, db, storage, functions, analytics };

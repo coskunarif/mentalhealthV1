@@ -84,7 +84,7 @@ export default function ExercisesScreen() {
 
   const handleStartExercise = () => {
     if (nextExercise) {
-      router.push(`/player?meditationId=${nextExercise.id}`);
+      router.push(`/player?meditationId=${nextExercise.id}&type=exercise`);
     }
   };
 

@@ -23,6 +23,7 @@ export type RootStackParamList = {
     meditationId: string;
     title?: string;
     subtitle?: string;
+    type?: 'meditation' | 'exercise';
     returnTo?: keyof RootStackParamList;
   };
   welcome: undefined;
