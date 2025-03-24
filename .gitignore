@@ -47,3 +47,4 @@ config/firebase.ts
 *.swo
 .DS_Store
 *.log
+serviceAccountKey.json
