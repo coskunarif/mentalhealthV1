@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
 import { miscStyles, typographyStyles } from '../config';
+import type DataPoint from '../components/RadarChart';
 import RadarChart from '../components/RadarChart';
 import RecentActivities from '../components/RecentActivities';
 import QuickActions from '../components/QuickActions';
@@ -31,19 +32,23 @@ interface RecentActivity {
 }
 
 export default function Home() {
+    // Test comment
     const theme = useTheme<AppTheme>();
     const { user, loading } = useAuth();
     const [radarData, setRadarData] = useState<RadarData[]>([]);
+    const [chartLabels, setChartLabels] = useState<string[]>([]);
     const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
 
     useEffect(() => {
         const fetchRadarData = async () => {
             try {
                 if (user) {
-                    const data = await ExerciseService.getRadarData(user.uid);
+                    const { data, labels } = await ExerciseService.getRadarData(user.uid);
                     setRadarData(data);
+                    setChartLabels(labels);
                 } else {
-                  setRadarData([]);
+                    setRadarData([]);
+                    setChartLabels([]);
                 }
             } catch (error) {
                 console.error('Error fetching radar data:', error);
@@ -125,7 +130,7 @@ export default function Home() {
                 <Text variant="headlineMedium" style={styles.sectionTitle}>
                     Your Progress
                 </Text>
-                <RadarChart data={radarData} />
+                <RadarChart data={radarData} labels={chartLabels} />
             </Surface>
 
             {/* Quick Actions Section */}

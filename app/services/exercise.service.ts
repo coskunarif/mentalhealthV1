@@ -78,7 +78,7 @@ export class ExerciseService {
     /**
      * Get user radar data for visualization
      */
-    static async getRadarData(userId: string): Promise<any[]> {
+    static async getRadarData(userId: string): Promise<{ data: any[], labels: string[] }> { // Changed return type
         try {
             // Get all exercises
             const exercisesRef = collection(db, 'exercises');
@@ -92,16 +92,18 @@ export class ExerciseService {
             const progressData = await this.getUserProgress(userId);
 
             // Calculate completion percentage for each category
-            return categories.map(category => {
+            const data = categories.map(category => {
                 const categoryProgress = progressData.categories[category] || 0;
                 return {
                     label: category,
                     value: categoryProgress / 100 // Normalize to 0-1 for radar chart
                 };
             });
+
+            return { data, labels: categories }; // Return both data and labels
         } catch (error) {
             console.error('Error fetching radar data:', error);
-            return [];
+            return { data: [], labels: [] }; // Return empty arrays on error
         }
     }
 
