@@ -26,6 +26,7 @@ export class MoodService {
     notes?: string
   }): Promise<string> {
     try {
+      console.log('Saving mood entry:', JSON.stringify(entry, null, 2));
       // Ensure duration exists (required field)
       const entryData = {
         ...entry,
@@ -34,10 +35,17 @@ export class MoodService {
         createdAt: Timestamp.fromDate(new Date())
       };
       
+      console.log('Formatted entry data:', JSON.stringify(entryData, null, 2));
+      
       const docRef = await addDoc(collection(db, 'moods'), entryData);
+      console.log('Successfully saved mood entry with ID:', docRef.id);
       return docRef.id;
-    } catch (error) {
+    } catch (error: any) { // Added ': any' to type error for accessing properties
       console.error('Error saving mood entry:', error);
+      // Log detailed error info if available
+      if (error && typeof error === 'object' && 'code' in error && 'message' in error) {
+        console.error('Error details:', error.code, error.message);
+      }
       throw error;
     }
   }

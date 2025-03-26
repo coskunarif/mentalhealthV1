@@ -30,9 +30,12 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
 }) => {
   const theme = useTheme<AppTheme>();
 
-  const [animations] = useState(() => 
-    exercises.map(() => new Animated.Value(0))
-  );
+  const [animations, setAnimations] = useState<Animated.Value[]>([]);
+  
+  useEffect(() => {
+    // Make sure animations array is recreated when exercises array changes
+    setAnimations(exercises.map(() => new Animated.Value(0)));
+  }, [exercises]);
 
   useEffect(() => {
     // Animate completed steps
@@ -104,7 +107,7 @@ const getStepIcon = (status: 'completed' | 'current' | 'upcoming') => {
               <View style={styles.iconContainer}>
                 <Animated.View style={{
                   transform: [{ 
-                    scale: animations[index].interpolate({
+                    scale: animations[index]?.interpolate({
                       inputRange: [0, 0.5, 1],
                       outputRange: [1, 1.2, 1]
                     }) 

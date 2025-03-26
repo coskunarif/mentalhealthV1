@@ -1,27 +1,12 @@
 {
   "indexes": [
     {
-      "collectionGroup": "moods",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "surveys",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "progress",
+      "collectionGroup": "activities",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "completedAt", "order": "DESCENDING" }
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" },
+        { "fieldPath": "__name__", "order": "DESCENDING" }
       ]
     }
   ],
