@@ -18,10 +18,7 @@ export default function TabLayout() {
         },
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontFamily: 'Kameron',
-        },
+        tabBarLabelStyle: { ...theme.fonts.labelMedium },
       }}
     >
       <Tabs.Screen

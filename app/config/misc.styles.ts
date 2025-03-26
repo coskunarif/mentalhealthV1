@@ -24,6 +24,8 @@ const miscStyles = StyleSheet.create({
     marginBottom: 12,
     color: theme.colors.onSurface,
     ...theme.fonts.headlineMedium,
+    textAlign: 'left',
+    paddingLeft: 2, // Small padding for visual alignment
   } as TextStyle,
 
   // Not Found

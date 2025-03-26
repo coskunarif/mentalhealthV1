@@ -135,6 +135,8 @@ export default function Home() {
             fontSize: 20,
             fontWeight: '500',
             letterSpacing: 0.15,
+            textAlign: 'left', // Explicitly set for consistency
+            paddingLeft: 2, // Small padding for visual alignment
         },
         actionButton: {
             marginTop: 24,

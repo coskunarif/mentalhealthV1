@@ -48,11 +48,7 @@ export default function AppLayout() {
                 backgroundColor: appTheme.colors.surface,
               },
               headerShadowVisible: false,
-              headerTitleStyle: {
-                fontFamily: 'Nunito',
-                fontWeight: '600',
-                fontSize: 20,
-              },
+              headerTitleStyle: { ...appTheme.fonts.titleMedium },
               contentStyle: {
                 backgroundColor: appTheme.colors.background,
               },
