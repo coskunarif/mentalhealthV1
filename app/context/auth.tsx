@@ -1,19 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth, User } from '../lib/firebase-utils';
+import { auth, User, db } from '../lib/firebase-utils';
 import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 interface AuthContextType {
   user: User | null;
   initialized: boolean;
-  loading: boolean; // Add loading state
+  loading: boolean;
   signOut: () => Promise<void>;
 }
 
-// Provide default values for the context (optional, but good practice)
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   initialized: false,
-  loading: true, // Default to loading
+  loading: true,
   signOut: async () => {},
 });
 
@@ -24,15 +24,53 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [initialized, setInitialized] = useState(false);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Only subscribe to auth state changes - don't initialize auth again
-    const unsubscribe = onAuthStateChanged(auth, (authUser: User | null) => {
+    // Only subscribe to auth state changes
+    const unsubscribe = onAuthStateChanged(auth, async (authUser: User | null) => {
       console.log('authUser:', authUser); // Added log
-      setUser(authUser);
+
+      if (authUser) {
+        // Try to get additional user data from Firestore if needed
+        try {
+          const userRef = doc(db, 'users', authUser.uid);
+          const userDoc = await getDoc(userRef);
+          
+          if (userDoc.exists()) {
+            // Merge auth user with DB data
+            const userData = userDoc.data();
+            console.log('User data from Firestore:', userData);
+            
+            // Set user with merged data
+            const enhancedUser = {
+              ...authUser,
+              displayName: userData.displayName || authUser.displayName,
+              photoURL: userData.photoURL || authUser.photoURL,
+              // Add other fields as needed
+            };
+            
+            setUser(enhancedUser);
+          } else {
+            // No user document found, just use auth user
+            console.log('No user document found in Firestore');
+            setUser(authUser);
+          }
+        } catch (error) {
+          console.error('Error fetching user data from Firestore:', error);
+          // Fallback to auth user data
+          setUser(authUser);
+        }
+      } else {
+        setUser(null);
+      }
+      
       setInitialized(true);
-      setLoading(false); // Set loading to false after auth state is determined
+      setLoading(false);
+    }, (error) => {
+      console.error('Auth state change error:', error);
+      setInitialized(true);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -40,18 +78,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const handleSignOut = async () => {
     try {
+      setLoading(true);
       await auth.signOut();
       setUser(null);
     } catch (error) {
       console.error('Error signing out:', error);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const authContextValue: AuthContextType = {
     user,
     initialized,
-    loading, // Provide loading state
+    loading,
     signOut: handleSignOut
   };
 

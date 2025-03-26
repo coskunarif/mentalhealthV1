@@ -31,20 +31,22 @@ isSupported().then(supported => {
   if (supported) {
     analytics = getAnalytics(app);
   }
+}).catch(error => {
+  console.error('Analytics initialization error:', error);
 });
 
 // Logging for debugging
 console.log('Firebase app initialization status:', getApps().length > 0 ? 'Already initialized' : 'New initialization');
-console.log('Firebase project config - Project ID:', firebaseConfig.projectId);
+console.log('Firebase project ID:', firebaseConfig.projectId || 'Not available');
 console.log('Firebase SDK version:', SDK_VERSION);
 
 // Test connectivity explicitly
 export const testFirestoreConnection = async () => {
   try {
     console.log('Testing Firestore connection...');
-    const testRef = collection(db, '_connection_test_');
-    await getDocs(testRef);
-    console.log('Firestore connection successful');
+    const testRef = collection(db, 'exercises');
+    const testSnapshot = await getDocs(testRef);
+    console.log('Firestore connection successful with', testSnapshot.size, 'documents');
     return true;
   } catch (error) {
     console.error('Firestore connection failed:', error);
@@ -52,7 +54,5 @@ export const testFirestoreConnection = async () => {
   }
 };
 
-// Call this early in your app startup - moved to _layout.tsx
-// testFirestoreConnection();
-
+// Export consolidated object
 export default { app, auth, db, storage, functions, analytics };

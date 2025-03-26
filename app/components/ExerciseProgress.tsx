@@ -30,26 +30,31 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
 }) => {
   const theme = useTheme<AppTheme>();
 
+  // Initialize animations array with default values
   const [animations, setAnimations] = useState<Animated.Value[]>([]);
   
   useEffect(() => {
-    // Make sure animations array is recreated when exercises array changes
-    setAnimations(exercises.map(() => new Animated.Value(0)));
-  }, [exercises]);
+    // Initialize animations with proper values when exercises change
+    if (Array.isArray(exercises)) {
+      setAnimations(exercises.map(() => new Animated.Value(0)));
+    }
+  }, [exercises?.length]);
 
   useEffect(() => {
-    // Animate completed steps
-    exercises.forEach((exercise, index) => {
-      if (exercise.isCompleted) {
-        Animated.timing(animations[index], {
-          toValue: 1,
-          duration: 800,
-          easing: Easing.elastic(1),
-          useNativeDriver: true,
-        }).start();
-      }
-    });
-  }, [exercises]);
+    // Animate completed steps - only run if animations and exercises are properly initialized
+    if (animations.length > 0 && Array.isArray(exercises)) {
+      exercises.forEach((exercise, index) => {
+        if (exercise.isCompleted && animations[index]) {
+          Animated.timing(animations[index], {
+            toValue: 1,
+            duration: 800,
+            easing: Easing.elastic(1),
+            useNativeDriver: true,
+          }).start();
+        }
+      });
+    }
+  }, [exercises, animations]);
 
   const getStepStatus = (index: number, isCompleted: boolean, isCurrent: boolean) => {
     if (isCompleted) return 'completed';
@@ -57,42 +62,51 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
     return 'upcoming';
   };
 
-const getStepIcon = (status: 'completed' | 'current' | 'upcoming') => {
-  switch (status) {
-    case 'completed':
-      return 'check-circle';
-    case 'current':
-      return 'radiobox-marked';
-    case 'upcoming':
-      return 'radiobox-blank';
-  }
-};
+  const getStepIcon = (status: 'completed' | 'current' | 'upcoming') => {
+    switch (status) {
+      case 'completed':
+        return 'check-circle';
+      case 'current':
+        return 'radiobox-marked';
+      case 'upcoming':
+        return 'radiobox-blank';
+    }
+  };
 
   const getStepColors = (status: 'completed' | 'current' | 'upcoming') => {
-  switch (status) {
-    case 'completed':
-      return {
-        icon: theme.colors.secondary,
-        text: theme.colors.onSurface,
-        connector: theme.colors.secondary,
-        connectorStyle: 'solid', // Solid line for completed
-      };
-    case 'current':
-      return {
-        icon: theme.colors.primary,
-        text: theme.colors.onSurface,
-        connector: theme.colors.primary,
-        connectorStyle: 'dashed', // Dashed for in-progress
-      };
-    case 'upcoming':
-      return {
-        icon: theme.colors.outlineVariant,
-        text: theme.colors.onSurfaceVariant,
-        connector: theme.colors.outlineVariant,
-        connectorStyle: 'dotted', // Dotted for upcoming
-      };
+    switch (status) {
+      case 'completed':
+        return {
+          icon: theme.colors.secondary,
+          text: theme.colors.onSurface,
+          connector: theme.colors.secondary,
+          connectorStyle: 'solid', // Solid line for completed
+        };
+      case 'current':
+        return {
+          icon: theme.colors.primary,
+          text: theme.colors.onSurface,
+          connector: theme.colors.primary,
+          connectorStyle: 'dashed', // Dashed for in-progress
+        };
+      case 'upcoming':
+        return {
+          icon: theme.colors.outlineVariant,
+          text: theme.colors.onSurfaceVariant,
+          connector: theme.colors.outlineVariant,
+          connectorStyle: 'dotted', // Dotted for upcoming
+        };
+    }
+  };
+
+  // Safeguard against undefined exercises
+  if (!Array.isArray(exercises) || exercises.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text>No exercises available.</Text>
+      </View>
+    );
   }
-};
 
   return (
     <View style={styles.container}>
@@ -101,13 +115,17 @@ const getStepIcon = (status: 'completed' | 'current' | 'upcoming') => {
         const status = getStepStatus(index, exercise.isCompleted, isCurrent);
         const colors = getStepColors(status);
         const isLast = index === exercises.length - 1;
+        
+        // Guard against undefined animation value
+        const animationValue = animations[index] || new Animated.Value(0);
+        
         return (
-          <View key={exercise.id} style={styles.stepContainer}>
+          <View key={exercise.id || `exercise-${index}`} style={styles.stepContainer}>
             <View style={styles.stepContent}>
               <View style={styles.iconContainer}>
                 <Animated.View style={{
                   transform: [{ 
-                    scale: animations[index]?.interpolate({
+                    scale: animationValue.interpolate({
                       inputRange: [0, 0.5, 1],
                       outputRange: [1, 1.2, 1]
                     }) 
@@ -139,15 +157,15 @@ const getStepIcon = (status: 'completed' | 'current' | 'upcoming') => {
                   color: colors.text, 
                   fontSize: 16, 
                   fontWeight: '500',
-                  marginVertical: 4 // Add proper spacing
+                  marginVertical: 4
                 }]} numberOfLines={1}>
-                  {exercise.title}
+                  {exercise.title || `Exercise ${index + 1}`}
                 </Text>
                 <Text style={[styles.stepDuration, { 
                   color: theme.colors.onSurfaceVariant,
                   fontSize: 14
                 }]}>                  
-                  {formatDuration(exercise.duration)}
+                  {formatDuration(exercise.duration || '0 min')}
                 </Text>
               </View>
             </View>
