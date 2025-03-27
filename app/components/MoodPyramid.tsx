@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Added useEffect
 import {
   View,
   ScrollView,
   TouchableOpacity,
   Dimensions,
   ViewStyle,
+  ActivityIndicator, // Added ActivityIndicator
+  StyleSheet, // Added StyleSheet
 } from 'react-native';
 import { Text, IconButton } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -13,13 +15,18 @@ import { typographyStyles } from '../config';
 import { useAppTheme } from '../hooks/useAppTheme';
 import EnhancedButton from './EnhancedButton';
 import { ScreenLayout } from './ScreenLayout'; // Import ScreenLayout
+import MoodService from '../services/mood.service'; // Import MoodService
+import { EmotionDefinition } from '../models/mood.model'; // Import EmotionDefinition
 
-type Emotion = {
-  label: string;
+// Type for the state used in the pyramid UI
+type PyramidEmotion = {
+  id: string;
+  label: string; // Use label for display consistency
   color: string;
-  width: string | number;
+  width: string; // Keep width for pyramid styling
 };
 
+// Type for selected emotions
 type EmotionSelection = {
   label: string;
   color: string;
@@ -81,17 +88,42 @@ const getBubbleConfig = (screenWidth: number): BubbleConfig[] => {
 export function MoodPyramid({ onPrevious, onFinish }: Props) {
   const theme = useAppTheme();
   const [selectedEmotions, setSelectedEmotions] = useState<EmotionSelection[]>([]);
-  const emotions: Emotion[] = [
-    { label: 'Peace', color: theme.moodColors.peace, width: '40%' },
-    { label: 'Joy', color: theme.moodColors.joy, width: '55%' },
-    { label: 'Love', color: theme.moodColors.love, width: '70%' },
-    { label: 'Reason', color: theme.moodColors.reason, width: '85%' },
-    { label: 'Acceptance', color: theme.moodColors.acceptance, width: '100%' },
-  ];
+  const [pyramidEmotions, setPyramidEmotions] = useState<PyramidEmotion[]>([]); // State for fetched emotions
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState<string | null>(null); // Error state
+
   const screenWidth = Dimensions.get('window').width;
   const bubbleConfig = getBubbleConfig(screenWidth);
 
-  const handleEmotionSelect = (emotion: Emotion) => {
+  // Hardcoded widths based on order - ideally fetch this too if it varies
+  const pyramidWidths = ['40%', '55%', '70%', '85%', '100%'];
+
+  // Fetch Emotion Definitions
+  useEffect(() => {
+    const fetchEmotions = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const definitions = await MoodService.getEmotionDefinitions();
+        const mappedEmotions = definitions.map((def, index) => ({
+          id: def.id,
+          label: def.name,
+          color: theme.moodColors[def.moodKey],
+          width: pyramidWidths[index % pyramidWidths.length] || '100%', // Assign width based on order
+        }));
+        setPyramidEmotions(mappedEmotions);
+      } catch (err: any) {
+        console.error('[MoodPyramid] Error fetching emotion definitions:', err);
+        setError(err.message || 'Failed to load emotion options.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEmotions();
+  }, [theme]); // Depend on theme as it's used for colors
+
+  const handleEmotionSelect = (emotion: PyramidEmotion) => {
+    // Use 'label' for selection logic as it's unique in this context
     if (selectedEmotions.some(e => e.label === emotion.label)) {
       setSelectedEmotions(prev => prev.filter(e => e.label !== emotion.label));
     } else if (selectedEmotions.length < 3) {
@@ -108,6 +140,28 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
   const handleBack = () => {
     router.back();
   };
+
+  // Handle Loading / Error states
+  if (loading) {
+    return (
+      <ScreenLayout title="Focus Emotions" onBackPress={handleBack} elevation={0}>
+        <View style={styles.centeredContainer}>
+          <ActivityIndicator size="large" />
+          <Text>Loading emotions...</Text>
+        </View>
+      </ScreenLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <ScreenLayout title="Focus Emotions" onBackPress={handleBack} elevation={0}>
+        <View style={styles.centeredContainer}>
+          <Text style={{ color: theme.colors.error }}>{error}</Text>
+        </View>
+      </ScreenLayout>
+    );
+  }
 
   return (
     <ScreenLayout
@@ -183,9 +237,10 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
       </Text>
 
       <View style={[localStyles.pyramid_container, { marginBottom: 24 }]}>
-        {emotions.map(emotion => (
+        {/* Use fetched pyramidEmotions */}
+        {pyramidEmotions.map(emotion => (
           <TouchableOpacity
-            key={emotion.label}
+            key={emotion.id} // Use unique ID from Firestore
             onPress={() => handleEmotionSelect(emotion)}
             accessibilityLabel={`Select emotion ${emotion.label}`}
             accessibilityRole="button"
@@ -269,33 +324,44 @@ export function MoodPyramid({ onPrevious, onFinish }: Props) {
           >
             {selectedEmotions[index] ? (
               <Text
-                style={[
-                  localStyles.pyramid_bubbleText,
-                  { fontSize: config.fontSize },
-                ]}
-              >
-                {selectedEmotions[index].label}
-              </Text>
-            ) : (
-              <Text
-                style={[
-                  typographyStyles.text_heading3,
-                  {
-                    fontSize: config.fontSize * 0.8,
-                    color: theme.colors.primary,
-                    textAlign: 'center',
-                    fontWeight: 'bold', // Added for emphasis
-                  },
-                ]}
-              >
-                Focus{'\n'}Emotions
-              </Text>
-            )}
-          </TouchableOpacity>
-        ))}
-      </View>
-    </ScreenLayout>
-  );
+            style={[
+              localStyles.pyramid_bubbleText,
+              { fontSize: config.fontSize },
+            ]}
+          >
+            {selectedEmotions[index].label}
+          </Text>
+        ) : (
+          <Text
+            style={[
+              typographyStyles.text_heading3,
+              {
+                fontSize: config.fontSize * 0.8,
+                color: theme.colors.primary,
+                textAlign: 'center',
+                fontWeight: 'bold', // Added for emphasis
+              },
+            ]}
+          >
+            Focus{'\n'}Emotions
+          </Text>
+        )}
+      </TouchableOpacity>
+    ))}
+  </View>
+</ScreenLayout>
+);
 }
+
+// Define styles using StyleSheet
+const styles = StyleSheet.create({
+  centeredContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+});
+
 
 export default MoodPyramid;

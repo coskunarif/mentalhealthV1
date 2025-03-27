@@ -15,7 +15,7 @@ export default function NotificationPreferencesScreen() {
     <ScreenLayout
       title="Notifications"
     >
-      <NotificationPreferences onToggle={handleToggle} />
+      <NotificationPreferences />
     </ScreenLayout>
   );
 }
