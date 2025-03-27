@@ -5,8 +5,9 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ScreenLayout } from './components/ScreenLayout';
 import { router } from 'expo-router';
 import EnhancedButton from './components/EnhancedButton';
-import { SurveyService } from './services/survey.service';
+// import { SurveyService } from './services/survey.service'; // Removed direct service import
 import { useAuth } from './context/auth';
+import { useSurvey } from './hooks/useSurvey'; // Import the hook
 
 const questions = [
     {
@@ -203,6 +204,7 @@ const styles = (theme: any) => StyleSheet.create({
 const SurveyScreen = () => {
     const theme = useTheme();
     const { user } = useAuth();
+    const { submitSurvey, loading, error } = useSurvey(); // Use the hook
     const userId = user?.uid || ''; // Provide default empty string
 
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -232,16 +234,18 @@ const SurveyScreen = () => {
                 console.error('User ID is required');
                 return;
             }
+            
+            // Extract question text for saving
+            const questionTexts = questions.map(q => q.text);
 
-            try {
-                await SurveyService.saveSurveyResponse({
-                    userId,
-                    timestamp: new Date(),
-                    responses: answers,
-                });
+            // Use the hook's submitSurvey function
+            const success = await submitSurvey(answers, questionTexts); 
+            
+            if (success) {
                 router.replace('/');
-            } catch (error) {
-                console.error('Error saving survey response:', error);
+            } else {
+                // Error is handled within the hook, but you could show a message here if needed
+                console.error('Survey submission failed (handled by useSurvey hook)');
             }
         } else {
             setCurrentQuestion(currentQuestion + 1);
@@ -310,10 +314,14 @@ const SurveyScreen = () => {
                             onPress={handleNext}
                             fullWidth
                             icon={isLastQuestion ? "check" : "arrow-right"}
+                            loading={loading} // Use loading state from hook
+                            disabled={loading} // Disable button while loading
                         >
                             {isLastQuestion ? 'Finish Survey' : 'Next'}
                         </EnhancedButton>
                     </View>
+                    {/* Optionally display error from hook */}
+                    {/* {error && <Text style={{ color: theme.colors.error, textAlign: 'center', marginTop: 8 }}>{error}</Text>} */}
                 </View>
             </View>
         </ScreenLayout>
