@@ -1,50 +1,82 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
+# Dependencies
 node_modules/
+.pnp/
+.pnp.js
 
 # Expo
 .expo/
 dist/
 web-build/
-
-# Native
-*.orig.*
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
+*.orig.*
 
 # Metro
 .metro-health-check*
 
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
+# Firebase
+.firebase/
+.firebase/*.log
+.firebase/**/*.log
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+firebase/functions/lib/
+firebase/functions/node_modules/
+firebase/functions/.runtimeconfig.json
 
-# macOS
-.DS_Store
-*.pem
+# Security & Credentials
+serviceAccountKey.json
+**/serviceAccountKey.json
 
-# local env files
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+debug.log
+*.log
+
+# Environment variables
 .env
 .env.*
 !.env.example
 
-# typescript
+# TypeScript
 *.tsbuildinfo
+lib/
+dist/
 
-app-example
+# Build
+*.p12
+*.mobileprovision
+*.ipa
+*.apk
+*.aab
 
-config/firebase.ts
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-.DS_Store
-*.log
-serviceAccountKey.json
+*.sublime*
+.project
+.classpath
+
+# Test coverage
+coverage/
+
+# App specific
+app-example
+config/firebase.ts
