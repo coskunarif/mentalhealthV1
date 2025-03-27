@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-03-27T10:38:58.245Z",
+  "results": {
+    "errors": [],
+    "warnings": [
+      "Found 2 mood entries (checked up to 500) with invalid user IDs. Example: GC8yFgI6CDmxgCOP5LAw, ugrvgGv5kXbX6OB1T3U4"
+    ],
+    "info": [
+      "Found 5 user documents",
+      "Found 5 exercise documents",
+      "Found 5 meditation documents",
+      "Found 215 mood entry documents",
+      "Mood entries by user: {\"sample-david\":42,\"sample-michael\":41,\"sample-emma\":49,\"sample-sophia\":37,\"sample-john\":44,\"user-id\":2}",
+      "Found 33 survey response documents",
+      "Found 30 stats documents",
+      "Checked survey responses (up to 500) reference valid users."
+    ]
+  }
+}
