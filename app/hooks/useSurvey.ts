@@ -7,7 +7,7 @@ export const useSurvey = () => {
   const [error, setError] = useState<string | null>(null); // Define type for error
   const { user } = useAuth();
 
-  const submitSurvey = async (responses: any[]) => { // Define type for responses
+  const submitSurvey = async (responses: (string | undefined)[], questions: string[]) => { // Added questions parameter
     if (!user?.uid) {
       setError('You must be logged in to submit a survey');
       return false;
@@ -18,7 +18,8 @@ export const useSurvey = () => {
       await SurveyService.saveSurveyResponse({
         userId: user.uid,
         timestamp: new Date(),
-        responses
+        responses,
+        questions // Pass questions to the service
       });
       setError(null);
       return true;

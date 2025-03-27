@@ -8,7 +8,8 @@ export class SurveyService {
   static async saveSurveyResponse(survey: {
     userId: string,
     timestamp: Date,
-    responses: (string | undefined)[]
+    responses: (string | undefined)[],
+    questions: string[] // Added questions field
   }): Promise<string> {
     try {
       if (!survey.userId) throw new Error('User ID is required');
@@ -20,6 +21,7 @@ export class SurveyService {
         userId: survey.userId,
         timestamp: survey.timestamp,
         responses: validResponses,
+        questions: survey.questions, // Added questions to data
         createdAt: new Date()
       };
       
