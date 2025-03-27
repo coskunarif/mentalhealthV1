@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, ScrollView } from 'react-native';
-import { Text, Button, Surface, Snackbar, Dialog, List } from 'react-native-paper';
+import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import { View, ScrollView, RefreshControl } from 'react-native'; // Added RefreshControl
+import { Text, Button, Surface, Snackbar, Dialog, List, ActivityIndicator } from 'react-native-paper'; // Added ActivityIndicator
 import type { PersonalInformation } from '../types/personalInformation';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
@@ -8,64 +8,120 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { layoutStyles, miscStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
 import { UserService } from '../services/user.service';
+import { UserStats } from '../models/user-stats.model'; // Correct import path
+import { Timestamp } from 'firebase/firestore'; // Import Timestamp
 
 export default function ProfileScreen() {
   const { user, signOut, loading: authLoading } = useAuth(); // Get loading state from useAuth
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSignOutLoading, setIsSignOutLoading] = useState(false); // Renamed for clarity
   const [error, setError] = useState<string | null>(null);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const router = useRouter();
 
-  // Simulated user stats
-  const [userStats, setUserStats] = useState({
-    sessions: 12,
-    streak: 5,
-    surveys: 8,
-  });
-  
-  // Simulated subscription status
-  const [subscriptionStatus, setSubscriptionStatus] = useState('Active');
+  // State for fetched data
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [subscription, setSubscription] = useState<{ plan: string; price: string } | null>(null);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      } catch (err) {
-        console.error('Error fetching user data:', err);
-      }
-    };
-    fetchUserData();
-  }, [user?.uid]);
+  // Loading and Refreshing states
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [subLoading, setSubLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchUserStats = async () => {
-      try {
-        const stats = await UserService.getUserProfile(user?.uid);
-        setUserStats({
-          sessions: stats?.sessions || 0,
-          streak: stats?.streak || 0,
-          surveys: stats?.surveys || 0,
-        });
-      } catch (error) {
-        console.error('Error fetching user stats:', error);
-      }
-    };
-    if (user?.uid) {
-      fetchUserStats();
+  // Combined loading state
+  const isLoading = statsLoading || subLoading;
+
+  // Fetching functions wrapped in useCallback
+  const fetchUserStats = useCallback(async () => {
+    if (!user?.uid) return;
+    setStatsLoading(true);
+    try {
+      // Use the correct service method
+      const stats = await UserService.getUserDetailedStats(user.uid);
+      // Provide a default object matching the UserStats structure if stats are null/undefined
+      setUserStats(stats || {
+        profile: { displayName: '', photoURL: '', createdAt: Timestamp.now(), streak: 0 },
+        meditation: { totalTime: 0, sessions: 0 },
+        activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
+        mood: { recentMoods: [] },
+      });
+    } catch (fetchError: any) {
+      console.error('Error fetching user stats:', fetchError);
+      setError(fetchError.message || 'Failed to load user statistics.');
+      // Set default object matching the UserStats structure on error
+      setUserStats({
+        profile: { displayName: '', photoURL: '', createdAt: Timestamp.now(), streak: 0 },
+        meditation: { totalTime: 0, sessions: 0 },
+        activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
+        mood: { recentMoods: [] },
+      });
+    } finally {
+      setStatsLoading(false);
     }
   }, [user?.uid]);
 
+  const fetchSubscriptionStatus = useCallback(async () => {
+    if (!user?.uid) return;
+    setSubLoading(true);
+    try {
+      const subStatus = await UserService.getSubscriptionStatus(user.uid);
+      setSubscription(subStatus);
+    } catch (fetchError: any) {
+      console.error('Error fetching subscription status:', fetchError);
+      setError(fetchError.message || 'Failed to load subscription details.');
+      setSubscription({ plan: 'Error', price: '' }); // Set error state
+    } finally {
+      setSubLoading(false);
+    }
+  }, [user?.uid]);
+
+  // Combined fetch function
+  const fetchData = useCallback(async () => {
+    setError(null); // Clear previous errors
+    await Promise.all([fetchUserStats(), fetchSubscriptionStatus()]);
+  }, [fetchUserStats, fetchSubscriptionStatus]);
+
+  // Initial data fetch
+  useEffect(() => {
+    if (user?.uid) {
+      fetchData();
+    } else {
+      // Handle case where user is not logged in or uid is not yet available
+      setStatsLoading(false);
+      setSubLoading(false);
+      // Set default object matching the UserStats structure
+      setUserStats({
+        profile: { displayName: '', photoURL: '', createdAt: Timestamp.now(), streak: 0 },
+        meditation: { totalTime: 0, sessions: 0 },
+        activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
+        mood: { recentMoods: [] },
+      });
+      setSubscription({ plan: 'N/A', price: '' });
+    }
+  }, [user?.uid, fetchData]);
+
+
+  // Refresh handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  }, [fetchData]);
+
+
+  // --- Removed duplicated useEffect hooks and handleSignOut body ---
+
   const handleSignOut = async () => {
-    setIsLoading(true);
+    setIsSignOutLoading(true); // Use specific loading state
     setError(null);
     try {
       if (!signOut) throw new Error('Sign out function not available');
       await signOut();
-      router.replace("/auth/sign-in");
+      // No need to manually navigate, AuthProvider likely handles redirect
+      // router.replace("/auth/sign-in");
     } catch (err: any) {
       setError(err?.message || "Failed to sign out. Please try again.");
     } finally {
-      setIsLoading(false);
+      setIsSignOutLoading(false); // Use specific loading state
     }
   };
 
@@ -76,20 +132,36 @@ export default function ProfileScreen() {
     dateOfBirth: "1990-01-01",
   };
 
-  // Conditional rendering based on authLoading
-  if (authLoading) {
+  // Conditional rendering based on authLoading OR initial data loading
+  if (authLoading || isLoading) {
     return (
-      <View style={layoutStyles.layout_container}>
-        <Text>Loading profile...</Text>
+      <View style={[layoutStyles.layout_container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" />
+        <Text style={{ marginTop: 10 }}>Loading profile...</Text>
       </View>
     );
   }
 
+  // Handle case where user is null after loading (shouldn't happen if AuthProvider redirects)
+  if (!user) {
+     return (
+      <View style={[layoutStyles.layout_container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text>Please sign in.</Text>
+        <Button onPress={() => router.replace('/auth/sign-in')}>Sign In</Button>
+      </View>
+     );
+  }
+
   return (
     <View style={layoutStyles.layout_container}>
-      <ScrollView style={layoutStyles.layout_scrollView}>
+      <ScrollView
+        style={layoutStyles.layout_scrollView}
+        refreshControl={ // Add RefreshControl
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {/* Profile Header with Stats */}
-<Surface 
+        <Surface
           style={[miscStyles.profile_header, { elevation: 2, marginHorizontal: theme.spacing.medium }]} 
           elevation={2}
         >
@@ -111,18 +183,18 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Mental Health Stats */}
+          {/* Mental Health Stats - Adjusted for nested structure */}
           <View style={miscStyles.profile_statsContainer}>
             <View style={miscStyles.profile_statItem}>
-              <Text style={miscStyles.profile_statNumber}>{userStats.sessions}</Text>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.meditation?.sessions ?? '...'}</Text>
               <Text style={miscStyles.profile_statLabel}>Sessions</Text>
             </View>
             <View style={miscStyles.profile_statItem}>
-              <Text style={miscStyles.profile_statNumber}>{userStats.streak}</Text>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.profile?.streak ?? '...'}</Text>
               <Text style={miscStyles.profile_statLabel}>Streak</Text>
             </View>
             <View style={miscStyles.profile_statItem}>
-              <Text style={miscStyles.profile_statNumber}>{userStats.surveys}</Text>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.activities?.surveysCompleted ?? '...'}</Text>
               <Text style={miscStyles.profile_statLabel}>Surveys</Text>
             </View>
           </View>
@@ -130,14 +202,14 @@ export default function ProfileScreen() {
           {/* Subscription Status */}
 <View style={miscStyles.profile_subscriptionStatus}>
   <Text style={[miscStyles.profile_statusLabel, theme.fonts.bodyMedium]}>
-    Subscription Status:
+    Subscription:
   </Text>
   <View
     style={[
       miscStyles.profile_statusBadge,
       {
         backgroundColor:
-          subscriptionStatus === 'Active'
+          subscription?.plan && subscription.plan !== 'No active plan' && subscription.plan !== 'Error' && subscription.plan !== 'N/A'
             ? theme.colors.primaryContainer
             : theme.colors.surfaceVariant,
       },
@@ -148,13 +220,13 @@ export default function ProfileScreen() {
         miscStyles.profile_statusText,
         {
           color:
-            subscriptionStatus === 'Active'
+            subscription?.plan && subscription.plan !== 'No active plan' && subscription.plan !== 'Error' && subscription.plan !== 'N/A'
               ? theme.colors.onPrimaryContainer
               : theme.colors.onSurfaceVariant,
         },
       ]}
     >
-      {subscriptionStatus}
+      {subscription?.plan ?? 'Loading...'} {/* Display fetched plan */}
     </Text>
   </View>
 </View>
@@ -233,13 +305,13 @@ export default function ProfileScreen() {
           <Button
             mode="outlined"
             onPress={() => setShowSignOutDialog(true)}
-            loading={isLoading}
-            disabled={isLoading}
+            loading={isSignOutLoading} // Use specific loading state
+            disabled={isSignOutLoading} // Use specific loading state
             icon="logout"
             style={{ marginTop: theme.spacing.small }}
             labelStyle={theme.fonts.labelLarge}
           >
-            {isLoading ? 'Signing Out...' : 'Sign Out'}
+            {isSignOutLoading ? 'Signing Out...' : 'Sign Out'}
           </Button>
         </Surface>
       </ScrollView>

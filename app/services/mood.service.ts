@@ -1,7 +1,7 @@
 import { collection, addDoc, query, where, orderBy, getDocs, doc, updateDoc, deleteDoc, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase-utils';
 import { Timestamp, queryDocuments, getDocument } from '../lib/firebase-utils/firestore';
-import { MoodEntry, MoodInsights, MoodInsightsResponse } from '../models/mood.model';
+import { MoodEntry, MoodInsights, MoodInsightsResponse, MoodDefinition, EmotionDefinition } from '../models/mood.model'; // Add EmotionDefinition import
 import { getFunctions, httpsCallable, HttpsCallableResult } from '@firebase/functions';
 import { app } from '../lib/firebase-utils';
 
@@ -84,6 +84,41 @@ export class MoodService {
     } catch (error) {
       console.error('Error getting latest mood entry:', error);
       return null;
+    }
+  }
+
+  /**
+   * Fetches the list of possible mood definitions from Firestore.
+   * Assumes a collection 'moodDefinitions' exists.
+   */
+  static async getMoodDefinitions(): Promise<MoodDefinition[]> {
+    try {
+      // Fetch definitions, perhaps ordered by a specific field like 'level' or 'name'
+      const definitions = await queryDocuments<MoodDefinition>('moodDefinitions', [
+        orderBy('name', 'asc') // Example ordering by name
+      ]);
+      console.log('[MoodService] Fetched mood definitions:', definitions.length);
+      return definitions;
+    } catch (error) {
+      console.error('[MoodService] Error fetching mood definitions:', error);
+      throw new Error('Failed to fetch mood definitions from Firestore.');
+    }
+  }
+
+  /**
+   * Fetches the list of emotion definitions for the pyramid from Firestore.
+   * Assumes a collection 'emotionDefinitions' exists, ordered by 'pyramidOrder'.
+   */
+  static async getEmotionDefinitions(): Promise<EmotionDefinition[]> {
+    try {
+      const definitions = await queryDocuments<EmotionDefinition>('emotionDefinitions', [
+        orderBy('pyramidOrder', 'asc') // Order by pyramid position
+      ]);
+      console.log('[MoodService] Fetched emotion definitions:', definitions.length);
+      return definitions;
+    } catch (error) {
+      console.error('[MoodService] Error fetching emotion definitions:', error);
+      throw new Error('Failed to fetch emotion definitions from Firestore.');
     }
   }
 

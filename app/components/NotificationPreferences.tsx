@@ -1,16 +1,22 @@
-import React, { useState } from 'react';
-import { Surface, List, Switch, Divider } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { View } from 'react-native';
+import { Surface, List, Switch, Divider, ActivityIndicator, Text } from 'react-native-paper';
 import { CARD_ELEVATION } from '../config/theme';
 import { useAppTheme } from '../hooks/useAppTheme';
 import styles from '../config/NotificationPreferences.styles';
+import { useAuth } from '../context/auth';
+import { UserService } from '../services/user.service';
+import { UserSettings } from '../models/user.model';
 
-interface NotificationSetting {
-  id: string;
+// Type for setting definition
+interface NotificationSettingDefinition {
+  id: keyof UserSettings['notifications'];
   label: string;
   description: string;
 }
 
-const defaultSettings: NotificationSetting[] = [
+// Definitions list
+const settingDefinitions: NotificationSettingDefinition[] = [
   {
     id: 'reminders',
     label: 'Daily Reminders',
@@ -33,57 +39,133 @@ const defaultSettings: NotificationSetting[] = [
   },
 ];
 
-interface NotificationPreferencesProps {
-  onToggle?: (settingId: string, value: boolean) => Promise<void>;
-}
+// Default settings
+const defaultNotificationSettings: UserSettings['notifications'] = {
+  reminders: true,
+  progress: true,
+  tips: true,
+  community: false,
+};
 
-export const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
-  onToggle,
-}) => {
+export const NotificationPreferences: React.FC = () => {
   const theme = useAppTheme();
-  const [settings, setSettings] = useState<Record<string, boolean>>({
-    reminders: true,
-    progress: true,
-    tips: true,
-    community: false,
-  });
-  const [isSubmitting, setIsSubmitting] = useState<Record<string, boolean>>({});
+  const { user } = useAuth();
+  const userId = user?.uid;
 
-  const handleToggle = async (settingId: string) => {
-    const newValue = !settings[settingId];
-    setIsSubmitting((prev) => ({ ...prev, [settingId]: true }));
-    try {
-      if (onToggle) {
-        await onToggle(settingId, newValue);
+  // State
+  const [settings, setSettings] = useState<UserSettings['notifications'] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [pendingUpdates, setPendingUpdates] = useState<Set<string>>(new Set());
+
+  // Fetch settings
+  useEffect(() => {
+    const fetchSettings = async () => {
+      if (!userId) {
+        setIsLoading(false);
+        setError("User not found");
+        setSettings(defaultNotificationSettings);
+        return;
       }
-      setSettings((prev) => ({ ...prev, [settingId]: newValue }));
-    } catch (error) {
-      // Handle error if needed
+
+      try {
+        const userSettings = await UserService.getUserSettings(userId);
+        setSettings(userSettings?.notifications || defaultNotificationSettings);
+        setError(null);
+      } catch (err: any) {
+        console.error("Error fetching settings:", err);
+        setError(err.message || "Failed to load settings");
+        setSettings(defaultNotificationSettings);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, [userId]);
+
+  // Toggle handler
+  const handleToggle = async (settingId: keyof UserSettings['notifications']) => {
+    if (!userId || !settings) return;
+
+    // Add to pending set
+    setPendingUpdates(prev => new Set(prev).add(settingId));
+    
+    // Update local state optimistically
+    const newValue = !settings[settingId];
+    setSettings({...settings, [settingId]: newValue});
+
+    try {
+      // Update in Firestore using dot notation
+      const updateData = {
+        [`notifications.${settingId}`]: newValue
+      };
+      await UserService.updateUserSettings(userId, updateData);
+      setError(null);
+    } catch (err: any) {
+      // Revert on error
+      console.error("Failed to update setting:", err);
+      setError(err.message || "Failed to save setting");
+      setSettings({...settings, [settingId]: !newValue});
     } finally {
-      setIsSubmitting((prev) => ({ ...prev, [settingId]: false }));
+      // Remove from pending
+      setPendingUpdates(prev => {
+        const next = new Set(prev);
+        next.delete(settingId);
+        return next;
+      });
     }
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <Surface style={[styles.container, { padding: 16 }]} elevation={CARD_ELEVATION.DEFAULT}>
+        <View style={{ alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <ActivityIndicator size="large" />
+          <Text style={{ marginTop: 12 }}>Loading preferences...</Text>
+        </View>
+      </Surface>
+    );
+  }
+
+  // Error state with no settings
+  if (error && !settings) {
+    return (
+      <Surface style={[styles.container, { padding: 16 }]} elevation={CARD_ELEVATION.DEFAULT}>
+        <View style={{ alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <Text style={{ color: theme.colors.error }}>{error}</Text>
+        </View>
+      </Surface>
+    );
+  }
+
   return (
     <Surface style={styles.container} elevation={CARD_ELEVATION.DEFAULT}>
+      {error && (
+        <Text style={{ color: theme.colors.error, textAlign: 'center', padding: 12 }}>
+          {error}
+        </Text>
+      )}
+      
       <List.Section>
-        {defaultSettings.map((setting) => (
+        {settingDefinitions.map((setting, index) => (
           <React.Fragment key={setting.id}>
             <List.Item
               title={setting.label}
               description={setting.description}
-              right={() => (
-                <Switch
-                  value={settings[setting.id]}
-                  onValueChange={() => handleToggle(setting.id)}
-                  disabled={isSubmitting[setting.id]}
-                />
-              )}
               titleStyle={styles.itemTitle}
               descriptionStyle={styles.itemDescription}
               style={styles.listItem}
+              right={() => (
+                <Switch
+                  value={settings?.[setting.id] ?? false}
+                  onValueChange={() => handleToggle(setting.id)}
+                  disabled={pendingUpdates.has(setting.id)}
+                />
+              )}
             />
-            {defaultSettings.indexOf(setting) < defaultSettings.length - 1 && (
+            {index < settingDefinitions.length - 1 && (
               <Divider style={styles.divider} />
             )}
           </React.Fragment>

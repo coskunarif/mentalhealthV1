@@ -76,25 +76,76 @@ export class UserService {
       throw error;
     }
   }
-  
+
   /**
-   * Update user settings
+   * Get user settings
    */
-  static async updateUserSettings(userId: string, settings: Partial<UserSettings>): Promise<void> {
+  static async getUserSettings(userId: string): Promise<UserSettings | null> {
     try {
       if (!userId) throw new Error('User ID is required');
-      
+
       const userRef = doc(db, 'users', userId);
-      
-      await updateDoc(userRef, {
-        'settings': settings,
-        updatedAt: new Date()
-      });
+      const userDoc = await getDoc(userRef);
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data() as UserModel;
+        // Return settings object, or a default if not present
+        return userData.settings || {
+          notifications: {
+            reminders: true, // Default values
+            recommendations: true,
+            updates: false,
+          },
+          // Add other default settings categories if needed
+        };
+      }
+      return null; // Or return default settings if user doc doesn't exist? Depends on requirements.
+    } catch (error) {
+      console.error('Error getting user settings:', error);
+      throw error;
+    }
+  }
+
+  // Corrected updateUserSettings using dot notation
+  static async updateUserSettings(userId: string, settingsUpdate: Partial<UserSettings>): Promise<void> {
+    try {
+      if (!userId) throw new Error('User ID is required');
+      const userRef = doc(db, 'users', userId);
+
+      // Prepare update data using dot notation for nested fields
+      const updateData: { [key: string]: any } = {};
+      // Example: If settingsUpdate is { notifications: { reminders: false } }
+      // We need to generate {'settings.notifications.reminders': false}
+      const flattenSettings = (obj: any, prefix = '', res: { [key: string]: any } = {}) => {
+        for (const key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const newKey = prefix ? `${prefix}.${key}` : key;
+            if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) { // Check if it's a nested object (and not an array)
+              flattenSettings(obj[key], newKey, res);
+            } else {
+              res[`settings.${newKey}`] = obj[key]; // Prepend 'settings.' for Firestore field path
+            }
+          }
+        }
+        return res;
+      };
+
+      const flattenedUpdate = flattenSettings(settingsUpdate);
+      flattenedUpdate['updatedAt'] = new Date(); // Also update the main doc timestamp
+
+      if (Object.keys(flattenedUpdate).length > 1) { // Ensure there's something to update besides timestamp
+         await updateDoc(userRef, flattenedUpdate);
+      } else {
+         console.warn("No settings provided to update.");
+      }
+
     } catch (error) {
       console.error('Error updating user settings:', error);
       throw error;
     }
   }
+
+  // Removed duplicated uploadProfilePicture function
   
   /**
    * Upload profile picture

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, ScrollView, Dimensions, SafeAreaView } from 'react-native';
+import { View, ScrollView, Dimensions, SafeAreaView, ActivityIndicator, StyleSheet } from 'react-native'; // Added StyleSheet
 import { router, useLocalSearchParams } from 'expo-router';
 import type { RootStackParamList } from './types/navigation';
 import { layoutStyles, miscStyles } from './config';
@@ -7,11 +7,13 @@ import MoodSelector from './components/MoodSelector';
 import { MoodPyramid } from './components/MoodPyramid';
 import { theme } from './config/theme';
 import type { IconName } from './components/MoodSelector';
+import MoodService from './services/mood.service'; // Import MoodService
+import { MoodDefinition } from './models/mood.model'; // Import MoodDefinition
+import { Text } from 'react-native-paper'; // Added Text for error/loading
 
-interface MoodType {
-  label: string;
-  key: keyof typeof theme.moodColors;
-  icon: IconName;
+// Interface for the state managed within this component, derived from MoodDefinition
+interface MoodState extends MoodDefinition {
+  label: string; // Add label to match MoodType expected by MoodSelector
   value: number;
   duration: number;
   isSelected: boolean;
@@ -36,24 +38,44 @@ const ProgressDots = ({ activeScreen }: { activeScreen: number }) => (
 );
 
 export default function MoodScreen() {
-  const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
-  const [moods, setMoods] = useState<MoodType[]>([
-    { label: 'Shame', key: 'shame', icon: 'emoticon-sad', value: 0, duration: 0, isSelected: false },
-    { label: 'Guilt', key: 'guilt', icon: 'emoticon-confused', value: 0, duration: 0, isSelected: false },
-    { label: 'Apathy', key: 'apathy', icon: 'emoticon-neutral', value: 0, duration: 0, isSelected: false },
-    { label: 'Grief', key: 'grief', icon: 'emoticon-cry', value: 0, duration: 0, isSelected: false },
-    { label: 'Fear', key: 'fear', icon: 'emoticon-frown', value: 0, duration: 0, isSelected: false },
-    { label: 'Desire', key: 'desire', icon: 'emoticon-excited', value: 0, duration: 0, isSelected: false },
-    { label: 'Anger', key: 'anger', icon: 'emoticon-angry', value: 0, duration: 0, isSelected: false },
-    { label: 'Pride', key: 'pride', icon: 'emoticon-cool', value: 0, duration: 0, isSelected: false },
-    { label: 'Willfulness', key: 'willfulness', icon: 'emoticon-cool', value: 0, duration: 0, isSelected: false },
-  ]);
+  const [selectedMood, setSelectedMood] = useState<MoodState | null>(null);
+  const [moods, setMoods] = useState<MoodState[]>([]); // Initialize as empty
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [error, setError] = useState<string | null>(null); // Add error state
 
   const { returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['mood']>();
 
   const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
   const [activeScreen, setActiveScreen] = useState(0);
   const [isSliding, setIsSliding] = useState(false);
+
+  // Fetch Mood Definitions
+  useEffect(() => {
+    const fetchMoodDefinitions = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const definitions = await MoodService.getMoodDefinitions();
+        // Map definitions to initial state, ensuring 'label' is included
+        const initialMoodsState = definitions.map(def => ({
+          ...def,
+          label: def.name, // Set label explicitly from name
+          value: 0,
+          duration: 0,
+          isSelected: false,
+        }));
+        setMoods(initialMoodsState);
+      } catch (err: any) {
+        console.error('[MoodScreen] Error fetching mood definitions:', err);
+        setError(err.message || 'Failed to load mood options.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMoodDefinitions();
+  }, []);
+
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', () => {
@@ -64,41 +86,59 @@ export default function MoodScreen() {
 
   const handleMoodSelect = (index: number) => {
     const mood = moods[index];
-    setSelectedMood(selectedMood?.label === mood.label ? null : mood);
+    // Use 'name' for comparison as it's the unique identifier from definition
+    setSelectedMood(selectedMood?.name === mood.name ? null : mood);
   };
 
-  const handleSliderChange = (value: number, label: string) => {
+  // Use 'name' instead of 'label' for identifying the mood to update
+  const handleSliderChange = (value: number, name: string) => {
     setMoods(prevMoods =>
       prevMoods.map(mood => ({
         ...mood,
-        value: mood.label === label ? value : mood.value,
-        isSelected: mood.label === label ? true : mood.isSelected,
+        value: mood.name === name ? value : mood.value,
+        isSelected: mood.name === name ? true : mood.isSelected,
       }))
     );
   };
 
+  // Use 'name' instead of 'label'
   const handleDurationChange = (value: number) => {
     if (!selectedMood) return;
     setMoods(prevMoods =>
       prevMoods.map(mood => ({
         ...mood,
-        duration: mood.label === selectedMood.label ? value : mood.duration,
+        duration: mood.name === selectedMood.name ? value : mood.duration,
       }))
     );
   };
 
   const handleSubmit = async () => {
+    // TODO: Refactor saving logic to use MoodService.saveMoodEntry
+    // This likely requires iterating through selected moods and calling the service for each.
+    // Need user context (useAuth hook) to pass userId to the service.
     try {
-      const moodValues = moods
+      const selectedMoodEntries = moods
         .filter(mood => mood.isSelected)
-        .reduce((acc, mood) => ({
-          ...acc,
-          [mood.label]: { value: mood.value, duration: mood.duration },
-        }), {});
-      console.log(moodValues);
+        .map(mood => ({
+          // userId: user?.uid, // Get user ID from auth context
+          mood: mood.name, // Use 'name' as the mood identifier
+          value: mood.value,
+          duration: mood.duration,
+          timestamp: new Date(), // Use current time or allow selection
+        }));
+
+      console.log('Mood entries to save:', selectedMoodEntries);
+      // Example: Call service for each entry (needs user ID)
+      // for (const entry of selectedMoodEntries) {
+      //   if (entry.userId) {
+      //     await MoodService.saveMoodEntry(entry);
+      //   }
+      // }
+
       router.replace(returnTo as keyof RootStackParamList);
     } catch (error) {
-      console.error('Error saving mood:', error);
+      console.error('Error preparing mood entries:', error);
+      // Handle saving error (e.g., show snackbar)
     }
   };
 
@@ -122,8 +162,30 @@ export default function MoodScreen() {
   };
 
   useEffect(() => {
-    scrollViewRef.current?.scrollTo({ x: activeScreen * screenWidth, animated: true });
-  }, [activeScreen, screenWidth]);
+    // Only scroll if moods have loaded
+    if (moods.length > 0) {
+      scrollViewRef.current?.scrollTo({ x: activeScreen * screenWidth, animated: true });
+    }
+  }, [activeScreen, screenWidth, moods]); // Add moods dependency
+
+  // Handle Loading and Error States
+  if (loading) {
+    return (
+      <SafeAreaView style={[layoutStyles.layout_container, styles.centeredContainer]}>
+        <ActivityIndicator size="large" />
+        <Text>Loading mood options...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={[layoutStyles.layout_container, styles.centeredContainer]}>
+        <Text style={{ color: theme.colors.error }}>{error}</Text>
+        {/* Optionally add a retry button */}
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={layoutStyles.layout_container}>
@@ -156,3 +218,12 @@ export default function MoodScreen() {
     </SafeAreaView>
   );
 }
+
+// Define styles using StyleSheet
+const styles = StyleSheet.create({
+  centeredContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
