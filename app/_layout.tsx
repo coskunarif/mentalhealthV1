@@ -1,4 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
+// Add this import:
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from './lib/firebase-utils/config'; // Adjust path if needed
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { PaperProvider } from 'react-native-paper';
@@ -12,7 +15,9 @@ import { useTheme } from 'react-native-paper';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './lib/firebase-utils'; // Assuming firebase-utils exports auth
 
-// Initialize Firebase once at app startup before component rendering
+// Initialize Firebase ONCE at the top level
+const app = initializeApp(firebaseConfig);
+// Then import other Firebase services
 import './lib/firebase';
 
 // Keep the splash screen visible while resources load
@@ -33,6 +38,35 @@ export default function AppLayout() {
     });
     
     return () => unsubscribe();
+  }, []);
+
+  // Step 7: Add debugging code to verify Firebase Authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (auth.currentUser) {
+        console.log("Current auth user:", auth.currentUser.uid);
+        try {
+          const token = await auth.currentUser.getIdToken(true);
+          console.log("Token retrieved successfully, length:", token.length);
+        } catch (e) {
+          console.error("Token retrieval error:", e);
+        }
+      } else {
+        console.log("No authenticated user");
+      }
+    };
+    
+    checkAuth();
+    // Re-check auth state on change as well
+    const unsubscribeAuthState = onAuthStateChanged(auth, checkAuth);
+    return () => unsubscribeAuthState();
+  }, []);
+  
+  // Step 5: Verify Database Connection
+  useEffect(() => {
+    if (auth.app?.options) {
+      console.log("Connected to Firebase project:", auth.app.options.projectId);
+    }
   }, []);
   
   const [loaded] = useFonts({

@@ -29,4 +29,10 @@ export const generateMoodInsights = httpsCallable<
   'generateMoodInsights'
 );
 
+// Add this for the new function
+export const ensureUserDocument = httpsCallable<void, {success: boolean, message: string}>(
+  functions, 
+  'ensureUserDocument'
+);
+
 export default {};

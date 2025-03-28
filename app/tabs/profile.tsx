@@ -7,9 +7,12 @@ import { useAuth } from '../context/auth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { layoutStyles, miscStyles, typographyStyles } from '../config';
 import { theme } from '../config/theme';
-import { UserService } from '../services/user.service';
+// Keep UserService import for getSubscriptionStatus
+import { UserService } from '../services/user.service'; 
 import { UserStats } from '../models/user-stats.model'; // Correct import path
 import { Timestamp } from 'firebase/firestore'; // Import Timestamp
+// Import the cloud functions
+import { ensureUserDocument, getUserStats } from '../services/firebase-functions';
 
 export default function ProfileScreen() {
   const { user, signOut, loading: authLoading } = useAuth(); // Get loading state from useAuth
@@ -34,38 +37,69 @@ export default function ProfileScreen() {
   const fetchUserStats = useCallback(async () => {
     if (!user?.uid) return;
     setStatsLoading(true);
+    setError(null); // Clear previous errors at the start
+    
     try {
-      // First try to ensure the user document exists
-      await UserService.ensureUserDocument(user.uid);
+      // First ensure user document exists via Cloud Function
+      console.log('[DEBUG] Calling ensureUserDocument Cloud Function...');
+      const docResult = await ensureUserDocument();
+      console.log('[DEBUG] Document creation/check result:', docResult.data.message);
       
-      // Then fetch stats
-      const stats = await UserService.getUserDetailedStats(user.uid);
-      setUserStats(stats || {
-        profile: { displayName: '', photoURL: '', createdAt: Timestamp.now(), streak: 0 },
-        meditation: { totalTime: 0, sessions: 0 },
-        activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
-        mood: { recentMoods: [] },
-      });
-    } catch (fetchError: any) {
-      console.error('Error fetching user stats:', fetchError);
-      setError(fetchError.message || 'Failed to load user statistics.');
-      // Set default stats even on error
+      if (!docResult.data.success && !docResult.data.message.includes('already exists')) {
+         // Throw an error if the function failed for reasons other than the doc already existing
+         throw new Error(docResult.data.message || 'Failed to ensure user document via Cloud Function');
+      }
+      
+      // Add a short delay to be safe (Firestore operations can have consistency delays)
+      console.log('[DEBUG] Waiting briefly before calling getUserStats...');
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Keep delay
+      
+      // Now call the getUserStats function
+      console.log('[DEBUG] Calling getUserStats Cloud Function...');
+      const statsResult = await getUserStats(); // Call the imported function
+      console.log('[DEBUG] getUserStats result success:', statsResult.data.success);
+
+      if (statsResult.data.success) {
+        // Ensure the stats object is not null/undefined before setting
+        setUserStats(statsResult.data.stats || { 
+          profile: { displayName: user.displayName || '', photoURL: user.photoURL || '', createdAt: Timestamp.now(), streak: 0 },
+          meditation: { totalTime: 0, sessions: 0 },
+          activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
+          mood: { recentMoods: [] }
+        }); 
+      } else {
+        // Throw error if getUserStats indicates failure
+        throw new Error((statsResult.data as any)?.message || 'Failed to get user stats from Cloud Function');
+      }
+    } catch (error: any) { // Catch errors from either ensureUserDocument or getUserStats
+      console.error('Error in fetchUserStats flow:', error);
+      setError(error.message || 'Failed to load user data');
+      
+      // Set minimal fallback stats
       setUserStats({
-        profile: { displayName: user.displayName || '', photoURL: user.photoURL || '', createdAt: Timestamp.now(), streak: 0 },
+        profile: { 
+          displayName: user?.displayName || '', 
+          photoURL: user?.photoURL || '', 
+          createdAt: Timestamp.now(), 
+          streak: 0 
+        },
         meditation: { totalTime: 0, sessions: 0 },
         activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
-        mood: { recentMoods: [] },
+        mood: { recentMoods: [] }
       });
     } finally {
       setStatsLoading(false);
     }
-  }, [user?.uid, user?.displayName, user?.photoURL]);
+  }, [user?.uid, user?.displayName, user?.photoURL]); // Dependencies remain the same
 
+  // fetchSubscriptionStatus might need adjustment if UserService is fully removed
   const fetchSubscriptionStatus = useCallback(async () => {
     if (!user?.uid) return;
     setSubLoading(true);
     try {
-      const subStatus = await UserService.getSubscriptionStatus(user.uid);
+      // Assuming getSubscriptionStatus remains in UserService for now
+      // If moved to cloud functions, update this call similarly
+      const subStatus = await UserService.getSubscriptionStatus(user.uid); 
       setSubscription(subStatus);
     } catch (fetchError: any) {
       console.error('Error fetching subscription status:', fetchError);
