@@ -20,7 +20,7 @@ import { onUserCreate } from './auth/onUserCreate';
 // Import v2 functions
 import { dailyStats } from './scheduled/dailyStats';
 import { generateMoodInsights } from './api/insights';
-import { getUserStats } from './api/userStats';
+import { getUserStats, ensureUserDocument } from './api/userStats'; // Added ensureUserDocument
 import { sendDailyMeditationReminder } from './scheduled/notificationManager';
 
 // Export all functions
@@ -34,5 +34,6 @@ export {
   
   // Callable API functions (v2)
   generateMoodInsights,
-  getUserStats
+  getUserStats,
+  ensureUserDocument // Added ensureUserDocument
 };
