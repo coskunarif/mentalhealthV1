@@ -35,9 +35,11 @@ export default function ProfileScreen() {
     if (!user?.uid) return;
     setStatsLoading(true);
     try {
-      // Use the correct service method
+      // First try to ensure the user document exists
+      await UserService.ensureUserDocument(user.uid);
+      
+      // Then fetch stats
       const stats = await UserService.getUserDetailedStats(user.uid);
-      // Provide a default object matching the UserStats structure if stats are null/undefined
       setUserStats(stats || {
         profile: { displayName: '', photoURL: '', createdAt: Timestamp.now(), streak: 0 },
         meditation: { totalTime: 0, sessions: 0 },
@@ -47,9 +49,9 @@ export default function ProfileScreen() {
     } catch (fetchError: any) {
       console.error('Error fetching user stats:', fetchError);
       setError(fetchError.message || 'Failed to load user statistics.');
-      // Set default object matching the UserStats structure on error
+      // Set default stats even on error
       setUserStats({
-        profile: { displayName: '', photoURL: '', createdAt: Timestamp.now(), streak: 0 },
+        profile: { displayName: user.displayName || '', photoURL: user.photoURL || '', createdAt: Timestamp.now(), streak: 0 },
         meditation: { totalTime: 0, sessions: 0 },
         activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
         mood: { recentMoods: [] },
@@ -57,7 +59,7 @@ export default function ProfileScreen() {
     } finally {
       setStatsLoading(false);
     }
-  }, [user?.uid]);
+  }, [user?.uid, user?.displayName, user?.photoURL]);
 
   const fetchSubscriptionStatus = useCallback(async () => {
     if (!user?.uid) return;

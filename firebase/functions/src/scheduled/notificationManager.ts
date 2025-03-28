@@ -1,4 +1,4 @@
-import { onSchedule } from 'firebase-functions/v2/scheduler';
+import { onSchedule, ScheduledEvent } from 'firebase-functions/v2/scheduler'; // Import ScheduledEvent
 import { logger } from 'firebase-functions/v2';
 import * as admin from 'firebase-admin';
 import { getMessaging } from 'firebase-admin/messaging';
@@ -9,7 +9,8 @@ export const sendDailyMeditationReminder = onSchedule({
   retryCount: 3,
   memory: '256MiB',
   region: 'europe-west1'
-}, async (event) => {
+// Add type for event parameter
+}, async (event: ScheduledEvent) => {
   try {
     // Simple placeholder implementation
     logger.info('Notification function executed');

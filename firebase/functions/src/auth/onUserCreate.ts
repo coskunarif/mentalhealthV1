@@ -5,7 +5,8 @@ import * as admin from 'firebase-admin';
 export const onUserCreate = functions
   .region('europe-west1')
   .auth.user()
-  .onCreate(async (user) => {
+  // Add type for user parameter
+  .onCreate(async (user: functions.auth.UserRecord) => {
     try {
       const timestamp = admin.firestore.FieldValue.serverTimestamp();
 
@@ -36,10 +37,12 @@ export const onUserCreate = functions
         }
       });
 
-      console.log(`User profile created for ${user.uid}`);
+      // Use functions logger instead of console
+      functions.logger.log(`User profile created for ${user.uid}`);
       return null;
     } catch (error) {
-      console.error('Error creating user profile:', error);
+      // Use functions logger instead of console
+      functions.logger.error('Error creating user profile:', error);
       throw error;
     }
   });

@@ -49,5 +49,17 @@ service cloud.firestore {
       allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow delete: if false;
     }
+
+    // Mood Definitions - allow read access to all authenticated users
+    match /moodDefinitions/{definitionId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Typically static data
+    }
+
+    // Emotion Definitions (for pyramid) - allow read access to all authenticated users
+    match /emotionDefinitions/{definitionId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Typically static data
+    }
   }
 }
