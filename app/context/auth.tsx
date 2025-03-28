@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { auth, User, db } from '../lib/firebase-utils';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore'; // Import onSnapshot and Unsubscribe
+import UserService from '../services/user.service'; // Import UserService
 
 interface AuthContextType {
-  user: User | null;
+  user: User | null; // Consider a more specific type combining Auth and Firestore data
   initialized: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
@@ -22,59 +23,94 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [initialized, setInitialized] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null); // Consider a more specific type
+  const [initialized, setInitialized] = useState(false); // Tracks if initial auth check is done
+  const [loading, setLoading] = useState(true); // Tracks if user data (including Firestore) is loaded
+  const firestoreUnsubscribeRef = useRef<Unsubscribe | null>(null); // Ref to store Firestore listener unsubscribe function
 
   useEffect(() => {
-    // Only subscribe to auth state changes
-    const unsubscribe = onAuthStateChanged(auth, async (authUser: User | null) => {
-      console.log('authUser:', authUser); // Added log
+    // Subscribe to auth state changes
+    const authUnsubscribe = onAuthStateChanged(auth, (authUser: User | null) => {
+      console.log('Auth state changed. authUser:', authUser?.uid);
 
-      if (authUser) {
-        // Try to get additional user data from Firestore if needed
-        try {
-          const userRef = doc(db, 'users', authUser.uid);
-          const userDoc = await getDoc(userRef);
-          
-          if (userDoc.exists()) {
-            // Merge auth user with DB data
-            const userData = userDoc.data();
-            console.log('User data from Firestore:', userData);
-            
-            // Set user with merged data
-            const enhancedUser = {
-              ...authUser,
-              displayName: userData.displayName || authUser.displayName,
-              photoURL: userData.photoURL || authUser.photoURL,
-              // Add other fields as needed
-            };
-            
-            setUser(enhancedUser);
-          } else {
-            // No user document found, just use auth user
-            console.log('No user document found in Firestore');
-            setUser(authUser);
-          }
-        } catch (error) {
-          console.error('Error fetching user data from Firestore:', error);
-          // Fallback to auth user data
-          setUser(authUser);
-        }
-      } else {
-        setUser(null);
+      // Unsubscribe from previous Firestore listener if it exists
+      if (firestoreUnsubscribeRef.current) {
+        console.log('Unsubscribing from previous Firestore listener.');
+        firestoreUnsubscribeRef.current();
+        firestoreUnsubscribeRef.current = null;
       }
       
-      setInitialized(true);
-      setLoading(false);
+      // Reset state before checking new user
+      setUser(null); 
+      setLoading(true); // Start loading until Firestore data is confirmed or user is null
+
+      if (authUser) {
+        // Add this line to ensure user document exists
+        UserService.ensureUserDocument(authUser.uid)
+          .catch(err => console.error('Error ensuring user document:', err));
+          
+        console.log(`User ${authUser.uid} logged in. Setting up Firestore listener.`);
+        const userRef = doc(db, 'users', authUser.uid);
+
+        // Subscribe to the user document in Firestore
+        firestoreUnsubscribeRef.current = onSnapshot(userRef, (snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.data();
+            console.log(`Firestore data received for ${authUser.uid}:`, userData);
+            // Merge auth user with DB data
+            const enhancedUser = {
+              ...authUser,
+              // Explicitly pull fields from userData, falling back to authUser if needed
+              displayName: userData.displayName ?? authUser.displayName,
+              photoURL: userData.photoURL ?? authUser.photoURL,
+              // Add other relevant fields from your Firestore user model
+              // e.g., settings: userData.settings, stats: userData.stats
+            };
+            setUser(enhancedUser);
+            setInitialized(true); // Auth check done
+            setLoading(false); // Firestore data loaded
+          } else {
+            // Document doesn't exist YET. Keep loading.
+            // This handles the race condition. The listener will fire again when the doc is created.
+            console.log(`Firestore document for ${authUser.uid} does not exist yet. Waiting...`);
+            setUser(authUser); // Temporarily set authUser, but keep loading=true
+            setInitialized(true); // Auth check is done, but data isn't fully loaded
+            setLoading(true); // Explicitly keep loading
+          }
+        }, (error) => {
+          console.error(`Error listening to Firestore document for ${authUser.uid}:`, error);
+          // Fallback to auth user data, but stop loading
+          setUser(authUser);
+          setInitialized(true);
+          setLoading(false); // Stop loading even on error
+        });
+
+      } else {
+        // User is logged out
+        console.log('User logged out.');
+        setUser(null);
+        setInitialized(true); // Auth check done
+        setLoading(false); // No user, so not loading
+      }
     }, (error) => {
+      // Error during initial auth state check
       console.error('Auth state change error:', error);
+      setUser(null);
       setInitialized(true);
       setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, []);
+    // Cleanup function for the useEffect hook
+    return () => {
+      console.log('Cleaning up AuthProvider useEffect.');
+      authUnsubscribe(); // Unsubscribe from auth state changes
+      // Unsubscribe from Firestore listener if it's active
+      if (firestoreUnsubscribeRef.current) {
+        console.log('Unsubscribing from Firestore listener during cleanup.');
+        firestoreUnsubscribeRef.current();
+      }
+    };
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const handleSignOut = async () => {
     try {

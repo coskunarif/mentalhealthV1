@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, setDoc, onSnapshot, Unsubscribe, collection } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, onSnapshot, Unsubscribe, collection, writeBatch } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { auth, db, storage, app } from '../lib/firebase-utils';
@@ -273,6 +273,78 @@ export class UserService {
       }
     } catch (error) {
       console.error('Error getting user stats:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Ensures a user document exists with default values
+   */
+  static async ensureUserDocument(userId: string): Promise<void> {
+    try {
+      if (!userId) throw new Error('User ID is required');
+      
+      // Check if user document exists
+      const userRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userRef);
+      
+      // If document doesn't exist, create it with default values
+      if (!userDoc.exists()) {
+        const timestamp = new Date();
+        const defaultUserData = {
+          uid: userId,
+          email: auth.currentUser?.email || '',
+          displayName: auth.currentUser?.displayName || '',
+          photoURL: auth.currentUser?.photoURL || '',
+          createdAt: timestamp,
+          updatedAt: timestamp,
+          settings: {
+            notifications: {
+              reminders: true,
+              progress: true,
+              tips: true,
+              community: false
+            },
+            language: 'en',
+            theme: 'light'
+          },
+          stats: {
+            meditationMinutes: 0,
+            exercisesCompleted: 0,
+            streak: 0,
+            surveysCompleted: 0,
+            lastActiveDate: null
+          }
+        };
+        
+        await setDoc(userRef, defaultUserData);
+        console.log('Created missing user document for', userId);
+        
+        // Create required subcollections
+        const batch = writeBatch(db);
+        
+        // Create meditation progress document
+        const meditationRef = doc(db, 'users', userId, 'progress', 'meditation');
+        batch.set(meditationRef, {
+          userId: userId,
+          totalTime: 0,
+          sessions: 0,
+          createdAt: timestamp,
+          updatedAt: timestamp
+        });
+        
+        // Create progress overview document
+        const overviewRef = doc(db, 'users', userId, 'progress', 'overview');
+        batch.set(overviewRef, {
+          overall: 0,
+          categories: {},
+          lastUpdated: timestamp
+        });
+        
+        await batch.commit();
+      }
+    } catch (error) {
+      console.error('Error ensuring user document:', error);
       throw error;
     }
   }

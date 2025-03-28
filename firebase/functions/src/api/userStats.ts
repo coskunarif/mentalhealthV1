@@ -45,7 +45,8 @@ export const getUserStats = onCall({
   timeoutSeconds: 30,
   memory: '256MiB',
   region: 'europe-west1'
-}, async (request) => {
+// Add type for request based on usage
+}, async (request: { auth?: { uid: string } }) => {
   if (!request.auth) {
     throw new HttpsError(
       'unauthenticated',
@@ -91,7 +92,8 @@ export const getUserStats = onCall({
       .get();
     
     const recentMoods: MoodData[] = [];
-    moodsSnapshot.forEach(doc => {
+    // Add type for doc
+    moodsSnapshot.forEach((doc: admin.firestore.QueryDocumentSnapshot) => {
       const data = doc.data() as Omit<MoodData, 'id'>;
       recentMoods.push({
         id: doc.id,
@@ -113,7 +115,8 @@ export const getUserStats = onCall({
       .get();
     
     const recentActivities: ActivityData[] = [];
-    activitiesSnapshot.forEach(doc => {
+    // Add type for doc
+    activitiesSnapshot.forEach((doc: admin.firestore.QueryDocumentSnapshot) => {
       const data = doc.data() as Omit<ActivityData, 'id'>;
       recentActivities.push({
         id: doc.id,
