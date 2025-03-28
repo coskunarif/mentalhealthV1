@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from './theme';
+import { lightTheme as theme } from './theme'; // Import lightTheme as theme
 import type { ViewStyle } from 'react-native';
 
 const layoutStyles = StyleSheet.create({

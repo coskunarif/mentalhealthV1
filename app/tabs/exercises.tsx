@@ -15,6 +15,7 @@ interface Exercise {
   title: string;
   duration: number;
   isCompleted: boolean;
+  order: number; // Add order field
 }
 
 export default function ExercisesScreen() {
@@ -26,8 +27,10 @@ export default function ExercisesScreen() {
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        const exercises = await ExerciseService.getExercises(userId);
-        setBreathExercises(exercises);
+        const exercises: Exercise[] = await ExerciseService.getExercises(userId);
+        // Sort exercises by the 'order' field before setting state
+        const sortedExercises = exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
+        setBreathExercises(sortedExercises);
       } catch (error) {
         console.error('Error fetching exercises:', error);
       }

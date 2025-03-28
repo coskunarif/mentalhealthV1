@@ -11,7 +11,7 @@ import {
 } from 'react-native-paper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import type { PersonalInformation } from '../types/personalInformation';
-import { theme } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme'; // Import hook
 import buttonStyles from '../config/button.styles';
 import styles from '../config/EditPersonalInfoForm.styles';
 import { UserService } from '../services/user.service';
@@ -27,6 +27,7 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
   onSave,
   userId,
 }) => {
+  const theme = useAppTheme(); // Use hook
   const [formData, setFormData] = useState<PersonalInformation>(info);
   const [errors, setErrors] = useState<
     Partial<Record<keyof PersonalInformation, string>>

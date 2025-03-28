@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { theme } from './theme';
-import type { ViewStyle, TextStyle, View } from 'react-native';
+import { lightTheme as theme } from './theme'; // Import lightTheme as theme
+import type { ViewStyle, TextStyle } from 'react-native';
 
 const miscStyles = StyleSheet.create({
     list_item: {

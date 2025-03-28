@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from './theme';
+import { lightTheme as theme } from './theme'; // Import lightTheme as theme
 import type { ViewStyle, TextStyle } from 'react-native';
 
 const formStyles = StyleSheet.create({

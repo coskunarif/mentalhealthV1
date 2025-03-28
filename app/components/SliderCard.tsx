@@ -3,9 +3,11 @@ import { View, PanResponder, TouchableOpacity } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import Slider from '@react-native-community/slider';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { theme } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme'; // Import hook
 import typographyStyles from '../config/typography.styles';
 import Animated, { FadeIn } from 'react-native-reanimated';
+import type { AppTheme } from '../types/theme';
+import { lightTheme } from '../config/theme'; // Import lightTheme for type derivation
 
 type BaseSliderProps = {
   icon: string;
@@ -17,7 +19,7 @@ type BaseSliderProps = {
 
 type EmotionSliderProps = BaseSliderProps & {
   variant: 'emotion';
-  moodKey: keyof typeof theme.moodColors;
+  moodKey: keyof typeof lightTheme.moodColors; // Use lightTheme here for type
 };
 
 type DurationSliderProps = BaseSliderProps & {
@@ -32,9 +34,10 @@ type SliderCardProps = EmotionSliderProps | DurationSliderProps;
 type MaterialCommunityIconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
 const SliderCard: React.FC<SliderCardProps> = (props) => {
+  const theme = useAppTheme(); // Use hook
   // Determine state color based on Material Design state layering
   const sliderColor = props.variant === 'emotion' 
-    ? theme.moodColors[props.moodKey]
+    ? theme.moodColors[props.moodKey] // Revert: Expect specific MoodKey type
     : theme.colors.primary;
   
   // Emoji icons based on value - sıralamayı değiştirdik (pozitiften negatife)

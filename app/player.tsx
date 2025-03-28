@@ -4,6 +4,7 @@ import { Text, IconButton, Surface, useTheme } from 'react-native-paper';
 import { Audio, AVPlaybackStatus, AVPlaybackStatusError } from 'expo-av';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ExerciseService } from './services/exercise.service';
+import { MeditationService } from './services/meditation.service'; // Import MeditationService
 import Svg, { Circle } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { RootStackParamList } from './types/navigation';
@@ -13,12 +14,7 @@ import { ScreenLayout } from './components/ScreenLayout';
 import { UserService } from './services/user.service';
 import { useAuth } from './context/auth';
 
-interface PlayerProps {
-  audioUrl: string;
-  title: string;
-  duration: string;
-  type: 'meditation' | 'exercise';
-}
+// Remove unused PlayerProps interface
 
 const MANDALA_SIZE = 200;
 const TIMER_SIZE = 260;
@@ -113,12 +109,17 @@ const createStyles = (theme: AppTheme) =>
 export default function PlayerScreen() {
   const soundRef = useRef<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(0); // Keep duration state (will be set from fetched data or audio file)
   const [position, setPosition] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Keep loading state
+  const [meditationData, setMeditationData] = useState<{ title: string; audioUrl: string; duration: number; description?: string } | null>(null); // State for fetched data
 
-  const { meditationId, title = 'Meditation', subtitle = 'Exercise', type = 'meditation' } =
-    useLocalSearchParams<RootStackParamList['player']>();
+  // Get params, provide defaults
+  const params = useLocalSearchParams<RootStackParamList['player']>();
+  const meditationId = params.meditationId;
+  const type = params.type || 'meditation'; // Default to meditation if type is missing
+  // Title/subtitle will come from fetched data or defaults if fetch fails
+
   const theme = useTheme<AppTheme>();
   const styles = createStyles(theme);
 
@@ -135,10 +136,42 @@ export default function PlayerScreen() {
   const bgInhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
   const bgExhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
 
+  // Fetch meditation data
+  useEffect(() => {
+    const fetchMeditation = async () => {
+      if (!meditationId || type !== 'meditation') {
+        // If it's an exercise or no ID, don't fetch meditation data
+        // Use default/passed title/subtitle later if needed
+        setIsLoading(false); // Stop loading if not fetching
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const data = await MeditationService.getMeditationById(meditationId);
+        if (data) {
+          setMeditationData(data);
+          // Optionally set initial duration from Firestore data if available
+          // setDuration(data.duration * 60000); // Assuming duration is in minutes
+        } else {
+          console.error('Meditation not found');
+          // Handle error: maybe show default title/subtitle or navigate back
+        }
+      } catch (error) {
+        console.error('Error fetching meditation data:', error);
+        // Handle error
+      } finally {
+        // Loading of audio will happen next, keep setIsLoading(false) there
+      }
+    };
+    fetchMeditation();
+  }, [meditationId, type]);
+
+
   useEffect(() => {
     let isMounted = true;
 
-    const initializeAudio = async () => {
+    // Initialize audio settings once
+    const initializeAudioSettings = async () => {
       try {
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: false,
@@ -147,18 +180,30 @@ export default function PlayerScreen() {
           shouldDuckAndroid: true,
           playThroughEarpieceAndroid: false,
         });
-
-        const audioSource = require('../assets/meditations/sample.mp3');
-
-        if (isMounted) {
-          await loadAudio();
-        }
       } catch (error) {
-        console.error('Error initializing audio:', error);
+        console.error('Error setting audio mode:', error);
       }
     };
 
-    initializeAudio();
+    initializeAudioSettings();
+
+    // Load audio when meditationData (containing audioUrl) is available or if it's an exercise
+    if ((type === 'meditation' && meditationData) || type === 'exercise') {
+       if (isMounted) {
+         loadAudio(); // Call loadAudio here
+       }
+    }
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+      if (soundRef.current) {
+        soundRef.current.unloadAsync().catch((err) =>
+          console.error('Error during cleanup:', err)
+        );
+      }
+    };
+    // REMOVED initializeAudio() call from here
 
     return () => {
       isMounted = false;
@@ -168,7 +213,9 @@ export default function PlayerScreen() {
         );
       }
     };
-  }, []);
+  // Depend on meditationData to trigger loading when URL is ready
+  }, [meditationData, type]); // Add type dependency
+
 
   useEffect(() => {
     if (isPlaying) {
@@ -267,18 +314,34 @@ export default function PlayerScreen() {
 
   const loadAudio = async () => {
     setIsLoading(true);
+    console.log('Loading audio...');
 
     try {
       if (soundRef.current) {
+        console.log('Unloading previous sound...');
         await soundRef.current.unloadAsync();
+        soundRef.current = null; // Clear the ref
       }
 
-      const audioSource = require('../assets/meditations/sample.mp3');
+      let audioSource: any;
+      if (type === 'meditation' && meditationData?.audioUrl) {
+        console.log('Using meditation audioUrl:', meditationData.audioUrl);
+        audioSource = { uri: meditationData.audioUrl };
+      } else if (type === 'exercise') {
+        // For exercises, continue using the sample or define exercise-specific audio
+        console.log('Using sample audio for exercise');
+        audioSource = require('../assets/meditations/sample.mp3');
+      } else {
+        console.error('Cannot load audio: Invalid type or missing audio URL.');
+        setIsLoading(false);
+        return; // Exit if no valid source
+      }
 
-      const { sound: audioSound } = await Audio.Sound.createAsync(
+      console.log('Creating sound object with source:', audioSource);
+      const { sound: audioSound, status } = await Audio.Sound.createAsync(
         audioSource,
         {
-          shouldPlay: false,
+          shouldPlay: false, // Don't play automatically
           progressUpdateIntervalMillis: 1000,
           positionMillis: 0,
           volume: 1.0,
@@ -288,19 +351,20 @@ export default function PlayerScreen() {
         handleStatusUpdate
       );
 
-      const initialStatus = await audioSound.getStatusAsync();
-
-      if (!initialStatus.isLoaded) {
+      // Check status after creation
+      if (!status.isLoaded) {
+        console.error('Failed to load audio file. Status:', status);
         throw new Error('Failed to load audio file');
       }
 
+      console.log('Audio loaded successfully. Duration:', status.durationMillis);
       soundRef.current = audioSound;
-      setDuration(initialStatus.durationMillis || 0);
-      setPosition(initialStatus.positionMillis || 0);
-      setIsLoading(false);
+      setDuration(status.durationMillis || 0);
+      setPosition(status.positionMillis || 0);
+      setIsLoading(false); // Loading finished
     } catch (error) {
-      console.error('Error loading audio:', error);
-      setIsLoading(false);
+      console.error('Error in loadAudio:', error);
+      setIsLoading(false); // Ensure loading stops on error
     }
   };
 
@@ -356,16 +420,25 @@ export default function PlayerScreen() {
       if (type === 'exercise') {
         // Assuming meditationId is the exerciseId for exercises
         await ExerciseService.completeExercise(userId, meditationId as string);
-      } else {
+      } else if (type === 'meditation') {
+        // Calculate minutes from duration (ms)
+        const minutesCompleted = Math.round(duration / 60000);
+
+        // Track activity in subcollection
         await UserService.trackActivity({
           userId,
           type: 'meditation',
           timestamp: new Date(),
           details: {
-            duration: duration / 60000, // Convert ms to minutes
-            title: title as string,
+            duration: minutesCompleted, // Log duration in minutes
+            title: meditationData?.title ?? (params.title as string) ?? 'Meditation', // Use fetched title or param title
           },
         });
+
+        // Update main user stats
+        if (minutesCompleted > 0) {
+          await UserService.updateMeditationStats(userId, minutesCompleted);
+        }
       }
 
       console.log(`${type} activity completed successfully.`);
@@ -380,12 +453,18 @@ export default function PlayerScreen() {
     }
   }, [isPlaying, position, duration, handleActivityCompletion]);
 
+  // Determine title and subtitle based on fetched data or params
+  const displayTitle = meditationData?.title ?? (params.title as string) ?? (type === 'meditation' ? 'Meditation' : 'Exercise');
+  const displaySubtitle = meditationData?.description ?? (params.subtitle as string) ?? '';
+
+
   return (
     <ScreenLayout
+      // Use displayTitle, truncate if needed
       title={
-        title && (title as string).length > 20
-          ? `${(title as string).substring(0, 20)}...`
-          : (title as string)
+        displayTitle && displayTitle.length > 20
+          ? `${displayTitle.substring(0, 20)}...`
+          : displayTitle
       }
       showBackButton={true}
       scrollable={false}
@@ -489,8 +568,8 @@ export default function PlayerScreen() {
             }
           />
         </View>
-        {/* If needed, you can add a smaller subtitle here */}
-        {subtitle && (
+        {/* Use displaySubtitle */}
+        {displaySubtitle && (
           <Text
             style={{
               fontSize: 16,
@@ -499,11 +578,9 @@ export default function PlayerScreen() {
               textAlign: 'center',
             }}
           >
-            {subtitle as string}
+            {displaySubtitle}
           </Text>
         )}
-
-        {/* Rest of the content... */}
       </View>
     </ScreenLayout>
   );

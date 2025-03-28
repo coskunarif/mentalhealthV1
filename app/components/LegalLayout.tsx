@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react';
 import { View, Text } from 'react-native';
-import { theme } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme'; // Import hook
 import { ScreenLayout } from './ScreenLayout';
+import type { AppTheme } from '../types/theme'; // Import AppTheme
 
 interface LegalLayoutProps {
   title: string;
@@ -14,6 +15,7 @@ export default function LegalLayout({
   children,
   lastUpdated,
 }: LegalLayoutProps) {
+  const theme = useAppTheme(); // Use hook
   return (
     <ScreenLayout title={title}>
       {children}

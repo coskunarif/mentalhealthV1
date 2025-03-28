@@ -2,7 +2,8 @@ import React from 'react';
 import { Button, ButtonProps } from 'react-native-paper';
 import { StyleProp, ViewStyle, TextStyle, View, Text } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { theme } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme'; // Import the hook
+import type { AppTheme } from '../types/theme'; // Import AppTheme type
 
 type ButtonStyle = StyleProp<ViewStyle>;
 
@@ -29,7 +30,9 @@ export default function EnhancedButton({
   iconComponent,
   children,
   ...props
-}: EnhancedButtonProps) {
+}: EnhancedButtonProps) { // Remove the incorrect arrow '=>'
+  const theme = useAppTheme(); // Use the hook to get the theme
+
   const baseStyle: ButtonStyle = variant === 'option' ? {
     height: 56,
     borderRadius: 12,

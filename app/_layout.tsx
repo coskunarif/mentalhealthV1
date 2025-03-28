@@ -6,11 +6,11 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { PaperProvider } from 'react-native-paper';
 import { Stack } from 'expo-router';
-import { AuthProvider } from './context/auth';
-import { theme as importedTheme } from './config/theme';
+import { AuthProvider, useAuth } from './context/auth'; // Import useAuth
+import { lightTheme, darkTheme } from './config/theme'; // Import specific themes
 import ErrorBoundary from './components/ErrorBoundary';
 import type { AppTheme } from './types/theme';
-import { useTheme } from 'react-native-paper';
+// Remove unused useTheme import from here if not used elsewhere in this file
 // Add at the beginning of app/_layout.tsx to check Auth state on startup (Added)
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './lib/firebase-utils'; // Assuming firebase-utils exports auth
@@ -23,11 +23,37 @@ import './lib/firebase';
 // Keep the splash screen visible while resources load
 SplashScreen.preventAutoHideAsync();
 
-export default function AppLayout() {
-  const appTheme = useTheme<AppTheme>();
+// Define a component to handle theme selection and rendering
+function ThemedApp() {
+  const { user, initialized, loading } = useAuth(); // Get user and loading state
 
-  // At the beginning of AppLayout function (Added)
+  // Determine the theme based on user settings, default to light
+  // Only apply user theme once auth is initialized and not loading
+  const currentTheme = React.useMemo(() => {
+    if (!initialized || loading) {
+      return lightTheme; // Default to light theme while loading/initializing
+    }
+    return user?.settings?.theme === 'dark' ? darkTheme : lightTheme;
+  }, [user, initialized, loading]);
+
+  // Use the selected theme for Stack navigator styling
+  const screenOptions = React.useMemo(() => ({
+    headerStyle: {
+      backgroundColor: currentTheme.colors.surface,
+    },
+    headerShadowVisible: false,
+    headerTitleStyle: { ...currentTheme.fonts.titleMedium },
+    contentStyle: {
+      backgroundColor: currentTheme.colors.background,
+    },
+    headerShown: false,
+  }), [currentTheme]);
+
+
+  // The rest of the original AppLayout logic, now inside ThemedApp
+  // Debugging useEffects
   useEffect(() => {
+    // ... (keep the existing useEffects for debugging if needed) ...
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log('[DEBUG] Auth state changed, user:', user?.uid);
       if (user) {
@@ -40,7 +66,6 @@ export default function AppLayout() {
     return () => unsubscribe();
   }, []);
 
-  // Step 7: Add debugging code to verify Firebase Authentication
   useEffect(() => {
     const checkAuth = async () => {
       if (auth.currentUser) {
@@ -57,18 +82,17 @@ export default function AppLayout() {
     };
     
     checkAuth();
-    // Re-check auth state on change as well
     const unsubscribeAuthState = onAuthStateChanged(auth, checkAuth);
     return () => unsubscribeAuthState();
   }, []);
   
-  // Step 5: Verify Database Connection
   useEffect(() => {
     if (auth.app?.options) {
       console.log("Connected to Firebase project:", auth.app.options.projectId);
     }
   }, []);
-  
+
+  // Font loading logic remains the same
   const [loaded] = useFonts({
     'Kameron': require('../assets/fonts/Kameron-Regular.ttf'),
     'Kameron-Bold': require('../assets/fonts/Kameron-Bold.ttf'),
@@ -76,38 +100,36 @@ export default function AppLayout() {
   });
 
   const onLayoutRootView = useCallback(async () => {
-    if (loaded) {
+    // Hide splash screen only when fonts AND auth are ready
+    if (loaded && initialized) {
       await SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, initialized]); // Add initialized dependency
 
   useEffect(() => {
     onLayoutRootView();
   }, [onLayoutRootView]);
 
-  if (!loaded) {
+  // Show splash screen until fonts are loaded AND auth is initialized
+  if (!loaded || !initialized) {
     return null;
   }
 
+  // Render the themed stack navigator
+  return (
+    <PaperProvider theme={currentTheme}>
+      <Stack screenOptions={screenOptions} />
+    </PaperProvider>
+  );
+}
+
+// Main AppLayout component wraps everything in providers
+export default function AppLayout() {
   return (
     <ErrorBoundary>
-      <PaperProvider theme={importedTheme}>
-        <AuthProvider>
-          <Stack
-            screenOptions={{
-              headerStyle: {
-                backgroundColor: appTheme.colors.surface,
-              },
-              headerShadowVisible: false,
-              headerTitleStyle: { ...appTheme.fonts.titleMedium },
-              contentStyle: {
-                backgroundColor: appTheme.colors.background,
-              },
-              headerShown: false,
-            }}
-          />
-        </AuthProvider>
-      </PaperProvider>
+      <AuthProvider>
+        <ThemedApp />
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

@@ -6,15 +6,16 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { layoutStyles, miscStyles, typographyStyles } from '../config';
-import { theme } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme'; // Import the theme hook
 // Keep UserService import for getSubscriptionStatus
 import { UserService } from '../services/user.service'; 
 import { UserStats } from '../models/user-stats.model'; // Correct import path
 import { Timestamp } from 'firebase/firestore'; // Import Timestamp
-// Import the cloud functions
-import { ensureUserDocument, getUserStats } from '../services/firebase-functions';
+// Import the cloud functions - remove ensureUserDocument
+import { getUserStats } from '../services/firebase-functions';
 
 export default function ProfileScreen() {
+  const theme = useAppTheme(); // Get the current theme using the hook
   const { user, signOut, loading: authLoading } = useAuth(); // Get loading state from useAuth
   const [isSignOutLoading, setIsSignOutLoading] = useState(false); // Renamed for clarity
   const [error, setError] = useState<string | null>(null);
@@ -40,21 +41,10 @@ export default function ProfileScreen() {
     setError(null); // Clear previous errors at the start
     
     try {
-      // First ensure user document exists via Cloud Function
-      console.log('[DEBUG] Calling ensureUserDocument Cloud Function...');
-      const docResult = await ensureUserDocument();
-      console.log('[DEBUG] Document creation/check result:', docResult.data.message);
-      
-      if (!docResult.data.success && !docResult.data.message.includes('already exists')) {
-         // Throw an error if the function failed for reasons other than the doc already existing
-         throw new Error(docResult.data.message || 'Failed to ensure user document via Cloud Function');
-      }
-      
-      // Add a short delay to be safe (Firestore operations can have consistency delays)
-      console.log('[DEBUG] Waiting briefly before calling getUserStats...');
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Keep delay
-      
-      // Now call the getUserStats function
+      // REMOVED redundant ensureUserDocument Cloud Function call
+      // The user document should be ensured by the logic in AuthContext
+
+      // Call the getUserStats function directly
       console.log('[DEBUG] Calling getUserStats Cloud Function...');
       const statsResult = await getUserStats(); // Call the imported function
       console.log('[DEBUG] getUserStats result success:', statsResult.data.success);
@@ -71,8 +61,8 @@ export default function ProfileScreen() {
         // Throw error if getUserStats indicates failure
         throw new Error((statsResult.data as any)?.message || 'Failed to get user stats from Cloud Function');
       }
-    } catch (error: any) { // Catch errors from either ensureUserDocument or getUserStats
-      console.error('Error in fetchUserStats flow:', error);
+    } catch (error: any) { // Catch errors from getUserStats
+      console.error('Error fetching user stats:', error); // Updated error message context
       setError(error.message || 'Failed to load user data');
       
       // Set minimal fallback stats
@@ -219,20 +209,33 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Mental Health Stats - Adjusted for nested structure */}
+          {/* Mental Health Stats - Displaying more stats */}
           <View style={miscStyles.profile_statsContainer}>
+            {/* Meditation Minutes */}
             <View style={miscStyles.profile_statItem}>
-              <Text style={miscStyles.profile_statNumber}>{userStats?.meditation?.sessions ?? '...'}</Text>
-              <Text style={miscStyles.profile_statLabel}>Sessions</Text>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.meditation?.totalTime ?? '...'}</Text>
+              <Text style={miscStyles.profile_statLabel}>Minutes</Text>
             </View>
+            {/* Exercises Completed */}
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.activities?.exercisesCompleted ?? '...'}</Text>
+              <Text style={miscStyles.profile_statLabel}>Exercises</Text>
+            </View>
+            {/* Streak */}
             <View style={miscStyles.profile_statItem}>
               <Text style={miscStyles.profile_statNumber}>{userStats?.profile?.streak ?? '...'}</Text>
               <Text style={miscStyles.profile_statLabel}>Streak</Text>
             </View>
+            {/* Surveys Completed */}
             <View style={miscStyles.profile_statItem}>
               <Text style={miscStyles.profile_statNumber}>{userStats?.activities?.surveysCompleted ?? '...'}</Text>
               <Text style={miscStyles.profile_statLabel}>Surveys</Text>
             </View>
+            {/* Optionally display Sessions if needed, or remove if Minutes is preferred */}
+            {/* <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.meditation?.sessions ?? '...'}</Text>
+              <Text style={miscStyles.profile_statLabel}>Sessions</Text>
+            </View> */}
           </View>
 
           {/* Subscription Status */}
