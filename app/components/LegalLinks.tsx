@@ -1,12 +1,16 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Card, Title, List } from 'react-native-paper';
+import { Card, Title, List, useTheme } from 'react-native-paper'; // Import useTheme
 import { useRouter } from 'expo-router';
-import { theme } from '../config/theme';
+// Remove direct theme import
 import { miscStyles } from '../config';
+import type { AppTheme } from '../types/theme'; // Import AppTheme
 
 export const LegalLinks: React.FC = () => {
+  const theme = useTheme<AppTheme>(); // Use hook
   const router = useRouter();
+  // Define styles inside the component or pass theme
+  const styles = createStyles(theme);
   return (
     <Card style={styles.card}>
       <Card.Content>
@@ -36,7 +40,8 @@ export const LegalLinks: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+// Define createStyles function to use theme from hook
+const createStyles = (theme: AppTheme) => StyleSheet.create({
   card: {
     marginHorizontal: theme.spacing.medium,
     padding: theme.spacing.small,

@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, setDoc, onSnapshot, Unsubscribe, collection, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc, onSnapshot, Unsubscribe, collection, writeBatch, increment, Timestamp } from 'firebase/firestore'; // Added increment, Timestamp
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { auth, db, storage, app } from '../lib/firebase-utils';
@@ -400,6 +400,27 @@ export class UserService {
     } catch (error) {
       console.error('[DEBUG] Error ensuring user document:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Updates meditation stats on the main user document.
+   */
+  static async updateMeditationStats(userId: string, minutes: number): Promise<void> {
+    try {
+      if (!userId) throw new Error('User ID is required');
+      if (typeof minutes !== 'number' || minutes < 0) throw new Error('Invalid minutes value');
+
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, {
+        'stats.meditationMinutes': increment(minutes),
+        'stats.lastActiveDate': Timestamp.now(), // Update last active date
+        updatedAt: Timestamp.now() // Update main document timestamp
+      });
+      console.log(`[UserService] Updated meditation stats for ${userId} by ${minutes} minutes.`);
+    } catch (error) {
+      console.error(`[UserService] Error updating meditation stats for ${userId}:`, error);
+      throw error; // Re-throw to handle upstream
     }
   }
 }

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { theme } from './theme';
+import { lightTheme as theme } from './theme'; // Import lightTheme as theme
 import typographyStyles from './typography.styles';
 
 export default StyleSheet.create({

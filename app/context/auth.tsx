@@ -1,11 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { auth, User, db } from '../lib/firebase-utils';
-import { onAuthStateChanged } from 'firebase/auth';
+// Use aliased import for firebase/auth User and remove User from firebase-utils import
+import { auth, db } from '../lib/firebase-utils';
+import { onAuthStateChanged, User as FirebaseAuthUser } from 'firebase/auth';
 import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore'; // Import onSnapshot and Unsubscribe
 import UserService from '../services/user.service'; // Import UserService
+import { UserModel } from '../models/user.model'; // Import UserModel
+
+// Combine Auth user properties with our Firestore model properties
+// Ensure required Auth properties (like uid, email) are present
+// Make Firestore specific fields potentially optional if they might not exist immediately
+type AppUser = Omit<FirebaseAuthUser, 'displayName' | 'photoURL'> & Partial<Omit<UserModel, 'uid' | 'email'>>;
 
 interface AuthContextType {
-  user: User | null; // Consider a more specific type combining Auth and Firestore data
+  user: AppUser | null; // Use the combined AppUser type
   initialized: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
@@ -23,14 +30,15 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null); // Consider a more specific type
+  const [user, setUser] = useState<AppUser | null>(null); // Use AppUser type for state
   const [initialized, setInitialized] = useState(false); // Tracks if initial auth check is done
   const [loading, setLoading] = useState(true); // Tracks if user data (including Firestore) is loaded
   const firestoreUnsubscribeRef = useRef<Unsubscribe | null>(null); // Ref to store Firestore listener unsubscribe function
 
   useEffect(() => {
     // Subscribe to auth state changes
-    const authUnsubscribe = onAuthStateChanged(auth, (authUser: User | null) => {
+    // Use FirebaseAuthUser type for the authUser parameter
+    const authUnsubscribe = onAuthStateChanged(auth, (authUser: FirebaseAuthUser | null) => {
       console.log('Auth state changed. authUser:', authUser?.uid);
 
       // Unsubscribe from previous Firestore listener if it exists
@@ -64,23 +72,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               displayName: userData.displayName ?? authUser.displayName,
               photoURL: userData.photoURL ?? authUser.photoURL,
               // Add other relevant fields from your Firestore user model
-              // e.g., settings: userData.settings, stats: userData.stats
+              settings: userData.settings, // Load settings from Firestore
+              stats: userData.stats,       // Load stats from Firestore
             };
-            setUser(enhancedUser);
+            // Ensure we have a valid user object structure even if Firestore data is partial
+            const completeUser = {
+              ...enhancedUser,
+              settings: enhancedUser.settings || {}, // Default to empty object if undefined
+              stats: enhancedUser.stats || {},       // Default to empty object if undefined
+            };
+            setUser(completeUser as AppUser); // Cast to AppUser
             setInitialized(true); // Auth check done
             setLoading(false); // Firestore data loaded
           } else {
             // Document doesn't exist YET. Keep loading.
             // This handles the race condition. The listener will fire again when the doc is created.
             console.log(`Firestore document for ${authUser.uid} does not exist yet. Waiting...`);
-            setUser(authUser); // Temporarily set authUser, but keep loading=true
+            // Cast authUser to AppUser, acknowledging Firestore fields might be missing initially
+            setUser(authUser as AppUser);
             setInitialized(true); // Auth check is done, but data isn't fully loaded
             setLoading(true); // Explicitly keep loading
           }
         }, (error) => {
           console.error(`Error listening to Firestore document for ${authUser.uid}:`, error);
           // Fallback to auth user data, but stop loading
-          setUser(authUser);
+          // Cast authUser to AppUser, acknowledging Firestore fields might be missing
+          setUser(authUser as AppUser);
           setInitialized(true);
           setLoading(false); // Stop loading even on error
         });

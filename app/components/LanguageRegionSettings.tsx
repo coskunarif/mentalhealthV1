@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Surface, Title, List, Portal, Modal, RadioButton, Searchbar, Text } from 'react-native-paper';
-import { theme } from '../config/theme';
+import { Surface, Title, List, Portal, Modal, RadioButton, Searchbar, Text, useTheme } from 'react-native-paper'; // Import useTheme
+// Remove direct theme import
 import { miscStyles } from '../config';
+import type { AppTheme } from '../types/theme'; // Import AppTheme
 
 interface Language {
   code: string;
@@ -32,6 +33,7 @@ export const LanguageRegionSettings: React.FC<LanguageRegionSettingsProps> = ({
   currentLanguage = 'en',
   onLanguageChange,
 }) => {
+  const theme = useTheme<AppTheme>(); // Use hook
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

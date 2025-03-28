@@ -13,7 +13,7 @@ import { EditPersonalInfoForm } from './EditPersonalInfoForm';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import type { AppTheme } from '../types/theme';
-import { theme } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme'; // Import hook
 import { ScreenLayout } from './ScreenLayout'; // Import ScreenLayout
 import { useAuth } from '../context/auth';
 import { layoutStyles, typographyStyles, buttonStyles } from '../config';
@@ -41,6 +41,7 @@ const createStyles = (theme: AppTheme) =>
   });
 
 export default function EditPersonalInfoScreen() {
+  const theme = useAppTheme(); // Use hook
   const { user } = useAuth();
   const router = useRouter();
   const styles = createStyles(theme);

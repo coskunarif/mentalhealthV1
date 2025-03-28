@@ -1,6 +1,6 @@
 // File: app\config\EditPersonalInfoForm.styles.ts
 import { StyleSheet } from 'react-native';
-import { theme } from './theme';
+import { lightTheme as theme } from './theme'; // Import lightTheme as theme
 
 export default StyleSheet.create({
   formContainer: {

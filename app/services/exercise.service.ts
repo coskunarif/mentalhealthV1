@@ -2,6 +2,7 @@ import { collection, query, where, getDocs, doc, getDoc, orderBy, limit, setDoc,
 import { db } from '../lib/firebase';
 import { Timestamp } from 'firebase/firestore';
 import { safeStringify, validateRadarData, validateRadarLabels, DataPoint } from '../lib/debug-utils';
+import UserService from './user.service'; // Import UserService
 
 export class ExerciseService {
     // Cache for recently fetched exercises
@@ -306,7 +307,7 @@ export class ExerciseService {
           console.log('getRecentActivities: Fetching recent activities...');
           const activitiesRef = collection(db, 'users', userId, 'activities');
           const q = query(activitiesRef,
-              where('type', 'in', ['meditation', 'exercise', 'mood']),
+              where('type', 'in', ['meditation', 'exercise', 'mood', 'survey']), // Added 'survey'
               orderBy('timestamp', 'desc'),
               limit(5)
           );
@@ -357,6 +358,8 @@ export class ExerciseService {
                 return 'Breathing Exercise';
             case 'mood':
                 return 'Mood Tracking';
+            case 'survey': // Added title for survey
+                return 'Wellness Survey';
             default:
                 return 'Activity';
         }
@@ -427,6 +430,7 @@ export class ExerciseService {
         try {
             // Get exercise details (for category)
             const exercise = await this.getExerciseById(exerciseId);
+            const userRef = doc(db, 'users', userId); // Reference to the main user document
 
             // Update the user's progress/overview document
             const overviewRef = doc(db, 'users', userId, 'progress', 'overview');
@@ -458,6 +462,25 @@ export class ExerciseService {
                 completed: true,
                 timestamp: Timestamp.now()
             }, { merge: true }); // Use merge to update if it exists
+
+            // Also increment the main stats counter on the user document
+            await updateDoc(userRef, {
+                'stats.exercisesCompleted': increment(1),
+                'stats.lastActiveDate': Timestamp.now(), // Update last active date
+                updatedAt: Timestamp.now() // Update main document timestamp
+            });
+
+            // Also track the activity
+            await UserService.trackActivity({
+              userId: userId,
+              type: 'exercise',
+              timestamp: Timestamp.now().toDate(), // Use current date
+              details: {
+                title: exercise.title, // Use exercise title
+                duration: exercise.duration, // Include duration
+                itemId: exerciseId // Reference the exercise ID
+              }
+            });
 
         } catch (error) {
             console.error('Error completing exercise:', error);

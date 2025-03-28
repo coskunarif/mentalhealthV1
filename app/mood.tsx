@@ -5,11 +5,13 @@ import type { RootStackParamList } from './types/navigation';
 import { layoutStyles, miscStyles } from './config';
 import MoodSelector from './components/MoodSelector';
 import { MoodPyramid } from './components/MoodPyramid';
-import { theme } from './config/theme';
+import { useAppTheme } from './hooks/useAppTheme'; // Import useAppTheme
 import type { IconName } from './components/MoodSelector';
-import MoodService from './services/mood.service'; // Import MoodService
-import { MoodDefinition } from './models/mood.model'; // Import MoodDefinition
-import { Text } from 'react-native-paper'; // Added Text for error/loading
+import MoodService from './services/mood.service';
+import UserService from './services/user.service'; // Import UserService
+import { MoodDefinition } from './models/mood.model';
+import { Text } from 'react-native-paper';
+import { useAuth } from './hooks/useAuth'; // Import useAuth
 
 // Interface for the state managed within this component, derived from MoodDefinition
 interface MoodState extends MoodDefinition {
@@ -19,31 +21,38 @@ interface MoodState extends MoodDefinition {
   isSelected: boolean;
 }
 
-const ProgressDots = ({ activeScreen }: { activeScreen: number }) => (
-  <View style={{ flexDirection: 'row', justifyContent: 'center', paddingVertical: 10 }}>
-    {[0, 1].map((index) => (
-      <View
-        key={index}
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: 4,
-          backgroundColor:
-            index === activeScreen ? theme.colors.primary : theme.colors.surfaceVariant,
-          marginHorizontal: 4,
-        }}
-      />
-    ))}
-  </View>
-);
+// Move ProgressDots inside MoodScreen or pass theme as prop
+// For simplicity, moving it inside:
+// const ProgressDots = ({ activeScreen, theme }: { activeScreen: number, theme: AppTheme }) => ( ... );
 
 export default function MoodScreen() {
+  const theme = useAppTheme(); // Use the hook here
   const [selectedMood, setSelectedMood] = useState<MoodState | null>(null);
-  const [moods, setMoods] = useState<MoodState[]>([]); // Initialize as empty
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState<string | null>(null); // Add error state
+  const [moods, setMoods] = useState<MoodState[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const { returnTo = 'tabs/home' } = useLocalSearchParams<RootStackParamList['mood']>();
+
+  // Define ProgressDots component here to access theme from hook
+  const ProgressDots = ({ activeScreen }: { activeScreen: number }) => (
+    <View style={{ flexDirection: 'row', justifyContent: 'center', paddingVertical: 10 }}>
+      {[0, 1].map((index) => (
+        <View
+          key={index}
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor:
+              index === activeScreen ? theme.colors.primary : theme.colors.surfaceVariant,
+            marginHorizontal: 4,
+          }}
+        />
+      ))}
+    </View>
+  );
 
   const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
   const [activeScreen, setActiveScreen] = useState(0);
@@ -113,32 +122,61 @@ export default function MoodScreen() {
   };
 
   const handleSubmit = async () => {
-    // TODO: Refactor saving logic to use MoodService.saveMoodEntry
-    // This likely requires iterating through selected moods and calling the service for each.
-    // Need user context (useAuth hook) to pass userId to the service.
+    if (!user?.uid) {
+      console.error("User not logged in, cannot save mood.");
+      setError("You must be logged in to save your mood.");
+      return;
+    }
+    setError(null); // Clear previous errors
+
+    const selectedMoodEntries = moods.filter(mood => mood.isSelected);
+
+    if (selectedMoodEntries.length === 0) {
+      console.log("No mood selected to save.");
+      // Optionally show a message to the user
+      router.replace(returnTo as keyof RootStackParamList); // Still navigate back
+      return;
+    }
+
     try {
-      const selectedMoodEntries = moods
-        .filter(mood => mood.isSelected)
-        .map(mood => ({
-          // userId: user?.uid, // Get user ID from auth context
-          mood: mood.name, // Use 'name' as the mood identifier
+      const now = new Date();
+      const savePromises = selectedMoodEntries.map(mood => {
+        const entryData = {
+          userId: user.uid,
+          mood: mood.name,
           value: mood.value,
-          duration: mood.duration,
-          timestamp: new Date(), // Use current time or allow selection
-        }));
+          duration: mood.duration, // Assuming duration is set via slider
+          timestamp: now,
+          // factors: [], // Add factors if collected
+          // notes: "",   // Add notes if collected
+        };
 
-      console.log('Mood entries to save:', selectedMoodEntries);
-      // Example: Call service for each entry (needs user ID)
-      // for (const entry of selectedMoodEntries) {
-      //   if (entry.userId) {
-      //     await MoodService.saveMoodEntry(entry);
-      //   }
-      // }
+        // Save to 'moods' collection
+        const saveEntryPromise = MoodService.saveMoodEntry(entryData);
 
+        // Save to 'activities' subcollection
+        const trackActivityPromise = UserService.trackActivity({
+          userId: user.uid,
+          type: 'mood',
+          timestamp: now,
+          details: {
+            title: mood.name, // Use mood name as title for activity
+            value: mood.value,
+            // Add other relevant details if needed
+          }
+        });
+
+        return Promise.all([saveEntryPromise, trackActivityPromise]);
+      });
+
+      await Promise.all(savePromises);
+      console.log(`Successfully saved ${selectedMoodEntries.length} mood entries and activities.`);
       router.replace(returnTo as keyof RootStackParamList);
+
     } catch (error) {
-      console.error('Error preparing mood entries:', error);
-      // Handle saving error (e.g., show snackbar)
+      console.error('Error saving mood entries:', error);
+      setError("Failed to save mood. Please try again.");
+      // Handle saving error (e.g., show snackbar) - error state is set
     }
   };
 

@@ -1,8 +1,9 @@
-import type { IconName } from '../components/MoodSelector'; // Import IconName
-import { theme } from '../config/theme'; // Import theme
+import type { IconName } from '../components/MoodSelector';
+// Import one of the themes (e.g., lightTheme) to get the moodColors keys
+import { lightTheme } from '../config/theme';
 
 // Define the specific type for mood keys based on the theme
-export type MoodKey = keyof typeof theme.moodColors;
+export type MoodKey = keyof typeof lightTheme.moodColors;
 
 // Mood tracking model
 

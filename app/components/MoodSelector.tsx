@@ -6,7 +6,7 @@ import Slider from '@react-native-community/slider';
 import { router } from 'expo-router';
 import localStyles from '../config/MoodSelector.styles';
 import { typographyStyles } from '../config';
-import { theme } from '../config/theme';
+import { useAppTheme } from '../hooks/useAppTheme'; // Import useAppTheme
 import type { AppTheme } from '../types/theme';
 import EnhancedButton from './EnhancedButton';
 import SliderCard from './SliderCard';
@@ -32,8 +32,8 @@ export type IconName =
 
 type MoodType = {
   label: string;
-  icon: IconName;
-  key: keyof AppTheme['moodColors'];
+  icon: IconName; // Keep IconName for now, assuming DB values match
+  key: string; // Change to string to accept any key from DB
   value: number;
   duration: number;
   isSelected: boolean;
@@ -59,6 +59,7 @@ function MoodSelector({
   onNext,
   onFinish,
 }: Props) {
+  const theme = useAppTheme(); // Use the hook
   const [slidersState, setSlidersState] = useState<{
     [label: string]: { value: number; color: string };
   }>({});
@@ -192,8 +193,9 @@ function MoodSelector({
         ]}>
           {moods.map((item, index) => {
             const isSelected = selectedMood?.label === item.label;
-            const moodColor = theme.moodColors[item.key];
-            
+            // Safely access mood color with a fallback
+            const moodColor = theme.moodColors[item.key as keyof AppTheme['moodColors']] || theme.colors.primary; // Fallback to primary color
+
             return (
               <Pressable
                 key={item.label}
@@ -244,7 +246,7 @@ function MoodSelector({
                 <MaterialCommunityIcons 
                   name={item.icon} 
                   size={28}
-                  color={moodColor} 
+                  color={moodColor} // Use the potentially fallback color
                 />
                 
                 <Text
@@ -288,7 +290,7 @@ function MoodSelector({
             icon={selectedMood.icon}
             label={selectedMood.label}
             value={selectedMood.value}
-            moodKey={selectedMood.key}
+            moodKey={selectedMood.key as keyof typeof theme.moodColors} // Add type assertion here
             onSlidingComplete={(val) => handleSliderComplete(val, selectedMood.label)}
           />
         </View>
