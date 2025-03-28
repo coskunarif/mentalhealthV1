@@ -261,18 +261,42 @@ export class UserService {
   static async getUserDetailedStats(userId: string): Promise<UserStatsResponse['stats']> {
     try {
       if (!userId) throw new Error('User ID is required');
+      console.log(`[DEBUG] Calling getUserStats for user: ${userId}`); // Added
 
-      const functions = getFunctions(app!);
+      // Specify the correct region for the function (Modified)
+      const functions = getFunctions(app!, 'europe-west1'); 
       const getStats = httpsCallable<unknown, UserStatsResponse>(functions, 'getUserStats');
       
+      // Check which user is set in Auth (Added)
+      const currentUser = auth.currentUser;
+      console.log(`[DEBUG] Current Auth user: ${currentUser?.uid}, trying to get stats for: ${userId}`);
+
+      // Attempt to get ID token manually (Added)
+      if (currentUser) {
+        try {
+          const idToken = await currentUser.getIdToken(true); // Force refresh
+          console.log('[DEBUG] Successfully retrieved ID token.');
+          // You could potentially log the token length or decoded payload here for more info, but be careful with sensitive data.
+        } catch (tokenError) {
+          console.error('[DEBUG] Error retrieving ID token:', tokenError);
+        }
+      } else {
+        console.warn('[DEBUG] currentUser is null before calling function!');
+      }
+      
+      console.log('[DEBUG] Calling Cloud Function...'); // Added
       const result = await getStats();
+      console.log('[DEBUG] Cloud Function returned result:', result.data.success); // Added
+      
       if (result.data.success) {
         return result.data.stats;
       } else {
         throw new Error('Failed to get user stats');
       }
     } catch (error) {
-      console.error('Error getting user stats:', error);
+      console.error('[DEBUG] Error getting user stats:', error); // Modified
+      // Log the complete error object (Added)
+      console.error('[DEBUG] Full error:', JSON.stringify(error)); 
       throw error;
     }
   }
