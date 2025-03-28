@@ -8,6 +8,9 @@ import { theme as importedTheme } from './config/theme';
 import ErrorBoundary from './components/ErrorBoundary';
 import type { AppTheme } from './types/theme';
 import { useTheme } from 'react-native-paper';
+// Add at the beginning of app/_layout.tsx to check Auth state on startup (Added)
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './lib/firebase-utils'; // Assuming firebase-utils exports auth
 
 // Initialize Firebase once at app startup before component rendering
 import './lib/firebase';
@@ -17,6 +20,20 @@ SplashScreen.preventAutoHideAsync();
 
 export default function AppLayout() {
   const appTheme = useTheme<AppTheme>();
+
+  // At the beginning of AppLayout function (Added)
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('[DEBUG] Auth state changed, user:', user?.uid);
+      if (user) {
+        console.log('[DEBUG] User email:', user.email);
+      } else {
+        console.log('[DEBUG] No user signed in');
+      }
+    });
+    
+    return () => unsubscribe();
+  }, []);
   
   const [loaded] = useFonts({
     'Kameron': require('../assets/fonts/Kameron-Regular.ttf'),

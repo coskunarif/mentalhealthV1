@@ -12,6 +12,15 @@ echo Reinstalling dependencies...
 call npm install
 
 echo.
+echo ===== Running TypeScript Type Checking =====
+echo.
+call npx tsc --noEmit
+if %errorlevel% neq 0 (
+    echo Warning: TypeScript errors found. Proceed with caution.
+    pause
+)
+
+echo.
 echo ===== Resetting Metro Bundler Cache =====
 echo.
 echo Starting Metro bundler with reset cache option. Press Ctrl+C after it starts to continue...
@@ -30,6 +39,11 @@ echo ===== Deploying Firebase Functions =====
 echo.
 cd ..
 call firebase deploy --only functions
+
+echo.
+echo ===== Deploying Firestore Rules and Indexes =====
+echo.
+call firebase deploy --only firestore:rules,firestore:indexes
 cd ..
 
 echo.
