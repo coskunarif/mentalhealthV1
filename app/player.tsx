@@ -3,6 +3,8 @@ import { View, Animated, Easing, StyleSheet } from 'react-native';
 import { Text, IconButton, Surface, useTheme } from 'react-native-paper';
 import { Audio, AVPlaybackStatus, AVPlaybackStatusError } from 'expo-av';
 import { router, useLocalSearchParams } from 'expo-router';
+import { getStorage, ref as storageRef, getDownloadURL } from 'firebase/storage'; // Added Firebase Storage imports
+// Removed incorrect Firebase app import
 import { ExerciseService } from './services/exercise.service';
 import Svg, { Circle } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -314,23 +316,42 @@ export default function PlayerScreen() {
       if (soundRef.current) {
         console.log('Unloading previous sound...');
         await soundRef.current.unloadAsync();
-        soundRef.current = null; // Clear the ref
+        soundRef.current = null;
       }
 
-      // Simplify audio loading - always exercise type
-      let audioSource: any = require('../assets/exercises/sample.mp3'); // Default exercise audio file
+      let audioSource;
       if (exerciseData?.audioUrl) {
-        console.log('Using exercise audioUrl:', exerciseData.audioUrl);
-        audioSource = { uri: exerciseData.audioUrl };
+        // Check if the audioUrl is a full URL or a Storage path
+        if (exerciseData.audioUrl.startsWith('http')) {
+          // It's already a full URL
+          audioSource = { uri: exerciseData.audioUrl };
+          console.log('Using direct URL:', exerciseData.audioUrl);
+        } else {
+          // It's a Storage path - convert to download URL
+          const storage = getStorage(); // Use getStorage without app instance
+          // Remove any leading slash if present
+          const storagePath = exerciseData.audioUrl.startsWith('/')
+            ? exerciseData.audioUrl.substring(1)
+            : exerciseData.audioUrl;
+
+          console.log('Fetching from Storage path:', storagePath);
+
+          const audioRef = storageRef(storage, storagePath);
+          const downloadUrl = await getDownloadURL(audioRef);
+          console.log('Retrieved download URL:', downloadUrl);
+          audioSource = { uri: downloadUrl };
+        }
       } else {
-        console.log('Using sample audio for exercise (no audioUrl found)');
+        // Fallback to local audio file
+        console.log('No audioUrl found, using sample audio');
+        audioSource = require('../assets/exercises/sample.mp3');
       }
 
       console.log('Creating sound object with source:', audioSource);
       const { sound: audioSound, status } = await Audio.Sound.createAsync(
         audioSource,
         {
-          shouldPlay: false, // Don't play automatically
+          shouldPlay: false,
           progressUpdateIntervalMillis: 1000,
           positionMillis: 0,
           volume: 1.0,
@@ -350,10 +371,27 @@ export default function PlayerScreen() {
       soundRef.current = audioSound;
       setDuration(status.durationMillis || 0);
       setPosition(status.positionMillis || 0);
-      setIsLoading(false); // Loading finished
-    } catch (error) {
+      setIsLoading(false);
+    } catch (error: unknown) { // Added type annotation
       console.error('Error in loadAudio:', error);
-      setIsLoading(false); // Ensure loading stops on error
+      // Specific error handling for storage errors with type checking
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        const firebaseError = error as { code: string; message?: string }; // Type assertion
+        if (firebaseError.code === 'storage/object-not-found') {
+          console.error(`Audio file not found at path: ${exerciseData?.audioUrl}. Error: ${firebaseError.message}`);
+          // Optionally set a state to show an error message to the user
+        } else if (firebaseError.code === 'storage/unauthorized') {
+          console.error(`Permission denied for audio file: ${exerciseData?.audioUrl}. Error: ${firebaseError.message}`);
+          // Check Firebase Storage rules
+        } else {
+          console.error('Firebase Storage Error:', firebaseError.message);
+        }
+      } else if (error instanceof Error) {
+          console.error('Generic Error in loadAudio:', error.message);
+      } else {
+          console.error('Unknown error type in loadAudio:', error);
+      }
+      setIsLoading(false);
     }
   };
 
