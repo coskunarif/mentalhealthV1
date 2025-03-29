@@ -80,3 +80,8 @@ coverage/
 # App specific
 app-example
 config/firebase.ts
+
+
+# Firebase additional exclusions
+firebase/functions/lib.bak/
+firebase/functions/lib/

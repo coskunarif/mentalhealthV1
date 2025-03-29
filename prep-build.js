@@ -26,9 +26,6 @@ const runNpmScript = (scriptName) => {
 console.log('Preparing build by excluding Firebase Functions...');
 execSync('node exclude-firebase-functions.js', { stdio: 'inherit' });
 
-// Run the fix-exports script if it exists
-runNpmScript('fix-exports');
-
 console.log('Build preparation complete.');
 
 // Temporarily move the firebase functions lib directory

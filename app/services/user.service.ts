@@ -3,7 +3,8 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { auth, db, storage, app } from '../lib/firebase-utils';
 import { UserModel, PersonalInformation, UserSettings } from '../models/user.model';
-import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
+// Import the pre-configured callable function instead of getFunctions/httpsCallable
+import { getUserStats as getUserStatsCallable } from './firebase-functions';
 import { UserStatsResponse } from '../models/user-stats.model';
 
 // User operations
@@ -281,14 +282,13 @@ export class UserService {
         throw new Error('No authenticated user found');
       }
 
-      // IMPORTANT CHANGE: Don't pass region here if it's already specified in the function config
-      const functions = getFunctions(app); // Use the initialized app instance
-      
-      // CRITICAL CHANGE: Don't pass userId parameter
-      const getStats = httpsCallable<void, UserStatsResponse>(
-        functions, 
-        'getUserStats'
-      );
+      // Use the imported pre-configured callable function
+      const getStats = getUserStatsCallable;
+
+      // Add extra logging right before the call
+      console.log(`[DEBUG] PRE-CALL CHECK: auth.currentUser UID: ${auth.currentUser?.uid}`);
+      console.log(`[DEBUG] PRE-CALL CHECK: auth.currentUser Email: ${auth.currentUser?.email}`);
+      console.log(`[DEBUG] PRE-CALL CHECK: Is currentUser null? ${auth.currentUser === null}`);
 
       console.log('[DEBUG] Calling Cloud Function (no params)...');
       // Call without parameters - the auth context will be passed automatically

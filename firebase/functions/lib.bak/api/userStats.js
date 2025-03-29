@@ -28,8 +28,8 @@ const https_1 = require("firebase-functions/v2/https");
 const admin = __importStar(require("firebase-admin"));
 exports.getUserStats = (0, https_1.onCall)({
     timeoutSeconds: 30,
-    memory: '256MiB',
-    region: 'europe-west1'
+    memory: '256MiB'
+    // Region is set globally in index.ts
     // Add type for request based on usage
 }, async (request) => {
     console.log('[DEBUG] getUserStats Cloud Function called');
