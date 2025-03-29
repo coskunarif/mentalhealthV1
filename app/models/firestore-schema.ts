@@ -29,7 +29,6 @@ export interface User extends FirestoreDocument {
     theme: 'light' | 'dark' | 'system';
   };
   stats: {
-    meditationMinutes: number;
     exercisesCompleted: number;
     streak: number; // Current consecutive days streak
     surveysCompleted: number;
@@ -57,14 +56,6 @@ export interface Exercise extends FirestoreDocument {
   // Consider adding fields like: audioUrl, videoUrl, difficulty, tags
 }
 
-// Meditation document structure in the 'meditations' collection
-export interface Meditation extends FirestoreDocument {
-  title: string;
-  duration: number; // Duration in minutes
-  description: string;
-  audioUrl: string; // Path in Firebase Storage or full URL
-  // Consider adding fields like: category, tags, speaker, imageUrl
-}
 
 // Mood entry document structure in the 'moods' collection
 export interface MoodEntry extends FirestoreDocument {
@@ -94,7 +85,6 @@ export interface DailyStats extends FirestoreDocument {
   date: string; // 'YYYY-MM-DD' format string
   activeUsers: number; // Count of users active on this day
   newUsers: number; // Count of new users registered on this day
-  meditationMinutes: number; // Total minutes meditated across all users
   exercisesCompleted: number; // Total exercises completed across all users
   surveysCompleted: number; // Total surveys completed across all users
   timestamp: admin.firestore.Timestamp; // When this stats document was last updated/created
@@ -112,13 +102,13 @@ export interface UserProgress extends FirestoreDocument {
 // User activity document structure in 'users/{userId}/activities' subcollection
 export interface UserActivity extends FirestoreDocument {
   // userId is implicitly the parent document ID
-  type: 'meditation' | 'exercise' | 'mood' | 'survey'; // Type of activity logged
+  type: 'exercise' | 'mood' | 'survey';
   timestamp: admin.firestore.Timestamp; // When the activity occurred or was logged
   date?: string; // Optional 'YYYY-MM-DD' string for easier querying by date
   details?: { // Optional details specific to the activity type
-    title?: string; // e.g., Meditation or Exercise title
-    itemId?: string; // e.g., ID of the Meditation or Exercise document
-    duration?: number; // e.g., Duration of meditation/exercise in minutes
+    title?: string; // e.g., Exercise title
+    itemId?: string; // e.g., ID of the Exercise document
+    duration?: number; // e.g., Duration of exercise in minutes
     mood?: string; // e.g., Mood recorded
     moodValue?: number; // e.g., Value associated with mood
     surveyId?: string; // e.g., ID of the survey taken

@@ -34,10 +34,10 @@ export default function TabLayout() {
         name="exercises"
         options={{
           title: 'Exercises',
-          tabBarIcon: ({ color }) => (
-            <IconButton icon="meditation" size={24} iconColor={color} />
-          ),
-        }}
+            tabBarIcon: ({ color }) => (
+              <IconButton icon="lungs" size={24} iconColor={color} />
+            ),
+          }}
       />
       <Tabs.Screen
         name="profile"

@@ -10,14 +10,14 @@ import { getMessaging, MulticastMessage } from 'firebase-admin/messaging'; // Im
 const db = admin.firestore();
 const messaging = getMessaging();
 
-export const sendDailyMeditationReminder = onSchedule({
+export const sendDailyExerciseReminder = onSchedule({
   schedule: 'every day 09:00', // Adjust schedule as needed
   timeZone: 'Europe/Berlin', // Adjust timezone as needed
   retryCount: 3,
   memory: '256MiB',
   region: 'europe-west1' // Ensure this matches your function deployment region
 }, async (event: ScheduledEvent) => {
-  logger.info('Executing sendDailyMeditationReminder function', { structuredData: true });
+  logger.info('Executing sendDailyExerciseReminder function', { structuredData: true }); // Updated log message
 
   try {
     // 1. Query users who have reminders enabled
@@ -49,8 +49,8 @@ export const sendDailyMeditationReminder = onSchedule({
     // 2. Construct the notification message
     const message: MulticastMessage = {
       notification: {
-        title: 'Mindful Moment Reminder',
-        body: 'Time for your daily meditation practice. Find peace and clarity.',
+        title: 'Daily Exercise Reminder', // Updated title
+        body: 'Ready for your daily breathing exercise? Take a moment to focus and recharge.', // Updated body
       },
       // Add other options like data payload if needed
       // data: { /* your custom data */ },
@@ -80,7 +80,7 @@ export const sendDailyMeditationReminder = onSchedule({
     }
 
   } catch (error) {
-    logger.error('Error sending meditation reminders:', error);
+    logger.error('Error sending daily exercise reminders:', error); // Updated log message
     // Consider re-throwing or handling specific errors if needed
   }
 });

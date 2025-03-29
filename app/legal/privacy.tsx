@@ -20,7 +20,7 @@ export default function PrivacyPolicyScreen() {
       </Text>
 
       <Text style={[typographyStyles.text_body, legalStyles.legal_body]}>
-        We collect information that you provide directly to us, including:{"\n\n"}• Account information (email, name){"\n"}• Usage data (meditation sessions, mood tracking){"\n"}• Device information
+        We collect information that you provide directly to us, including:{"\n\n"}• Account information (email, name){"\n"}• Usage data (exercise sessions, mood tracking){"\n"}• Device information
       </Text>
 
       <Text style={[typographyStyles.text_heading3, legalStyles.legal_subheading]}>
