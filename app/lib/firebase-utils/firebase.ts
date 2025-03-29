@@ -22,8 +22,8 @@ export const db = getFirestore(app);
 // Storage
 export const storage = getStorage(app);
 
-// Functions
-export const functions = getFunctions(app);
+// Functions - Specify region
+export const functions = getFunctions(app, 'europe-west1');
 
 // Analytics (initialize only if supported)
 export let analytics: any = null; // Use let to allow reassignment
