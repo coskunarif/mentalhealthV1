@@ -1,0 +1,5 @@
+# .bundleignore - Add this file to your project root
+firebase/functions/lib/
+firebase/functions/src/
+node_modules/firebase-admin/
+node_modules/firebase-functions/

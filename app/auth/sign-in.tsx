@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { Text, TextInput, Button, useTheme } from 'react-native-paper';
+import { Text, Button, useTheme } from 'react-native-paper';
 import { Link, router } from 'expo-router';
-import styles from '../config/styles';
+import { layoutStyles, typographyStyles, buttonStyles } from '../config';
 import type { AppTheme } from '../types/theme';
-import { auth } from '../lib/firebase';
+import { auth } from '../lib/firebase-utils';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { AuthIllustration, MaterialInput } from '../components';
 
 export default function SignInScreen() {
   const theme = useTheme<AppTheme>();
+  console.log('Theme in SignInScreen:', theme); // Debug log
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSignIn = async () => {
-    if (loading) return;
+const handleSignIn = async () => {
+  console.log('Sign in button pressed');
+  if (loading) return;
     setLoading(true);
     setError('');
 
@@ -31,65 +35,76 @@ export default function SignInScreen() {
   };
 
   return (
-    <View style={styles.layout_container}>
-      <View style={styles.common_screen_auth_container}>
-        <View style={styles.signIn_screen_auth_form}>
-          <View style={styles.signIn_screen_auth_header}>
-            <Text style={styles.text_heading1}>Welcome Back</Text>
-            <Text style={[styles.text_body, styles.signIn_subtitle]}>
+    <View style={layoutStyles.layout_container}>
+      <View style={layoutStyles.common_screen_auth_container}>
+        <View style={[
+          layoutStyles.common_screen_auth_form,
+          {
+            elevation: 1,
+            backgroundColor: theme.colors.surface,
+            borderRadius: theme.componentSizes.cardBorderRadius,
+            shadowColor: theme.colors.shadow,
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.1,
+            shadowRadius: 3,
+            padding: theme.spacing.large,
+            width: '100%',
+            maxWidth: 400,
+          }
+        ]}>
+          <AuthIllustration type="login" />
+          <View style={layoutStyles.common_screen_auth_header}>
+            <Text style={typographyStyles.text_heading2}>Welcome Back</Text>
+            <Text style={[typographyStyles.text_body, { marginTop: theme.spacing?.tiny || 4 }]}>
               Sign in to continue your journey
             </Text>
           </View>
 
-          <View style={styles.component_input_container}>
-            <Text style={styles.component_input_label}>Email Address</Text>
-            <TextInput
-              mode="outlined"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              style={styles.component_input_field}
-              placeholder="Enter your email"
-              placeholderTextColor={theme.colors.onSurfaceVariant}
-            />
-          </View>
+          <MaterialInput
+            label="Email Address"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            placeholder="Enter your email"
+            error={error ? error : undefined}
+          />
 
-          <View style={styles.component_input_container}>
-            <Text style={styles.component_input_label}>Password</Text>
-            <TextInput
-              mode="outlined"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              style={styles.component_input_field}
-              placeholder="Enter your password"
-              placeholderTextColor={theme.colors.onSurfaceVariant}
-            />
-            {error ? (
-              <Text style={styles.component_input_error}>{error}</Text>
-            ) : null}
-          </View>
+          <MaterialInput
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholder="Enter your password"
+            style={{ marginTop: theme.spacing?.small || 8 }}
+          />
 
           <Button
             mode="contained"
             onPress={handleSignIn}
             loading={loading}
-            style={[styles.button_primary, { marginTop: 8 }]}
-            labelStyle={styles.text_button}
+            style={[
+              buttonStyles.button_primary,
+              {
+                marginTop: theme.spacing?.medium || 16,
+                elevation: 3,
+                height: 48,
+              }
+            ]}
+            labelStyle={typographyStyles.text_button}
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </Button>
 
-          <View style={styles.signIn_screen_auth_footer}>
-            <Text style={styles.text_body}>Don't have an account? </Text>
-            <Link href="/auth/sign-up" style={styles.text_link}>
+          <View style={layoutStyles.signIn_screen_auth_footer}>
+            <Text style={typographyStyles.text_body}>Don't have an account? </Text>
+            <Link href="/auth/sign-up" style={typographyStyles.text_link}>
               Sign Up
             </Link>
           </View>
 
-          <View style={styles.signIn_screen_auth_footer}>
-            <Link href="/auth/forgot-password" style={styles.text_link}>
+          <View style={layoutStyles.signIn_screen_auth_footer}>
+            <Link href="/auth/forgot-password" style={typographyStyles.text_link}>
               Forgot Password?
             </Link>
           </View>

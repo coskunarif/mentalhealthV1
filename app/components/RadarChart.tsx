@@ -1,33 +1,24 @@
-// File: app/components/RadarChart.tsx
-
-import React, { useState } from 'react';
-import { View, ViewStyle, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, ViewStyle, StyleSheet, useWindowDimensions, Text } from 'react-native';
 import { useTheme } from 'react-native-paper';
-import Svg, {
-  Path,
-  Circle,
-  Line,
-  Text as SvgText,
-} from 'react-native-svg';
+import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
 import type { AppTheme } from '../types/theme';
+import { safeStringify } from '../lib/debug-utils';
 
-interface DataPoint {
-  label?: string;   // Optional if you want dynamic labels per point
+export interface DataPoint {
+  label: string;
   value: number;
 }
 
 interface RadarChartProps {
   data: DataPoint[];
   style?: ViewStyle;
-  size?: number;         // Optional fixed size
-  strokeWidth?: number;  // Polygon stroke width
-  fillOpacity?: number;  // Polygon fill opacity
-  labels?: string[];     // Optionally override default labels
+  size?: number;
+  strokeWidth?: number;
+  fillOpacity?: number;
+  labels?: string[];
 }
 
-/**
- * Example default labels, if data points do not provide a label property.
- */
 const defaultLabels = [
   'Balance past memories',
   'Change your opinion',
@@ -39,126 +30,173 @@ const defaultLabels = [
 export default function RadarChart({
   data,
   style,
-  size, // If not provided, will be derived from screen width
+  size,
   strokeWidth = 2,
   fillOpacity = 0.25,
   labels,
 }: RadarChartProps) {
   const theme = useTheme<AppTheme>();
   const { width: screenWidth } = useWindowDimensions();
-
-  /**
-   * Determine chart size:
-   * - If `size` prop is provided, use it.
-   * - Otherwise, adapt to screen width with some padding (e.g., 32px).
-   * - You can clamp the max size to prevent overly large charts on tablets.
-   */
   const chartSize = size || Math.min(screenWidth - 32, 320);
-
-  // Combine default labels with optional custom labels
-  const chartLabels = labels || defaultLabels;
-  // Ensure data length matches label length
-  if (data.length !== chartLabels.length) {
-    console.warn(
-      'RadarChart: data length and label length mismatch. Truncating or adjusting data.'
+  
+  console.log('🔍 [CHART DEBUG] RadarChart rendering with data:', safeStringify(data));
+  console.log('🔍 [CHART DEBUG] RadarChart labels:', safeStringify(labels));
+  
+  // Validate and fix data using useMemo to avoid unnecessary recalculations
+  const { validData, chartLabels, hasError } = useMemo(() => {
+    let result = {
+      validData: [] as DataPoint[],
+      chartLabels: [] as string[],
+      hasError: false
+    };
+    
+    // Validate data
+    if (!data || !Array.isArray(data)) {
+      console.error('❌ [CHART DEBUG] Invalid data provided to RadarChart:', data);
+      result.validData = [];
+      result.hasError = true;
+    } else {
+      // Deep copy and validate each data point
+      result.validData = data.map((point, index) => {
+        if (!point || typeof point !== 'object') {
+          console.error(`❌ [CHART DEBUG] Invalid data point at index ${index}:`, point);
+          result.hasError = true;
+          return { label: `Unknown ${index}`, value: 0 };
+        }
+        
+        if (typeof point.value !== 'number' || isNaN(point.value)) {
+          console.error(`❌ [CHART DEBUG] Invalid value at index ${index}:`, point.value);
+          result.hasError = true;
+          return { ...point, value: 0 };
+        }
+        
+        if (point.value < 0 || point.value > 1) {
+          console.warn(`⚠️ [CHART DEBUG] Value out of range at index ${index}:`, point.value);
+          return { 
+            ...point, 
+            value: Math.min(Math.max(point.value, 0), 1) 
+          };
+        }
+        
+        return { ...point };
+      });
+    }
+    
+    // Validate labels
+    if (!labels || !Array.isArray(labels)) {
+      console.error('❌ [CHART DEBUG] Invalid labels provided to RadarChart:', labels);
+      result.chartLabels = [...defaultLabels];
+      result.hasError = true;
+    } else {
+      result.chartLabels = [...labels];
+    }
+    
+    // Check for length mismatch
+    if (result.validData.length !== result.chartLabels.length) {
+      console.warn(
+        `⚠️ [CHART DEBUG] Data length (${result.validData.length}) and label length (${result.chartLabels.length}) mismatch.`
+      );
+      
+      // If we have more data points than labels, truncate data
+      if (result.validData.length > result.chartLabels.length) {
+        console.warn('⚠️ [CHART DEBUG] Truncating data to match labels length');
+        result.validData = result.validData.slice(0, result.chartLabels.length);
+      }
+      
+      // If we have more labels than data points, add dummy data points
+      if (result.validData.length < result.chartLabels.length) {
+        console.warn('⚠️ [CHART DEBUG] Adding dummy data points to match labels length');
+        const dummyPoints = result.chartLabels.slice(result.validData.length).map((label, index) => ({
+          label,
+          value: 0
+        }));
+        result.validData = [...result.validData, ...dummyPoints];
+      }
+    }
+    
+    return result;
+  }, [data, labels]);
+  
+  // If we have no valid data or labels, show a placeholder
+  if (validData.length === 0 || chartLabels.length === 0) {
+    return (
+      <View style={[styles.container, style, styles.placeholderContainer]}>
+        <Text style={styles.placeholderText}>No data available</Text>
+      </View>
     );
-    data = data.slice(0, chartLabels.length);
   }
-
-  // Chart geometry
   const center = chartSize / 2;
-  const padding = 50; // Additional padding to avoid label cutoff
+  const padding = 50; // Increased padding
   const radius = (chartSize - padding * 2) / 2;
   const angleStep = (Math.PI * 2) / chartLabels.length;
-
-  // The polygon stroke color & fill from theme
   const polygonStrokeColor = theme.colors.primary;
   const polygonFillColor = theme.colors.primary;
-
-  // For grid lines & circles, use an outline variant or subtle color
-  const gridColor = theme.colors.outlineVariant + '80'; // '80' => ~50% opacity
+  const gridColor = theme.colors.outlineVariant + '80';
   const gridStrokeWidth = 1;
-
-  // For data points, pick a highlight color
   const pointColor = theme.colors.secondary;
 
-  /**
-   * Helper: Convert a data value and angle index to chart coordinates.
-   */
   const getCoordinates = (value: number, index: number) => {
     const angle = index * angleStep - Math.PI / 2;
     const distance = value * radius;
-    return {
-      x: center + distance * Math.cos(angle),
-      y: center + distance * Math.sin(angle),
-    };
+    return { x: center + distance * Math.cos(angle), y: center + distance * Math.sin(angle) };
   };
 
-  /**
-   * Helper: Coordinates for label positioning, slightly outside the polygon.
-   */
   const getLabelCoordinates = (index: number) => {
     const angle = index * angleStep - Math.PI / 2;
-    const labelDistance = radius + 20; // how far labels sit from the outer radius
-    return {
-      x: center + labelDistance * Math.cos(angle),
-      y: center + labelDistance * Math.sin(angle),
-    };
+    const labelDistance = radius + 20; // Reduced distance
+    return { x: center + labelDistance * Math.cos(angle), y: center + labelDistance * Math.sin(angle) };
   };
 
-  /**
-   * Logic to position & anchor multiline labels
-   */
   const getLabelLayout = (index: number) => {
     const angle = index * angleStep - Math.PI / 2;
     const { x, y } = getLabelCoordinates(index);
     let textAnchor: 'start' | 'middle' | 'end' = 'middle';
     let xOffset = 0;
     let yOffset = 0;
-    const maxWidth = 80;
+    const maxWidth = 100;
 
-    // Quadrant-based logic to shift label
-    if (angle >= -Math.PI / 4 && angle <= Math.PI / 4) {
-      textAnchor = 'start';
-      xOffset = 8;
-    } else if (angle >= (3 * Math.PI) / 4 || angle <= -(3 * Math.PI) / 4) {
-      textAnchor = 'end';
-      xOffset = -8;
-    } else if (angle > Math.PI / 4 && angle < (3 * Math.PI) / 4) {
-      textAnchor = 'middle';
-      yOffset = 16;
+    //No xOffset
+
+    // Dynamic yOffset based on angle (above or below the center)
+    if (angle > 0 && angle < Math.PI) {
+      yOffset = 10; // Below the center
+    } else if (angle < 0 && angle > -Math.PI) {
+      yOffset = -8; // Above the center
     } else {
-      textAnchor = 'middle';
-      yOffset = -16;
+      yOffset = -6;
     }
 
-    // Split label text for multiline rendering
+    if (angle === Math.PI) { //Special case for the bottom label
+      yOffset = 20;
+    }
+
     const words = chartLabels[index].split(' ');
     const lines: string[] = [];
     let currentLine = '';
-
     words.forEach((word) => {
       const testLine = currentLine ? `${currentLine} ${word}` : word;
-      // Rough approximation of text width
-      if (testLine.length * 5 > maxWidth && currentLine) {
+      if (testLine.length * 6 > maxWidth && currentLine) {
         lines.push(currentLine);
         currentLine = word;
       } else {
         currentLine = testLine;
       }
     });
-    if (currentLine) {
-      lines.push(currentLine);
-    }
-
-    return { x, y, textAnchor, xOffset, yOffset, lines };
+    if (currentLine) lines.push(currentLine);
+    return {
+      x,
+      y,
+      textAnchor,
+      xOffset,
+      yOffset,
+      lines,
+      fill: theme.colors.onSurface,
+      fontWeight: '500',
+    };
   };
 
-  /**
-   * Generate circular grid lines
-   */
   const gridCircles = [];
-  const gridSteps = 5; // number of concentric circles
+  const gridSteps = 5;
   for (let i = 1; i <= gridSteps; i++) {
     const gridRadius = (radius / gridSteps) * i;
     gridCircles.push(
@@ -167,18 +205,16 @@ export default function RadarChart({
         cx={center}
         cy={center}
         r={gridRadius}
-        stroke={gridColor}
-        strokeWidth={gridStrokeWidth}
+        stroke={theme.colors.outlineVariant}
+        strokeWidth={1}
+        strokeOpacity={i === gridSteps ? 0.8 : 0.4}
         fill="none"
       />
     );
   }
 
-  /**
-   * Generate radial lines from center
-   */
   const radialLines = chartLabels.map((_, idx) => {
-    const { x, y } = getCoordinates(1, idx); // full radius
+    const { x, y } = getCoordinates(1, idx);
     return (
       <Line
         key={`radial-line-${idx}`}
@@ -192,56 +228,84 @@ export default function RadarChart({
     );
   });
 
-  /**
-   * Compute data polygon points
-   */
-  const points = data.map((item, idx) => getCoordinates(item.value, idx));
-  const pathData =
-    points
+  const points = validData.map((item, idx) => getCoordinates(item.value, idx));
+  
+  // Only create a path if we have at least 3 points (to form a polygon)
+  let pathData = '';
+  if (points.length >= 3) {
+    pathData = points
       .map((p, idx) => (idx === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`))
       .join(' ') + ' Z';
+  }
 
   return (
     <View style={[styles.container, style]}>
+      {hasError && (
+        <Text style={styles.errorText}>
+          Some data may be incomplete or missing
+        </Text>
+      )}
       <Svg width={chartSize} height={chartSize}>
-        {/* Grid Circles & Radial Lines */}
         {gridCircles}
         {radialLines}
-
-        {/* Data Polygon */}
-        <Path
-          d={pathData}
-          stroke={polygonStrokeColor}
-          strokeWidth={strokeWidth}
-          fill={polygonFillColor}
-          fillOpacity={fillOpacity}
-        />
-
-        {/* Data Points */}
-        {points.map((point, idx) => (
-          <Circle
-            key={`data-point-${idx}`}
-            cx={point.x}
-            cy={point.y}
-            r={5}
-            fill={pointColor}
-            stroke={theme.colors.background} 
-            strokeWidth={2}
-            accessibilityLabel={`${chartLabels[idx]}: ${data[idx].value}`}
+        {pathData && (
+          <Path
+            d={pathData}
+            stroke={polygonStrokeColor}
+            strokeWidth={strokeWidth}
+            fill={polygonFillColor}
+            fillOpacity={fillOpacity}
           />
+        )}
+        {points.map((point, idx) => (
+          <React.Fragment key={`data-point-${idx}`}>
+            <Circle
+              cx={point.x}
+              cy={point.y}
+              r={24}
+              fill="transparent"
+              accessibilityLabel={`${chartLabels[idx]}: ${validData[idx].value}`}
+            />
+            <Circle
+              cx={point.x}
+              cy={point.y}
+              r={8}
+              fill={pointColor}
+              stroke={theme.colors.background}
+              strokeWidth={2}
+            />
+            <Circle
+              cx={point.x}
+              cy={point.y - 16}
+              r={14}
+              fill="#FFFFFF"
+              fillOpacity={0.8}
+              stroke={theme.colors.primary}
+              strokeWidth={0.5}
+            />
+            <SvgText
+              x={point.x}
+              y={point.y - 16}
+              fontSize={12}
+              fontWeight="700"
+              fill="#4A4A4A"
+              textAnchor="middle"
+              dy={4}
+            >
+              {(typeof validData[idx].value === 'number' ? (validData[idx].value * 100).toFixed(0) : '0')}%
+            </SvgText>
+          </React.Fragment>
         ))}
-
-        {/* Labels */}
         {chartLabels.map((_, idx) => {
           const { x, y, textAnchor, xOffset, yOffset, lines } = getLabelLayout(idx);
           return lines.map((line, lineIndex) => (
             <SvgText
               key={`label-${idx}-line-${lineIndex}`}
               x={x + xOffset}
-              y={y + yOffset + lineIndex * 12} // line spacing
-              fontSize={10}
-              fill={theme.colors.onSurfaceVariant}
-              fontFamily={theme.fonts.bodyMedium.fontFamily} // or 'Kameron'
+              y={y + yOffset + lineIndex * 12}
+              fontSize={12}
+              fontWeight="500"
+              fill={theme.colors.onSurface}
               textAnchor={textAnchor}
             >
               {line}
@@ -255,9 +319,26 @@ export default function RadarChart({
 
 const styles = StyleSheet.create({
   container: {
-    // Center the chart and provide padding for small screens
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 16,
+    padding: 8,
   },
+  placeholderContainer: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: '#666',
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#ff6b6b',
+    marginBottom: 8,
+    textAlign: 'center',
+  }
 });

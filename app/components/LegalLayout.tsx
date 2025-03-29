@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { IconButton } from 'react-native-paper';
-import { router } from 'expo-router';
-import styles from '../config/styles';
+import { View, Text } from 'react-native';
+import { useAppTheme } from '../hooks/useAppTheme'; // Import hook
+import { ScreenLayout } from './ScreenLayout';
+import type { AppTheme } from '../types/theme'; // Import AppTheme
 
 interface LegalLayoutProps {
   title: string;
@@ -10,30 +10,26 @@ interface LegalLayoutProps {
   lastUpdated?: string;
 }
 
-export default function LegalLayout({ title, children, lastUpdated }: LegalLayoutProps) {
+export default function LegalLayout({
+  title,
+  children,
+  lastUpdated,
+}: LegalLayoutProps) {
+  const theme = useAppTheme(); // Use hook
   return (
-    <View style={styles.layout_container}>
-      <View style={styles.screen_legal_header}>
-        <IconButton
-          icon="arrow-left"
-          size={24}
-          onPress={() => router.back()}
-        />
-        <Text style={styles.text_heading1}>{title}</Text>
-      </View>
-
-      <ScrollView
-        style={styles.layout_scrollView}
-        contentContainerStyle={styles.layout_content}
-      >
-        {children}
-
-        {lastUpdated && (
-          <Text style={[styles.text_caption, { marginTop: 24 }]}>
-            Last updated: {lastUpdated}
-          </Text>
-        )}
-      </ScrollView>
-    </View>
+    <ScreenLayout title={title}>
+      {children}
+      {lastUpdated && (
+        <Text
+          style={{
+            ...theme.fonts.labelMedium,
+            color: theme.colors.onSurfaceVariant,
+            marginTop: theme.spacing.large,
+          }}
+        >
+          Last updated: {lastUpdated}
+        </Text>
+      )}
+    </ScreenLayout>
   );
 }

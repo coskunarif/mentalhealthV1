@@ -1,42 +1,23 @@
 import React from 'react';
 import { Stack } from 'expo-router';
-import styles from '../config/styles';
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-
-const screenOptions: NativeStackNavigationOptions = {
-  headerShown: false,
-  animation: 'default',
-  contentStyle: { backgroundColor: 'transparent' },
-};
+import { useTheme } from 'react-native-paper';
+import type { AppTheme } from '../types/theme';
 
 export default function AuthLayout() {
+  const theme = useTheme<AppTheme>();
+  
   return (
     <Stack
       screenOptions={{
-        ...screenOptions,
+        headerShown: false,
         contentStyle: {
-          backgroundColor: styles.common_screen_auth_container.backgroundColor,
+          backgroundColor: theme.colors.background,
         },
       }}
     >
-      <Stack.Screen
-        name="sign-in"
-        options={{
-          title: 'Sign In',
-        }}
-      />
-      <Stack.Screen
-        name="sign-up"
-        options={{
-          title: 'Sign Up',
-        }}
-      />
-      <Stack.Screen
-        name="forgot-password"
-        options={{
-          title: 'Forgot Password',
-        }}
-      />
+      <Stack.Screen name="sign-in" />
+      <Stack.Screen name="sign-up" />
+      <Stack.Screen name="forgot-password" />
     </Stack>
   );
 }
