@@ -1,7 +1,8 @@
 import { getFunctions, httpsCallable, HttpsCallableResult } from 'firebase/functions';
 import { app } from '../lib/firebase-utils';
 
-const functions = getFunctions(app);
+// Specify the region for Cloud Functions
+const functions = getFunctions(app, 'europe-west1');
 
 // Define types for your function responses
 interface UserStatsResponse {
