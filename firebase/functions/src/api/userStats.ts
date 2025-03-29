@@ -43,8 +43,8 @@ interface UserStats {
 
 export const getUserStats = onCall({
   timeoutSeconds: 30,
-  memory: '256MiB',
-  region: 'europe-west1'
+  memory: '256MiB'
+  // Region is set globally in index.ts
 // Add type for request based on usage
 }, async (request: { auth?: { uid: string }, data?: any }) => { // Add data to type annotation
   console.log('[DEBUG] getUserStats Cloud Function called');

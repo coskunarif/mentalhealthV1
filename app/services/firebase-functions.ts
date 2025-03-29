@@ -1,5 +1,8 @@
-import { httpsCallable, HttpsCallableResult } from 'firebase/functions';
-import { functions } from '../lib/firebase-utils'; // Import the configured functions instance
+import { httpsCallable, HttpsCallableResult, getFunctions } from 'firebase/functions'; // Added getFunctions import
+import { app } from '../lib/firebase'; // Import only the 'app' instance
+
+// Initialize functions directly here, specifying the region
+const functions = getFunctions(app, 'europe-west1');
 
 // Define types for your function responses
 interface UserStatsResponse {
@@ -32,5 +35,3 @@ export const ensureUserDocument = httpsCallable<void, {success: boolean, message
   functions, 
   'ensureUserDocument'
 );
-
-export default {};
