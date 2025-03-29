@@ -1,6 +1,5 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import styles from '../config/styles';
 import { IconButton, useTheme } from 'react-native-paper';
 import type { AppTheme } from '../types/theme';
 
@@ -19,10 +18,7 @@ export default function TabLayout() {
         },
         tabBarActiveTintColor: theme.colors.primary,
         tabBarInactiveTintColor: theme.colors.onSurfaceVariant,
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontFamily: 'Kameron',
-        },
+        tabBarLabelStyle: { ...theme.fonts.labelMedium },
       }}
     >
       <Tabs.Screen
@@ -30,11 +26,16 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => (
-            <IconButton 
-              icon="home" 
-              size={24} 
-              iconColor={color}
-            />
+            <IconButton icon="home" size={24} iconColor={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="exercises"
+        options={{
+          title: 'Exercises',
+          tabBarIcon: ({ color }) => (
+            <IconButton icon="meditation" size={24} iconColor={color} />
           ),
         }}
       />
@@ -43,11 +44,7 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => (
-            <IconButton 
-              icon="account" 
-              size={24} 
-              iconColor={color}
-            />
+            <IconButton icon="account" size={24} iconColor={color} />
           ),
         }}
       />

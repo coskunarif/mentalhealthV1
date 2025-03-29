@@ -1,17 +1,27 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from 'firebase/auth';
-import { auth } from '../lib/firebase';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+// Use aliased import for firebase/auth User and remove User from firebase-utils import
+import { auth, db } from '../lib/firebase-utils';
+import { onAuthStateChanged, User as FirebaseAuthUser } from 'firebase/auth';
+import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore'; // Import onSnapshot and Unsubscribe
+import UserService from '../services/user.service'; // Import UserService
+import { UserModel } from '../models/user.model'; // Import UserModel
+
+// Combine Auth user properties with our Firestore model properties
+// Ensure required Auth properties (like uid, email) are present
+// Make Firestore specific fields potentially optional if they might not exist immediately
+type AppUser = Omit<FirebaseAuthUser, 'displayName' | 'photoURL'> & Partial<Omit<UserModel, 'uid' | 'email'>>;
 
 interface AuthContextType {
-  user: User | null;
+  user: AppUser | null; // Use the combined AppUser type
   initialized: boolean;
+  loading: boolean;
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType>({
+export const AuthContext = createContext<AuthContextType>({
   user: null,
   initialized: false,
+  loading: true,
   signOut: async () => {},
 });
 
@@ -20,81 +30,130 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [initialized, setInitialized] = useState(false);
+  const [user, setUser] = useState<AppUser | null>(null); // Use AppUser type for state
+  const [initialized, setInitialized] = useState(false); // Tracks if initial auth check is done
+  const [loading, setLoading] = useState(true); // Tracks if user data (including Firestore) is loaded
+  const firestoreUnsubscribeRef = useRef<Unsubscribe | null>(null); // Ref to store Firestore listener unsubscribe function
 
   useEffect(() => {
-    console.log("Setting up auth state listener");
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      console.log("Auth state changed:", {
-        userId: user?.uid,
-        isAuthenticated: !!user,
-        previouslyInitialized: initialized
-      });
-      setUser(user);
-      setInitialized(true);
+    // Subscribe to auth state changes
+    // Use FirebaseAuthUser type for the authUser parameter
+    const authUnsubscribe = onAuthStateChanged(auth, (authUser: FirebaseAuthUser | null) => {
+      console.log('Auth state changed. authUser:', authUser?.uid);
+
+      // Unsubscribe from previous Firestore listener if it exists
+      if (firestoreUnsubscribeRef.current) {
+        console.log('Unsubscribing from previous Firestore listener.');
+        firestoreUnsubscribeRef.current();
+        firestoreUnsubscribeRef.current = null;
+      }
+      
+      // Reset state before checking new user
+      setUser(null); 
+      setLoading(true); // Start loading until Firestore data is confirmed or user is null
+
+      if (authUser) {
+        // Add this line to ensure user document exists
+        UserService.ensureUserDocument(authUser.uid)
+          .catch(err => console.error('Error ensuring user document:', err));
+          
+        console.log(`User ${authUser.uid} logged in. Setting up Firestore listener.`);
+        const userRef = doc(db, 'users', authUser.uid);
+
+        // Subscribe to the user document in Firestore
+        firestoreUnsubscribeRef.current = onSnapshot(userRef, (snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.data();
+            console.log(`Firestore data received for ${authUser.uid}:`, userData);
+            // Merge auth user with DB data
+            const enhancedUser = {
+              ...authUser,
+              // Explicitly pull fields from userData, falling back to authUser if needed
+              displayName: userData.displayName ?? authUser.displayName,
+              photoURL: userData.photoURL ?? authUser.photoURL,
+              // Add other relevant fields from your Firestore user model
+              settings: userData.settings, // Load settings from Firestore
+              stats: userData.stats,       // Load stats from Firestore
+            };
+            // Ensure we have a valid user object structure even if Firestore data is partial
+            const completeUser = {
+              ...enhancedUser,
+              settings: enhancedUser.settings || {}, // Default to empty object if undefined
+              stats: enhancedUser.stats || {},       // Default to empty object if undefined
+            };
+            setUser(completeUser as AppUser); // Cast to AppUser
+            setInitialized(true); // Auth check done
+            setLoading(false); // Firestore data loaded
+          } else {
+            // Document doesn't exist YET. Keep loading.
+            // This handles the race condition. The listener will fire again when the doc is created.
+            console.log(`Firestore document for ${authUser.uid} does not exist yet. Waiting...`);
+            // Cast authUser to AppUser, acknowledging Firestore fields might be missing initially
+            setUser(authUser as AppUser);
+            setInitialized(true); // Auth check is done, but data isn't fully loaded
+            setLoading(true); // Explicitly keep loading
+          }
+        }, (error) => {
+          console.error(`Error listening to Firestore document for ${authUser.uid}:`, error);
+          // Fallback to auth user data, but stop loading
+          // Cast authUser to AppUser, acknowledging Firestore fields might be missing
+          setUser(authUser as AppUser);
+          setInitialized(true);
+          setLoading(false); // Stop loading even on error
+        });
+
+      } else {
+        // User is logged out
+        console.log('User logged out.');
+        setUser(null);
+        setInitialized(true); // Auth check done
+        setLoading(false); // No user, so not loading
+      }
     }, (error) => {
-      console.error("Auth state change error:", error);
+      // Error during initial auth state check
+      console.error('Auth state change error:', error);
+      setUser(null);
+      setInitialized(true);
+      setLoading(false);
     });
 
+    // Cleanup function for the useEffect hook
     return () => {
-      console.log("Cleaning up auth state listener");
-      unsubscribe();
+      console.log('Cleaning up AuthProvider useEffect.');
+      authUnsubscribe(); // Unsubscribe from auth state changes
+      // Unsubscribe from Firestore listener if it's active
+      if (firestoreUnsubscribeRef.current) {
+        console.log('Unsubscribing from Firestore listener during cleanup.');
+        firestoreUnsubscribeRef.current();
+      }
     };
-  }, [initialized]);
+  }, []); // Empty dependency array ensures this runs only once on mount
 
-  const signOut = async () => {
+  const handleSignOut = async () => {
     try {
-      console.log("Starting sign-out process");
-      console.log("Current user:", auth.currentUser?.uid);
-
-      // Sign out from Firebase
-      console.log("Calling auth.signOut()");
+      setLoading(true);
       await auth.signOut();
-      console.log("auth.signOut() completed");
-
-      // Clear Firebase persistence key from AsyncStorage
-      const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
-      const persistenceKey = `firebase:authUser:${projectId}:[DEFAULT]`;
-      console.log(`Clearing AsyncStorage key: ${persistenceKey}`);
-      await AsyncStorage.removeItem(persistenceKey);
-      console.log("Firebase persistence key removed");
-
-      // Verify auth state
-      console.log("Verifying auth state after sign-out");
-      console.log("Current auth state:", {
-        currentUser: auth.currentUser?.uid,
-        isSignedIn: !!auth.currentUser
-      });
-
-      // Reset user state
-      console.log("Resetting user state");
       setUser(null);
-      
-      console.log("Sign-out process completed successfully");
-      
-      // Note: Navigation will be handled automatically by the root navigator
-      // when auth state changes to null
-    } catch (error: any) { // Type assertion for error object
+    } catch (error) {
       console.error('Error signing out:', error);
-      console.error('Error details:', {
-        name: error?.name,
-        message: error?.message,
-        code: error?.code,
-        stack: error?.stack
-      });
-      throw error; // Propagate error to be handled by the UI
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
+  const authContextValue: AuthContextType = {
+    user,
+    initialized,
+    loading,
+    signOut: handleSignOut
+  };
+
   return (
-    <AuthContext.Provider value={{ user, initialized, signOut }}>
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export default {
-  useAuth,
-  AuthProvider
-}
+export default AuthProvider;

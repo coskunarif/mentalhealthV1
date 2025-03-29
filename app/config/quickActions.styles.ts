@@ -1,42 +1,46 @@
-// File: app/components/QuickActions.styles.ts
 import { StyleSheet } from 'react-native';
-import { theme } from '../config/theme';
-
-const spacing = {
-  xSmall: 4,
-  small: 8,
-  medium: 16,
-};
-
-const shape = {
-  borderRadius: 8,
-};
+import { lightTheme as theme } from './theme'; // Import lightTheme as theme
 
 export default StyleSheet.create({
-  surface: {
-    marginBottom: spacing.medium,
-    padding: spacing.medium,
-    borderRadius: shape.borderRadius,
-    elevation: 2, // Directly using a number for elevation
-    backgroundColor: theme.colors.surface,
+  container: {
+    marginVertical: 16, // Match the other cards' vertical spacing
+    // Remove any horizontal margins or padding that affect width
+    padding: 0, // Remove padding and handle it inside
   },
-  headerText: {
-    marginBottom: spacing.small,
-    color: theme.colors.onSurface,
+  title: {
+    marginBottom: 20,
+    paddingHorizontal: 16,
+    fontSize: 20,
+    fontWeight: '500',
   },
-  actionsContainer: {
+  fabContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap', // allows wrap on smaller screens
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
+    paddingVertical: 16, // Increased from 12
+    paddingHorizontal: 16,
+    paddingBottom: 20, // Added extra bottom padding
+  },
+  fabButton: {
+    width: 72, // Increased from 64
+    height: 72, // Increased from 64
+    borderRadius: 36, // Half of width/height
+    justifyContent: 'center',
     alignItems: 'center',
+    elevation: 6,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    backgroundColor: theme.colors.primary,
   },
-  button: {
-    flexBasis: '48%',
-    marginVertical: spacing.xSmall,
-    borderRadius: shape.borderRadius,
+  labelContainer: {
+    alignItems: 'center',
+    marginTop: 14, // Increased from 10 for more spacing between button and label
   },
-  buttonLabel: {
-    fontSize: 14, // example
-    textTransform: 'none',
+  labelText: {
+    fontSize: 14, // Increased from 13
+    fontWeight: '500',
+    color: theme.colors.onSurface,
+    textAlign: 'center',
   },
 });

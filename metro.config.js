@@ -1,12 +1,24 @@
 const { getDefaultConfig } = require('expo/metro-config');
+const path = require('path');
 
-/** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
 
-config.resolver.assetExts.push('mp3');
-config.watchFolders = [
-  ...config.watchFolders || [],
-  `${__dirname}/assets`,
-];
+// Ensure we properly resolve modules
+config.resolver.extraNodeModules = {
+  ...config.resolver.extraNodeModules,
+  'firebase-functions': path.resolve(__dirname, './app/lib/mocks/firebase-functions.js'),
+  'firebase-admin': path.resolve(__dirname, './app/lib/mocks/firebase-admin.js')
+};
+
+// Handle resolution errors
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName.includes('firebase-admin') || moduleName.includes('firebase-functions')) {
+    return {
+      filePath: path.resolve(__dirname, './app/lib/mocks/firebase-functions.js'),
+      type: 'sourceFile',
+    };
+  }
+  return context.resolveRequest(context, moduleName, platform);
+};
 
 module.exports = config;

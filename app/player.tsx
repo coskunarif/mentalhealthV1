@@ -1,35 +1,24 @@
-// File: app/player.tsx
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import {
-  View,
-  Animated,
-  Easing,
-  StyleSheet,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
+import { View, Animated, Easing, StyleSheet } from 'react-native';
 import { Text, IconButton, Surface, useTheme } from 'react-native-paper';
 import { Audio, AVPlaybackStatus, AVPlaybackStatusError } from 'expo-av';
 import { router, useLocalSearchParams } from 'expo-router';
+import { ExerciseService } from './services/exercise.service';
+import { MeditationService } from './services/meditation.service'; // Import MeditationService
 import Svg, { Circle } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { RootStackParamList } from './types/navigation';
 import type { AppTheme } from './types/theme';
 import type { ViewStyle, TextStyle } from 'react-native';
+import { ScreenLayout } from './components/ScreenLayout';
+import { UserService } from './services/user.service';
+import { useAuth } from './context/auth';
 
-interface PlayerProps {
-  audioUrl: string;
-  title: string;
-  duration: string;
-}
+// Remove unused PlayerProps interface
 
-/**
- * Adjust these sizes to ensure the UI fits comfortably on smaller screens.
- */
-const MANDALA_SIZE = 200; // Reduced from 240
-const TIMER_SIZE = 260;   // Reduced from 300
-const CIRCLE_RADIUS = 120; 
-// 2 * π * 120 ≈ 753.6, so round to 754 for strokeDasharray.
+const MANDALA_SIZE = 200;
+const TIMER_SIZE = 260;
+const CIRCLE_RADIUS = 120;
 const CIRCLE_LENGTH = 754;
 
 const createStyles = (theme: AppTheme) =>
@@ -38,8 +27,6 @@ const createStyles = (theme: AppTheme) =>
       flex: 1,
       backgroundColor: theme.colors.background,
     } as ViewStyle,
-
-    // Reduced top padding from 48 to 24 to save vertical space
     header: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -47,131 +34,145 @@ const createStyles = (theme: AppTheme) =>
       paddingTop: 24,
       paddingBottom: 16,
     } as ViewStyle,
-
-    headerText: {
-      marginLeft: 16,
-    } as ViewStyle,
-
-    title: {
-      ...theme.fonts.headlineMedium,
-      color: theme.colors.onSurface,
-    } as TextStyle,
-
-    subtitle: {
-      ...theme.fonts.bodyMedium,
-      color: theme.colors.onSurfaceVariant,
-    } as TextStyle,
-
-    /**
-     * Changed justifyContent from 'space-around' to 'center' and
-     * reduced vertical padding to ensure elements fit better.
-     */
+    headerText: { marginLeft: 16 } as ViewStyle,
+    title: { ...theme.fonts.headlineMedium, color: theme.colors.onSurface } as TextStyle,
+    subtitle: { ...theme.fonts.bodyMedium, color: theme.colors.onSurfaceVariant } as TextStyle,
     content: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
       paddingVertical: 16,
     } as ViewStyle,
-
-    /**
-     * Reduced mandala size from 240 -> 200 to free up space.
-     */
     mandalaContainer: {
       width: MANDALA_SIZE,
       height: MANDALA_SIZE,
       alignItems: 'center',
       justifyContent: 'center',
       opacity: 0.8,
-      marginBottom: 16, // Provide spacing below the mandala
+      marginBottom: 16,
     } as ViewStyle,
-
-    mandala: {
-      position: 'absolute',
-    } as ViewStyle,
-
-    /**
-     * Reduced timer container from 300 -> 260
-     */
+    mandala: { position: 'absolute' } as ViewStyle,
     timerContainer: {
       position: 'relative',
       width: TIMER_SIZE,
       height: TIMER_SIZE,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: 16, // Space below the timer for the button
+      marginBottom: 16,
     } as ViewStyle,
-
     svg: {
       position: 'absolute',
       transform: [{ rotate: '-90deg' }],
     } as ViewStyle,
-
-    timerText: {
-      alignItems: 'center',
-    } as ViewStyle,
-
-    currentTime: {
-      ...theme.fonts.displayLarge,
-      color: theme.colors.onSurface,
-    } as TextStyle,
-
-    totalTime: {
-      ...theme.fonts.titleMedium,
-      color: theme.colors.onSurfaceVariant,
-      marginTop: 8,
-    } as TextStyle,
-
-    /**
-     * Reduced marginTop to 0 or 8 to keep the button closer to the timer.
-     */
-    controls: {
-      alignItems: 'center',
-      marginTop: 8,
-    } as ViewStyle,
-
-    /**
-     * Increase padding and add borderRadius/elevation for clearer CTA.
-     */
+    timerText: { alignItems: 'center' } as ViewStyle,
+    currentTime: { ...theme.fonts.displayLarge, color: theme.colors.onSurface } as TextStyle,
+    totalTime: { ...theme.fonts.titleMedium, color: theme.colors.onSurfaceVariant, marginTop: 8 } as TextStyle,
+    controls: { alignItems: 'center', marginTop: 8 } as ViewStyle,
     playButton: {
       backgroundColor: theme.colors.surfaceVariant,
       borderRadius: 36,
       elevation: 4,
       padding: 8,
     } as ViewStyle,
-
-    /**
-     * Optional style for debug text.
-     */
-    debugText: {
-      padding: 10,
-      backgroundColor: '#f0f0f0',
+    breathingGuideText: {
+      ...theme.fonts.titleMedium,
+      color: theme.colors.primary,
+      marginBottom: 16,
+      opacity: 0.8,
+      textAlign: 'center',
     } as TextStyle,
+    gradientContainer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: -1,
+    } as ViewStyle,
+    backgroundBase: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+    } as ViewStyle,
+    colorLayer: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: theme.colors.primary,
+    } as ViewStyle,
   });
 
 export default function PlayerScreen() {
-  // Use useRef to store the sound instance persistently
   const soundRef = useRef<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(0); // Keep duration state (will be set from fetched data or audio file)
   const [position, setPosition] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [debugMessage, setDebugMessage] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true); // Keep loading state
+  const [meditationData, setMeditationData] = useState<{ title: string; audioUrl: string; duration: number; description?: string } | null>(null); // State for fetched data
 
-  const { meditationId, title = 'Meditation', subtitle = 'Exercise' } =
-    useLocalSearchParams<RootStackParamList['player']>();
+  // Get params, provide defaults
+  const params = useLocalSearchParams<RootStackParamList['player']>();
+  const meditationId = params.meditationId;
+  const type = params.type || 'meditation'; // Default to meditation if type is missing
+  // Title/subtitle will come from fetched data or defaults if fetch fails
+
   const theme = useTheme<AppTheme>();
   const styles = createStyles(theme);
 
-  // Initialize animation values only once
-  const spinValue = useRef(new Animated.Value(0)).current;
+  const { user } = useAuth();
+  const userId = user?.uid || ''; // Provide default empty string
 
-  // Load and configure audio on mount
+  const [breathingPhase, setBreathingPhase] = useState<'inhale' | 'exhale' | 'hold'>('inhale');
+  const [breathingCycleCount, setBreathingCycleCount] = useState(0);
+  const scaleValue = useRef(new Animated.Value(0.8)).current;
+  const backgroundIntensity = useRef(new Animated.Value(0)).current;
+
+  const inhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+  const exhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+  const bgInhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+  const bgExhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+
+  // Fetch meditation data
+  useEffect(() => {
+    const fetchMeditation = async () => {
+      if (!meditationId || type !== 'meditation') {
+        // If it's an exercise or no ID, don't fetch meditation data
+        // Use default/passed title/subtitle later if needed
+        setIsLoading(false); // Stop loading if not fetching
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const data = await MeditationService.getMeditationById(meditationId);
+        if (data) {
+          setMeditationData(data);
+          // Optionally set initial duration from Firestore data if available
+          // setDuration(data.duration * 60000); // Assuming duration is in minutes
+        } else {
+          console.error('Meditation not found');
+          // Handle error: maybe show default title/subtitle or navigate back
+        }
+      } catch (error) {
+        console.error('Error fetching meditation data:', error);
+        // Handle error
+      } finally {
+        // Loading of audio will happen next, keep setIsLoading(false) there
+      }
+    };
+    fetchMeditation();
+  }, [meditationId, type]);
+
+
   useEffect(() => {
     let isMounted = true;
 
-    const initializeAudio = async () => {
+    // Initialize audio settings once
+    const initializeAudioSettings = async () => {
       try {
-        setDebugMessage('Configuring audio session...');
         await Audio.setAudioModeAsync({
           allowsRecordingIOS: false,
           staysActiveInBackground: true,
@@ -179,55 +180,122 @@ export default function PlayerScreen() {
           shouldDuckAndroid: true,
           playThroughEarpieceAndroid: false,
         });
-
-        const audioSource = require('../assets/meditations/sample.mp3');
-        console.log('Audio file reference:', audioSource);
-
-        if (isMounted) {
-          await loadAudio();
-        }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-        setDebugMessage(`Audio initialization error: ${errorMessage}`);
-        console.error('Error initializing audio:', error);
+        console.error('Error setting audio mode:', error);
       }
     };
 
-    initializeAudio();
+    initializeAudioSettings();
 
+    // Load audio when meditationData (containing audioUrl) is available or if it's an exercise
+    if ((type === 'meditation' && meditationData) || type === 'exercise') {
+       if (isMounted) {
+         loadAudio(); // Call loadAudio here
+       }
+    }
+
+    // Cleanup function
     return () => {
       isMounted = false;
       if (soundRef.current) {
-        console.log('Cleaning up audio resources...');
         soundRef.current.unloadAsync().catch((err) =>
           console.error('Error during cleanup:', err)
         );
       }
     };
-  }, []);
+    // REMOVED initializeAudio() call from here
 
-  // Spin animation if audio is playing
+    return () => {
+      isMounted = false;
+      if (soundRef.current) {
+        soundRef.current.unloadAsync().catch((err) =>
+          console.error('Error during cleanup:', err)
+        );
+      }
+    };
+  // Depend on meditationData to trigger loading when URL is ready
+  }, [meditationData, type]); // Add type dependency
+
+
   useEffect(() => {
     if (isPlaying) {
-      Animated.loop(
-        Animated.timing(spinValue, {
-          toValue: 1,
-          duration: 10000,
-          easing: Easing.linear,
+      // Create breathing animation sequence
+      const breathingAnimation = () => {
+        // Inhale animation (grow)
+        inhaleAnimRef.current = Animated.timing(scaleValue, {
+          toValue: 1.2,
+          duration: 4000, // 4 seconds inhale
+          easing: Easing.inOut(Easing.ease),
           useNativeDriver: true,
-        })
-      ).start();
+        });
+
+        inhaleAnimRef.current.start(({ finished }) => {
+          // Add this parallel animation for the background
+          bgInhaleAnimRef.current = Animated.timing(backgroundIntensity, {
+            toValue: 1,
+            duration: 4000,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true, // CHANGE THIS TO TRUE
+          });
+
+          bgInhaleAnimRef.current.start();
+
+          if (finished) {
+            setBreathingPhase('hold');
+
+            // Hold breath briefly
+            setTimeout(() => {
+              setBreathingPhase('exhale');
+
+              // Exhale animation (shrink)
+              exhaleAnimRef.current = Animated.timing(scaleValue, {
+                toValue: 0.8,
+                duration: 6000, // 6 seconds exhale
+                easing: Easing.inOut(Easing.ease),
+                useNativeDriver: true,
+              });
+
+              exhaleAnimRef.current.start(({ finished }) => {
+                // Add this parallel animation for the background
+                bgExhaleAnimRef.current = Animated.timing(backgroundIntensity, {
+                  toValue: 0,
+                  duration: 6000,
+                  easing: Easing.inOut(Easing.ease),
+                  useNativeDriver: true, // CHANGE THIS TO TRUE
+                });
+
+                bgExhaleAnimRef.current.start();
+
+                if (finished) {
+                  setBreathingPhase('inhale');
+                  setBreathingCycleCount(prev => prev + 1);
+                  breathingAnimation(); // Repeat the cycle
+                }
+              });
+            }, 1000); // Hold for 1 second
+          }
+        });
+      };
+
+      // Start the breathing animation
+      breathingAnimation();
     } else {
-      spinValue.setValue(0);
+      // Reset animations when paused
+      if (inhaleAnimRef.current) inhaleAnimRef.current.stop();
+      if (exhaleAnimRef.current) exhaleAnimRef.current.stop();
+      if (bgInhaleAnimRef.current) bgInhaleAnimRef.current.stop();
+      if (bgExhaleAnimRef.current) bgExhaleAnimRef.current.stop();
     }
-  }, [isPlaying]);
 
-  const spin = spinValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
+    return () => {
+      // Cleanup animations on unmount
+      if (inhaleAnimRef.current) inhaleAnimRef.current.stop();
+      if (exhaleAnimRef.current) exhaleAnimRef.current.stop();
+      if (bgInhaleAnimRef.current) bgInhaleAnimRef.current.stop();
+      if (bgExhaleAnimRef.current) bgExhaleAnimRef.current.stop();
+    };
+  }, [isPlaying, scaleValue, backgroundIntensity]);
 
-  // Status callback
   const handleStatusUpdate = useCallback((status: AVPlaybackStatus) => {
     if (status.isLoaded) {
       setIsPlaying(status.isPlaying);
@@ -235,37 +303,45 @@ export default function PlayerScreen() {
       if (status.didJustFinish) {
         setIsPlaying(false);
         setPosition(0);
-        setDebugMessage('Playback finished');
       }
     } else {
       const errorStatus = status as AVPlaybackStatusError;
       if (errorStatus.error) {
         console.error('Playback error:', errorStatus.error);
-        setDebugMessage(`Playback error: ${errorStatus.error}`);
       }
     }
   }, []);
 
-  // Load the audio file
   const loadAudio = async () => {
-    setDebugMessage('Starting audio load...');
     setIsLoading(true);
+    console.log('Loading audio...');
 
     try {
-      // Unload existing sound if present
       if (soundRef.current) {
-        setDebugMessage('Unloading existing sound...');
+        console.log('Unloading previous sound...');
         await soundRef.current.unloadAsync();
+        soundRef.current = null; // Clear the ref
       }
 
-      setDebugMessage('Creating new sound object...');
-      const audioSource = require('../assets/meditations/sample.mp3');
-      console.log('Loading audio source:', audioSource);
+      let audioSource: any;
+      if (type === 'meditation' && meditationData?.audioUrl) {
+        console.log('Using meditation audioUrl:', meditationData.audioUrl);
+        audioSource = { uri: meditationData.audioUrl };
+      } else if (type === 'exercise') {
+        // For exercises, continue using the sample or define exercise-specific audio
+        console.log('Using sample audio for exercise');
+        audioSource = require('../assets/meditations/sample.mp3');
+      } else {
+        console.error('Cannot load audio: Invalid type or missing audio URL.');
+        setIsLoading(false);
+        return; // Exit if no valid source
+      }
 
-      const { sound: audioSound } = await Audio.Sound.createAsync(
+      console.log('Creating sound object with source:', audioSource);
+      const { sound: audioSound, status } = await Audio.Sound.createAsync(
         audioSource,
         {
-          shouldPlay: false,
+          shouldPlay: false, // Don't play automatically
           progressUpdateIntervalMillis: 1000,
           positionMillis: 0,
           volume: 1.0,
@@ -275,57 +351,45 @@ export default function PlayerScreen() {
         handleStatusUpdate
       );
 
-      setDebugMessage('Sound created, getting status...');
-      const initialStatus = await audioSound.getStatusAsync();
-      console.log('Initial audio status:', initialStatus);
-
-      if (!initialStatus.isLoaded) {
+      // Check status after creation
+      if (!status.isLoaded) {
+        console.error('Failed to load audio file. Status:', status);
         throw new Error('Failed to load audio file');
       }
 
+      console.log('Audio loaded successfully. Duration:', status.durationMillis);
       soundRef.current = audioSound;
-      setDuration(initialStatus.durationMillis || 0);
-      setPosition(initialStatus.positionMillis || 0);
-      setDebugMessage('Audio loaded successfully');
-      setIsLoading(false);
+      setDuration(status.durationMillis || 0);
+      setPosition(status.positionMillis || 0);
+      setIsLoading(false); // Loading finished
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setDebugMessage(`Error loading audio: ${errorMessage}`);
-      console.error('Error loading audio:', error);
-      setIsLoading(false);
+      console.error('Error in loadAudio:', error);
+      setIsLoading(false); // Ensure loading stops on error
     }
   };
 
-  // Handle play/pause
   const handlePlayPause = async () => {
     if (!soundRef.current) {
-      setDebugMessage('No sound loaded');
       return;
     }
 
     try {
       const status = await soundRef.current.getStatusAsync();
-      console.log('Current playback status:', status);
 
       if (!status.isLoaded) {
         throw new Error('Sound not properly loaded');
       }
 
       if (status.isPlaying) {
-        setDebugMessage('Pausing playback...');
         await soundRef.current.pauseAsync();
       } else {
-        setDebugMessage('Starting playback...');
         await soundRef.current.playAsync();
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setDebugMessage(`Playback error: ${errorMessage}`);
-      console.error('Playback error:', errorMessage);
+      console.error('Playback error:', error);
     }
   };
 
-  // Update position every second
   useEffect(() => {
     if (soundRef.current) {
       const interval = setInterval(async () => {
@@ -339,57 +403,126 @@ export default function PlayerScreen() {
     }
   }, [soundRef.current]);
 
-  // Format time as M:SS
   const formatTime = (milliseconds: number) => {
     const minutes = Math.floor(milliseconds / 60000);
     const seconds = Math.floor((milliseconds % 60000) / 1000);
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  // Progress circle calculation
   const progress = duration ? position / duration : 0;
 
+ const handleActivityCompletion = async () => {
+    try {
+      if (!userId) {
+        console.error('User ID is required');
+        return;
+      }
+      if (type === 'exercise') {
+        // Assuming meditationId is the exerciseId for exercises
+        await ExerciseService.completeExercise(userId, meditationId as string);
+      } else if (type === 'meditation') {
+        // Calculate minutes from duration (ms)
+        const minutesCompleted = Math.round(duration / 60000);
+
+        // Track activity in subcollection
+        await UserService.trackActivity({
+          userId,
+          type: 'meditation',
+          timestamp: new Date(),
+          details: {
+            duration: minutesCompleted, // Log duration in minutes
+            title: meditationData?.title ?? (params.title as string) ?? 'Meditation', // Use fetched title or param title
+          },
+        });
+
+        // Update main user stats
+        if (minutesCompleted > 0) {
+          await UserService.updateMeditationStats(userId, minutesCompleted);
+        }
+      }
+
+      console.log(`${type} activity completed successfully.`);
+    } catch (error) {
+      console.error(`Error logging ${type} activity:`, error);
+    }
+  };
+
+  useEffect(() => {
+    if (!isPlaying && position === duration && duration > 0) {
+      handleActivityCompletion();
+    }
+  }, [isPlaying, position, duration, handleActivityCompletion]);
+
+  // Determine title and subtitle based on fetched data or params
+  const displayTitle = meditationData?.title ?? (params.title as string) ?? (type === 'meditation' ? 'Meditation' : 'Exercise');
+  const displaySubtitle = meditationData?.description ?? (params.subtitle as string) ?? '';
+
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Surface style={styles.header} elevation={0}>
-        <IconButton
-          icon="chevron-down"
-          size={28}
-          onPress={() => router.back()}
-          accessibilityLabel="Close player"
-        />
-        <View style={styles.headerText}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
-        </View>
-      </Surface>
+    <ScreenLayout
+      // Use displayTitle, truncate if needed
+      title={
+        displayTitle && displayTitle.length > 20
+          ? `${displayTitle.substring(0, 20)}...`
+          : displayTitle
+      }
+      showBackButton={true}
+      scrollable={false}
+    >
+      <View style={styles.content}>
+        <Animated.View style={styles.gradientContainer}>
+          {/* Solid background */}
+          <View
+            style={[
+              styles.backgroundBase,
+              { backgroundColor: theme.colors.background },
+            ]}
+          />
 
-      {/* Only show debug info in development */}
-      {__DEV__ && debugMessage && (
-        <Text style={styles.debugText}>Debug: {debugMessage}</Text>
-      )}
-
-      {/**
-       * Using a ScrollView here can help if the screen is still too tall
-       * on certain devices, ensuring no element gets cut off.
-       */}
-      <ScrollView contentContainerStyle={styles.content}>
+          {/* Color overlay for breathing effect */}
+          <Animated.View
+            style={[
+              styles.colorLayer,
+              {
+                opacity: backgroundIntensity.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.05, 0.25],
+                }),
+              },
+            ]}
+          />
+        </Animated.View>
         <Animated.View
-          style={[styles.mandalaContainer, { transform: [{ rotate: spin }] }]}
-          accessibilityElementsHidden
-          importantForAccessibility="no-hide-descendants"
+          style={[
+            styles.mandalaContainer,
+            {
+              transform: [{ scale: scaleValue }],
+            },
+          ]}
+          accessibilityElementsHidden={false}
+          accessibilityLabel={`Breathing guide: ${breathingPhase} phase`}
+          importantForAccessibility="yes"
         >
           <MaterialCommunityIcons
-            name="flower-outline"
+            name="circle-outline"
             size={MANDALA_SIZE}
             color={theme.colors.primary}
             style={styles.mandala}
           />
         </Animated.View>
+        <Text
+          style={styles.breathingGuideText}
+          accessibilityLiveRegion="polite"
+        >
+          {breathingPhase === 'inhale'
+            ? 'Breathe in...'
+            : breathingPhase === 'hold'
+            ? 'Hold...'
+            : 'Breathe out...'}
+        </Text>
 
         <View style={styles.timerContainer}>
           <Svg width={TIMER_SIZE} height={TIMER_SIZE} style={styles.svg}>
-            {/* Background Circle */}
             <Circle
               cx={TIMER_SIZE / 2}
               cy={TIMER_SIZE / 2}
@@ -398,7 +531,6 @@ export default function PlayerScreen() {
               strokeWidth={12}
               fill="none"
             />
-            {/* Progress Circle */}
             <Circle
               cx={TIMER_SIZE / 2}
               cy={TIMER_SIZE / 2}
@@ -425,7 +557,9 @@ export default function PlayerScreen() {
             onPress={handlePlayPause}
             disabled={isLoading}
             style={styles.playButton}
-            accessibilityLabel={isPlaying ? 'Pause meditation' : 'Play meditation'}
+            accessibilityLabel={
+              isPlaying ? 'Pause meditation' : 'Play meditation'
+            }
             accessibilityState={{ disabled: isLoading, busy: isLoading }}
             accessibilityHint={
               isPlaying
@@ -434,7 +568,20 @@ export default function PlayerScreen() {
             }
           />
         </View>
-      </ScrollView>
-    </SafeAreaView>
+        {/* Use displaySubtitle */}
+        {displaySubtitle && (
+          <Text
+            style={{
+              fontSize: 16,
+              color: theme.colors.onSurfaceVariant,
+              marginBottom: 16,
+              textAlign: 'center',
+            }}
+          >
+            {displaySubtitle}
+          </Text>
+        )}
+      </View>
+    </ScreenLayout>
   );
 }

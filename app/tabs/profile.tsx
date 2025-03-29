@@ -1,193 +1,398 @@
-import React, { useState } from 'react';
-import { View, ScrollView } from 'react-native';
-import { Text, Button, Surface, Snackbar, Avatar, Divider, List, Dialog, Portal } from 'react-native-paper';
-import { PersonalInformationSection } from '../components/PersonalInformationSection';
+import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
+import { View, ScrollView, RefreshControl } from 'react-native'; // Added RefreshControl
+import { Text, Button, Surface, Snackbar, Dialog, List, ActivityIndicator } from 'react-native-paper'; // Added ActivityIndicator
 import type { PersonalInformation } from '../types/personalInformation';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/auth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import styles from '../config/styles';
-import { theme } from '../config/theme';
-
-interface ProfileListItemProps {
-  title: string;
-  icon: string;
-  onPress: () => void;
-}
-
-const ProfileListItem = ({ title, icon, onPress }: ProfileListItemProps) => (
-  <List.Item
-    title={title}
-    left={props => <List.Icon {...props} icon={icon} />}
-    right={props => <List.Icon {...props} icon="chevron-right" />}
-    onPress={onPress}
-    titleStyle={theme.fonts.bodyLarge}
-  />
-);
+import { layoutStyles, miscStyles, typographyStyles } from '../config';
+import { useAppTheme } from '../hooks/useAppTheme'; // Import the theme hook
+// Keep UserService import for getSubscriptionStatus
+import { UserService } from '../services/user.service'; 
+import { UserStats } from '../models/user-stats.model'; // Correct import path
+import { Timestamp } from 'firebase/firestore'; // Import Timestamp
+// Import the cloud functions - remove ensureUserDocument
+import { getUserStats } from '../services/firebase-functions';
 
 export default function ProfileScreen() {
-  const router = useRouter();
-  const { user, signOut } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
+  const theme = useAppTheme(); // Get the current theme using the hook
+  const { user, signOut, loading: authLoading } = useAuth(); // Get loading state from useAuth
+  const [isSignOutLoading, setIsSignOutLoading] = useState(false); // Renamed for clarity
   const [error, setError] = useState<string | null>(null);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const router = useRouter();
+
+  // State for fetched data
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [subscription, setSubscription] = useState<{ plan: string; price: string } | null>(null);
+
+  // Loading and Refreshing states
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [subLoading, setSubLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  // Combined loading state
+  const isLoading = statsLoading || subLoading;
+
+  // Fetching functions wrapped in useCallback
+  const fetchUserStats = useCallback(async () => {
+    if (!user?.uid) return;
+    setStatsLoading(true);
+    setError(null); // Clear previous errors at the start
+    
+    try {
+      // REMOVED redundant ensureUserDocument Cloud Function call
+      // The user document should be ensured by the logic in AuthContext
+
+      // Call the getUserStats function directly
+      console.log('[DEBUG] Calling getUserStats Cloud Function...');
+      const statsResult = await getUserStats(); // Call the imported function
+      console.log('[DEBUG] getUserStats result success:', statsResult.data.success);
+
+      if (statsResult.data.success) {
+        // Ensure the stats object is not null/undefined before setting
+        setUserStats(statsResult.data.stats || { 
+          profile: { displayName: user.displayName || '', photoURL: user.photoURL || '', createdAt: Timestamp.now(), streak: 0 },
+          meditation: { totalTime: 0, sessions: 0 },
+          activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
+          mood: { recentMoods: [] }
+        }); 
+      } else {
+        // Throw error if getUserStats indicates failure
+        throw new Error((statsResult.data as any)?.message || 'Failed to get user stats from Cloud Function');
+      }
+    } catch (error: any) { // Catch errors from getUserStats
+      console.error('Error fetching user stats:', error); // Updated error message context
+      setError(error.message || 'Failed to load user data');
+      
+      // Set minimal fallback stats
+      setUserStats({
+        profile: { 
+          displayName: user?.displayName || '', 
+          photoURL: user?.photoURL || '', 
+          createdAt: Timestamp.now(), 
+          streak: 0 
+        },
+        meditation: { totalTime: 0, sessions: 0 },
+        activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
+        mood: { recentMoods: [] }
+      });
+    } finally {
+      setStatsLoading(false);
+    }
+  }, [user?.uid, user?.displayName, user?.photoURL]); // Dependencies remain the same
+
+  // fetchSubscriptionStatus might need adjustment if UserService is fully removed
+  const fetchSubscriptionStatus = useCallback(async () => {
+    if (!user?.uid) return;
+    setSubLoading(true);
+    try {
+      // Assuming getSubscriptionStatus remains in UserService for now
+      // If moved to cloud functions, update this call similarly
+      const subStatus = await UserService.getSubscriptionStatus(user.uid); 
+      setSubscription(subStatus);
+    } catch (fetchError: any) {
+      console.error('Error fetching subscription status:', fetchError);
+      setError(fetchError.message || 'Failed to load subscription details.');
+      setSubscription({ plan: 'Error', price: '' }); // Set error state
+    } finally {
+      setSubLoading(false);
+    }
+  }, [user?.uid]);
+
+  // Combined fetch function
+  const fetchData = useCallback(async () => {
+    setError(null); // Clear previous errors
+    await Promise.all([fetchUserStats(), fetchSubscriptionStatus()]);
+  }, [fetchUserStats, fetchSubscriptionStatus]);
+
+  // Initial data fetch
+  useEffect(() => {
+    if (user?.uid) {
+      fetchData();
+    } else {
+      // Handle case where user is not logged in or uid is not yet available
+      setStatsLoading(false);
+      setSubLoading(false);
+      // Set default object matching the UserStats structure
+      setUserStats({
+        profile: { displayName: '', photoURL: '', createdAt: Timestamp.now(), streak: 0 },
+        meditation: { totalTime: 0, sessions: 0 },
+        activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
+        mood: { recentMoods: [] },
+      });
+      setSubscription({ plan: 'N/A', price: '' });
+    }
+  }, [user?.uid, fetchData]);
+
+
+  // Refresh handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  }, [fetchData]);
+
+
+  // --- Removed duplicated useEffect hooks and handleSignOut body ---
 
   const handleSignOut = async () => {
-    setIsLoading(true);
+    setIsSignOutLoading(true); // Use specific loading state
     setError(null);
     try {
       if (!signOut) throw new Error('Sign out function not available');
       await signOut();
-      router.replace("/auth/sign-in");
+      // No need to manually navigate, AuthProvider likely handles redirect
+      // router.replace("/auth/sign-in");
     } catch (err: any) {
       setError(err?.message || "Failed to sign out. Please try again.");
     } finally {
-      setIsLoading(false);
+      setIsSignOutLoading(false); // Use specific loading state
     }
   };
 
+  const personalInfo: PersonalInformation = {
+    name: user?.displayName || "User Name",
+    email: user?.email || "user@example.com",
+    phoneNumber: "555-1234",
+    dateOfBirth: "1990-01-01",
+  };
+
+  // Conditional rendering based on authLoading OR initial data loading
+  if (authLoading || isLoading) {
+    return (
+      <View style={[layoutStyles.layout_container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" />
+        <Text style={{ marginTop: 10 }}>Loading profile...</Text>
+      </View>
+    );
+  }
+
+  // Handle case where user is null after loading (shouldn't happen if AuthProvider redirects)
+  if (!user) {
+     return (
+      <View style={[layoutStyles.layout_container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text>Please sign in.</Text>
+        <Button onPress={() => router.replace('/auth/sign-in')}>Sign In</Button>
+      </View>
+     );
+  }
+
   return (
-    <View style={styles.layout_container}>
-      <PersonalInformationSection 
-        info={{
-          name: "John Doe",
-          email: "johndoe@example.com",
-          phoneNumber: "555-1234",
-          dateOfBirth: "1990-01-01",
-        }}
-      />
-      <ScrollView style={styles.layout_scrollView}>
-        {/* Subscription Section */}
-        <Surface style={styles.profile_mainSection} elevation={1}>
-          <View style={styles.profile_sectionHeader}>
-            <MaterialCommunityIcons 
-              name="crown" 
-              size={24} 
-              color={theme.colors.secondary} 
-            />
-            <Text style={[styles.profile_sectionTitle, theme.fonts.titleMedium]}>
-              Premium Subscription
-            </Text>
-          </View>
-          <View style={styles.profile_subscriptionStatus}>
-            <Text style={[styles.profile_statusLabel, theme.fonts.bodyMedium]}>
-              Status:
-            </Text>
-            <View style={[styles.profile_statusBadge, { backgroundColor: theme.colors.secondary }]}>
-              <Text style={[styles.profile_statusText, { color: theme.colors.onSecondary }]}>
-                Active
+    <View style={layoutStyles.layout_container}>
+      <ScrollView
+        style={layoutStyles.layout_scrollView}
+        refreshControl={ // Add RefreshControl
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* Profile Header with Stats */}
+        <Surface
+          style={[miscStyles.profile_header, { elevation: 2, marginHorizontal: theme.spacing.medium }]} 
+          elevation={2}
+        >
+          <View style={miscStyles.profile_headerContent}>
+            <View style={miscStyles.profile_avatarContainer}>
+              <MaterialCommunityIcons 
+                name="account-circle"
+                size={40}
+                color={theme.colors.primary}
+              />
+            </View>
+            <View style={miscStyles.profile_headerText}>
+              <Text style={[typographyStyles.text_heading2, miscStyles.profile_name]}>
+                {personalInfo.name}
+              </Text>
+              <Text style={miscStyles.profile_email}>
+                {personalInfo.email}
               </Text>
             </View>
           </View>
-          <Text style={[styles.profile_subscriptionDetails, theme.fonts.bodyMedium]}>
-            Next billing date: March 15, 2024
-          </Text>
-          <Button
-            mode="contained"
-            onPress={() => router.push('/subscription/manage')}
-            style={styles.profile_actionButton}
-            labelStyle={theme.fonts.labelLarge}
-          >
-            Manage Subscription
-          </Button>
+
+          {/* Mental Health Stats - Displaying more stats */}
+          <View style={miscStyles.profile_statsContainer}>
+            {/* Meditation Minutes */}
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.meditation?.totalTime ?? '...'}</Text>
+              <Text style={miscStyles.profile_statLabel}>Minutes</Text>
+            </View>
+            {/* Exercises Completed */}
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.activities?.exercisesCompleted ?? '...'}</Text>
+              <Text style={miscStyles.profile_statLabel}>Exercises</Text>
+            </View>
+            {/* Streak */}
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.profile?.streak ?? '...'}</Text>
+              <Text style={miscStyles.profile_statLabel}>Streak</Text>
+            </View>
+            {/* Surveys Completed */}
+            <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.activities?.surveysCompleted ?? '...'}</Text>
+              <Text style={miscStyles.profile_statLabel}>Surveys</Text>
+            </View>
+            {/* Optionally display Sessions if needed, or remove if Minutes is preferred */}
+            {/* <View style={miscStyles.profile_statItem}>
+              <Text style={miscStyles.profile_statNumber}>{userStats?.meditation?.sessions ?? '...'}</Text>
+              <Text style={miscStyles.profile_statLabel}>Sessions</Text>
+            </View> */}
+          </View>
+
+          {/* Subscription Status */}
+<View style={miscStyles.profile_subscriptionStatus}>
+  <Text style={[miscStyles.profile_statusLabel, theme.fonts.bodyMedium]}>
+    Subscription:
+  </Text>
+  <View
+    style={[
+      miscStyles.profile_statusBadge,
+      {
+        backgroundColor:
+          subscription?.plan && subscription.plan !== 'No active plan' && subscription.plan !== 'Error' && subscription.plan !== 'N/A'
+            ? theme.colors.primaryContainer
+            : theme.colors.surfaceVariant,
+      },
+    ]}
+  >
+    <Text
+      style={[
+        miscStyles.profile_statusText,
+        {
+          color:
+            subscription?.plan && subscription.plan !== 'No active plan' && subscription.plan !== 'Error' && subscription.plan !== 'N/A'
+              ? theme.colors.onPrimaryContainer
+              : theme.colors.onSurfaceVariant,
+        },
+      ]}
+    >
+      {subscription?.plan ?? 'Loading...'} {/* Display fetched plan */}
+    </Text>
+  </View>
+</View>
         </Surface>
 
-        {/* Settings Sections */}
-        <Surface style={styles.profile_mainSection} elevation={1}>
+        {/* Account Information */}
+        <Surface style={miscStyles.profile_sectionCard} elevation={2}>
+          <Text style={miscStyles.profile_sectionTitle}>Account Information</Text>
           <List.Section>
-            <List.Subheader style={theme.fonts.titleMedium}>
-              Account Settings
-            </List.Subheader>
-            
-            <ProfileListItem
-              title="Personal Information"
-              icon="account"
-              onPress={() => router.push('/account/personal-info')}
+            <List.Item
+              title="Edit Personal Information"
+              onPress={() => router.push('/components/EditPersonalInfoScreen')}
+              left={() => <List.Icon icon="account-edit" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
-            
-            <ProfileListItem
-              title="Notification Preferences"
-              icon="bell"
-              onPress={() => router.push('/account/notifications')}
+            <List.Item
+              title="Manage Subscription"
+              onPress={() => router.push('/components/ManageSubscriptionScreen')}
+              left={() => <List.Icon icon="credit-card" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
-            
-            <ProfileListItem
+          </List.Section>
+        </Surface>
+
+        {/* Options */}
+        <Surface style={miscStyles.profile_sectionCard} elevation={2}>
+          <Text style={miscStyles.profile_sectionTitle}>Options</Text>
+          <List.Section>
+            <List.Item
               title="Language & Region"
-              icon="translate"
-              onPress={() => router.push('/account/language')}
+              onPress={() => router.push('/components/LanguageRegionScreen')}
+              left={() => <List.Icon icon="earth" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
-            
-            <Divider />
-            
-            <List.Subheader style={theme.fonts.titleMedium}>
-              Support & Legal
-            </List.Subheader>
-            
-            <ProfileListItem
+            <List.Item
+              title="Notification Preferences"
+              onPress={() => router.push('/components/NotificationPreferencesScreen')}
+              left={() => <List.Icon icon="bell-outline" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
+            />
+            <List.Item
               title="Help Center"
-              icon="help-circle"
-              onPress={() => router.push('/support/help')}
+              onPress={() => router.push('/components/HelpCenterScreen')}
+              left={() => <List.Icon icon="help-circle-outline" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
-            
-            <ProfileListItem
-              title="Privacy Policy"
-              icon="shield-account"
-              onPress={() => router.push('/legal/privacy')}
-            />
-            
-            <ProfileListItem
-              title="Terms of Service"
-              icon="file-document"
-              onPress={() => router.push('/legal/terms')}
+            <List.Item
+              title="Privacy Policy & Terms of Service"
+              onPress={() => router.push('/components/LegalScreen')}
+              left={() => <List.Icon icon="file-document-outline" color={theme.colors.primary} />}
+              right={() => <List.Icon icon="chevron-right" color={theme.colors.onSurfaceVariant} />}
+              style={miscStyles.list_item}
+              titleStyle={{ ...theme.fonts.bodyLarge }}
+              rippleColor={theme.withOpacity(theme.colors.primary, 0.1)}
             />
           </List.Section>
         </Surface>
 
         {/* Sign Out Button */}
-        <Surface style={[styles.profile_mainSection, styles.profile_signOutSection]} elevation={1}>
+        <Surface style={miscStyles.profile_sectionCard} elevation={2}>
           <Button
             mode="outlined"
             onPress={() => setShowSignOutDialog(true)}
-            loading={isLoading}
-            disabled={isLoading}
+            loading={isSignOutLoading} // Use specific loading state
+            disabled={isSignOutLoading} // Use specific loading state
             icon="logout"
-            style={styles.profile_signOutButton}
+            style={{ marginTop: theme.spacing.small }}
             labelStyle={theme.fonts.labelLarge}
           >
-            {isLoading ? 'Signing Out...' : 'Sign Out'}
+            {isSignOutLoading ? 'Signing Out...' : 'Sign Out'}
           </Button>
         </Surface>
       </ScrollView>
 
-      {/* Sign Out Confirmation Dialog */}
-      <Portal>
-        <Dialog visible={showSignOutDialog} onDismiss={() => setShowSignOutDialog(false)}>
-          <Dialog.Title style={theme.fonts.titleLarge}>Sign Out</Dialog.Title>
-          <Dialog.Content>
-            <Text style={theme.fonts.bodyMedium}>
-              Are you sure you want to sign out?
-            </Text>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button 
-              onPress={() => setShowSignOutDialog(false)}
-              labelStyle={theme.fonts.labelLarge}
-            >
-              Cancel
-            </Button>
-            <Button 
-              onPress={() => {
-                setShowSignOutDialog(false);
-                handleSignOut();
-              }}
-              labelStyle={theme.fonts.labelLarge}
-            >
-              Sign Out
-            </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
+      {/* Sign Out Dialog */}
+      <Dialog 
+        visible={showSignOutDialog} 
+        onDismiss={() => setShowSignOutDialog(false)}
+        style={{ 
+          borderRadius: 28, // Material Design 3 dialog radius
+          backgroundColor: theme.colors.surface,
+        }}
+      >
+        <Dialog.Title style={[theme.fonts.headlineSmall, { color: theme.colors.onSurface }]}>
+          Sign Out
+        </Dialog.Title>
+        <Dialog.Content>
+          <Text style={[theme.fonts.bodyMedium, { color: theme.colors.onSurfaceVariant }]}>
+            Are you sure you want to sign out?
+          </Text>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button 
+            onPress={() => setShowSignOutDialog(false)} 
+            textColor={theme.colors.primary}
+          >
+            Cancel
+          </Button>
+          <Button
+            mode="contained"
+            onPress={() => {
+              setShowSignOutDialog(false);
+              handleSignOut();
+            }}
+            style={{ borderRadius: theme.componentSizes.buttonBorderRadius }}
+          >
+            Sign Out
+          </Button>
+        </Dialog.Actions>
+      </Dialog>
 
+      {/* Error Snackbar */}
       <Snackbar
         visible={!!error}
         onDismiss={() => setError(null)}

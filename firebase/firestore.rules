@@ -1,0 +1,65 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isCurrentUser(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Exercise data - allow read access to all authenticated users
+    match /exercises/{exerciseId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Only admin can modify exercises
+    }
+
+    // User profile data
+    match /users/{userId} {
+      allow read: if isSignedIn();  // Allow any authenticated user to read
+      allow create, update, delete: if isCurrentUser(userId);
+      
+      // User progress subcollection
+      match /progress/{progressId} {
+        allow read: if isSignedIn();
+        allow create, update, delete: if isCurrentUser(userId);
+      }
+      
+      // User activities subcollection
+      match /activities/{activityId} {
+        allow read: if isSignedIn();
+        allow create, update, delete: if isCurrentUser(userId);
+      }
+    }
+
+    // Mood tracking data
+    match /moods/{moodId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Survey responses
+    match /surveys/{surveyId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // Mood Definitions - allow read access to all authenticated users
+    match /moodDefinitions/{definitionId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Typically static data
+    }
+
+    // Emotion Definitions (for pyramid) - allow read access to all authenticated users
+    match /emotionDefinitions/{definitionId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Typically static data
+    }
+  }
+}

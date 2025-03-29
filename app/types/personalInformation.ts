@@ -4,3 +4,5 @@ export interface PersonalInformation {
   phoneNumber?: string;
   dateOfBirth?: string; // ISO formatted date string
 }
+
+export default {};
