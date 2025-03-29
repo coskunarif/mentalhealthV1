@@ -18,9 +18,9 @@ const faqs: FAQ[] = [
       'Use the Mood Tracker on the home screen to log your daily emotional state. You can select from various moods and add notes about your feelings.',
   },
   {
-    question: 'Can I customize my meditation reminders?',
+    question: 'Can I customize my exercise reminders?', // Updated question
     answer:
-      'Yes! Go to Notification Preferences in your Profile settings to set up custom meditation reminders that work best for your schedule.',
+      'Yes! Go to Notification Preferences in your Profile settings to set up custom exercise reminders that work best for your schedule.', // Updated answer
   },
   {
     question: 'How do I cancel my subscription?',

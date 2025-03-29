@@ -53,7 +53,6 @@ export default function ProfileScreen() {
         // Ensure the stats object is not null/undefined before setting
         setUserStats(statsResult.data.stats || { 
           profile: { displayName: user.displayName || '', photoURL: user.photoURL || '', createdAt: Timestamp.now(), streak: 0 },
-          meditation: { totalTime: 0, sessions: 0 },
           activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
           mood: { recentMoods: [] }
         }); 
@@ -71,9 +70,8 @@ export default function ProfileScreen() {
           displayName: user?.displayName || '', 
           photoURL: user?.photoURL || '', 
           createdAt: Timestamp.now(), 
-          streak: 0 
+           streak: 0 
         },
-        meditation: { totalTime: 0, sessions: 0 },
         activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
         mood: { recentMoods: [] }
       });
@@ -117,7 +115,6 @@ export default function ProfileScreen() {
       // Set default object matching the UserStats structure
       setUserStats({
         profile: { displayName: '', photoURL: '', createdAt: Timestamp.now(), streak: 0 },
-        meditation: { totalTime: 0, sessions: 0 },
         activities: { exercisesCompleted: 0, surveysCompleted: 0, recentActivities: [] },
         mood: { recentMoods: [] },
       });
@@ -209,16 +206,11 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Mental Health Stats - Displaying more stats */}
-          <View style={miscStyles.profile_statsContainer}>
-            {/* Meditation Minutes */}
-            <View style={miscStyles.profile_statItem}>
-              <Text style={miscStyles.profile_statNumber}>{userStats?.meditation?.totalTime ?? '...'}</Text>
-              <Text style={miscStyles.profile_statLabel}>Minutes</Text>
-            </View>
-            {/* Exercises Completed */}
-            <View style={miscStyles.profile_statItem}>
-              <Text style={miscStyles.profile_statNumber}>{userStats?.activities?.exercisesCompleted ?? '...'}</Text>
+{/* Mental Health Stats */}
+<View style={miscStyles.profile_statsContainer}>
+  {/* Exercises Completed */}
+  <View style={miscStyles.profile_statItem}>
+    <Text style={miscStyles.profile_statNumber}>{userStats?.activities?.exercisesCompleted ?? '...'}</Text>
               <Text style={miscStyles.profile_statLabel}>Exercises</Text>
             </View>
             {/* Streak */}
@@ -229,14 +221,9 @@ export default function ProfileScreen() {
             {/* Surveys Completed */}
             <View style={miscStyles.profile_statItem}>
               <Text style={miscStyles.profile_statNumber}>{userStats?.activities?.surveysCompleted ?? '...'}</Text>
-              <Text style={miscStyles.profile_statLabel}>Surveys</Text>
-            </View>
-            {/* Optionally display Sessions if needed, or remove if Minutes is preferred */}
-            {/* <View style={miscStyles.profile_statItem}>
-              <Text style={miscStyles.profile_statNumber}>{userStats?.meditation?.sessions ?? '...'}</Text>
-              <Text style={miscStyles.profile_statLabel}>Sessions</Text>
-            </View> */}
-          </View>
+    <Text style={miscStyles.profile_statLabel}>Surveys</Text>
+  </View>
+</View>
 
           {/* Subscription Status */}
 <View style={miscStyles.profile_subscriptionStatus}>

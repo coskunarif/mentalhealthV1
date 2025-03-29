@@ -348,7 +348,6 @@ export class UserService {
             theme: 'light'
           },
           stats: {
-            meditationMinutes: 0,
             exercisesCompleted: 0,
             streak: 0,
             surveysCompleted: 0,
@@ -368,16 +367,6 @@ export class UserService {
         // Create required subcollections
         console.log(`[DEBUG] Creating subcollections for ${userId}`);
         const batch = writeBatch(db);
-        
-        // Create meditation progress document
-        const meditationRef = doc(db, 'users', userId, 'progress', 'meditation');
-        batch.set(meditationRef, {
-          userId: userId,
-          totalTime: 0,
-          sessions: 0,
-          createdAt: timestamp,
-          updatedAt: timestamp
-        });
         
         // Create progress overview document
         const overviewRef = doc(db, 'users', userId, 'progress', 'overview');
@@ -400,27 +389,6 @@ export class UserService {
     } catch (error) {
       console.error('[DEBUG] Error ensuring user document:', error);
       throw error;
-    }
-  }
-
-  /**
-   * Updates meditation stats on the main user document.
-   */
-  static async updateMeditationStats(userId: string, minutes: number): Promise<void> {
-    try {
-      if (!userId) throw new Error('User ID is required');
-      if (typeof minutes !== 'number' || minutes < 0) throw new Error('Invalid minutes value');
-
-      const userRef = doc(db, 'users', userId);
-      await updateDoc(userRef, {
-        'stats.meditationMinutes': increment(minutes),
-        'stats.lastActiveDate': Timestamp.now(), // Update last active date
-        updatedAt: Timestamp.now() // Update main document timestamp
-      });
-      console.log(`[UserService] Updated meditation stats for ${userId} by ${minutes} minutes.`);
-    } catch (error) {
-      console.error(`[UserService] Error updating meditation stats for ${userId}:`, error);
-      throw error; // Re-throw to handle upstream
     }
   }
 }

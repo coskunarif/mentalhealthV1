@@ -19,13 +19,12 @@ export type RootStackParamList = {
   mood: {
     returnTo?: keyof RootStackParamList;
   };
-  player: {
-    meditationId: string;
-    title?: string;
-    subtitle?: string;
-    type?: 'meditation' | 'exercise';
-    returnTo?: keyof RootStackParamList;
-  };
+player: {
+  exerciseId: string;
+  title?: string;
+  subtitle?: string;
+  returnTo?: keyof RootStackParamList;
+};
   welcome: undefined;
   'not-found': undefined;
   'mood-pyramid': undefined;

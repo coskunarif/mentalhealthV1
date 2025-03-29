@@ -2,6 +2,14 @@
   "indexes": [
     {
       "collectionGroup": "activities",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "activities",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
         { "fieldPath": "type", "order": "ASCENDING" },

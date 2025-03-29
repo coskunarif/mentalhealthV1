@@ -23,7 +23,6 @@ export interface UserProfile extends FirestoreDocument {
     theme: 'light' | 'dark' | 'system';
   };
   stats: {
-    meditationMinutes: number;
     exercisesCompleted: number;
     streak: number;
     surveysCompleted: number;

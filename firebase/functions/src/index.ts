@@ -21,7 +21,7 @@ import { onUserCreate } from './auth/onUserCreate';
 import { dailyStats } from './scheduled/dailyStats';
 import { generateMoodInsights } from './api/insights';
 import { getUserStats, ensureUserDocument } from './api/userStats'; // Added ensureUserDocument
-import { sendDailyMeditationReminder } from './scheduled/notificationManager';
+import { sendDailyExerciseReminder } from './scheduled/notificationManager'; // Renamed import
 
 // Export all functions
 export {
@@ -30,7 +30,7 @@ export {
   
   // Scheduled functions (v2)
   dailyStats,
-  sendDailyMeditationReminder,
+  sendDailyExerciseReminder, // Renamed export
   
   // Callable API functions (v2)
   generateMoodInsights,

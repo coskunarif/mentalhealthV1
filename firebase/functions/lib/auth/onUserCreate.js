@@ -53,7 +53,7 @@ exports.onUserCreate = functions
                 theme: 'light'
             },
             stats: {
-                meditationMinutes: 0,
+                // Removed meditationMinutes
                 exercisesCompleted: 0,
                 streak: 0,
                 surveysCompleted: 0,

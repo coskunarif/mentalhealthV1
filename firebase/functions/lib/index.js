@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserStats = exports.generateMoodInsights = exports.sendDailyMeditationReminder = exports.dailyStats = exports.onUserCreate = void 0;
+exports.ensureUserDocument = exports.getUserStats = exports.generateMoodInsights = exports.sendDailyExerciseReminder = exports.dailyStats = exports.onUserCreate = void 0;
 const admin = __importStar(require("firebase-admin"));
 const v2_1 = require("firebase-functions/v2");
 // Initialize Firebase Admin first (important for hybrid approach)
@@ -45,8 +45,9 @@ const dailyStats_1 = require("./scheduled/dailyStats");
 Object.defineProperty(exports, "dailyStats", { enumerable: true, get: function () { return dailyStats_1.dailyStats; } });
 const insights_1 = require("./api/insights");
 Object.defineProperty(exports, "generateMoodInsights", { enumerable: true, get: function () { return insights_1.generateMoodInsights; } });
-const userStats_1 = require("./api/userStats");
+const userStats_1 = require("./api/userStats"); // Added ensureUserDocument
 Object.defineProperty(exports, "getUserStats", { enumerable: true, get: function () { return userStats_1.getUserStats; } });
-const notificationManager_1 = require("./scheduled/notificationManager");
-Object.defineProperty(exports, "sendDailyMeditationReminder", { enumerable: true, get: function () { return notificationManager_1.sendDailyMeditationReminder; } });
+Object.defineProperty(exports, "ensureUserDocument", { enumerable: true, get: function () { return userStats_1.ensureUserDocument; } });
+const notificationManager_1 = require("./scheduled/notificationManager"); // Renamed import
+Object.defineProperty(exports, "sendDailyExerciseReminder", { enumerable: true, get: function () { return notificationManager_1.sendDailyExerciseReminder; } });
 //# sourceMappingURL=index.js.map
