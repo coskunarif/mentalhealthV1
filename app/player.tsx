@@ -3,8 +3,9 @@ import { View, Animated, Easing, StyleSheet } from 'react-native';
 import { Text, IconButton, Surface, useTheme } from 'react-native-paper';
 import { Audio, AVPlaybackStatus, AVPlaybackStatusError } from 'expo-av';
 import { router, useLocalSearchParams } from 'expo-router';
+import { getStorage, ref as storageRef, getDownloadURL } from 'firebase/storage'; // Added Firebase Storage imports
+// Removed incorrect Firebase app import
 import { ExerciseService } from './services/exercise.service';
-import { MeditationService } from './services/meditation.service'; // Import MeditationService
 import Svg, { Circle } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { RootStackParamList } from './types/navigation';
@@ -109,16 +110,14 @@ const createStyles = (theme: AppTheme) =>
 export default function PlayerScreen() {
   const soundRef = useRef<Audio.Sound | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(0); // Keep duration state (will be set from fetched data or audio file)
+  const [duration, setDuration] = useState(0);
   const [position, setPosition] = useState(0);
-  const [isLoading, setIsLoading] = useState(true); // Keep loading state
-  const [meditationData, setMeditationData] = useState<{ title: string; audioUrl: string; duration: number; description?: string } | null>(null); // State for fetched data
+  const [isLoading, setIsLoading] = useState(true);
+  const [exerciseData, setExerciseData] = useState<{ id: string; title: string; audioUrl?: string; duration: number; description?: string } | null>(null); // State for fetched exercise data
 
-  // Get params, provide defaults
+  // Get params
   const params = useLocalSearchParams<RootStackParamList['player']>();
-  const meditationId = params.meditationId;
-  const type = params.type || 'meditation'; // Default to meditation if type is missing
-  // Title/subtitle will come from fetched data or defaults if fetch fails
+  const exerciseId = params.exerciseId;
 
   const theme = useTheme<AppTheme>();
   const styles = createStyles(theme);
@@ -136,35 +135,34 @@ export default function PlayerScreen() {
   const bgInhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
   const bgExhaleAnimRef = useRef<Animated.CompositeAnimation | null>(null);
 
-  // Fetch meditation data
+  // Fetch Exercise data
   useEffect(() => {
-    const fetchMeditation = async () => {
-      if (!meditationId || type !== 'meditation') {
-        // If it's an exercise or no ID, don't fetch meditation data
-        // Use default/passed title/subtitle later if needed
-        setIsLoading(false); // Stop loading if not fetching
+    const fetchExercise = async () => {
+      if (!exerciseId) {
+        console.error('Exercise ID is missing');
+        setIsLoading(false);
         return;
       }
       setIsLoading(true);
       try {
-        const data = await MeditationService.getMeditationById(meditationId);
+        const data = await ExerciseService.getExerciseById(exerciseId as string);
         if (data) {
-          setMeditationData(data);
+          setExerciseData(data);
           // Optionally set initial duration from Firestore data if available
           // setDuration(data.duration * 60000); // Assuming duration is in minutes
         } else {
-          console.error('Meditation not found');
+          console.error('Exercise not found');
           // Handle error: maybe show default title/subtitle or navigate back
         }
       } catch (error) {
-        console.error('Error fetching meditation data:', error);
+        console.error('Error fetching exercise data:', error);
         // Handle error
       } finally {
-        // Loading of audio will happen next, keep setIsLoading(false) there
+        // Loading of audio will happen in the next effect, triggered by exerciseData change
       }
     };
-    fetchMeditation();
-  }, [meditationId, type]);
+    fetchExercise();
+  }, [exerciseId]);
 
 
   useEffect(() => {
@@ -187,11 +185,9 @@ export default function PlayerScreen() {
 
     initializeAudioSettings();
 
-    // Load audio when meditationData (containing audioUrl) is available or if it's an exercise
-    if ((type === 'meditation' && meditationData) || type === 'exercise') {
-       if (isMounted) {
-         loadAudio(); // Call loadAudio here
-       }
+    // Load audio when exerciseData (containing audioUrl) is available
+    if (exerciseData && isMounted) {
+      loadAudio(); // Call loadAudio here
     }
 
     // Cleanup function
@@ -213,8 +209,8 @@ export default function PlayerScreen() {
         );
       }
     };
-  // Depend on meditationData to trigger loading when URL is ready
-  }, [meditationData, type]); // Add type dependency
+  // Depend on exerciseData to trigger loading when URL is ready
+  }, [exerciseData]);
 
 
   useEffect(() => {
@@ -320,28 +316,42 @@ export default function PlayerScreen() {
       if (soundRef.current) {
         console.log('Unloading previous sound...');
         await soundRef.current.unloadAsync();
-        soundRef.current = null; // Clear the ref
+        soundRef.current = null;
       }
 
-      let audioSource: any;
-      if (type === 'meditation' && meditationData?.audioUrl) {
-        console.log('Using meditation audioUrl:', meditationData.audioUrl);
-        audioSource = { uri: meditationData.audioUrl };
-      } else if (type === 'exercise') {
-        // For exercises, continue using the sample or define exercise-specific audio
-        console.log('Using sample audio for exercise');
-        audioSource = require('../assets/meditations/sample.mp3');
+      let audioSource;
+      if (exerciseData?.audioUrl) {
+        // Check if the audioUrl is a full URL or a Storage path
+        if (exerciseData.audioUrl.startsWith('http')) {
+          // It's already a full URL
+          audioSource = { uri: exerciseData.audioUrl };
+          console.log('Using direct URL:', exerciseData.audioUrl);
+        } else {
+          // It's a Storage path - convert to download URL
+          const storage = getStorage(); // Use getStorage without app instance
+          // Remove any leading slash if present
+          const storagePath = exerciseData.audioUrl.startsWith('/')
+            ? exerciseData.audioUrl.substring(1)
+            : exerciseData.audioUrl;
+
+          console.log('Fetching from Storage path:', storagePath);
+
+          const audioRef = storageRef(storage, storagePath);
+          const downloadUrl = await getDownloadURL(audioRef);
+          console.log('Retrieved download URL:', downloadUrl);
+          audioSource = { uri: downloadUrl };
+        }
       } else {
-        console.error('Cannot load audio: Invalid type or missing audio URL.');
-        setIsLoading(false);
-        return; // Exit if no valid source
+        // Fallback to local audio file
+        console.log('No audioUrl found, using sample audio');
+        audioSource = require('../assets/exercises/sample.mp3');
       }
 
       console.log('Creating sound object with source:', audioSource);
       const { sound: audioSound, status } = await Audio.Sound.createAsync(
         audioSource,
         {
-          shouldPlay: false, // Don't play automatically
+          shouldPlay: false,
           progressUpdateIntervalMillis: 1000,
           positionMillis: 0,
           volume: 1.0,
@@ -361,10 +371,27 @@ export default function PlayerScreen() {
       soundRef.current = audioSound;
       setDuration(status.durationMillis || 0);
       setPosition(status.positionMillis || 0);
-      setIsLoading(false); // Loading finished
-    } catch (error) {
+      setIsLoading(false);
+    } catch (error: unknown) { // Added type annotation
       console.error('Error in loadAudio:', error);
-      setIsLoading(false); // Ensure loading stops on error
+      // Specific error handling for storage errors with type checking
+      if (typeof error === 'object' && error !== null && 'code' in error) {
+        const firebaseError = error as { code: string; message?: string }; // Type assertion
+        if (firebaseError.code === 'storage/object-not-found') {
+          console.error(`Audio file not found at path: ${exerciseData?.audioUrl}. Error: ${firebaseError.message}`);
+          // Optionally set a state to show an error message to the user
+        } else if (firebaseError.code === 'storage/unauthorized') {
+          console.error(`Permission denied for audio file: ${exerciseData?.audioUrl}. Error: ${firebaseError.message}`);
+          // Check Firebase Storage rules
+        } else {
+          console.error('Firebase Storage Error:', firebaseError.message);
+        }
+      } else if (error instanceof Error) {
+          console.error('Generic Error in loadAudio:', error.message);
+      } else {
+          console.error('Unknown error type in loadAudio:', error);
+      }
+      setIsLoading(false);
     }
   };
 
@@ -417,33 +444,16 @@ export default function PlayerScreen() {
         console.error('User ID is required');
         return;
       }
-      if (type === 'exercise') {
-        // Assuming meditationId is the exerciseId for exercises
-        await ExerciseService.completeExercise(userId, meditationId as string);
-      } else if (type === 'meditation') {
-        // Calculate minutes from duration (ms)
-        const minutesCompleted = Math.round(duration / 60000);
-
-        // Track activity in subcollection
-        await UserService.trackActivity({
-          userId,
-          type: 'meditation',
-          timestamp: new Date(),
-          details: {
-            duration: minutesCompleted, // Log duration in minutes
-            title: meditationData?.title ?? (params.title as string) ?? 'Meditation', // Use fetched title or param title
-          },
-        });
-
-        // Update main user stats
-        if (minutesCompleted > 0) {
-          await UserService.updateMeditationStats(userId, minutesCompleted);
-        }
+      if (!exerciseId) {
+        console.error('Exercise ID is missing for completion');
+        return;
       }
 
-      console.log(`${type} activity completed successfully.`);
+      // Always handle as exercise completion
+      await ExerciseService.completeExercise(userId, exerciseId as string);
+      console.log('Exercise completed successfully');
     } catch (error) {
-      console.error(`Error logging ${type} activity:`, error);
+      console.error('Error completing exercise:', error);
     }
   };
 
@@ -451,11 +461,11 @@ export default function PlayerScreen() {
     if (!isPlaying && position === duration && duration > 0) {
       handleActivityCompletion();
     }
-  }, [isPlaying, position, duration, handleActivityCompletion]);
+  }, [isPlaying, position, duration, userId, exerciseId]); // Added userId, exerciseId dependencies
 
-  // Determine title and subtitle based on fetched data or params
-  const displayTitle = meditationData?.title ?? (params.title as string) ?? (type === 'meditation' ? 'Meditation' : 'Exercise');
-  const displaySubtitle = meditationData?.description ?? (params.subtitle as string) ?? '';
+  // Determine title and subtitle based on fetched exercise data
+  const displayTitle = exerciseData?.title ?? 'Exercise';
+  const displaySubtitle = exerciseData?.description ?? '';
 
 
   return (
@@ -558,13 +568,13 @@ export default function PlayerScreen() {
             disabled={isLoading}
             style={styles.playButton}
             accessibilityLabel={
-              isPlaying ? 'Pause meditation' : 'Play meditation'
+              isPlaying ? 'Pause exercise' : 'Play exercise' // Updated label
             }
             accessibilityState={{ disabled: isLoading, busy: isLoading }}
             accessibilityHint={
               isPlaying
-                ? 'Pauses the current meditation'
-                : 'Starts playing the meditation'
+                ? 'Pauses the current exercise' // Updated hint
+                : 'Starts playing the exercise' // Updated hint
             }
           />
         </View>

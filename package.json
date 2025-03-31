@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
-    "prestart": "node firebase-symlinks.js && node fix-exports.js && node prep-build.js",
-    "start": "expo start --config ./rn-config-override.js --clear",
+    "prestart": "node prep-build.js",
+    "start": "expo start --clear",
     "fix-exports": "node fix-exports.js",
     "fix-and-start": "node firebase-symlinks.js && npm run fix-exports && node prep-build.js && npx expo start --clear",
     "android": "node prep-build.js && expo start --android",

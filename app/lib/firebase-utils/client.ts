@@ -1,10 +1,6 @@
-import { app, auth, db as firestore, storage, functions } from './firebase';
+import { app, auth, db as firestore, storage } from './firebase'; // Removed 'functions' import
 
-// Client-side callable functions
-export const clientFunctions = {
-  generateMoodInsights: functions, // You'll define these properly later
-  getUserStats: functions
-};
+// Client-side callable functions - Removed this section as it's handled elsewhere
 
 // Add a default export
-export default { app, auth, firestore, storage, functions, clientFunctions };
+export default { app, auth, firestore, storage }; // Removed 'functions' and 'clientFunctions'

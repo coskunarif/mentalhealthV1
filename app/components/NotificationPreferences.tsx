@@ -18,9 +18,10 @@ interface NotificationSettingDefinition {
 // Definitions list
 const settingDefinitions: NotificationSettingDefinition[] = [
   {
-    id: 'reminders',
+    id: 'reminders', // Added id field
     label: 'Daily Reminders',
-    description: 'Get notifications for your daily meditation practice',
+    description: 'Get notifications for your daily exercise', // Updated description
+    // value: 'reminders', // Removed incorrect value field
   },
   {
     id: 'progress',

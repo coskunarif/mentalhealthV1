@@ -30,10 +30,6 @@ export interface UserStats {
     createdAt: Timestamp;
     streak: number;
   };
-  meditation: {
-    totalTime: number;
-    sessions: number;
-  };
   activities: {
     exercisesCompleted: number;
     surveysCompleted: number;

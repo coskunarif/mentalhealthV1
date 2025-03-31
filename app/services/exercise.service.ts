@@ -305,12 +305,12 @@ export class ExerciseService {
     static async getRecentActivities(userId: string): Promise<any[]> {
       try {
           console.log('getRecentActivities: Fetching recent activities...');
-          const activitiesRef = collection(db, 'users', userId, 'activities');
-          const q = query(activitiesRef,
-              where('type', 'in', ['meditation', 'exercise', 'mood', 'survey']), // Added 'survey'
-              orderBy('timestamp', 'desc'),
-              limit(5)
-          );
+  const activitiesRef = collection(db, 'users', userId, 'activities');
+  const q = query(activitiesRef,
+    where('type', 'in', ['exercise', 'mood', 'survey']),
+    orderBy('timestamp', 'desc'),
+    limit(5)
+  );
 
             let snapshot;
             try {
@@ -352,8 +352,6 @@ export class ExerciseService {
      */
     private static getActivityTitle(type: string): string {
         switch (type) {
-            case 'meditation':
-                return 'Meditation Session';
             case 'exercise':
                 return 'Breathing Exercise';
             case 'mood':

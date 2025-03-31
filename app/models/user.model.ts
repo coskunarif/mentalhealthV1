@@ -12,7 +12,6 @@ export interface UserSettings {
 }
 
 export interface UserStats {
-  meditationMinutes: number;
   exercisesCompleted: number;
   streak: number;
   surveysCompleted: number;
@@ -30,7 +29,7 @@ export interface UserModel {
   stats: UserStats;
   phoneNumber?: string;
   dateOfBirth?: string;
-  sessions?: number;
+  // Remove sessions field
   streak?: number;
   surveys?: number;
 }

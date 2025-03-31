@@ -3,7 +3,7 @@ import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { getFunctions } from 'firebase/functions';
+// Removed getFunctions import
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { firebaseConfig } from './config';
 import { SDK_VERSION } from 'firebase/app';
@@ -22,8 +22,7 @@ export const db = getFirestore(app);
 // Storage
 export const storage = getStorage(app);
 
-// Functions
-export const functions = getFunctions(app);
+// Functions - Removed initialization from here
 
 // Analytics (initialize only if supported)
 export let analytics: any = null; // Use let to allow reassignment
@@ -54,5 +53,5 @@ export const testFirestoreConnection = async () => {
   }
 };
 
-// Export consolidated object
-export default { app, auth, db, storage, functions, analytics };
+// Export consolidated object (without functions)
+export default { app, auth, db, storage, analytics };

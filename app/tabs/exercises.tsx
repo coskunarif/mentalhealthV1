@@ -87,7 +87,7 @@ export default function ExercisesScreen() {
 
   const handleStartExercise = () => {
     if (nextExercise) {
-      router.push(`/player?meditationId=${nextExercise.id}&type=exercise`);
+      router.push(`/player?exerciseId=${nextExercise.id}`); // Use exerciseId, removed type
     }
   };
 
@@ -113,7 +113,7 @@ export default function ExercisesScreen() {
             </Text>
           </View>
           <MaterialCommunityIcons
-            name="meditation"
+            name="lungs"
             size={48}
             color={theme.colors.primary}
             style={{ marginLeft: 16 }}

@@ -27,12 +27,12 @@ export const onUserCreate = functions
           },
           language: 'en',
           theme: 'light'
-        },
-        stats: {
-          meditationMinutes: 0,
-          exercisesCompleted: 0,
-          streak: 0,
-          surveysCompleted: 0,
+          },
+          stats: {
+            // Removed meditationMinutes
+            exercisesCompleted: 0,
+            streak: 0,
+            surveysCompleted: 0,
           lastActiveDate: null
         }
       });
