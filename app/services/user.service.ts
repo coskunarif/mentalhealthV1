@@ -3,8 +3,8 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { auth, db, storage, app } from '../lib/firebase-utils';
 import { UserModel, PersonalInformation, UserSettings } from '../models/user.model';
-// Import the pre-configured callable function instead of getFunctions/httpsCallable
-import { getUserStats as getUserStatsCallable } from './firebase-functions';
+// Import the pre-configured callable function AND the functions instance
+import { functions, getUserStats as getUserStatsCallable } from './firebase-functions';
 import { UserStatsResponse } from '../models/user-stats.model';
 
 // User operations
@@ -286,6 +286,8 @@ export class UserService {
       const getStats = getUserStatsCallable;
 
       // Add extra logging right before the call
+      // Log the imported functions instance region
+      console.log(`[DEBUG] PRE-CALL CHECK: Functions instance region: ${functions.region}`);
       console.log(`[DEBUG] PRE-CALL CHECK: auth.currentUser UID: ${auth.currentUser?.uid}`);
       console.log(`[DEBUG] PRE-CALL CHECK: auth.currentUser Email: ${auth.currentUser?.email}`);
       console.log(`[DEBUG] PRE-CALL CHECK: Is currentUser null? ${auth.currentUser === null}`);
