@@ -43,6 +43,7 @@ const createStyles = (theme: AppTheme) =>
       alignItems: 'center',
       justifyContent: 'center',
       paddingVertical: 16,
+      paddingTop: 24, // Added more top padding to prevent overlap with app bar
     } as ViewStyle,
     mandalaContainer: {
       width: MANDALA_SIZE,
@@ -478,6 +479,7 @@ export default function PlayerScreen() {
       }
       showBackButton={true}
       scrollable={false}
+      contentTopPadding={24} // Added more top padding
     >
       <View style={styles.content}>
         <Animated.View style={styles.gradientContainer}>
@@ -502,6 +504,8 @@ export default function PlayerScreen() {
             ]}
           />
         </Animated.View>
+        {/* Added a spacer view to push content down */}
+        <View style={{ height: 20 }} />
         <Animated.View
           style={[
             styles.mandalaContainer,
