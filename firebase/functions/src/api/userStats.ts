@@ -47,6 +47,8 @@ export const getUserStats = onCall({
   // Region is set globally in index.ts
 // Add type for request based on usage
 }, async (request: { auth?: { uid: string }, data?: any }) => { // Add data to type annotation
+  // Log the raw request object immediately
+  console.log('[DEBUG] Raw request object:', JSON.stringify(request, null, 2));
   console.log('[DEBUG] getUserStats Cloud Function called');
   // Log the project ID the function is connected to
   console.log(`[DEBUG] Function connected to project: ${admin.app().options.projectId}`);

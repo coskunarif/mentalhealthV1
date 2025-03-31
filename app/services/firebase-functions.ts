@@ -2,7 +2,7 @@ import { httpsCallable, HttpsCallableResult, getFunctions } from 'firebase/funct
 import { app } from '../lib/firebase'; // Import only the 'app' instance
 
 // Initialize functions directly here, specifying the region
-const functions = getFunctions(app, 'europe-west1');
+export const functions = getFunctions(app, 'europe-west1'); // Export this instance
 
 // Define types for your function responses
 interface UserStatsResponse {

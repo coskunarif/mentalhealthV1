@@ -1,8 +1,22 @@
 import * as admin from 'firebase-admin';
 import { setGlobalOptions } from 'firebase-functions/v2';
+import { logger } from 'firebase-functions/v2'; // Import logger
+
+// Log environment variables before initializing admin
+logger.info('Firebase/GCP Environment Variables:', {
+  FIREBASE_CONFIG: process.env.FIREBASE_CONFIG,
+  GOOGLE_CLOUD_PROJECT: process.env.GOOGLE_CLOUD_PROJECT,
+  FUNCTION_REGION: process.env.FUNCTION_REGION,
+  FUNCTION_TARGET: process.env.FUNCTION_TARGET,
+  FUNCTION_SIGNATURE_TYPE: process.env.FUNCTION_SIGNATURE_TYPE,
+  K_SERVICE: process.env.K_SERVICE,
+  K_REVISION: process.env.K_REVISION,
+  PORT: process.env.PORT
+});
 
 // Initialize Firebase Admin first (important for hybrid approach)
 admin.initializeApp();
+logger.info('Firebase Admin Initialized.'); // Log after init
 
 // Set global options for v2 functions
 setGlobalOptions({
