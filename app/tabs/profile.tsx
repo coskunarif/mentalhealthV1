@@ -13,6 +13,7 @@ import { UserStats } from '../models/user-stats.model'; // Correct import path
 import { Timestamp } from 'firebase/firestore'; // Import Timestamp
 // Import the cloud functions - remove ensureUserDocument
 import { getUserStats } from '../services/firebase-functions';
+import { auth } from '../lib/firebase'; // Import auth
 
 export default function ProfileScreen() {
   const theme = useAppTheme(); // Get the current theme using the hook
@@ -100,9 +101,25 @@ export default function ProfileScreen() {
 
   // Combined fetch function
   const fetchData = useCallback(async () => {
-    setError(null); // Clear previous errors
-    await Promise.all([fetchUserStats(), fetchSubscriptionStatus()]);
-  }, [fetchUserStats, fetchSubscriptionStatus]);
+    setError(null);
+    // Add this check before making any calls
+    if (!user?.uid || !auth.currentUser) {
+      console.log('[DEBUG] Auth not ready yet, deferring data fetch');
+      setStatsLoading(false);
+      setSubLoading(false);
+      return;
+    }
+    
+    // Check token validity first
+    try {
+      await auth.currentUser.getIdToken(true); // Force token refresh
+      console.log('[DEBUG] Token refreshed successfully');
+      await Promise.all([fetchUserStats(), fetchSubscriptionStatus()]);
+    } catch (error) {
+      console.error('[DEBUG] Token refresh error:', error);
+      setError('Authentication error. Please try signing in again.');
+    }
+  }, [fetchUserStats, fetchSubscriptionStatus, user?.uid]); // Added user?.uid dependency
 
   // Initial data fetch
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { doc, getDoc, updateDoc, setDoc, onSnapshot, Unsubscribe, collection, writeBatch, increment, Timestamp } from 'firebase/firestore'; // Added increment, Timestamp
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
-import { auth, db, storage, app } from '../lib/firebase-utils';
+import { auth, db, storage, app } from '../lib/firebase-utils/index'; // Corrected import path
 import { UserModel, PersonalInformation, UserSettings } from '../models/user.model';
 // Import the pre-configured callable function AND the functions instance
 import { functions, getUserStats as getUserStatsCallable } from './firebase-functions';
@@ -10,6 +10,79 @@ import { UserStatsResponse } from '../models/user-stats.model';
 // User operations
 
 export class UserService {
+
+  // Add this helper function
+  private static async callWithRetry<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {
+    let lastError;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Add increasing delays between retries
+        if (attempt > 1) {
+          await new Promise(resolve => setTimeout(resolve, 300 * Math.pow(2, attempt - 1)));
+        }
+        
+        // Force token refresh on retries
+        if (attempt > 1 && auth.currentUser) {
+           try {
+             console.log(`[DEBUG] Retry attempt ${attempt}: Refreshing token...`);
+             await auth.currentUser.getIdToken(true);
+             console.log(`[DEBUG] Retry attempt ${attempt}: Token refreshed.`);
+           } catch (tokenRefreshError) {
+             console.error(`[DEBUG] Retry attempt ${attempt}: Token refresh failed during retry:`, tokenRefreshError);
+             // Decide if token refresh failure itself should stop retries or be the lastError
+             lastError = tokenRefreshError; 
+             // Optionally continue to next attempt or break/throw immediately
+             // continue; // Or throw if token refresh is critical for the next attempt
+           }
+        }
+        
+        console.log(`[DEBUG] Retry attempt ${attempt}: Calling function...`);
+        return await fn();
+      } catch (error: any) {
+        console.error(`[DEBUG] Attempt ${attempt} failed:`, error.code, error.message); // Log code and message
+        lastError = error;
+        
+        // Only retry on specific authentication-related errors (adjust codes as needed)
+        const errorCode = error?.code; // Firebase errors often have a 'code' property
+        const errorMessage = error?.message?.toLowerCase() || '';
+        
+        // Example list of retryable error codes/messages (customize based on observed errors)
+        const retryableErrorCodes = [
+          'auth/user-token-expired', 
+          'auth/invalid-user-token',
+          'functions/unauthenticated', // Common for callable functions
+          'unavailable' // Sometimes used for temporary network issues
+        ];
+        const retryableMessages = [
+          'unauthenticated', 
+          'token refresh failed',
+          'network error' // Generic network issue
+        ];
+
+        let shouldRetry = retryableErrorCodes.includes(errorCode);
+        if (!shouldRetry) {
+           shouldRetry = retryableMessages.some(msg => errorMessage.includes(msg));
+        }
+
+        if (!shouldRetry) {
+          console.log(`[DEBUG] Non-retryable error encountered (Code: ${errorCode}, Message: ${errorMessage}). Throwing.`);
+          throw error; // Re-throw non-retryable errors immediately
+        }
+        
+        // If it's the last attempt, throw the last error
+        if (attempt === maxRetries) {
+           console.error(`[DEBUG] Max retries (${maxRetries}) reached. Throwing last error.`);
+           throw lastError;
+        }
+        console.log(`[DEBUG] Retryable error encountered. Proceeding to attempt ${attempt + 1}...`);
+      }
+    }
+    // This line should theoretically not be reached if maxRetries > 0, 
+    // but needed for TypeScript compiler satisfaction if maxRetries could be 0.
+    // Throwing the last captured error is the safest fallback.
+    throw lastError || new Error('Retry mechanism failed without capturing an error.'); 
+  }
+
   /**
    * Get user profile data
    */
@@ -261,50 +334,56 @@ export class UserService {
    */
   static async getUserDetailedStats(userId: string): Promise<UserStatsResponse['stats']> {
     try {
+      // Check 1: userId exists
       if (!userId) throw new Error('User ID is required');
       console.log(`[DEBUG] Calling getUserStats for user: ${userId}`);
-      
-      // REMOVE this delay - it's unnecessary and can cause issues
-      // await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Get fresh token - KEEP this part
-      if (auth.currentUser) {
-        console.log(`[DEBUG] Current Auth user: ${auth.currentUser?.uid}, trying to get stats for: ${userId}`);
-        try {
-          await auth.currentUser.getIdToken(true); // Force refresh
-          console.log('[DEBUG] Successfully refreshed ID token.');
-        } catch (tokenError) {
-          console.error('[DEBUG] Error refreshing ID token:', tokenError);
-          throw new Error('Authentication token refresh failed');
-        }
-      } else {
-        console.warn('[DEBUG] currentUser is null before calling function!');
-        throw new Error('No authenticated user found');
+  
+      // Check 2: auth.currentUser exists
+      if (!auth.currentUser) {
+        console.error('[DEBUG] No authenticated user found');
+        throw new Error('Authentication required');
       }
-
+  
+      // Check 3: User ID matches current auth user
+      if (auth.currentUser.uid !== userId) {
+        console.error('[DEBUG] User ID mismatch:', auth.currentUser.uid, userId);
+        throw new Error('User ID mismatch');
+      }
+  
+      // Check 4: Get fresh token with explicit error handling
+      try {
+        const token = await auth.currentUser.getIdToken(true); // Force token refresh
+        console.log('[DEBUG] Token refreshed successfully, length:', token.length);
+      } catch (tokenError) {
+        console.error('[DEBUG] Token refresh failed:', tokenError);
+        throw new Error('Authentication token refresh failed');
+      }
+  
+      // Check 5: Call the function with a small delay to ensure token propagation
+      await new Promise(resolve => setTimeout(resolve, 100));
+  
       // Use the imported pre-configured callable function
-      const getStats = getUserStatsCallable;
-
-      // Add extra logging right before the call
-      // Log the imported functions instance region
+      const getStats = getUserStatsCallable; // Keep this line from original code
+  
+      // Add extra logging right before the call (optional, kept from original for debugging)
       console.log(`[DEBUG] PRE-CALL CHECK: Functions instance region: ${functions.region}`);
       console.log(`[DEBUG] PRE-CALL CHECK: auth.currentUser UID: ${auth.currentUser?.uid}`);
       console.log(`[DEBUG] PRE-CALL CHECK: auth.currentUser Email: ${auth.currentUser?.email}`);
       console.log(`[DEBUG] PRE-CALL CHECK: Is currentUser null? ${auth.currentUser === null}`);
-
-      console.log('[DEBUG] Calling Cloud Function (no params)...');
-      // Call without parameters - the auth context will be passed automatically
-      const result = await getStats();
+  
+      console.log('[DEBUG] Calling Cloud Function via retry wrapper...');
+      // Call using the retry wrapper
+      const result = await this.callWithRetry(() => getStats()); 
       console.log('[DEBUG] Cloud Function returned result success status:', result.data.success);
-
+  
       if (result.data.success) {
-        return result.data.stats;
+        return result.data.stats; // Keep this line from original code
       } else {
         const errorMessage = (result.data as any)?.error || 'Failed to get user stats';
         console.error(`[DEBUG] Cloud function indicated failure: ${errorMessage}`);
-        throw new Error(errorMessage);
+        throw new Error(errorMessage); // Keep this line from original code
       }
-    } catch (error) {
+    } catch (error) { // Keep existing catch block
       console.error('[DEBUG] Error getting user stats:', error);
       // Log the complete error object
       console.error('[DEBUG] Full error:', JSON.stringify(error));

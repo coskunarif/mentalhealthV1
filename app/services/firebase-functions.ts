@@ -1,5 +1,5 @@
 import { httpsCallable, HttpsCallableResult, getFunctions } from 'firebase/functions'; // Added getFunctions import
-import { app } from '../lib/firebase'; // Import only the 'app' instance
+import { app } from '../lib/firebase-utils/index'; // Corrected import path
 
 // Initialize functions directly here, specifying the region
 export const functions = getFunctions(app, 'europe-west1'); // Export this instance
