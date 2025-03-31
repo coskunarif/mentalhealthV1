@@ -216,3 +216,5 @@ export const CARD_ELEVATION = { // Reference lightTheme for simplicity, or make 
 };
 
 // Removed default export
+
+export default lightTheme; // Add lightTheme as the default export

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 // Use aliased import for firebase/auth User and remove User from firebase-utils import
-import { auth, db } from '../lib/firebase-utils';
+import { auth, db } from '../lib/firebase-utils/index'; // Corrected import path
 import { onAuthStateChanged, User as FirebaseAuthUser } from 'firebase/auth';
 import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore'; // Import onSnapshot and Unsubscribe
 import UserService from '../services/user.service'; // Import UserService
@@ -38,8 +38,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Subscribe to auth state changes
     // Use FirebaseAuthUser type for the authUser parameter
-    const authUnsubscribe = onAuthStateChanged(auth, (authUser: FirebaseAuthUser | null) => {
-      console.log('Auth state changed. authUser:', authUser?.uid);
+    const authUnsubscribe = onAuthStateChanged(auth, async (authUser: FirebaseAuthUser | null) => { // Added async here
+      // --- Start Added Debug Logging ---
+      console.log(`[AUTH DEBUG] Auth state changed: ${authUser ? 'signed in' : 'signed out'}`);
+      if (authUser) {
+        console.log(`[AUTH DEBUG] User ID: ${authUser.uid}`);
+        try {
+          const token = await authUser.getIdToken(); // Added await
+          console.log(`[AUTH DEBUG] Token retrieved, first 10 chars: ${token.substring(0, 10)}...`);
+        } catch (e) {
+          console.error('[AUTH DEBUG] Token retrieval error:', e);
+        }
+      }
+      // --- End Added Debug Logging ---
+      
+      console.log('Auth state changed. authUser:', authUser?.uid); // Kept original log for comparison
 
       // Unsubscribe from previous Firestore listener if it exists
       if (firestoreUnsubscribeRef.current) {

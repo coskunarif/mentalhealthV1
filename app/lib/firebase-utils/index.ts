@@ -1,16 +1,16 @@
-import { app, auth, db, storage, functions, analytics } from './firebase';
+import { app, auth, db, storage, analytics } from './firebase'; // Removed 'functions' import
 import * as authMethods from './auth';
 import * as firestoreMethods from './firestore';
 import * as storageMethods from './storage';
 
 // Re-export everything
-export { 
-  app, 
-  auth, 
-  db, 
-  storage, 
-  functions, 
-  analytics 
+export {
+  app,
+  auth,
+  db,
+  storage,
+  // Removed 'functions' re-export
+  analytics
 };
 
 // Re-export utility methods
@@ -22,5 +22,3 @@ export * from './storage';
 export type { User } from 'firebase/auth';
 
 export { Timestamp, queryDocuments, getDocument } from './firestore';
-
-export default {};
