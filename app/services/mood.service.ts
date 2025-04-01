@@ -26,6 +26,13 @@ export class MoodService {
     factors?: string[],
     notes?: string
   }): Promise<string> {
+    // Validation
+    if (!entry.userId) throw new Error('User ID is required');
+    if (!entry.mood) throw new Error('Mood type is required');
+    if (typeof entry.value !== 'number' || entry.value < 0 || entry.value > 100) {
+      throw new Error('Mood value must be a number between 0 and 100');
+    }
+  
     try {
       console.log('Saving mood entry:', JSON.stringify(entry, null, 2));
       // Ensure duration exists (required field)
