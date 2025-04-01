@@ -12,33 +12,40 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if request.auth != null;  // Allow any authenticated user to read
       allow create, update, delete: if request.auth != null && request.auth.uid == userId;
-      
+
       // User progress subcollection
       match /progress/{progressId} {
         allow read: if request.auth != null;
         allow create, update, delete: if request.auth != null && request.auth.uid == userId;
       }
-      
+
       // User activities subcollection
       match /activities/{activityId} {
         allow read: if request.auth != null;
-        allow create, update, delete: if request.auth != null && request.auth.uid == userId;
+        // Ensure the user creating the activity owns it (matches path and data)
+        allow create: if request.auth != null && request.auth.uid == userId && request.resource.data.userId == request.auth.uid;
+        // Allow update/delete only by the owner
+        allow update, delete: if request.auth != null && request.auth.uid == userId;
       }
     }
 
     // Mood tracking data
     match /moods/{moodId} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null;
+      // Ensure the user creating the mood entry owns it
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      // Allow update/delete only by the owner
       allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
     }
 
     // Survey responses
     match /surveys/{surveyId} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null;
+      // Ensure the user creating the survey response owns it
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      // Allow update only by the owner
       allow update: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow delete: if false;
+      allow delete: if false; // Disallow deletion
     }
 
     // Mood Definitions - allow read access to all authenticated users

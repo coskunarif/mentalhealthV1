@@ -10,8 +10,9 @@ import QuickActions from '../components/QuickActions';
 import TodaysFocus from '../components/TodaysFocus';
 import { useAuth } from '../hooks/useAuth';
 import type { AppTheme } from '../types/theme';
-import { ExerciseService } from '../services/exercise.service';
+import { UserService } from '../services/user.service'; // Import UserService
 import { MoodService } from '../services/mood.service'; // Import MoodService
+import { UserActivity } from '../models/user.model'; // Import UserActivity
 import { safeStringify } from '../lib/debug-utils';
 
 const todaysFocus = {
@@ -19,14 +20,7 @@ const todaysFocus = {
   affirmation: "You're capable of handling whatever comes today."
 };
 
-interface RecentActivity {
-    id: string;
-    type: string;
-    title: string;
-    subtitle: string;
-    duration: number;
-    timestamp: Date;
-}
+// Removed local RecentActivity interface
 
 export default function Home() {
     // Test comment
@@ -34,7 +28,7 @@ export default function Home() {
     const { user, loading } = useAuth();
     const [radarData, setRadarData] = useState<DataPoint[]>([]);
     const [chartLabels, setChartLabels] = useState<string[]>([]);
-    const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
+    const [recentActivities, setRecentActivities] = useState<UserActivity[]>([]); // Use UserActivity[]
 
     useEffect(() => {
         const fetchMoodData = async () => { // Renamed function
@@ -72,10 +66,11 @@ export default function Home() {
             try {
                 console.log('🔍 [HOME DEBUG] Fetching recent activities, user:', user?.uid);
                 if (user) {
-                    const activities = await ExerciseService.getRecentActivities(user.uid);
+                    // Use UserService to fetch activities which are already typed as UserActivity[]
+                    const activities = await UserService.getRecentActivities(user.uid); 
                     console.log('🔍 [HOME DEBUG] Received activities:', safeStringify(activities));
                     
-                    // Validate activities
+                    // Validate activities (UserService already returns UserActivity[])
                     if (!Array.isArray(activities)) {
                         console.error('❌ [HOME DEBUG] Activities is not an array:', activities);
                         setRecentActivities([]);

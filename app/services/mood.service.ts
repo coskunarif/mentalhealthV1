@@ -4,6 +4,7 @@ import { Timestamp, queryDocuments, getDocument } from '../lib/firebase-utils/fi
 import { MoodEntry, MoodInsights, MoodInsightsResponse, MoodDefinition, EmotionDefinition } from '../models/mood.model'; // Add EmotionDefinition import
 import { DataPoint } from '../components/RadarChart'; // Assuming DataPoint is defined here or imported appropriately
 import { getFunctions, httpsCallable, HttpsCallableResult } from '@firebase/functions';
+import UserService from './user.service'; // Import UserService
 import { app } from '../lib/firebase-utils';
 
 const functions = getFunctions(app!);
@@ -47,6 +48,19 @@ export class MoodService {
       
       const docRef = await addDoc(collection(db, 'moods'), entryData);
       console.log('Successfully saved mood entry with ID:', docRef.id);
+
+      // Track the activity
+      await UserService.trackActivity({
+        userId: entry.userId,
+        type: 'mood',
+        timestamp: entry.timestamp || new Date(),
+        details: {
+          title: `Recorded ${entry.mood}`,
+          value: entry.value,
+          factors: entry.factors || []
+        }
+      });
+
       return docRef.id;
     } catch (error: any) {
       console.error('Error saving mood entry:', error);
