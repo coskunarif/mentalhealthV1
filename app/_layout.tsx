@@ -10,6 +10,8 @@ import { AuthProvider, useAuth } from './context/auth'; // Import useAuth
 import { lightTheme, darkTheme } from './config/theme'; // Import specific themes
 import ErrorBoundary from './components/ErrorBoundary';
 import type { AppTheme } from './types/theme';
+// Import locale registration
+import { registerTranslation, en } from 'react-native-paper-dates';
 // Remove unused useTheme import from here if not used elsewhere in this file
 // Add at the beginning of app/_layout.tsx to check Auth state on startup (Added)
 import { onAuthStateChanged } from 'firebase/auth';
@@ -19,6 +21,9 @@ import { auth } from './lib/firebase-utils'; // Assuming firebase-utils exports 
 const app = initializeApp(firebaseConfig);
 // Then import other Firebase services
 import './lib/firebase';
+
+// Register the English locale for react-native-paper-dates
+registerTranslation('en', en);
 
 // Keep the splash screen visible while resources load
 SplashScreen.preventAutoHideAsync();
