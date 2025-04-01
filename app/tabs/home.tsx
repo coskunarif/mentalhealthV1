@@ -11,6 +11,7 @@ import TodaysFocus from '../components/TodaysFocus';
 import { useAuth } from '../hooks/useAuth';
 import type { AppTheme } from '../types/theme';
 import { ExerciseService } from '../services/exercise.service';
+import { MoodService } from '../services/mood.service'; // Import MoodService
 import { safeStringify } from '../lib/debug-utils';
 
 const todaysFocus = {
@@ -36,43 +37,32 @@ export default function Home() {
     const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
 
     useEffect(() => {
-        const fetchRadarData = async () => {
+        const fetchMoodData = async () => { // Renamed function
             try {
-                console.log('🔍 [HOME DEBUG] Fetching radar data, user:', user?.uid);
+                console.log('🔍 [HOME DEBUG] Fetching mood radar data, user:', user?.uid); // Updated log
                 if (user) {
-                    const { data, labels } = await ExerciseService.getRadarData(user.uid);
+                    // Fetch mood data using MoodService
+                    const { data, labels } = await MoodService.getMoodRadarData(user.uid); 
                     
-                    console.log('🔍 [HOME DEBUG] Received radar data:', safeStringify(data));
-                    console.log('🔍 [HOME DEBUG] Received radar labels:', safeStringify(labels));
+                    console.log('🔍 [HOME DEBUG] Received mood radar data:', safeStringify(data)); // Updated log
+                    console.log('🔍 [HOME DEBUG] Received mood radar labels:', safeStringify(labels)); // Updated log
                     
-                    // Check if data is valid
-                    if (!Array.isArray(data)) {
-                        console.error('❌ [HOME DEBUG] Radar data is not an array:', data);
-                        setRadarData([]);
-                    } else if (data.length === 0) {
-                        console.warn('⚠️ [HOME DEBUG] Radar data array is empty');
-                        setRadarData([]);
-                    } else {
-                        // Data is already validated in the service, just set it
+                    // Basic validation (can be enhanced)
+                    if (Array.isArray(data) && Array.isArray(labels)) {
                         setRadarData(data);
-                    }
-                    
-                    // Validate labels
-                    if (!Array.isArray(labels)) {
-                        console.error('❌ [HOME DEBUG] Radar labels is not an array:', labels);
-                        setChartLabels([]);
-                    } else {
-                        console.log('🔍 [HOME DEBUG] Setting chart labels:', labels);
                         setChartLabels(labels);
+                    } else {
+                        console.error('❌ [HOME DEBUG] Invalid mood data/labels received');
+                        setRadarData([]);
+                        setChartLabels([]);
                     }
                 } else {
-                    console.log('🔍 [HOME DEBUG] No user, setting empty radar data');
+                    console.log('🔍 [HOME DEBUG] No user, setting empty mood radar data'); // Updated log
                     setRadarData([]);
                     setChartLabels([]);
                 }
             } catch (error) {
-                console.error('❌ [HOME DEBUG] Error fetching radar data:', error);
-                // Set default empty values on error
+                console.error('❌ [HOME DEBUG] Error fetching mood radar data:', error); // Updated log
                 setRadarData([]);
                 setChartLabels([]);
             }
@@ -103,7 +93,7 @@ export default function Home() {
 
         if (!loading) {
             console.log('🔍 [HOME DEBUG] User loaded, fetching data...');
-            fetchRadarData();
+            fetchMoodData(); // Call the new function
             fetchRecentActivities();
         }
     }, [user, loading]);
@@ -161,10 +151,10 @@ export default function Home() {
             style={styles.container}
             contentContainerStyle={styles.contentContainer}
         >
-            {/* Radar Chart Section */}
+            {/* Radar Chart Section - Updated Title */}
             <Surface style={styles.section} elevation={1}>
                 <Text variant="headlineMedium" style={styles.sectionTitle}>
-                    Your Progress
+                    Your Mood Patterns 
                 </Text>
                 <RadarChart data={radarData} labels={chartLabels} />
             </Surface>
