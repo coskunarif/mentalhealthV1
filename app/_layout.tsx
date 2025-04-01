@@ -17,9 +17,7 @@ import { registerTranslation, en } from 'react-native-paper-dates';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './lib/firebase-utils'; // Assuming firebase-utils exports auth
 
-// Initialize Firebase ONCE at the top level
-const app = initializeApp(firebaseConfig);
-// Then import other Firebase services
+// Import Firebase utils - this will trigger initialization if needed
 import './lib/firebase';
 
 // Register the English locale for react-native-paper-dates
