@@ -1,5 +1,6 @@
 import { collection, addDoc, query, where, orderBy, getDocs, doc, updateDoc, setDoc, increment } from 'firebase/firestore';
 import { db } from '../lib/firebase-utils';
+import UserService from './user.service'; // Import UserService
 
 export class SurveyService {
   /**
@@ -34,8 +35,16 @@ export class SurveyService {
         'stats.surveysCompleted': increment(1)
       });
       
-      // Track the activity
-      await this.trackSurveyActivity(survey.userId, survey.timestamp);
+      // Track the activity using the central service
+      await UserService.trackActivity({
+        userId: survey.userId,
+        type: 'survey',
+        timestamp: survey.timestamp || new Date(),
+        details: {
+          title: 'Completed Wellness Survey',
+          subtitle: 'Daily Check-in'
+        }
+      });
       
       return docRef.id;
     } catch (error) {
@@ -44,27 +53,6 @@ export class SurveyService {
     }
   }
   
-  /**
-   * Track survey completion in activities
-   */
-  private static async trackSurveyActivity(userId: string, timestamp: Date): Promise<void> {
-    try {
-      const activityRef = doc(collection(db, 'users', userId, 'activities'));
-      const today = timestamp.toISOString().split('T')[0];
-      
-      await setDoc(activityRef, {
-        userId,
-        type: 'survey',
-        timestamp,
-        date: today,
-        details: {
-          title: 'Completed Wellness Survey',
-          subtitle: 'Daily Check-in'
-        }
-      });
-    } catch (error) {
-      console.error('Error tracking survey activity:', error);
-    }
-  }
+  // Removed the local trackSurveyActivity method as it's now handled by UserService
 }
 export default SurveyService;
