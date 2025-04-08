@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
+import { useRouter } from 'expo-router'; // Added for navigation
 // Add this import:
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './lib/firebase-utils/config'; // Adjust path if needed
@@ -29,6 +30,7 @@ SplashScreen.preventAutoHideAsync();
 // Define a component to handle theme selection and rendering
 function ThemedApp() {
   const { user, initialized, loading } = useAuth(); // Get user and loading state
+  const router = useRouter(); // Added for navigation
 
   // Determine the theme based on user settings, default to light
   // Only apply user theme once auth is initialized and not loading
@@ -95,10 +97,10 @@ function ThemedApp() {
     }
   }, []);
 
-  // Font loading logic remains the same
+  // Font loading logic - Using only Nunito as Kameron fonts failed on iOS
   const [loaded] = useFonts({
-    'Kameron': require('../assets/fonts/Kameron-Regular.ttf'),
-    'Kameron-Bold': require('../assets/fonts/Kameron-Bold.ttf'),
+    // 'Kameron': require('../assets/fonts/Kameron-Regular.ttf'), // Disabled due to iOS loading issues
+    // 'Kameron-Bold': require('../assets/fonts/Kameron-Bold.ttf'), // Disabled due to iOS loading issues
     'Nunito': require('../assets/fonts/Nunito-Regular.ttf'),
   });
 
@@ -112,6 +114,20 @@ function ThemedApp() {
   useEffect(() => {
     onLayoutRootView();
   }, [onLayoutRootView]);
+
+  // Add explicit navigation logic (MOVED HERE TO FIX HOOK ORDER)
+  useEffect(() => {
+    // We only attempt navigation *if* the app is ready (loaded and initialized)
+    // and the auth state is settled (!loading)
+    if (loaded && initialized && !loading) {
+      if (user) {
+        router.replace('/tabs/home');
+      } else {
+        router.replace('/auth/sign-in');
+      }
+    }
+    // Dependencies now include 'loaded' as navigation depends on it
+  }, [loaded, initialized, loading, user, router]);
 
   // Show splash screen until fonts are loaded AND auth is initialized
   if (!loaded || !initialized) {
