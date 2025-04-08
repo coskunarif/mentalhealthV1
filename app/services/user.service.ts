@@ -1,8 +1,8 @@
-import { doc, getDoc, updateDoc, setDoc, onSnapshot, Unsubscribe, collection, writeBatch, increment, Timestamp } from 'firebase/firestore'; // Added increment, Timestamp
+import { doc, getDoc, updateDoc, setDoc, onSnapshot, Unsubscribe, collection, writeBatch, increment, Timestamp, query, orderBy, limit, getDocs } from 'firebase/firestore'; // Added query, orderBy, limit, getDocs
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
 import { auth, db, storage, app } from '../lib/firebase-utils/index'; // Corrected import path
-import { UserModel, PersonalInformation, UserSettings } from '../models/user.model';
+import { UserModel, PersonalInformation, UserSettings, UserActivity } from '../models/user.model'; // Added UserActivity
 // Import the pre-configured callable function AND the functions instance
 import { functions, getUserStats as getUserStatsCallable } from './firebase-functions';
 import { UserStatsResponse } from '../models/user-stats.model';
@@ -282,6 +282,7 @@ export class UserService {
       });
     } catch (error) {
       console.error('Error tracking user activity:', error);
+      throw error; // Re-throw the error to propagate it
     }
   }
 
@@ -470,6 +471,36 @@ export class UserService {
     } catch (error) {
       console.error('[DEBUG] Error ensuring user document:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Get recent user activities
+   */
+  static async getRecentActivities(userId: string, count: number = 5): Promise<UserActivity[]> {
+    try {
+      if (!userId) throw new Error('User ID is required');
+      
+      const activitiesRef = collection(db, 'users', userId, 'activities');
+      const q = query(activitiesRef,
+        orderBy('timestamp', 'desc'),
+        limit(count)
+      );
+      
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        // Ensure timestamp is converted to Date object
+        const timestamp = data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.timestamp); 
+        return {
+          id: doc.id,
+          ...data,
+          timestamp: timestamp
+        } as UserActivity;
+      });
+    } catch (error) {
+      console.error('Error fetching recent activities:', error);
+      return [];
     }
   }
 }

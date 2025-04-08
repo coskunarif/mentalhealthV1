@@ -48,6 +48,7 @@ export const ScreenLayout: React.FC<ScreenLayoutProps> = ({
       flex: 1,
       paddingHorizontal: 16,
       paddingBottom: 24,
+      paddingTop: 8, // Added padding to ensure content doesn't overlap with app bar
     },
     subtitleText: {
       color: theme.colors.onSurfaceVariant,

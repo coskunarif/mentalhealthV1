@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback } from 'react';
+import { useRouter } from 'expo-router'; // Added for navigation
 // Add this import:
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from './lib/firebase-utils/config'; // Adjust path if needed
@@ -10,15 +11,18 @@ import { AuthProvider, useAuth } from './context/auth'; // Import useAuth
 import { lightTheme, darkTheme } from './config/theme'; // Import specific themes
 import ErrorBoundary from './components/ErrorBoundary';
 import type { AppTheme } from './types/theme';
+// Import locale registration
+import { registerTranslation, en } from 'react-native-paper-dates';
 // Remove unused useTheme import from here if not used elsewhere in this file
 // Add at the beginning of app/_layout.tsx to check Auth state on startup (Added)
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './lib/firebase-utils'; // Assuming firebase-utils exports auth
 
-// Initialize Firebase ONCE at the top level
-const app = initializeApp(firebaseConfig);
-// Then import other Firebase services
+// Import Firebase utils - this will trigger initialization if needed
 import './lib/firebase';
+
+// Register the English locale for react-native-paper-dates
+registerTranslation('en', en);
 
 // Keep the splash screen visible while resources load
 SplashScreen.preventAutoHideAsync();
@@ -26,6 +30,7 @@ SplashScreen.preventAutoHideAsync();
 // Define a component to handle theme selection and rendering
 function ThemedApp() {
   const { user, initialized, loading } = useAuth(); // Get user and loading state
+  const router = useRouter(); // Added for navigation
 
   // Determine the theme based on user settings, default to light
   // Only apply user theme once auth is initialized and not loading
@@ -92,10 +97,10 @@ function ThemedApp() {
     }
   }, []);
 
-  // Font loading logic remains the same
+  // Font loading logic - Using only Nunito as Kameron fonts failed on iOS
   const [loaded] = useFonts({
-    'Kameron': require('../assets/fonts/Kameron-Regular.ttf'),
-    'Kameron-Bold': require('../assets/fonts/Kameron-Bold.ttf'),
+    // 'Kameron': require('../assets/fonts/Kameron-Regular.ttf'), // Disabled due to iOS loading issues
+    // 'Kameron-Bold': require('../assets/fonts/Kameron-Bold.ttf'), // Disabled due to iOS loading issues
     'Nunito': require('../assets/fonts/Nunito-Regular.ttf'),
   });
 
@@ -109,6 +114,20 @@ function ThemedApp() {
   useEffect(() => {
     onLayoutRootView();
   }, [onLayoutRootView]);
+
+  // Add explicit navigation logic (MOVED HERE TO FIX HOOK ORDER)
+  useEffect(() => {
+    // We only attempt navigation *if* the app is ready (loaded and initialized)
+    // and the auth state is settled (!loading)
+    if (loaded && initialized && !loading) {
+      if (user) {
+        router.replace('/tabs/home');
+      } else {
+        router.replace('/auth/sign-in');
+      }
+    }
+    // Dependencies now include 'loaded' as navigation depends on it
+  }, [loaded, initialized, loading, user, router]);
 
   // Show splash screen until fonts are loaded AND auth is initialized
   if (!loaded || !initialized) {

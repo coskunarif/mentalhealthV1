@@ -107,9 +107,19 @@ export const EditPersonalInfoForm: React.FC<EditPersonalInfoFormProps> = ({
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
+  // Keep signature for TS, but handle runtime object { date: Date } using type assertion
   const handleConfirmDate = (date: Date) => {
-    const formattedDate = date.toISOString().split('T')[0];
-    handleChange('dateOfBirth', formattedDate);
+    // Assert type to access the 'date' property based on runtime behavior
+    const paramsDate = (date as any)?.date;
+
+    // Check if the extracted date is valid
+    if (paramsDate && paramsDate instanceof Date && !isNaN(paramsDate.getTime())) {
+      const formattedDate = paramsDate.toISOString().split('T')[0];
+      handleChange('dateOfBirth', formattedDate);
+    } else {
+      // Log if the received data structure is unexpected or date is invalid
+      console.warn('DatePickerModal onConfirm received invalid or unexpected data. Parameter:', date, 'Extracted date:', paramsDate);
+    }
     setDatePickerVisible(false);
   };
 

@@ -1,19 +1,15 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Divider, useTheme, TouchableRipple } from 'react-native-paper';
+import { Text, Divider, useTheme, TouchableRipple, Icon } from 'react-native-paper'; // Import Icon
 import type { AppTheme } from '../types/theme';
+import { UserActivity } from '../models/user.model'; // Import UserActivity type
 
-interface Activity {
-  id: string;
-  type: string; // Change from enum to string
-  title: string;
-  subtitle: string;
-  duration: number;
-  timestamp?: Date; // Add this to your interface
+interface Activity extends UserActivity { // Use UserActivity interface
+  // Inherits properties from UserActivity
 }
 
 interface RecentActivitiesProps {
-  activities: Activity[];
+  activities: UserActivity[]; // Use UserActivity[]
 }
 
 const getRippleColor = (color: string, opacity: number) => {
@@ -44,14 +40,38 @@ const getTimeBadge = (timestamp?: Date): string => {
   return 'Earlier';
 };
 
+// Add the icon mapping function
+const getActivityIcon = (type: string): string => {
+  switch (type) {
+    case 'exercise':
+      return 'fitness-center'; // Material Icons name
+    case 'mood':
+      return 'mood'; // Material Icons name
+    case 'survey':
+      return 'assignment'; // Material Icons name
+    default:
+      return 'history'; // Default icon
+  }
+};
+
 export default function RecentActivities({ activities }: RecentActivitiesProps) {
   const theme = useTheme<AppTheme>();
 
     const styles = React.useMemo(() => StyleSheet.create({
     item: {
+      // Removed paddingHorizontal, handled by touchable
       paddingVertical: 8,
-      paddingHorizontal: 16,
       minHeight: 48,
+      flexDirection: 'row', // Arrange icon and text horizontally
+      alignItems: 'center', // Align items vertically
+    },
+    iconContainer: {
+      marginRight: 16, // Space between icon and text
+      width: 24, // Fixed width for alignment
+      alignItems: 'center',
+    },
+    textContainer: {
+      flex: 1, // Allow text to take remaining space
     },
     touchable: {
       paddingVertical: 8,
@@ -100,19 +120,37 @@ export default function RecentActivities({ activities }: RecentActivitiesProps) 
             style={styles.touchable}
           >
             <View style={styles.item}>
-              <View style={styles.itemHeader}>
-                <Text style={styles.title}>{activity.title}</Text>
-                {getTimeBadge(activity.timestamp) && (
-                  <View style={[styles.badgeContainer, {
-                    backgroundColor: theme.colors.surfaceVariant
-                  }]}>
-                    <Text style={styles.badgeText}>{getTimeBadge(activity.timestamp)}</Text>
-                  </View>
-                )}
+              {/* Icon */}
+              <View style={styles.iconContainer}>
+                <Icon 
+                  source={getActivityIcon(activity.type)} 
+                  size={24} 
+                  color={theme.colors.onSurfaceVariant} 
+                />
               </View>
-              <Text style={styles.subtitle}>
-                {activity.subtitle} • {activity.duration} min
-              </Text>
+              {/* Text Content */}
+              <View style={styles.textContainer}>
+                <View style={styles.itemHeader}>
+                  {/* Use activity.details.title if available, fallback to generated title */}
+                  <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+                    {activity.details?.title || 'Activity'} 
+                  </Text>
+                  {getTimeBadge(activity.timestamp) && (
+                    <View style={[styles.badgeContainer, {
+                      backgroundColor: theme.colors.surfaceVariant,
+                      marginLeft: 8, // Add some space before the badge
+                    }]}>
+                      <Text style={styles.badgeText}>{getTimeBadge(activity.timestamp)}</Text>
+                    </View>
+                  )}
+                </View>
+                {/* Use activity.details.subtitle if available */}
+                <Text style={styles.subtitle} numberOfLines={1} ellipsizeMode="tail">
+                  {activity.details?.subtitle || ''} 
+                  {activity.details?.subtitle && activity.details?.duration ? ' • ' : ''}
+                  {activity.details?.duration ? `${activity.details.duration} min` : ''}
+                </Text>
+              </View>
             </View>
           </TouchableRipple>
           {index < activities.length - 1 && (

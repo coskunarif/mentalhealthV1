@@ -151,26 +151,16 @@ export default function MoodScreen() {
           // notes: "",   // Add notes if collected
         };
 
-        // Save to 'moods' collection
+        // Save to 'moods' collection. This service method now also handles tracking the activity internally.
         const saveEntryPromise = MoodService.saveMoodEntry(entryData);
 
-        // Save to 'activities' subcollection
-        const trackActivityPromise = UserService.trackActivity({
-          userId: user.uid,
-          type: 'mood',
-          timestamp: now,
-          details: {
-            title: mood.name, // Use mood name as title for activity
-            value: mood.value,
-            // Add other relevant details if needed
-          }
-        });
+        // The UserService.trackActivity call was removed from here as it's redundant.
 
-        return Promise.all([saveEntryPromise, trackActivityPromise]);
+        return saveEntryPromise; // Return only the promise for saving the mood entry
       });
 
-      await Promise.all(savePromises);
-      console.log(`Successfully saved ${selectedMoodEntries.length} mood entries and activities.`);
+      await Promise.all(savePromises); // Wait for all mood entries to be saved (activity tracking happens inside)
+      console.log(`Successfully saved ${selectedMoodEntries.length} mood entries.`); // Updated log message
       router.replace(returnTo as keyof RootStackParamList);
 
     } catch (error) {
