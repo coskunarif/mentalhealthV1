@@ -10,14 +10,15 @@ const withOpacity = (color: string, opacity: number) => {
 };
 
 const fontConfig: Partial<Record<keyof MD3Typescale, MD3Type>> = {
+  // Using Nunito for all styles as Kameron fonts failed on iOS
   titleMedium: { fontFamily: 'Nunito', fontWeight: '600', fontSize: 20, lineHeight: 28, letterSpacing: 0 },
   bodyMedium: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 16, lineHeight: 24, letterSpacing: 0 },
-  displayLarge: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 57, lineHeight: 64, letterSpacing: 0 },
-  displayMedium: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 45, lineHeight: 52, letterSpacing: 0 },
-  displaySmall: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 36, lineHeight: 44, letterSpacing: 0 },
-  headlineLarge: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 32, lineHeight: 40, letterSpacing: 0 },
-  headlineMedium: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 28, lineHeight: 36, letterSpacing: 0 },
-  headlineSmall: { fontFamily: 'Kameron', fontWeight: '400', fontSize: 24, lineHeight: 32, letterSpacing: 0 },
+  displayLarge: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 57, lineHeight: 64, letterSpacing: 0 }, // Was Kameron
+  displayMedium: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 45, lineHeight: 52, letterSpacing: 0 }, // Was Kameron
+  displaySmall: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 36, lineHeight: 44, letterSpacing: 0 }, // Was Kameron
+  headlineLarge: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 32, lineHeight: 40, letterSpacing: 0 }, // Was Kameron
+  headlineMedium: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 28, lineHeight: 36, letterSpacing: 0 }, // Was Kameron
+  headlineSmall: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 24, lineHeight: 32, letterSpacing: 0 }, // Was Kameron
   titleLarge: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 22, lineHeight: 28, letterSpacing: 0 },
   titleSmall: { fontFamily: 'Nunito', fontWeight: '500', fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
   bodyLarge: { fontFamily: 'Nunito', fontWeight: '400', fontSize: 16, lineHeight: 24, letterSpacing: 0.5 },

@@ -5,14 +5,14 @@ import type { TextStyle } from 'react-native';
 const typographyStyles = StyleSheet.create({
   text_heading1: {
     ...theme.fonts.displayLarge,
-    fontFamily: 'Kameron',
+    fontFamily: 'Nunito', // Changed from Kameron
     fontWeight: 'bold',
     color: theme.colors.onSurface,
     marginBottom: theme.spacing.small,
   } as TextStyle,
   text_heading2: {
     ...theme.fonts.headlineMedium,
-    fontFamily: 'Kameron', // Add this to be consistent with heading1 and heading3
+    fontFamily: 'Nunito', // Changed from Kameron
     fontWeight: 'bold',
     color: theme.colors.onSurface,
     marginBottom: theme.spacing.small,
@@ -21,7 +21,7 @@ const typographyStyles = StyleSheet.create({
     ...theme.fonts.headlineSmall,
     fontWeight: 'bold',
     color: theme.colors.onSurface,
-    fontFamily: 'Kameron',
+    fontFamily: 'Nunito', // Changed from Kameron
   } as TextStyle,
   text_body: {
     ...theme.fonts.bodyLarge,
