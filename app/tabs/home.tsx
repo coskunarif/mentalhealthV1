@@ -67,15 +67,18 @@ export default function Home() {
                 console.log('🔍 [HOME DEBUG] Fetching recent activities, user:', user?.uid);
                 if (user) {
                     // Use UserService to fetch activities which are already typed as UserActivity[]
-                    const activities = await UserService.getRecentActivities(user.uid); 
+                    const activities = await UserService.getRecentActivities(user.uid);
                     console.log('🔍 [HOME DEBUG] Received activities:', safeStringify(activities));
-                    
+
                     // Validate activities (UserService already returns UserActivity[])
                     if (!Array.isArray(activities)) {
                         console.error('❌ [HOME DEBUG] Activities is not an array:', activities);
                         setRecentActivities([]);
                     } else {
-                        setRecentActivities(activities);
+                        // Filter activities to only include 'exercise' type (played audio)
+                        const filteredActivities = activities.filter(activity => activity.type === 'exercise');
+                        console.log('🔍 [HOME DEBUG] Filtered activities (exercise only):', safeStringify(filteredActivities));
+                        setRecentActivities(filteredActivities);
                     }
                 } else {
                     setRecentActivities([]);
@@ -164,10 +167,10 @@ export default function Home() {
                 sectionStyle={styles.section}
             />
 
-            {/* Recent Activities Section */}
+            {/* Latest Sessions Section */}
             <Surface style={styles.section} elevation={1}>
                 <Text variant="headlineMedium" style={styles.sectionTitle}>
-                    Recent Activities
+                    Latest Sessions
                 </Text>
                 <RecentActivities activities={recentActivities} />
             </Surface>
