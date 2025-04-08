@@ -2,7 +2,9 @@ import { collection, addDoc, query, where, orderBy, getDocs, doc, updateDoc, del
 import { db } from '../lib/firebase-utils';
 import { Timestamp, queryDocuments, getDocument } from '../lib/firebase-utils/firestore';
 import { MoodEntry, MoodInsights, MoodInsightsResponse, MoodDefinition, EmotionDefinition } from '../models/mood.model'; // Add EmotionDefinition import
+import { DataPoint } from '../components/RadarChart'; // Assuming DataPoint is defined here or imported appropriately
 import { getFunctions, httpsCallable, HttpsCallableResult } from '@firebase/functions';
+import UserService from './user.service'; // Import UserService
 import { app } from '../lib/firebase-utils';
 
 const functions = getFunctions(app!);
@@ -25,6 +27,13 @@ export class MoodService {
     factors?: string[],
     notes?: string
   }): Promise<string> {
+    // Validation
+    if (!entry.userId) throw new Error('User ID is required');
+    if (!entry.mood) throw new Error('Mood type is required');
+    if (typeof entry.value !== 'number' || entry.value < 0 || entry.value > 100) {
+      throw new Error('Mood value must be a number between 0 and 100');
+    }
+  
     try {
       console.log('Saving mood entry:', JSON.stringify(entry, null, 2));
       // Ensure duration exists (required field)
@@ -39,6 +48,19 @@ export class MoodService {
       
       const docRef = await addDoc(collection(db, 'moods'), entryData);
       console.log('Successfully saved mood entry with ID:', docRef.id);
+
+      // Track the activity
+      await UserService.trackActivity({
+        userId: entry.userId,
+        type: 'mood',
+        timestamp: entry.timestamp || new Date(),
+        details: {
+          title: `Recorded ${entry.mood}`,
+          value: entry.value,
+          factors: entry.factors || []
+        }
+      });
+
       return docRef.id;
     } catch (error: any) {
       console.error('Error saving mood entry:', error);
@@ -119,6 +141,52 @@ export class MoodService {
     } catch (error) {
       console.error('[MoodService] Error fetching emotion definitions:', error);
       throw new Error('Failed to fetch emotion definitions from Firestore.');
+    }
+  }
+
+  static async getMoodRadarData(userId: string): Promise<{ data: DataPoint[], labels: string[] }> {
+    try {
+      // Get mood entries from the last 30 days
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30);
+      
+      const moodEntries = await this.getMoodEntries(userId, 30);
+      
+      // Group moods by type and calculate averages
+      const moodMap = new Map<string, { count: number, total: number }>();
+      
+      moodEntries.forEach(entry => {
+        if (!moodMap.has(entry.mood)) {
+          moodMap.set(entry.mood, { count: 0, total: 0 });
+        }
+        const current = moodMap.get(entry.mood)!;
+        current.count += 1;
+        // Assuming 'value' represents the mood intensity (e.g., 0-100)
+        current.total += entry.value; 
+      });
+      
+      // Convert to radar chart format
+      const data: DataPoint[] = [];
+      const labels: string[] = [];
+      
+      moodMap.forEach((value, key) => {
+        // Avoid division by zero if count is 0
+        const averageValue = value.count > 0 ? value.total / value.count : 0; 
+        // Normalize to 0-1 range for the chart (assuming max value is 100)
+        const normalizedValue = averageValue / 100; 
+        
+        labels.push(key);
+        data.push({
+          label: key,
+          value: normalizedValue
+        });
+      });
+      
+      return { data, labels };
+    } catch (error) {
+      console.error('Error getting mood radar data:', error);
+      // Return empty arrays on error to prevent UI crashes
+      return { data: [], labels: [] }; 
     }
   }
 

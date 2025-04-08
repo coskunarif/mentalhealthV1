@@ -40,4 +40,22 @@ export interface PersonalInformation {
   phoneNumber?: string;
   dateOfBirth?: string;
 }
+
+export interface UserActivity {
+  id?: string;
+  userId: string;
+  type: 'exercise' | 'mood' | 'survey';
+  timestamp: Date;
+  date: string; // YYYY-MM-DD format
+  details?: {
+    title?: string;
+    subtitle?: string;
+    duration?: number;
+    value?: number;
+    itemId?: string;
+    factors?: string[];
+    [key: string]: any;
+  };
+}
+
 export default {};

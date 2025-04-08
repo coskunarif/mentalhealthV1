@@ -13,6 +13,8 @@ import { EditPersonalInfoForm } from './EditPersonalInfoForm';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import type { AppTheme } from '../types/theme';
+import type { PersonalInformation } from '../types/personalInformation'; // Import type
+import { UserService } from '../services/user.service'; // Import service
 import { useAppTheme } from '../hooks/useAppTheme'; // Import hook
 import { ScreenLayout } from './ScreenLayout'; // Import ScreenLayout
 import { useAuth } from '../context/auth';
@@ -57,22 +59,33 @@ export default function EditPersonalInfoScreen() {
     }).start();
   }, [slideAnim]);
 
+  // Corrected userInfo object, removing duplicates
   const userInfo = {
+    // Fetch initial values from user context or service if needed
+    // For now, using defaults or context values
     name: user?.displayName || '',
-    email: user?.email || '',
-    phoneNumber: '',
-    dateOfBirth: '',
+    email: user?.email || '', // Email is usually not editable here, but needed for type
+    phoneNumber: user?.phoneNumber || '', // Assuming phoneNumber might be on user object from auth or fetched separately
+    dateOfBirth: user?.dateOfBirth || '', // Assuming dateOfBirth might be on user object from auth or fetched separately
   };
 
   const userId = user?.uid || '';
 
-  const handleSave = async (info: any) => {
+  // Update handleSave to use UserService and correct type
+  const handleSave = async (info: PersonalInformation) => {
+    if (!userId) {
+      setSnackbar({ visible: true, message: 'Error: User not identified.' });
+      return;
+    }
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Call the user service to update the info
+      await UserService.updatePersonalInfo(userId, info);
       setSnackbar({ visible: true, message: 'Profile updated successfully' });
-      handleBack();
+      // Optionally update local auth context if needed, though service might handle some parts
+      // e.g., auth.updateUser({ displayName: info.name });
+      handleBack(); // Navigate back after successful save
     } catch (error: any) {
-      console.error('Failed to save:', error);
+      console.error('Failed to save personal info:', error);
       setSnackbar({
         visible: true,
         message: error.message || 'Failed to save profile',
