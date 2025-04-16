@@ -4,14 +4,14 @@ const path = require('path');
 
 module.exports = {
   moduleMap: {
-    'firebase-functions': 'C:/CodiumDev/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
-    'firebase-functions/v1': 'C:/CodiumDev/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
-    'firebase-functions/v2': 'C:/CodiumDev/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
-    'firebase-functions/v2/https': 'C:/CodiumDev/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
-    'firebase-functions/v2/scheduler': 'C:/CodiumDev/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
-    'firebase-functions/v2/logger': 'C:/CodiumDev/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
-    'firebase-admin': 'C:/CodiumDev/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
-    'firebase-admin/messaging': 'C:/CodiumDev/mentalhealthV1/app/lib/utils/empty-firebase-functions.js'
+    'firebase-functions': 'C:/Project/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
+    'firebase-functions/v1': 'C:/Project/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
+    'firebase-functions/v2': 'C:/Project/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
+    'firebase-functions/v2/https': 'C:/Project/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
+    'firebase-functions/v2/scheduler': 'C:/Project/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
+    'firebase-functions/v2/logger': 'C:/Project/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
+    'firebase-admin': 'C:/Project/mentalhealthV1/app/lib/utils/empty-firebase-functions.js',
+    'firebase-admin/messaging': 'C:/Project/mentalhealthV1/app/lib/utils/empty-firebase-functions.js'
     // Add other firebase-admin subpaths if needed
   }
 };
