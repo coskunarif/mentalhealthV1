@@ -1,20 +1,25 @@
-# Dependencies
+# Node & package manager dependencies
 node_modules/
 .pnp/
 .pnp.js
 
-# Expo
+# Expo build artifacts
 .expo/
 dist/
 web-build/
+
+# Android/iOS signing keys (security)
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
+*.ipa
+*.apk
+*.aab
 *.orig.*
 
-# Metro
+# Metro bundler
 .metro-health-check*
 
 # Firebase
@@ -24,48 +29,39 @@ web-build/
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+
+# Firebase Functions (server)
 firebase/functions/lib/
+firebase/functions/lib.bak/
 firebase/functions/node_modules/
 firebase/functions/.runtimeconfig.json
+firebase/functions/dist/
 
-# Security & Credentials
+# Firebase Emulator data (if used)
+firebase/emu-data/
+
+# Security & credentials
 serviceAccountKey.json
 **/serviceAccountKey.json
-
-# Debug logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-debug.log
-*.log
 
 # Environment variables
 .env
 .env.*
 !.env.example
 
+# Debug & error logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+debug.log
+*.log
+
 # TypeScript
 *.tsbuildinfo
 lib/
 dist/
 
-# Build
-*.p12
-*.mobileprovision
-*.ipa
-*.apk
-*.aab
-
-# OS specific
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# IDE
+# IDE/editor configs
 .idea/
 .vscode/
 *.swp
@@ -74,14 +70,22 @@ Thumbs.db
 .project
 .classpath
 
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 # Test coverage
 coverage/
 
-# App specific
+# App-specific
 app-example
 config/firebase.ts
 
-
-# Firebase additional exclusions
-firebase/functions/lib.bak/
-firebase/functions/lib/
+# (Optional) Ignore any other generated or temp files below
+# tmp/
+# temp/
