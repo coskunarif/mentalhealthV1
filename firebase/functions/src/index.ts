@@ -38,16 +38,10 @@ import { getUserStats, ensureUserDocument } from './api/userStats'; // Added ens
 import { sendDailyExerciseReminder } from './scheduled/notificationManager'; // Renamed import
 
 // Export all functions
-export {
-  // Auth function (v1)
-  onUserCreate,
-  
-  // Scheduled functions (v2)
-  dailyStats,
-  sendDailyExerciseReminder, // Renamed export
-  
-  // Callable API functions (v2)
-  generateMoodInsights,
-  getUserStats,
-  ensureUserDocument // Added ensureUserDocument
-};
+exports.onUserCreate = onUserCreate;
+exports.dailyStats = dailyStats;
+exports.generateMoodInsights = generateMoodInsights;
+exports.getUserStats = getUserStats;
+exports.ensureUserDocument = ensureUserDocument;
+exports.sendDailyExerciseReminder = sendDailyExerciseReminder;
+
