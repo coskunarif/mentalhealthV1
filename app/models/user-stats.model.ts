@@ -38,6 +38,15 @@ export interface UserStats {
   mood: {
     recentMoods: MoodData[];
   };
+  // Optional: Progress for each function category (0-100)
+  functionCategories?: {
+    balanceMemories?: number;
+    changeOpinion?: number;
+    supportDreams?: number;
+    gainAwareness?: number;
+    breatheUp?: number;
+    [key: string]: number | undefined;
+  };
 }
 
 export interface UserStatsResponse {

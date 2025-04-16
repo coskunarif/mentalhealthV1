@@ -60,6 +60,12 @@ service cloud.firestore {
       allow write: if false; // Typically static data
     }
 
+    // Function Categories - allow read access to all authenticated users
+    match /functionCategories/{categoryId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only admins can modify
+    }
+
     // Emotion Definitions (for pyramid) - allow read access to all authenticated users
     match /emotionDefinitions/{definitionId} {
       allow read: if request.auth != null;
