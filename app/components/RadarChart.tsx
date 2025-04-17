@@ -19,13 +19,18 @@ interface RadarChartProps {
   labels?: string[];
 }
 
-const defaultLabels = [
-  'Balance past memories',
-  'Change your opinion',
-  'Support dreams',
-  'Gain awareness',
-  'Breath up',
+// Default function category labels for radar chart
+export const FUNCTION_CATEGORY_LABELS = [
+  'Balance Memories',
+  'Change Opinion',
+  'Support Dreams',
+  'Gain Awareness',
+  'Breathe Up',
 ];
+
+
+
+const defaultLabels = FUNCTION_CATEGORY_LABELS;
 
 export default function RadarChart({
   data,
