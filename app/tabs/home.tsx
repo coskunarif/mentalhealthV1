@@ -11,7 +11,7 @@ import TodaysFocus from '../components/TodaysFocus';
 import { useAuth } from '../hooks/useAuth';
 import type { AppTheme } from '../types/theme';
 import { UserService } from '../services/user.service'; // Import UserService
-import { MoodService } from '../services/mood.service'; // Import MoodService
+import { ExerciseService } from '../services/exercise.service'; // Import ExerciseService
 import { UserActivity } from '../models/user.model'; // Import UserActivity
 import { safeStringify } from '../lib/debug-utils';
 
@@ -31,32 +31,27 @@ export default function Home() {
     const [recentActivities, setRecentActivities] = useState<UserActivity[]>([]); // Use UserActivity[]
 
     useEffect(() => {
-        const fetchMoodData = async () => { // Renamed function
+        const fetchRadarData = async () => {
             try {
-                console.log('🔍 [HOME DEBUG] Fetching mood radar data, user:', user?.uid); // Updated log
+                console.log('🔍 [HOME DEBUG] Fetching function category radar data, user:', user?.uid);
                 if (user) {
-                    // Fetch mood data using MoodService
-                    const { data, labels } = await MoodService.getMoodRadarData(user.uid); 
-                    
-                    console.log('🔍 [HOME DEBUG] Received mood radar data:', safeStringify(data)); // Updated log
-                    console.log('🔍 [HOME DEBUG] Received mood radar labels:', safeStringify(labels)); // Updated log
-                    
-                    // Basic validation (can be enhanced)
+                    // Fetch function category data using ExerciseService
+                    const { data, labels } = await ExerciseService.getRadarData(user.uid);
+                    console.log('🔍 [HOME DEBUG] Received radar data:', safeStringify(data));
+                    console.log('🔍 [HOME DEBUG] Received radar labels:', safeStringify(labels));
                     if (Array.isArray(data) && Array.isArray(labels)) {
                         setRadarData(data);
                         setChartLabels(labels);
                     } else {
-                        console.error('❌ [HOME DEBUG] Invalid mood data/labels received');
                         setRadarData([]);
                         setChartLabels([]);
                     }
                 } else {
-                    console.log('🔍 [HOME DEBUG] No user, setting empty mood radar data'); // Updated log
                     setRadarData([]);
                     setChartLabels([]);
                 }
             } catch (error) {
-                console.error('❌ [HOME DEBUG] Error fetching mood radar data:', error); // Updated log
+                console.error('❌ [HOME DEBUG] Error fetching radar data:', error);
                 setRadarData([]);
                 setChartLabels([]);
             }
@@ -91,7 +86,7 @@ export default function Home() {
 
         if (!loading) {
             console.log('🔍 [HOME DEBUG] User loaded, fetching data...');
-            fetchMoodData(); // Call the new function
+            fetchRadarData(); // Call the correct function
             fetchRecentActivities();
         }
     }, [user, loading]);
@@ -152,7 +147,7 @@ export default function Home() {
             {/* Radar Chart Section - Updated Title */}
             <Surface style={styles.section} elevation={1}>
                 <Text variant="headlineMedium" style={styles.sectionTitle}>
-                    Your Mood Patterns 
+                    Your Function Categories Progress
                 </Text>
                 <RadarChart data={radarData} labels={chartLabels} />
             </Surface>
