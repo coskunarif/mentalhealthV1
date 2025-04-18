@@ -20,17 +20,18 @@ interface RadarChartProps {
 }
 
 // Default function category labels for radar chart
-export const FUNCTION_CATEGORY_LABELS = [
+export const EXERCISE_CATEGORY_LABELS = [
   'Balance Memories',
   'Change Opinion',
   'Support Dreams',
   'Gain Awareness',
-  'Breathe Up',
+  'Breathe Up', // Keep labels but update constant name
+
 ];
 
 
 
-const defaultLabels = FUNCTION_CATEGORY_LABELS;
+const defaultLabels = EXERCISE_CATEGORY_LABELS;
 
 export default function RadarChart({
   data,

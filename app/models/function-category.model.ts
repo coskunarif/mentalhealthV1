@@ -1,5 +1,5 @@
 // Function Category Model
-export interface FunctionCategory {
+export interface ExerciseCategory {
   id: string; // Matches document ID
   name: string; // Display name
   description: string;
@@ -9,5 +9,6 @@ export interface FunctionCategory {
   };
   order: number; // For sorting
 }
+
 
 export default {};
