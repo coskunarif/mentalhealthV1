@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 // Use aliased import for firebase/auth User and remove User from firebase-utils import
-import { auth, db } from '../lib/firebase-utils/index'; // Corrected import path
+import { auth, db, refreshAuthToken, startTokenRefreshInterval, stopTokenRefreshInterval } from '../lib/firebase-utils/index'; // Corrected import path
 import { onAuthStateChanged, User as FirebaseAuthUser } from 'firebase/auth';
 import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore'; // Import onSnapshot and Unsubscribe
 import UserService from '../services/user.service'; // Import UserService
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
       // --- End Added Debug Logging ---
-      
+
       console.log('Auth state changed. authUser:', authUser?.uid); // Kept original log for comparison
 
       // Unsubscribe from previous Firestore listener if it exists
@@ -60,16 +60,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         firestoreUnsubscribeRef.current();
         firestoreUnsubscribeRef.current = null;
       }
-      
+
       // Reset state before checking new user
-      setUser(null); 
+      setUser(null);
       setLoading(true); // Start loading until Firestore data is confirmed or user is null
 
       if (authUser) {
+        // Start token refresh interval when user is authenticated
+        startTokenRefreshInterval();
+
+        // Force an immediate token refresh
+        refreshAuthToken(true)
+          .then(() => console.log('Initial auth token refreshed successfully'))
+          .catch((err: Error) => console.error('Error refreshing initial auth token:', err));
+
         // Add this line to ensure user document exists
         UserService.ensureUserDocument(authUser.uid)
-          .catch(err => console.error('Error ensuring user document:', err));
-          
+          .catch((err: Error) => console.error('Error ensuring user document:', err));
+
         console.log(`User ${authUser.uid} logged in. Setting up Firestore listener.`);
         const userRef = doc(db, 'users', authUser.uid);
 
@@ -118,6 +126,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         // User is logged out
         console.log('User logged out.');
+        // Stop token refresh interval when user logs out
+        stopTokenRefreshInterval();
         setUser(null);
         setInitialized(true); // Auth check done
         setLoading(false); // No user, so not loading
@@ -145,6 +155,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const handleSignOut = async () => {
     try {
       setLoading(true);
+      // Stop token refresh interval before signing out
+      stopTokenRefreshInterval();
       await auth.signOut();
       setUser(null);
     } catch (error) {

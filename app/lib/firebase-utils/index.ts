@@ -1,4 +1,4 @@
-import { app, auth, db, storage, analytics } from './firebase'; // Removed 'functions' import
+import { app, auth, db, storage, analytics, refreshAuthToken, startTokenRefreshInterval, stopTokenRefreshInterval } from './firebase'; // Import new functions
 import * as authMethods from './auth';
 import * as firestoreMethods from './firestore';
 import * as storageMethods from './storage';
@@ -10,7 +10,11 @@ export {
   db,
   storage,
   // Removed 'functions' re-export
-  analytics
+  analytics,
+  // Export new token refresh functions
+  refreshAuthToken,
+  startTokenRefreshInterval,
+  stopTokenRefreshInterval
 };
 
 // Re-export utility methods

@@ -13,6 +13,12 @@ export const firebaseConfig = {
 // Force production mode - never use emulator
 export const useEmulator = false;
 
+// Add a longer token refresh interval to avoid token expiration issues
+export const authSettings = {
+  // Force token refresh when older than 30 minutes
+  tokenRefreshIntervalMinutes: 30
+};
+
 // Logging for debugging
 console.log('Firebase config variables check:', {
   apiKeySet: !!process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
