@@ -14,30 +14,39 @@ interface Exercise {
   id: string;
   title: string;
   duration: number;
-  isCompleted: boolean;
   order: number; // Add order field
+  // No isCompleted or boolean field
 }
 
 export default function ExercisesScreen() {
   const [breathExercises, setBreathExercises] = useState<Exercise[]>([]);
-  const nextExercise = breathExercises.find((exercise) => !exercise.isCompleted);
+  // Track completed exercise IDs in state
+const [completedExerciseIds, setCompletedExerciseIds] = useState<string[]>([]);
+
+const nextExercise = breathExercises.find((exercise) => !completedExerciseIds.includes(exercise.id));
   const theme = useTheme<AppTheme>();
   const userId = 'user-id'; // Replace with actual user ID
 
   useEffect(() => {
-    const fetchExercises = async () => {
-      try {
-        const exercises: Exercise[] = await ExerciseService.getExercises(userId);
-        // Sort exercises by the 'order' field before setting state
-        const sortedExercises = exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
-        setBreathExercises(sortedExercises);
-      } catch (error) {
-        console.error('Error fetching exercises:', error);
-      }
-    };
+  const fetchExercises = async () => {
+    try {
+      const exercises: Exercise[] = await ExerciseService.getExercises(userId);
+      // Sort exercises by the 'order' field before setting state
+      const sortedExercises = exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
+      setBreathExercises(sortedExercises);
 
-    fetchExercises();
-  }, [userId]);
+      // Fetch completions (simulate or fetch from service as needed)
+      // For now, assume completedExerciseIds are a subset of exercise IDs (mocked)
+      // TODO: Replace with real fetch from userExerciseCompletions
+      const completions: string[] = []; // Replace with actual fetching logic
+      setCompletedExerciseIds(completions);
+    } catch (error) {
+      console.error('Error fetching exercises:', error);
+    }
+  };
+
+  fetchExercises();
+}, [userId]);
 
   const styles = React.useMemo(() => StyleSheet.create({
     container: {
@@ -87,14 +96,13 @@ export default function ExercisesScreen() {
 
   const handleStartExercise = () => {
     if (nextExercise) {
-      router.push(`/player?exerciseId=${nextExercise.id}`); // Use exerciseId, removed type
+      router.push(`/player?exerciseId=${nextExercise.id}`);
     }
   };
 
-  // Calculate exercise statistics
-  const completedExercises = breathExercises.filter(ex => ex.isCompleted).length;
+  const completedExercises = breathExercises.filter(ex => completedExerciseIds.includes(ex.id)).length;
   const totalExercises = breathExercises.length;
-  const completionRate = Math.round((completedExercises / totalExercises) * 100);
+  const completionRate = totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0;
 
   return (
     <ScrollView
@@ -147,7 +155,7 @@ export default function ExercisesScreen() {
         <Text variant="headlineMedium" style={styles.sectionTitle}>
           Exercise Progress
         </Text>
-        <ExerciseProgress exercises={breathExercises} currentStep={nextExercise?.id} />
+        <ExerciseProgress exercises={breathExercises} currentStep={nextExercise?.id} completedExerciseIds={completedExerciseIds} />
         {nextExercise && (
           <EnhancedButton
             mode="contained"
@@ -172,8 +180,9 @@ export default function ExercisesScreen() {
         </Text>
         {completedExercises > 0 ? (
           <ExerciseProgress 
-            exercises={breathExercises.filter(ex => ex.isCompleted)} 
-            currentStep={undefined} 
+            exercises={breathExercises.filter(ex => completedExerciseIds.includes(ex.id))}
+            currentStep={undefined}
+            completedExerciseIds={completedExerciseIds}
           />
         ) : (
           <Text style={{ textAlign: 'center', padding: 16, color: theme.colors.onSurfaceVariant }}>

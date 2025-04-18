@@ -38,13 +38,8 @@ export interface UserStats {
   mood: {
     recentMoods: MoodData[];
   };
-  // Optional: Progress for each function category (0-100)
-  functionCategories?: {
-    balanceMemories?: number;
-    changeOpinion?: number;
-    supportDreams?: number;
-    gainAwareness?: number;
-    breatheUp?: number;
+  // Optional: Progress for each exercise category (0-100)
+  exerciseCategories?: {
     [key: string]: number | undefined;
   };
 }

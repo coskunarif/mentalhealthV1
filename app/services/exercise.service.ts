@@ -71,19 +71,12 @@ export class ExerciseService {
         const exercisesSnapshot = await getDocs(collection(db, 'exercises'));
         const exercises = exercisesSnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data() as Record<string, any>,
-          isCompleted: false
+          ...doc.data() as Record<string, any>
         }));
 
         // Then check user progress to mark completed exercises
-        const userProgressSnapshot = await this.getUserExercises(userId);
-        const completedExerciseIds = userProgressSnapshot.map(progress => progress.exerciseId);
-
-        // Mark completed exercises
-        return exercises.map(exercise => ({
-          ...exercise,
-          isCompleted: completedExerciseIds.includes(exercise.id)
-        }));
+        // (No longer needed to annotate exercises with isCompleted; UI should handle completion lookup)
+        return exercises;
       } catch (error) {
         console.error('Error fetching exercises:', error);
         throw error;
@@ -121,32 +114,33 @@ export class ExerciseService {
         throw new Error('No exercises found for assigned template.');
     }
 
-    // 4. Count per function category
-    const categoryCounts: Record<string, number> = {};
+    // 4. Count per category (exerciseCategories is an object)
+    const Counts: Record<string, number> = {};
     let total = 0;
     for (const ex of exercises) {
-        const cats: string[] = Array.isArray(ex.functionCategories) ? ex.functionCategories : [];
-        for (const cat of cats) {
-            categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
-            total++;
+        if (typeof ex.exerciseCategories === 'object' && ex.exerciseCategories !== null) {
+            for (const cat of Object.keys(ex.exerciseCategories)) {
+                Counts[cat] = (Counts[cat] || 0) + 1;
+                total++;
+            }
         }
     }
 
     // 5. Get all function categories for labels (ordered)
-    const catSnapshot = await getDocs(collection(db, 'functionCategories'));
+    const catSnapshot = await getDocs(collection(db, 'exerciseCategories'));
     const categories = catSnapshot.docs
         .map(doc => ({ id: doc.id, ...(doc.data() as { label?: string; name?: string; order?: number }) }))
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-    const categoryIds = categories.map(cat => cat.id);
-    const categoryLabels = categories.map(cat => cat.label || cat.name || cat.id);
+    const Ids = categories.map(cat => cat.id);
+    const Labels = categories.map(cat => cat.label || cat.name || cat.id);
 
-    // 6. Build radar data (percent per category)
-    const data = categoryIds.map((catId, idx) => ({
-        label: categoryLabels[idx],
-        value: total > 0 ? (categoryCounts[catId] || 0) / total : 0
+    // 6. Build radar data (percent per )
+    const data = Ids.map((catId, idx) => ({
+        label: Labels[idx],
+        value: total > 0 ? (Counts[catId] || 0) / total : 0
     }));
 
-    return { data, labels: categoryLabels };
+    return { data, labels: Labels };
 }
 
     /**
@@ -179,10 +173,10 @@ export class ExerciseService {
                 
                 // Log each category value
                 if (data.categories) {
-                    Object.entries(data.categories).forEach(([category, value]) => {
-                        console.log(`🔍 [PROGRESS DEBUG] Category ${category} value:`, value);
+                    Object.entries(data.categories).forEach(([key, value]) => {
+                        console.log(`🔍 [PROGRESS DEBUG] Category ${key} value:`, value);
                         if (typeof value !== 'number' || isNaN(value)) {
-                            console.error(`❌ [PROGRESS DEBUG] Invalid value for category ${category}:`, value);
+                            console.error(`❌ [PROGRESS DEBUG] Invalid value for ${key}:`, value);
                         }
                     });
                 }
@@ -212,7 +206,7 @@ export class ExerciseService {
      */
     static async completeExercise(userId: string, exerciseId: string): Promise<void> {
         try {
-            // Get exercise details (for category)
+            // Get exercise details (for )
             const exercise = await this.getExerciseById(exerciseId);
             const userRef = doc(db, 'users', userId); // Reference to the main user document
 
@@ -221,20 +215,24 @@ export class ExerciseService {
             const overviewDoc = await getDoc(overviewRef);
 
             if (overviewDoc.exists()) {
-                // Increment the category count
-                await updateDoc(overviewRef, {
-                    [`categories.${exercise.category}`]: increment(1),
-                    lastUpdated: Timestamp.now()
-                });
+                // Increment the category count (pick first category key)
+                const categoryKey = exercise.exerciseCategories ? Object.keys(exercise.exerciseCategories)[0] : undefined;
+                if (categoryKey) {
+                    await updateDoc(overviewRef, {
+                        [`categories.${categoryKey}`]: increment(1),
+                        lastUpdated: Timestamp.now()
+                    });
+                }
+
             } else {
                 // Create the document if it doesn't exist
+                const categoryKey = exercise.exerciseCategories ? Object.keys(exercise.exerciseCategories)[0] : undefined;
                 await setDoc(overviewRef, {
                     overall: 0, // This might need adjustment based on how "overall" is calculated
-                    categories: {
-                        [exercise.category]: 1
-                    },
+                    categories: categoryKey ? { [categoryKey]: 1 } : {},
                     lastUpdated: Timestamp.now()
                 });
+
             }
 
             // Add/update the individual exercise progress entry
