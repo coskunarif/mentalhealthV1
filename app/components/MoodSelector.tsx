@@ -32,12 +32,15 @@ export type IconName =
 
 type MoodType = {
   label: string;
-  icon: IconName; // Keep IconName for now, assuming DB values match
-  key: string; // Change to string to accept any key from DB
+  icon: IconName;
+  key: string;
   value: number;
   duration: number;
   isSelected: boolean;
-  count?: number; // Optional bubble count
+  count?: number;
+  // Consciousness fields (optional for backward compatibility)
+  consciousnessValue?: number;
+  consciousnessLevel?: string;
 };
 
 type Props = {
@@ -117,6 +120,85 @@ function MoodSelector({
     }
   };
 
+  // Group moods by consciousnessLevel (Hawkins hierarchy)
+  const groupedMoods = React.useMemo(() => {
+    const groups: { [level: string]: MoodType[] } = {};
+    moods.forEach(mood => {
+      const level = mood.consciousnessLevel || 'Other';
+      if (!groups[level]) groups[level] = [];
+      groups[level].push(mood);
+    });
+    // Sort groups by Hawkins scale (lowest to highest)
+    const order = [
+      'Shame', 'Guilt', 'Apathy', 'Grief', 'Fear', 'Desire', 'Anger', 'Pride',
+      'Courage', 'Neutrality', 'Willingness', 'Acceptance', 'Reason', 'Love', 'Joy', 'Peace', 'Other'
+    ];
+    return order.map(level => ({
+      level,
+      moods: groups[level] || []
+    })).filter(g => g.moods.length > 0);
+  }, [moods]);
+
+  // Tooltip state for consciousness info
+  const [tooltipLevel, setTooltipLevel] = useState<string | null>(null);
+
+  // Helper for Hawkins color coding
+  const getConsciousnessColor = (value?: number) => {
+    if (!value) return theme.colors.surfaceVariant;
+    if (value < 100) return '#B71C1C'; // Red
+    if (value < 200) return '#F57C00'; // Orange
+    if (value < 300) return '#FBC02D'; // Yellow
+    if (value < 400) return '#388E3C'; // Green
+    if (value < 500) return '#1976D2'; // Blue
+    if (value < 600) return '#7B1FA2'; // Purple
+    return '#4A148C'; // Deep purple for highest
+  };
+
+  // Hawkins scale info
+  const hawkinsInfo: { [level: string]: string } = {
+    Shame: 'Lowest level, feelings of humiliation, misery, worthlessness.',
+    Guilt: 'Blame, remorse, self-reproach.',
+    Apathy: 'Despair, hopelessness, abdication.',
+    Grief: 'Regret, sadness, loss.',
+    Fear: 'Anxiety, withdrawal, worry.',
+    Desire: 'Craving, longing, addiction.',
+    Anger: 'Frustration, aggression, vengeance.',
+    Pride: 'Arrogance, denial, superiority.',
+    Courage: 'Affirmation, empowerment, determination.',
+    Neutrality: 'Trust, satisfaction, release.',
+    Willingness: 'Optimism, intention, hopefulness.',
+    Acceptance: 'Forgiveness, harmony, transcendence.',
+    Reason: 'Understanding, rationality, abstraction.',
+    Love: 'Reverence, unconditional, benevolence.',
+    Joy: 'Serenity, completeness, bliss.',
+    Peace: 'Transcendence, self-realization, oneness.',
+    Other: 'Uncategorized emotion.'
+  };
+
+  // Hawkins scale visualization for selected mood
+  const renderHawkinsBar = (mood: MoodType) => {
+    if (!mood.consciousnessValue) return null;
+    const percent = (mood.consciousnessValue - 20) / (600 - 20);
+    return (
+      <View style={{ marginVertical: 16 }}>
+        <Text style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant, marginBottom: 4 }}>
+          Consciousness Level: <Text style={{ fontWeight: 'bold', color: getConsciousnessColor(mood.consciousnessValue) }}>{mood.consciousnessLevel} ({mood.consciousnessValue})</Text>
+        </Text>
+        <View style={{ height: 12, backgroundColor: theme.colors.surfaceVariant, borderRadius: 6, overflow: 'hidden', marginHorizontal: 24 }}>
+          <View style={{
+            width: `${Math.max(0, Math.min(1, percent)) * 100}%`,
+            height: 12,
+            backgroundColor: getConsciousnessColor(mood.consciousnessValue),
+            borderRadius: 6
+          }} />
+        </View>
+        <Text style={{ fontSize: 12, color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 2 }}>
+          (Hawkins Scale: 20 - 600)
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <ScreenLayout
       title="Mood Tracker"
@@ -175,126 +257,95 @@ function MoodSelector({
       >
         How are you feeling?
       </Text>
-
-      {/* Mood Grid */}
-      <View style={{ 
-        paddingHorizontal: 16, 
-        marginBottom: 20,
-        height: Dimensions.get('window').height * 0.33, // Ekranın 1/3'ünü kaplasın
-      }}>
-        <View style={[
-          localStyles.mood_gridContainer,
-          { 
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignContent: 'flex-start',
+      <ScrollView style={{ marginBottom: 20 }}>
+        {/* Chunk all moods into rows of 3 for a flat grid */}
+        {(() => {
+          const chunks: MoodType[][] = [];
+          for (let i = 0; i < moods.length; i += 3) {
+            chunks.push(moods.slice(i, i + 3));
           }
-        ]}>
-          {moods.map((item, index) => {
-            const isSelected = selectedMood?.label === item.label;
-            // Safely access mood color with a fallback
-            const moodColor = theme.moodColors[item.key as keyof AppTheme['moodColors']] || theme.colors.primary; // Fallback to primary color
+          return chunks.map((row, rowIdx) => (
+            <View key={rowIdx} style={{ flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 12 }}>
+              {row.map((item, colIdx) => {
+                const isSelected = selectedMood?.label === item.label;
+                const moodColor = theme.moodColors[item.key as keyof AppTheme['moodColors']] || theme.colors.primary;
+                return (
+                  <View key={item.label} style={{ flex: 1, alignItems: 'center', maxWidth: '33%' }}>
+                    <Pressable
+                      onPress={() => {
+                        console.log('Mood selected:', item);
+                        onMoodSelect(moods.findIndex(m => m.label === item.label));
+                      }}
+                      style={({ pressed }) => [
+                        {
+                          width: '100%',
+                          aspectRatio: 1,
+                          marginHorizontal: 4,
+                          alignItems: 'center', justifyContent: 'center',
+                          borderRadius: theme.shape.borderRadius,
+                          backgroundColor: theme.colors.surface,
+                          borderWidth: isSelected ? 2 : 1,
+                          borderColor: isSelected ? moodColor : getConsciousnessColor(item.consciousnessValue),
+                          shadowColor: theme.colors.shadow,
+                          shadowOffset: { width: 0, height: 1 },
+                          shadowOpacity: 0.1, shadowRadius: 2, elevation: 1,
+                        },
+                        pressed && { opacity: 0.8 },
+                      ]}
+                      accessibilityLabel={`Select mood ${item.label}`}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: isSelected }}
+                    >
+                      <MaterialCommunityIcons 
+                        name={item.icon} 
+                        size={28}
+                        color={moodColor}
+                      />
+                      <Text style={{ fontWeight: isSelected ? '700' : '400', color: isSelected ? moodColor : theme.colors.onSurfaceVariant, fontSize: 13, marginTop: 2 }}>
+                        {item.label}
+                      </Text>
+                      {/* Consciousness badge */}
+                      {item.consciousnessValue && (
+                        <View style={{ backgroundColor: getConsciousnessColor(item.consciousnessValue), borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2, marginTop: 2 }}>
+                          <Text style={{ color: '#fff', fontSize: 10, fontWeight: 'bold' }}>{item.consciousnessValue}</Text>
+                        </View>
+                      )}
+                    </Pressable>
+                  </View>
+                );
+              })}
+              {/* Fill empty columns if less than 3 moods in this row */}
+              {row.length < 3 && Array.from({ length: 3 - row.length }).map((_, i) => (
+                <View key={`empty-${i}`} style={{ flex: 1, maxWidth: '33%' }} />
+              ))}
+            </View>
+          ));
+        })()}
 
-            return (
-              <Pressable
-                key={item.label}
-                onPress={() => onMoodSelect(index)}
-                style={({ pressed }) => [
-                  {
-                    width: '30%', // 3 sütun için
-                    aspectRatio: 1, // Kare şeklinde
-                    margin: '1.5%', // Aralarında boşluk
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: theme.shape.borderRadius,
-                    backgroundColor: theme.colors.surface,
-                    // Tüm butonlara hafif gölge ekleyelim
-                    shadowColor: theme.colors.shadow,
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 2,
-                    elevation: 1,
-                  },
-                  pressed && { opacity: 0.8 }, // Basıldığında hafif opaklık
-                  isSelected && {
-                    // Seçildiğinde daha belirgin gölge
-                    shadowColor: moodColor,
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 4,
-                    elevation: 3,
-                  },
-                ]}
-                accessibilityLabel={`Select mood ${item.label}`}
-                accessibilityRole="button"
-                accessibilityState={{ selected: isSelected }}
-              >
-                {/* Seçim göstergesi olarak ince bir çerçeve ekleyelim */}
-                {isSelected && (
-                  <View 
-                    style={{
-                      position: 'absolute',
-                      top: 0, left: 0, right: 0, bottom: 0,
-                      borderRadius: theme.shape.borderRadius,
-                      borderWidth: 1.5,
-                      borderColor: moodColor,
-                    }}
-                  />
-                )}
-                
-                <MaterialCommunityIcons 
-                  name={item.icon} 
-                  size={28}
-                  color={moodColor} // Use the potentially fallback color
-                />
-                
-                <Text
-                  style={[
-                    typographyStyles.text_caption,
-                    theme.fonts.labelMedium,
-                    { 
-                      marginTop: theme.spacing.tiny,
-                      color: isSelected ? moodColor : theme.colors.onSurfaceVariant,
-                      fontWeight: isSelected ? '600' : '400',
-                      textAlign: 'center',
-                      fontSize: theme.scaleFont(12),
-                    },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {item.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      </View>
-
-      {/* Duration Slider */}
-      {selectedMood && (
-        <View style={{ marginTop: 20, paddingHorizontal: 16 }}>
-          <SliderCard
-            variant="duration"
-            icon="clock-outline"
-            label="How long have you felt this way?"
-            value={selectedMood.duration || 0}
-            onSlidingComplete={onDurationChange}
-            labels={['< 3 months', '6 months', '> 1 year']}
-            steps={33}
-          />
-
-          {/* Emot Slider */}
-          <SliderCard
-            variant="emotion"
-            icon={selectedMood.icon}
-            label={selectedMood.label}
-            value={selectedMood.value}
-            moodKey={selectedMood.key as keyof typeof theme.moodColors} // Add type assertion here
-            onSlidingComplete={(val) => handleSliderComplete(val, selectedMood.label)}
-          />
-        </View>
-      )}
+        {/* Show slider and Hawkins bar when a mood is selected */}
+        {selectedMood && (
+          <>
+            {renderHawkinsBar(selectedMood)}
+            <SliderCard
+              variant="emotion"
+              label={selectedMood.label}
+              moodKey={selectedMood.key as keyof AppTheme['moodColors']}
+              icon={selectedMood.icon}
+              value={slidersState[selectedMood.label]?.value ?? selectedMood.value}
+              onSlidingComplete={value => handleSliderComplete(value, selectedMood.label)}
+            />
+            <SliderCard
+              variant="duration"
+              label="How long have you felt this way?"
+              icon="clock-outline"
+              value={selectedMood.duration ?? 0}
+              onSlidingComplete={onDurationChange}
+              labels={["< 3 months", "6 months", "> 1 year"]}
+              steps={2}
+            />
+          </>
+        )}
+      </ScrollView>
     </ScreenLayout>
   );
 }

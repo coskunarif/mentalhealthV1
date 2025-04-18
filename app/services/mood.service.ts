@@ -18,6 +18,9 @@ export const moodServiceUpdated = {
 };
 
 export class MoodService {
+  /**
+   * Save a mood entry, including consciousnessValue and consciousnessLevel from moodDefinitions
+   */
   static async saveMoodEntry(entry: {
     userId: string, 
     timestamp: Date, 
@@ -36,12 +39,28 @@ export class MoodService {
   
     try {
       console.log('Saving mood entry:', JSON.stringify(entry, null, 2));
-      // Ensure duration exists (required field)
+      // Fetch mood definition to get consciousness values
+      let consciousnessValue: number | undefined = undefined;
+      let consciousnessLevel: string | undefined = undefined;
+      try {
+        const moodDefs = await this.getMoodDefinitions();
+        const def = moodDefs.find(m => m.name.toLowerCase() === entry.mood.toLowerCase() || m.key === entry.mood);
+        if (def) {
+          consciousnessValue = def.consciousnessValue;
+          consciousnessLevel = def.consciousnessLevel;
+        }
+      } catch (e) {
+        // Fallback: leave undefined if can't fetch
+        console.warn('Could not fetch mood definition for consciousness mapping:', e);
+      }
+
       const entryData = {
         ...entry,
         duration: entry.duration || 0,
         timestamp: Timestamp.fromDate(entry.timestamp || new Date()),
-        createdAt: Timestamp.fromDate(new Date())
+        createdAt: Timestamp.fromDate(new Date()),
+        consciousnessValue,
+        consciousnessLevel
       };
       
       console.log('Formatted entry data:', JSON.stringify(entryData, null, 2));
@@ -79,6 +98,9 @@ export class MoodService {
     }
   }
 
+  /**
+   * Returns all mood entries for a user in the last N days (with consciousness fields if present)
+   */
   static async getMoodEntries(userId: string, days: number = 30): Promise<MoodEntry[]> {
     try {
       const startDate = new Date();
@@ -112,6 +134,9 @@ export class MoodService {
   /**
    * Fetches the list of possible mood definitions from Firestore.
    * Assumes a collection 'moodDefinitions' exists.
+   */
+  /**
+   * Returns all mood definitions (includes consciousness values)
    */
   static async getMoodDefinitions(): Promise<MoodDefinition[]> {
     try {
@@ -190,7 +215,31 @@ export class MoodService {
     }
   }
 
-  // Other methods remain the same...
+  /**
+   * Calculates the average consciousness value for a user's recent mood entries.
+   */
+  static async getAverageConsciousness(userId: string, days: number = 30): Promise<number | null> {
+    const entries = await this.getMoodEntries(userId, days);
+    const values = entries.map(e => e.consciousnessValue).filter(v => typeof v === 'number') as number[];
+    if (!values.length) return null;
+    return values.reduce((a, b) => a + b, 0) / values.length;
+  }
+
+  /**
+   * Returns a trend array of consciousness values for the user's recent entries (ordered by timestamp asc)
+   */
+  static async getConsciousnessTrend(userId: string, limitN: number = 10): Promise<{timestamp: Date, value: number, level: string}[]> {
+    const entries = await this.getMoodEntries(userId, 90); // fetch more to allow for limit
+    // Sort by timestamp ascending
+    const sorted = [...entries].sort((a, b) => (a.timestamp as any) - (b.timestamp as any));
+    return sorted.filter(e => typeof e.consciousnessValue === 'number' && !!e.consciousnessLevel)
+      .slice(-limitN)
+      .map(e => ({
+        timestamp: e.timestamp,
+        value: e.consciousnessValue!,
+        level: e.consciousnessLevel!
+      }));
+  }
 }
 
 export default MoodService;
