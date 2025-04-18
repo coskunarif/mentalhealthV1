@@ -12,6 +12,7 @@ import UserService from './services/user.service'; // Import UserService
 import { MoodDefinition } from './models/mood.model';
 import { Text } from 'react-native-paper';
 import { useAuth } from './hooks/useAuth'; // Import useAuth
+import { auth } from './lib/firebase-utils'; // Import auth for debug logging
 
 // Interface for the state managed within this component, derived from MoodDefinition
 interface MoodState extends MoodDefinition {
@@ -127,6 +128,11 @@ export default function MoodScreen() {
       setError("You must be logged in to save your mood.");
       return;
     }
+
+    // Add debug logging for auth state
+    console.log("Current user from useAuth:", user.uid);
+    console.log("Current auth.currentUser:", auth.currentUser?.uid);
+
     setError(null); // Clear previous errors
 
     const selectedMoodEntries = moods.filter(mood => mood.isSelected);
@@ -163,9 +169,20 @@ export default function MoodScreen() {
       console.log(`Successfully saved ${selectedMoodEntries.length} mood entries.`); // Updated log message
       router.replace(returnTo as keyof RootStackParamList);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving mood entries:', error);
-      setError("Failed to save mood. Please try again.");
+
+      // Provide more specific error messages based on the error type
+      if (error?.code === 'permission-denied') {
+        setError("Permission error: Please sign out and sign in again.");
+      } else if (error?.code === 'unauthenticated' || error?.message?.includes('not authenticated')) {
+        setError("Authentication error: Please sign in again.");
+      } else if (error?.code === 'unavailable' || error?.message?.includes('network')) {
+        setError("Network error: Please check your connection and try again.");
+      } else {
+        setError("Failed to save mood. Please try again.");
+      }
+
       // Handle saving error (e.g., show snackbar) - error state is set
     }
   };
