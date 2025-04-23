@@ -114,15 +114,14 @@ export class ExerciseService {
         throw new Error('No exercises found for assigned template.');
     }
 
-    // 4. Count per category (exerciseCategories is an object)
+    // 4. Count per category (exerciseCategories is now a string reference)
     const Counts: Record<string, number> = {};
     let total = 0;
     for (const ex of exercises) {
-        if (typeof ex.exerciseCategories === 'object' && ex.exerciseCategories !== null) {
-            for (const cat of Object.keys(ex.exerciseCategories)) {
-                Counts[cat] = (Counts[cat] || 0) + 1;
-                total++;
-            }
+        if (typeof ex.exerciseCategories === 'string' && ex.exerciseCategories) {
+            const categoryId = ex.exerciseCategories;
+            Counts[categoryId] = (Counts[categoryId] || 0) + 1;
+            total++;
         }
     }
 
@@ -148,29 +147,29 @@ export class ExerciseService {
      */
     private static async getUserProgress(userId: string): Promise<any> {
         console.log('🔍 [PROGRESS DEBUG] Getting user progress for userId:', userId);
-        
+
         try {
             const progressRef = doc(db, 'users', userId, 'progress', 'overview');
             console.log('🔍 [PROGRESS DEBUG] Progress document path:', progressRef.path);
-            
+
             const progressDoc = await getDoc(progressRef);
             console.log('🔍 [PROGRESS DEBUG] Progress document exists:', progressDoc.exists());
-            
+
             if (progressDoc.exists()) {
                 const data = progressDoc.data();
                 console.log('🔍 [PROGRESS DEBUG] Progress data retrieved:', JSON.stringify(data, this.safeJsonReplacer));
-                
+
                 // Validate data structure
                 if (!data.categories) {
                     console.warn('⚠️ [PROGRESS DEBUG] Progress data missing categories property');
                     data.categories = {};
                 }
-                
+
                 if (typeof data.categories !== 'object') {
                     console.error('❌ [PROGRESS DEBUG] Categories is not an object:', typeof data.categories);
                     data.categories = {};
                 }
-                
+
                 // Log each category value
                 if (data.categories) {
                     Object.entries(data.categories).forEach(([key, value]) => {
@@ -180,12 +179,12 @@ export class ExerciseService {
                         }
                     });
                 }
-                
+
                 // Handle any timestamp fields
                 if (data.lastUpdated && typeof data.lastUpdated.toDate === 'function') {
                     data.lastUpdated = data.lastUpdated.toDate();
                 }
-                
+
                 return data;
             }
 
@@ -215,21 +214,21 @@ export class ExerciseService {
             const overviewDoc = await getDoc(overviewRef);
 
             if (overviewDoc.exists()) {
-                // Increment the category count (pick first category key)
-                const categoryKey = exercise.exerciseCategories ? Object.keys(exercise.exerciseCategories)[0] : undefined;
-                if (categoryKey) {
+                // Increment the category count (now a direct string reference)
+                const categoryId = exercise.exerciseCategories;
+                if (categoryId) {
                     await updateDoc(overviewRef, {
-                        [`categories.${categoryKey}`]: increment(1),
+                        [`categories.${categoryId}`]: increment(1),
                         lastUpdated: Timestamp.now()
                     });
                 }
 
             } else {
                 // Create the document if it doesn't exist
-                const categoryKey = exercise.exerciseCategories ? Object.keys(exercise.exerciseCategories)[0] : undefined;
+                const categoryId = exercise.exerciseCategories;
                 await setDoc(overviewRef, {
                     overall: 0, // This might need adjustment based on how "overall" is calculated
-                    categories: categoryKey ? { [categoryKey]: 1 } : {},
+                    categories: categoryId ? { [categoryId]: 1 } : {},
                     lastUpdated: Timestamp.now()
                 });
 
