@@ -120,84 +120,11 @@ function MoodSelector({
     }
   };
 
-  // Group moods by consciousnessLevel (Hawkins hierarchy)
-  const groupedMoods = React.useMemo(() => {
-    const groups: { [level: string]: MoodType[] } = {};
-    moods.forEach(mood => {
-      const level = mood.consciousnessLevel || 'Other';
-      if (!groups[level]) groups[level] = [];
-      groups[level].push(mood);
-    });
-    // Sort groups by Hawkins scale (lowest to highest)
-    const order = [
-      'Shame', 'Guilt', 'Apathy', 'Grief', 'Fear', 'Desire', 'Anger', 'Pride',
-      'Courage', 'Neutrality', 'Willingness', 'Acceptance', 'Reason', 'Love', 'Joy', 'Peace', 'Other'
-    ];
-    return order.map(level => ({
-      level,
-      moods: groups[level] || []
-    })).filter(g => g.moods.length > 0);
-  }, [moods]);
+  // Mood grouping by consciousness level removed
 
-  // Tooltip state for consciousness info
-  const [tooltipLevel, setTooltipLevel] = useState<string | null>(null);
+  // Consciousness-related code removed
 
-  // Helper for Hawkins color coding
-  const getConsciousnessColor = (value?: number) => {
-    if (!value) return theme.colors.surfaceVariant;
-    if (value < 100) return '#B71C1C'; // Red
-    if (value < 200) return '#F57C00'; // Orange
-    if (value < 300) return '#FBC02D'; // Yellow
-    if (value < 400) return '#388E3C'; // Green
-    if (value < 500) return '#1976D2'; // Blue
-    if (value < 600) return '#7B1FA2'; // Purple
-    return '#4A148C'; // Deep purple for highest
-  };
-
-  // Hawkins scale info
-  const hawkinsInfo: { [level: string]: string } = {
-    Shame: 'Lowest level, feelings of humiliation, misery, worthlessness.',
-    Guilt: 'Blame, remorse, self-reproach.',
-    Apathy: 'Despair, hopelessness, abdication.',
-    Grief: 'Regret, sadness, loss.',
-    Fear: 'Anxiety, withdrawal, worry.',
-    Desire: 'Craving, longing, addiction.',
-    Anger: 'Frustration, aggression, vengeance.',
-    Pride: 'Arrogance, denial, superiority.',
-    Courage: 'Affirmation, empowerment, determination.',
-    Neutrality: 'Trust, satisfaction, release.',
-    Willingness: 'Optimism, intention, hopefulness.',
-    Acceptance: 'Forgiveness, harmony, transcendence.',
-    Reason: 'Understanding, rationality, abstraction.',
-    Love: 'Reverence, unconditional, benevolence.',
-    Joy: 'Serenity, completeness, bliss.',
-    Peace: 'Transcendence, self-realization, oneness.',
-    Other: 'Uncategorized emotion.'
-  };
-
-  // Hawkins scale visualization for selected mood
-  const renderHawkinsBar = (mood: MoodType) => {
-    if (!mood.consciousnessValue) return null;
-    const percent = (mood.consciousnessValue - 20) / (600 - 20);
-    return (
-      <View style={{ marginVertical: 16 }}>
-        <Text style={{ textAlign: 'center', color: theme.colors.onSurfaceVariant, marginBottom: 4 }}>
-          Consciousness Level: <Text style={{ fontWeight: 'bold', color: getConsciousnessColor(mood.consciousnessValue) }}>{mood.consciousnessLevel} ({mood.consciousnessValue})</Text>
-        </Text>
-        <View style={{ height: 12, backgroundColor: theme.colors.surfaceVariant, borderRadius: 6, overflow: 'hidden', marginHorizontal: 24 }}>
-          <View style={{
-            width: `${Math.max(0, Math.min(1, percent)) * 100}%`,
-            height: 12,
-            backgroundColor: getConsciousnessColor(mood.consciousnessValue),
-            borderRadius: 6
-          }} />
-        </View>
-        <Text style={{ fontSize: 12, color: theme.colors.onSurfaceVariant, textAlign: 'center', marginTop: 2 }}>
-          (Hawkins Scale: 20 - 600)
-        </Text>
-      </View>
-    );
-  };
+  // Hawkins scale visualization removed
 
   return (
     <ScreenLayout
@@ -210,8 +137,8 @@ function MoodSelector({
           localStyles.mood_buttonContainer,
           isSmallScreen && { flexDirection: 'column' }
         ]}>
-          <View style={{ 
-            flex: 1, 
+          <View style={{
+            flex: 1,
             marginRight: isSmallScreen ? 0 : theme.spacing.small,
             marginBottom: isSmallScreen ? theme.spacing.small : 0
           }}>
@@ -225,9 +152,9 @@ function MoodSelector({
               NEXT
             </EnhancedButton>
           </View>
-          <View style={{ 
-            flex: 1, 
-            marginLeft: isSmallScreen ? 0 : theme.spacing.small 
+          <View style={{
+            flex: 1,
+            marginLeft: isSmallScreen ? 0 : theme.spacing.small
           }}>
             <EnhancedButton
               mode="contained"
@@ -285,7 +212,7 @@ function MoodSelector({
                           borderRadius: theme.shape.borderRadius,
                           backgroundColor: theme.colors.surface,
                           borderWidth: isSelected ? 2 : 1,
-                          borderColor: isSelected ? moodColor : getConsciousnessColor(item.consciousnessValue),
+                          borderColor: isSelected ? moodColor : theme.colors.surfaceVariant,
                           shadowColor: theme.colors.shadow,
                           shadowOffset: { width: 0, height: 1 },
                           shadowOpacity: 0.1, shadowRadius: 2, elevation: 1,
@@ -296,20 +223,15 @@ function MoodSelector({
                       accessibilityRole="button"
                       accessibilityState={{ selected: isSelected }}
                     >
-                      <MaterialCommunityIcons 
-                        name={item.icon} 
+                      <MaterialCommunityIcons
+                        name={item.icon}
                         size={28}
                         color={moodColor}
                       />
                       <Text style={{ fontWeight: isSelected ? '700' : '400', color: isSelected ? moodColor : theme.colors.onSurfaceVariant, fontSize: 13, marginTop: 2 }}>
                         {item.label}
                       </Text>
-                      {/* Consciousness badge */}
-                      {item.consciousnessValue && (
-                        <View style={{ backgroundColor: getConsciousnessColor(item.consciousnessValue), borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2, marginTop: 2 }}>
-                          <Text style={{ color: '#fff', fontSize: 10, fontWeight: 'bold' }}>{item.consciousnessValue}</Text>
-                        </View>
-                      )}
+                      {/* Consciousness badge removed */}
                     </Pressable>
                   </View>
                 );
@@ -322,10 +244,9 @@ function MoodSelector({
           ));
         })()}
 
-        {/* Show slider and Hawkins bar when a mood is selected */}
+        {/* Show sliders when a mood is selected */}
         {selectedMood && (
           <>
-            {renderHawkinsBar(selectedMood)}
             <SliderCard
               variant="emotion"
               label={selectedMood.label}

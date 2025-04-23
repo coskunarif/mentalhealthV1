@@ -6,14 +6,8 @@ export interface Exercise {
   duration: number;
   order: number;
   audioUrl: string;
-  // New: exerciseCategories object with category impact scores
-  exerciseCategories: {
-    supportDreams?: number;
-    balanceMemories?: number;
-    gainAwareness?: number;
-    changeOpinion?: number;
-    breatheUp?: number;
-  };
+  // Updated: exerciseCategories is now a single string reference to a category ID
+  exerciseCategories: string;
 }
 
 
