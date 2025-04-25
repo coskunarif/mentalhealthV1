@@ -1,0 +1,15 @@
+# Ignore dependencies and build output for Firebase Cloud Functions
+node_modules/
+lib/
+lib.bak/
+dist/
+
+# Optional: ignore log files and environment configs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+debug.log
+*.log
+.env
+.env.*
+!.env.example

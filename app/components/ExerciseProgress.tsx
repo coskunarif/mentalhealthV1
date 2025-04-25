@@ -11,9 +11,9 @@ interface ExerciseProgressProps {
     id: string;
     title: string;
     duration: string | number; // Accept both string and number
-    isCompleted: boolean;
   }[];
   currentStep: string | undefined;
+  completedExerciseIds?: string[];
 }
 
 const formatDuration = (duration: string | number): string => {
@@ -24,26 +24,33 @@ const formatDuration = (duration: string | number): string => {
   return duration;
 };
 
-const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
+function ExerciseProgress({
   exercises,
   currentStep,
-}) => {
+  completedExerciseIds = [],
+}: ExerciseProgressProps) {
   const theme = useTheme<AppTheme>();
+
+  // Map isCompleted based on completedExerciseIds
+  const exercisesWithCompletion = exercises.map((ex) => ({
+    ...ex,
+    isCompleted: completedExerciseIds.includes(ex.id),
+  }));
 
   // Initialize animations array with default values
   const [animations, setAnimations] = useState<Animated.Value[]>([]);
   
   useEffect(() => {
     // Initialize animations with proper values when exercises change
-    if (Array.isArray(exercises)) {
-      setAnimations(exercises.map(() => new Animated.Value(0)));
+    if (Array.isArray(exercisesWithCompletion)) {
+      setAnimations(exercisesWithCompletion.map(() => new Animated.Value(0)));
     }
-  }, [exercises?.length]);
+  }, [exercisesWithCompletion?.length]);
 
   useEffect(() => {
     // Animate completed steps - only run if animations and exercises are properly initialized
-    if (animations.length > 0 && Array.isArray(exercises)) {
-      exercises.forEach((exercise, index) => {
+    if (animations.length > 0 && Array.isArray(exercisesWithCompletion)) {
+      exercisesWithCompletion.forEach((exercise, index) => {
         if (exercise.isCompleted && animations[index]) {
           Animated.timing(animations[index], {
             toValue: 1,
@@ -54,7 +61,7 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
         }
       });
     }
-  }, [exercises, animations]);
+  }, [exercisesWithCompletion, animations]);
 
   const getStepStatus = (index: number, isCompleted: boolean, isCurrent: boolean) => {
     if (isCompleted) return 'completed';
@@ -100,7 +107,7 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
   };
 
   // Safeguard against undefined exercises
-  if (!Array.isArray(exercises) || exercises.length === 0) {
+  if (!Array.isArray(exercisesWithCompletion) || exercisesWithCompletion.length === 0) {
     return (
       <View style={styles.container}>
         <Text>No exercises available.</Text>
@@ -110,11 +117,11 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
 
   return (
     <View style={styles.container}>
-      {exercises.map((exercise, index) => {
+      {exercisesWithCompletion.map((exercise, index) => {
         const isCurrent = exercise.id === currentStep;
         const status = getStepStatus(index, exercise.isCompleted, isCurrent);
         const colors = getStepColors(status);
-        const isLast = index === exercises.length - 1;
+        const isLast = index === exercisesWithCompletion.length - 1;
         
         // Guard against undefined animation value
         const animationValue = animations[index] || new Animated.Value(0);
@@ -150,23 +157,9 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
                 )}
               </View>
               <View style={styles.textContainer}>
-                <Text style={[styles.stepNumber, { color: colors.text, fontSize: 12, fontWeight: '500' }]}>
-                  Step {index + 1}
-                </Text>
-                <Text style={[styles.stepTitle, { 
-                  color: colors.text, 
-                  fontSize: 16, 
-                  fontWeight: '500',
-                  marginVertical: 4
-                }]} numberOfLines={1}>
-                  {exercise.title || `Exercise ${index + 1}`}
-                </Text>
-                <Text style={[styles.stepDuration, { 
-                  color: theme.colors.onSurfaceVariant,
-                  fontSize: 14
-                }]}>                  
-                  {formatDuration(exercise.duration || '0 min')}
-                </Text>
+                <Text style={[styles.stepNumber, { color: colors.text, fontSize: 12, fontWeight: '500' }]}>Step {index + 1}</Text>
+                <Text style={[styles.stepTitle, { color: colors.text, fontSize: 16, fontWeight: '500', marginVertical: 4 }]} numberOfLines={1}>{exercise.title || `Exercise ${index + 1}`}</Text>
+                <Text style={[styles.stepDuration, { color: theme.colors.onSurfaceVariant, fontSize: 14 }]}>{formatDuration(exercise.duration)}</Text>
               </View>
             </View>
           </View>
@@ -174,6 +167,6 @@ const ExerciseProgress: React.FC<ExerciseProgressProps> = ({
       })}
     </View>
   );
-};
+}
 
 export default ExerciseProgress;

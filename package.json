@@ -5,6 +5,7 @@
   "scripts": {
     "prestart": "node prep-build.js",
     "start": "expo start --clear",
+    "dev-all": "npm install --prefix . && npm install --prefix firebase/functions && npm run build --prefix firebase/functions && npm run prebuild --prefix . && npm run start --prefix .",
     "fix-exports": "node fix-exports.js",
     "fix-and-start": "node firebase-symlinks.js && npm run fix-exports && node prep-build.js && npx expo start --clear",
     "android": "node prep-build.js && expo start --android",
@@ -43,6 +44,7 @@
     "firebase-admin": "^13.2.0",
     "firebase-functions": "^6.3.2",
     "libphonenumber-js": "^1.11.20",
+    "mentalhealthv1": "file:",
     "metro-core": "^0.81.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",

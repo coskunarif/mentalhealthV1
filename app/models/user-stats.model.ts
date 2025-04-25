@@ -38,6 +38,10 @@ export interface UserStats {
   mood: {
     recentMoods: MoodData[];
   };
+  // Optional: Progress for each exercise category (0-100)
+  exerciseCategories?: {
+    [key: string]: number | undefined;
+  };
 }
 
 export interface UserStatsResponse {

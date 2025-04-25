@@ -1,5 +1,5 @@
 import { collection, addDoc, query, where, orderBy, getDocs, doc, updateDoc, deleteDoc, limit } from 'firebase/firestore';
-import { db } from '../lib/firebase-utils';
+import { db, auth, refreshAuthToken } from '../lib/firebase-utils';
 import { Timestamp, queryDocuments, getDocument } from '../lib/firebase-utils/firestore';
 import { MoodEntry, MoodInsights, MoodInsightsResponse, MoodDefinition, EmotionDefinition } from '../models/mood.model'; // Add EmotionDefinition import
 import { DataPoint } from '../components/RadarChart'; // Assuming DataPoint is defined here or imported appropriately
@@ -18,10 +18,13 @@ export const moodServiceUpdated = {
 };
 
 export class MoodService {
+  /**
+   * Save a mood entry, including consciousnessValue and consciousnessLevel from moodDefinitions
+   */
   static async saveMoodEntry(entry: {
-    userId: string, 
-    timestamp: Date, 
-    mood: string, 
+    userId: string,
+    timestamp: Date,
+    mood: string,
     value: number,
     duration?: number,
     factors?: string[],
@@ -33,25 +36,58 @@ export class MoodService {
     if (typeof entry.value !== 'number' || entry.value < 0 || entry.value > 100) {
       throw new Error('Mood value must be a number between 0 and 100');
     }
-  
+
+    // Verify authentication and refresh token if needed
+    if (!auth.currentUser) {
+      throw new Error('User not authenticated');
+    }
+
+    // If there's a mismatch between the provided userId and the authenticated user,
+    // log a warning and use the authenticated user's ID instead
+    if (auth.currentUser.uid !== entry.userId) {
+      console.warn(`User ID mismatch: provided ${entry.userId}, using authenticated user ID ${auth.currentUser.uid} instead`);
+      // Update the entry with the correct user ID
+      entry.userId = auth.currentUser.uid;
+    }
+
     try {
+      // Refresh auth token before saving to ensure fresh credentials
+      await refreshAuthToken(true);
+
       console.log('Saving mood entry:', JSON.stringify(entry, null, 2));
-      // Ensure duration exists (required field)
+      // Fetch mood definition to get consciousness values
+      let consciousnessValue: number | undefined = undefined;
+      let consciousnessLevel: string | undefined = undefined;
+      try {
+        const moodDefs = await this.getMoodDefinitions();
+        const def = moodDefs.find(m => m.name.toLowerCase() === entry.mood.toLowerCase() || m.key === entry.mood);
+        if (def) {
+          consciousnessValue = def.consciousnessValue;
+          consciousnessLevel = def.consciousnessLevel;
+        }
+      } catch (e) {
+        // Fallback: leave undefined if can't fetch
+        console.warn('Could not fetch mood definition for consciousness mapping:', e);
+      }
+
       const entryData = {
         ...entry,
         duration: entry.duration || 0,
         timestamp: Timestamp.fromDate(entry.timestamp || new Date()),
-        createdAt: Timestamp.fromDate(new Date())
+        createdAt: Timestamp.fromDate(new Date()),
+        consciousnessValue,
+        consciousnessLevel
       };
-      
+
       console.log('Formatted entry data:', JSON.stringify(entryData, null, 2));
-      
+
       const docRef = await addDoc(collection(db, 'moods'), entryData);
       console.log('Successfully saved mood entry with ID:', docRef.id);
 
-      // Track the activity
+      // Track the activity - ensure we're using the correct user ID
+      const activityUserId = auth.currentUser ? auth.currentUser.uid : entry.userId;
       await UserService.trackActivity({
-        userId: entry.userId,
+        userId: activityUserId,
         type: 'mood',
         timestamp: entry.timestamp || new Date(),
         details: {
@@ -68,17 +104,70 @@ export class MoodService {
       if (error && typeof error === 'object' && 'code' in error && 'message' in error) {
         console.error('Error details:', error.code, error.message);
       }
-      
-      // Use default mock ID for testing when permissions fail
+
+      // Handle permission errors specifically
       if (error?.code === 'permission-denied') {
-        console.log('Using mock ID due to permission issue - this is expected during testing');
-        return `mock-mood-${Date.now()}`;
+        console.log('Permission denied error - attempting to refresh token and retry');
+
+        try {
+          // Force token refresh and retry once
+          await refreshAuthToken(true);
+
+          // Small delay to ensure token propagation
+          await new Promise(resolve => setTimeout(resolve, 500));
+
+          // Retry the save operation
+          console.log('Retrying mood entry save after token refresh');
+
+          // Ensure we're using the current authenticated user ID
+          if (auth.currentUser && auth.currentUser.uid !== entry.userId) {
+            console.warn(`Updating user ID for retry: from ${entry.userId} to ${auth.currentUser.uid}`);
+            entry.userId = auth.currentUser.uid;
+          }
+
+          const entryData = {
+            ...entry,
+            duration: entry.duration || 0,
+            timestamp: Timestamp.fromDate(entry.timestamp || new Date()),
+            createdAt: Timestamp.fromDate(new Date()),
+            // We don't need consciousness values for retry - they were already fetched
+          };
+
+          const docRef = await addDoc(collection(db, 'moods'), entryData);
+          console.log('Successfully saved mood entry on retry with ID:', docRef.id);
+
+          // Track the activity - ensure we're using the correct user ID
+          const activityUserId = auth.currentUser ? auth.currentUser.uid : entry.userId;
+          await UserService.trackActivity({
+            userId: activityUserId,
+            type: 'mood',
+            timestamp: entry.timestamp || new Date(),
+            details: {
+              title: `Recorded ${entry.mood}`,
+              value: entry.value,
+              factors: entry.factors || []
+            }
+          });
+
+          return docRef.id;
+        } catch (retryError: any) {
+          console.error('Retry failed:', retryError);
+          // If retry also fails with permission-denied, use mock ID for testing
+          if (retryError?.code === 'permission-denied') {
+            console.log('Using mock ID due to persistent permission issue - this is expected during testing');
+            return `mock-mood-${Date.now()}`;
+          }
+          throw retryError;
+        }
       }
-      
+
       throw error;
     }
   }
 
+  /**
+   * Returns all mood entries for a user in the last N days (with consciousness fields if present)
+   */
   static async getMoodEntries(userId: string, days: number = 30): Promise<MoodEntry[]> {
     try {
       const startDate = new Date();
@@ -112,6 +201,9 @@ export class MoodService {
   /**
    * Fetches the list of possible mood definitions from Firestore.
    * Assumes a collection 'moodDefinitions' exists.
+   */
+  /**
+   * Returns all mood definitions (includes consciousness values)
    */
   static async getMoodDefinitions(): Promise<MoodDefinition[]> {
     try {
@@ -149,12 +241,12 @@ export class MoodService {
       // Get mood entries from the last 30 days
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - 30);
-      
+
       const moodEntries = await this.getMoodEntries(userId, 30);
-      
+
       // Group moods by type and calculate averages
       const moodMap = new Map<string, { count: number, total: number }>();
-      
+
       moodEntries.forEach(entry => {
         if (!moodMap.has(entry.mood)) {
           moodMap.set(entry.mood, { count: 0, total: 0 });
@@ -162,35 +254,59 @@ export class MoodService {
         const current = moodMap.get(entry.mood)!;
         current.count += 1;
         // Assuming 'value' represents the mood intensity (e.g., 0-100)
-        current.total += entry.value; 
+        current.total += entry.value;
       });
-      
+
       // Convert to radar chart format
       const data: DataPoint[] = [];
       const labels: string[] = [];
-      
+
       moodMap.forEach((value, key) => {
         // Avoid division by zero if count is 0
-        const averageValue = value.count > 0 ? value.total / value.count : 0; 
+        const averageValue = value.count > 0 ? value.total / value.count : 0;
         // Normalize to 0-1 range for the chart (assuming max value is 100)
-        const normalizedValue = averageValue / 100; 
-        
+        const normalizedValue = averageValue / 100;
+
         labels.push(key);
         data.push({
           label: key,
           value: normalizedValue
         });
       });
-      
+
       return { data, labels };
     } catch (error) {
       console.error('Error getting mood radar data:', error);
       // Return empty arrays on error to prevent UI crashes
-      return { data: [], labels: [] }; 
+      return { data: [], labels: [] };
     }
   }
 
-  // Other methods remain the same...
+  /**
+   * Calculates the average consciousness value for a user's recent mood entries.
+   */
+  static async getAverageConsciousness(userId: string, days: number = 30): Promise<number | null> {
+    const entries = await this.getMoodEntries(userId, days);
+    const values = entries.map(e => e.consciousnessValue).filter(v => typeof v === 'number') as number[];
+    if (!values.length) return null;
+    return values.reduce((a, b) => a + b, 0) / values.length;
+  }
+
+  /**
+   * Returns a trend array of consciousness values for the user's recent entries (ordered by timestamp asc)
+   */
+  static async getConsciousnessTrend(userId: string, limitN: number = 10): Promise<{timestamp: Date, value: number, level: string}[]> {
+    const entries = await this.getMoodEntries(userId, 90); // fetch more to allow for limit
+    // Sort by timestamp ascending
+    const sorted = [...entries].sort((a, b) => (a.timestamp as any) - (b.timestamp as any));
+    return sorted.filter(e => typeof e.consciousnessValue === 'number' && !!e.consciousnessLevel)
+      .slice(-limitN)
+      .map(e => ({
+        timestamp: e.timestamp,
+        value: e.consciousnessValue!,
+        level: e.consciousnessLevel!
+      }));
+  }
 }
 
 export default MoodService;

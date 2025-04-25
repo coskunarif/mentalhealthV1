@@ -16,6 +16,9 @@ export interface MoodEntry {
   duration: number;
   factors?: string[];
   notes?: string;
+  // Consciousness scale fields (optional for backward compatibility)
+  consciousnessValue?: number;
+  consciousnessLevel?: string;
 }
 
 // Represents the definition of a mood type (e.g., Shame, Guilt)
@@ -24,6 +27,12 @@ export interface MoodDefinition {
   name: string; // The display name (e.g., "Shame") - used for sorting/display
   key: MoodKey; // Use the specific MoodKey type derived from theme
   icon: IconName; // Use the specific IconName type
+  /**
+   * consciousnessValue: Numeric value on Hawkins' scale (20-700+)
+   * consciousnessLevel: The consciousness level name (e.g., "Shame", "Fear", "Courage")
+   */
+  consciousnessValue: number;
+  consciousnessLevel: string;
   // Add other definition fields if needed (e.g., description, default value)
 }
 
