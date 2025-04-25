@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, doc, getDoc, orderBy, limit, setDoc, updateDoc, increment } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, orderBy, limit, setDoc, updateDoc, increment, addDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Timestamp } from 'firebase/firestore';
 import { safeStringify, validateRadarData, validateRadarLabels, DataPoint } from '../lib/debug-utils';
@@ -62,6 +62,30 @@ export class ExerciseService {
         }
     }
 
+    /**
+     * Get completed exercise IDs for a user
+     */
+    static async getCompletedExerciseIds(userId: string): Promise<string[]> {
+        try {
+            if (!userId) {
+                console.error('User ID is required to fetch completed exercises');
+                return [];
+            }
+
+            const userExercisesQuery = query(
+                collection(db, 'users', userId, 'progress'),
+                where('type', '==', 'exercise'),
+                where('completed', '==', true)
+            );
+
+            const snapshot = await getDocs(userExercisesQuery);
+            return snapshot.docs.map(doc => doc.id);
+        } catch (error) {
+            console.error('Error fetching completed exercises:', error);
+            return [];
+        }
+    }
+
   /**
    * Get all exercises
    */
@@ -71,19 +95,12 @@ export class ExerciseService {
         const exercisesSnapshot = await getDocs(collection(db, 'exercises'));
         const exercises = exercisesSnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data() as Record<string, any>,
-          isCompleted: false
+          ...doc.data() as Record<string, any>
         }));
 
         // Then check user progress to mark completed exercises
-        const userProgressSnapshot = await this.getUserExercises(userId);
-        const completedExerciseIds = userProgressSnapshot.map(progress => progress.exerciseId);
-
-        // Mark completed exercises
-        return exercises.map(exercise => ({
-          ...exercise,
-          isCompleted: completedExerciseIds.includes(exercise.id)
-        }));
+        // (No longer needed to annotate exercises with isCompleted; UI should handle completion lookup)
+        return exercises;
       } catch (error) {
         console.error('Error fetching exercises:', error);
         throw error;
@@ -91,321 +108,182 @@ export class ExerciseService {
     }
 
     /**
-     * Get user radar data for visualization
+     * Get user's assigned template and its exercises in order
      */
-    static async getRadarData(userId: string): Promise<{ data: DataPoint[], labels: string[] }> {
-        // Define the type for exercise data
-        interface ExerciseData {
-            id: string;
-            title: string;
-            duration: number;
-            category: string;
-            description: string;
-            order: number;
-            isCompleted: boolean;
-        }
-        
-        console.log('🔍 [RADAR DEBUG] getRadarData: Start of function for userId:', userId);
-        console.log('🔍 [RADAR DEBUG] Firebase project ID:', db.app.options.projectId);
-        
-        try {
-            // Test basic Firebase connectivity first
-            console.log('🔍 [RADAR DEBUG] Testing basic Firestore connectivity...');
-            try {
-                const dbRef = collection(db, 'exercises');
-                const simpleQuery = query(dbRef, limit(1));
-                const snapshot = await getDocs(simpleQuery);
-                console.log('🔍 [RADAR DEBUG] Basic connectivity test succeeded, found documents:', !snapshot.empty);
-                if (!snapshot.empty) {
-                    const sampleDoc = snapshot.docs[0].data();
-                    console.log('🔍 [RADAR DEBUG] Sample document structure:', safeStringify(sampleDoc));
-                }
-            } catch (error: any) {
-                console.error('❌ [RADAR DEBUG] Basic connectivity test failed:', error);
-                // This is a critical error - if we can't even do a simple query, we should stop
-                throw new Error(`Firebase connectivity issue: ${error?.message || 'Unknown error'}`);
-            }
-
-            // Fetch all exercises to get categories
-            console.log('🔍 [RADAR DEBUG] Fetching all exercises...');
-            const exercisesRef = collection(db, 'exercises');
-            let exercises: ExerciseData[] = [];
-            
-            try {
-                const exercisesSnapshot = await getDocs(exercisesRef);
-                console.log('🔍 [RADAR DEBUG] Exercises query returned', exercisesSnapshot.size, 'documents');
-                
-                if (exercisesSnapshot.empty) {
-                    console.warn('⚠️ [RADAR DEBUG] No exercises found in database');
-                }
-                
-                exercises = exercisesSnapshot.docs.map(doc => {
-                    const data = doc.data();
-                    console.log(`🔍 [RADAR DEBUG] Exercise ${doc.id} category:`, data.category);
-                    return {
-                        id: doc.id,
-                        ...data,
-                    } as ExerciseData;
-                });
-            } catch (error: any) {
-                console.error('❌ [RADAR DEBUG] Error fetching exercises:', error);
-                throw new Error(`Failed to fetch exercises: ${error?.message || 'Unknown error'}`);
-            }
-
-            // Extract unique categories with validation
-            console.log('🔍 [RADAR DEBUG] Extracting categories from exercises...');
-            const categoriesSet = new Set<string>();
-            exercises.forEach(exercise => {
-                if (!exercise.category) {
-                    console.warn(`⚠️ [RADAR DEBUG] Exercise ${exercise.id} has no category`);
-                } else {
-                    categoriesSet.add(String(exercise.category));
-                }
-            });
-            
-            const categories = Array.from(categoriesSet);
-            console.log('🔍 [RADAR DEBUG] Categories extracted:', safeStringify(categories));
-            
-            if (categories.length === 0) {
-                console.warn('⚠️ [RADAR DEBUG] No categories found in exercises');
-                return { data: [], labels: [] };
-            }
-
-            // Get user progress data
-            console.log('🔍 [RADAR DEBUG] Fetching user progress for userId:', userId);
-            let progressData;
-            try {
-                progressData = await this.getUserProgress(userId);
-                console.log('🔍 [RADAR DEBUG] Raw progress data:', safeStringify(progressData));
-            } catch (error: any) {
-                console.error('❌ [RADAR DEBUG] Error fetching user progress:', error);
-                throw new Error(`Failed to fetch user progress: ${error?.message || 'Unknown error'}`);
-            }
-
-            // Validate progress data structure
-            if (!progressData) {
-                console.error('❌ [RADAR DEBUG] Progress data is null or undefined');
-                progressData = { overall: 0, categories: {} };
-            }
-            
-            if (!progressData.categories || typeof progressData.categories !== 'object') {
-                console.error('❌ [RADAR DEBUG] Invalid categories structure:', progressData.categories);
-                progressData.categories = {}; // Default to empty object
-            }
-
-            // Calculate completion percentage for each category
-            console.log('🔍 [RADAR DEBUG] Calculating radar data points...');
-            let data = categories.map(category => {
-                // Ensure category is a string
-                const categoryKey = String(category);
-                console.log(`🔍 [RADAR DEBUG] Processing category: ${categoryKey}`);
-
-                // Safely access the progress value, defaulting to 0
-                let categoryProgress = 0;
-                try {
-                    const rawProgress = progressData.categories[categoryKey];
-                    console.log(`🔍 [RADAR DEBUG] Raw progress for ${categoryKey}:`, rawProgress);
-                    
-                    if (rawProgress !== undefined && rawProgress !== null) {
-                        categoryProgress = Number(rawProgress);
-                        if (isNaN(categoryProgress)) {
-                            console.error(`❌ [RADAR DEBUG] Invalid progress value for ${categoryKey}:`, rawProgress);
-                            categoryProgress = 0;
-                        } else {
-                            console.log(`🔍 [RADAR DEBUG] Numeric progress for ${categoryKey}:`, categoryProgress);
-                        }
-                    } else {
-                        console.log(`🔍 [RADAR DEBUG] No progress data for ${categoryKey}, defaulting to 0`);
-                    }
-                } catch (e) {
-                    console.error(`❌ [RADAR DEBUG] Error accessing progress for ${categoryKey}:`, e);
-                }
-
-                // Calculate normalized value (0-1)
-                const normalizedValue = Math.min(Math.max(categoryProgress / 100, 0), 1);
-                console.log(`🔍 [RADAR DEBUG] Normalized value for ${categoryKey}:`, normalizedValue);
-                
-                return {
-                    label: categoryKey,
-                    value: normalizedValue
-                };
-            });
-
-            console.log('🔍 [RADAR DEBUG] Pre-validation radar data points:', safeStringify(data));
-            console.log('🔍 [RADAR DEBUG] Pre-validation radar labels:', safeStringify(categories));
-            
-            // Validate data and labels using our utility functions
-            const dataValidation = validateRadarData(data);
-            if (!dataValidation.isValid) {
-                console.error('❌ [RADAR DEBUG] Radar data validation failed:', dataValidation.errors.join(', '));
-                dataValidation.warnings.forEach(warning => {
-                    console.warn(`⚠️ [RADAR DEBUG] ${warning}`);
-                });
-                data = dataValidation.fixedData;
-            }
-            
-            const labelsValidation = validateRadarLabels(categories);
-            if (!labelsValidation.isValid) {
-                console.error('❌ [RADAR DEBUG] Radar labels validation failed:', labelsValidation.errors.join(', '));
-                labelsValidation.warnings.forEach(warning => {
-                    console.warn(`⚠️ [RADAR DEBUG] ${warning}`);
-                });
-            }
-            
-            // Ensure data and labels have the same length
-            if (data.length !== labelsValidation.fixedLabels.length) {
-                console.warn(`⚠️ [RADAR DEBUG] Data length (${data.length}) and label length (${labelsValidation.fixedLabels.length}) mismatch`);
-                
-                // If we have more data points than labels, truncate data
-                if (data.length > labelsValidation.fixedLabels.length) {
-                    console.warn('⚠️ [RADAR DEBUG] Truncating data to match labels length');
-                    data = data.slice(0, labelsValidation.fixedLabels.length);
-                }
-                
-                // If we have more labels than data points, add dummy data points
-                if (data.length < labelsValidation.fixedLabels.length) {
-                    console.warn('⚠️ [RADAR DEBUG] Adding dummy data points to match labels length');
-                    const dummyPoints = labelsValidation.fixedLabels.slice(data.length).map((label, index) => ({
-                        label,
-                        value: 0
-                    }));
-                    data = [...data, ...dummyPoints];
-                }
-            }
-            
-            // Final validation check
-            console.log('🔍 [RADAR DEBUG] Final radar data points:', safeStringify(data));
-            console.log('🔍 [RADAR DEBUG] Final radar labels:', safeStringify(labelsValidation.fixedLabels));
-            
-            // Ensure we always return valid arrays
-            return { 
-                data: Array.isArray(data) ? data : [], 
-                labels: Array.isArray(labelsValidation.fixedLabels) ? labelsValidation.fixedLabels : [] 
-            };
-        } catch (error) {
-            console.error('❌ [RADAR DEBUG] Error fetching radar data:', error);
-            // Return empty arrays on error
-            return { data: [], labels: [] }; 
-        } finally {
-            // Test accessing a different collection
-            console.log('Testing access to users collection...');
-            try {
-                const testRef = collection(db, 'users');
-                const testSnapshot = await getDocs(query(testRef, limit(1)));
-                console.log('Users collection test - empty?:', testSnapshot.empty);
-            } catch (error) {
-                console.error('Error accessing users collection:', error);
-            }
-        }
-    }
-
-    /**
-     * Get recent activities for the user
-     */
-    static async getRecentActivities(userId: string): Promise<any[]> {
+    static async getUserTemplateExercises(userId: string): Promise<any[]> {
       try {
-          console.log('getRecentActivities: Fetching recent activities...');
-  const activitiesRef = collection(db, 'users', userId, 'activities');
-  const q = query(activitiesRef,
-    where('type', 'in', ['exercise', 'mood', 'survey']),
-    orderBy('timestamp', 'desc'),
-    limit(5)
-  );
-
-            let snapshot;
-            try {
-                snapshot = await getDocs(q);
-            } catch (error) {
-                console.error('getRecentActivities: Error fetching activities with getDocs:', error);
-                return []; // Return empty array on error
-            }
-
-          const activities = snapshot.docs.map(doc => {
-              const data = doc.data();
-              console.log(`getRecentActivities: Processing activity ${doc.id}:`, data);
-              
-              // Convert Firestore timestamp to Date object
-              let timestamp = new Date();
-              if (data.timestamp && typeof data.timestamp.toDate === 'function') {
-                  timestamp = data.timestamp.toDate();
-              }
-              
-              return {
-                  id: doc.id,
-                  type: data.type,
-                  title: data.details?.title || this.getActivityTitle(data.type),
-                  subtitle: data.details?.subtitle || '',
-                  duration: data.details?.duration || 0,
-                  timestamp: timestamp
-              };
-          });
-          console.log('getRecentActivities: Final activities:', JSON.stringify(activities, this.safeJsonReplacer));
-          return activities;
-      } catch (error) {
-          console.error('getRecentActivities: Error fetching recent activities:', error);
+        if (!userId) {
+          console.error('User ID is required to fetch template exercises');
           return [];
+        }
+
+        // 1. Get user's assigned template ID
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+
+        if (!userDoc.exists()) {
+          console.error('User document not found');
+          return [];
+        }
+
+        const assignedTemplateId = userDoc.data()?.assignedTemplateId;
+        if (!assignedTemplateId) {
+          console.error('No template assigned to user');
+          return [];
+        }
+
+        // 2. Get template's exercise IDs
+        const templateRef = doc(db, 'exerciseTemplates', assignedTemplateId);
+        const templateDoc = await getDoc(templateRef);
+
+        if (!templateDoc.exists()) {
+          console.error('Template document not found');
+          return [];
+        }
+
+        // Parse the exerciseIds string into an array
+        let exerciseIds: string[] = [];
+        const exerciseIdsData = templateDoc.data()?.exerciseIds;
+
+        if (typeof exerciseIdsData === 'string') {
+          // Handle string format like "[exercise-1, exercise-2, exercise-3]"
+          exerciseIds = exerciseIdsData
+            .replace('[', '')
+            .replace(']', '')
+            .split(',')
+            .map(id => id.trim());
+        } else if (Array.isArray(exerciseIdsData)) {
+          // Handle array format
+          exerciseIds = exerciseIdsData;
+        }
+
+        if (exerciseIds.length === 0) {
+          console.error('No exercises found in template');
+          return [];
+        }
+
+        // 3. Fetch all exercises in the template
+        const exercises: any[] = [];
+        for (const exId of exerciseIds) {
+          const exDoc = await getDoc(doc(db, 'exercises', exId));
+          if (exDoc.exists()) {
+            exercises.push({
+              id: exDoc.id,
+              ...exDoc.data()
+            });
+          }
+        }
+
+        // 4. Sort exercises by order field
+        return exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
+      } catch (error) {
+        console.error('Error fetching user template exercises:', error);
+        return [];
       }
     }
 
     /**
-     * Helper to get activity title
+     * Get user radar data for visualization
      */
-    private static getActivityTitle(type: string): string {
-        switch (type) {
-            case 'exercise':
-                return 'Breathing Exercise';
-            case 'mood':
-                return 'Mood Tracking';
-            case 'survey': // Added title for survey
-                return 'Wellness Survey';
-            default:
-                return 'Activity';
+    static async getRadarData(userId: string): Promise<{ data: DataPoint[], labels: string[] }> {
+    // --- RADAR CHART: Template-based calculation ---
+    // 1. Get user's assigned template
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+    const assignedTemplateId = userDoc.data()?.assignedTemplateId;
+    if (!assignedTemplateId) {
+        throw new Error('No exercise template assigned to user.');
+    }
+
+    // 2. Get template's exercise IDs
+    const templateRef = doc(db, 'exerciseTemplates', assignedTemplateId);
+    const templateDoc = await getDoc(templateRef);
+    const exerciseIds: string[] = templateDoc.exists() ? (templateDoc.data()?.exerciseIds || []) : [];
+    if (exerciseIds.length === 0) {
+        throw new Error('Assigned template has no exercises.');
+    }
+
+    // 3. Fetch all exercises in template
+    const exercises: any[] = [];
+    for (const exId of exerciseIds) {
+        const exDoc = await getDoc(doc(db, 'exercises', exId));
+        if (exDoc.exists()) exercises.push(exDoc.data());
+    }
+    if (exercises.length === 0) {
+        throw new Error('No exercises found for assigned template.');
+    }
+
+    // 4. Count per category (exerciseCategories is now a string reference)
+    const Counts: Record<string, number> = {};
+    let total = 0;
+    for (const ex of exercises) {
+        if (typeof ex.exerciseCategories === 'string' && ex.exerciseCategories) {
+            const categoryId = ex.exerciseCategories;
+            Counts[categoryId] = (Counts[categoryId] || 0) + 1;
+            total++;
         }
     }
+
+    // 5. Get all function categories for labels (ordered)
+    const catSnapshot = await getDocs(collection(db, 'exerciseCategories'));
+    const categories = catSnapshot.docs
+        .map(doc => ({ id: doc.id, ...(doc.data() as { label?: string; name?: string; order?: number }) }))
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const Ids = categories.map(cat => cat.id);
+    const Labels = categories.map(cat => cat.label || cat.name || cat.id);
+
+    // 6. Build radar data (percent per )
+    const data = Ids.map((catId, idx) => ({
+        label: Labels[idx],
+        value: total > 0 ? (Counts[catId] || 0) / total : 0
+    }));
+
+    return { data, labels: Labels };
+}
 
     /**
      * Get user progress data
      */
     private static async getUserProgress(userId: string): Promise<any> {
         console.log('🔍 [PROGRESS DEBUG] Getting user progress for userId:', userId);
-        
+
         try {
             const progressRef = doc(db, 'users', userId, 'progress', 'overview');
             console.log('🔍 [PROGRESS DEBUG] Progress document path:', progressRef.path);
-            
+
             const progressDoc = await getDoc(progressRef);
             console.log('🔍 [PROGRESS DEBUG] Progress document exists:', progressDoc.exists());
-            
+
             if (progressDoc.exists()) {
                 const data = progressDoc.data();
                 console.log('🔍 [PROGRESS DEBUG] Progress data retrieved:', JSON.stringify(data, this.safeJsonReplacer));
-                
+
                 // Validate data structure
                 if (!data.categories) {
                     console.warn('⚠️ [PROGRESS DEBUG] Progress data missing categories property');
                     data.categories = {};
                 }
-                
+
                 if (typeof data.categories !== 'object') {
                     console.error('❌ [PROGRESS DEBUG] Categories is not an object:', typeof data.categories);
                     data.categories = {};
                 }
-                
+
                 // Log each category value
                 if (data.categories) {
-                    Object.entries(data.categories).forEach(([category, value]) => {
-                        console.log(`🔍 [PROGRESS DEBUG] Category ${category} value:`, value);
+                    Object.entries(data.categories).forEach(([key, value]) => {
+                        console.log(`🔍 [PROGRESS DEBUG] Category ${key} value:`, value);
                         if (typeof value !== 'number' || isNaN(value)) {
-                            console.error(`❌ [PROGRESS DEBUG] Invalid value for category ${category}:`, value);
+                            console.error(`❌ [PROGRESS DEBUG] Invalid value for ${key}:`, value);
                         }
                     });
                 }
-                
+
                 // Handle any timestamp fields
                 if (data.lastUpdated && typeof data.lastUpdated.toDate === 'function') {
                     data.lastUpdated = data.lastUpdated.toDate();
                 }
-                
+
                 return data;
             }
 
@@ -426,7 +304,7 @@ export class ExerciseService {
      */
     static async completeExercise(userId: string, exerciseId: string): Promise<void> {
         try {
-            // Get exercise details (for category)
+            // Get exercise details
             const exercise = await this.getExerciseById(exerciseId);
             const userRef = doc(db, 'users', userId); // Reference to the main user document
 
@@ -435,20 +313,24 @@ export class ExerciseService {
             const overviewDoc = await getDoc(overviewRef);
 
             if (overviewDoc.exists()) {
-                // Increment the category count
-                await updateDoc(overviewRef, {
-                    [`categories.${exercise.category}`]: increment(1),
-                    lastUpdated: Timestamp.now()
-                });
+                // Increment the category count (now a direct string reference)
+                const categoryId = exercise.exerciseCategories;
+                if (categoryId) {
+                    await updateDoc(overviewRef, {
+                        [`categories.${categoryId}`]: increment(1),
+                        lastUpdated: Timestamp.now()
+                    });
+                }
+
             } else {
                 // Create the document if it doesn't exist
+                const categoryId = exercise.exerciseCategories;
                 await setDoc(overviewRef, {
                     overall: 0, // This might need adjustment based on how "overall" is calculated
-                    categories: {
-                        [exercise.category]: 1
-                    },
+                    categories: categoryId ? { [categoryId]: 1 } : {},
                     lastUpdated: Timestamp.now()
                 });
+
             }
 
             // Add/update the individual exercise progress entry
@@ -480,9 +362,106 @@ export class ExerciseService {
               }
             });
 
+            // Update template completion progress
+            await this.updateTemplateProgress(userId, exerciseId);
+
         } catch (error) {
             console.error('Error completing exercise:', error);
             throw error; // Re-throw to handle upstream
+        }
+    }
+
+    /**
+     * Updates the user's template completion progress when an exercise is completed
+     */
+    private static async updateTemplateProgress(userId: string, completedExerciseId: string): Promise<void> {
+        try {
+            // 1. Get user's assigned template
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            if (!userDoc.exists()) {
+                console.error('User document not found');
+                return;
+            }
+
+            const assignedTemplateId = userDoc.data()?.assignedTemplateId;
+            if (!assignedTemplateId) {
+                console.error('No template assigned to user');
+                return;
+            }
+
+            // 2. Get template details
+            const templateDoc = await getDoc(doc(db, 'exerciseTemplates', assignedTemplateId));
+            if (!templateDoc.exists()) {
+                console.error('Template document not found');
+                return;
+            }
+
+            // Parse the exerciseIds string into an array
+            let exerciseIds: string[] = [];
+            const exerciseIdsData = templateDoc.data()?.exerciseIds;
+
+            if (typeof exerciseIdsData === 'string') {
+                // Handle string format like "[exercise-1, exercise-2, exercise-3]"
+                exerciseIds = exerciseIdsData
+                    .replace('[', '')
+                    .replace(']', '')
+                    .split(',')
+                    .map(id => id.trim());
+            } else if (Array.isArray(exerciseIdsData)) {
+                // Handle array format
+                exerciseIds = exerciseIdsData;
+            }
+
+            if (exerciseIds.length === 0) {
+                console.error('No exercises found in template');
+                return;
+            }
+
+            // 3. Get all completed exercises for this user
+            const completedExerciseIds = await this.getCompletedExerciseIds(userId);
+
+            // 4. Count how many template exercises are completed
+            const templateExercisesCompleted = exerciseIds.filter(id =>
+                completedExerciseIds.includes(id)
+            ).length;
+
+            // 5. Update or create the userTemplateCompletions document
+            // First check if there's an existing document for this user and template
+            const templateCompletionsQuery = query(
+                collection(db, 'userTemplateCompletions'),
+                where('userId', '==', userId),
+                where('templateId', '==', assignedTemplateId),
+                limit(1)
+            );
+
+            const existingDocs = await getDocs(templateCompletionsQuery);
+
+            if (!existingDocs.empty) {
+                // Update existing document
+                const docId = existingDocs.docs[0].id;
+                await updateDoc(doc(db, 'userTemplateCompletions', docId), {
+                    exercisesCompleted: templateExercisesCompleted,
+                    totalExercises: exerciseIds.length,
+                    completedAt: templateExercisesCompleted === exerciseIds.length ?
+                        Timestamp.now() : existingDocs.docs[0].data().completedAt || null
+                });
+            } else {
+                // Create new document
+                await addDoc(collection(db, 'userTemplateCompletions'), {
+                    userId: userId,
+                    templateId: assignedTemplateId,
+                    exercisesCompleted: templateExercisesCompleted,
+                    totalExercises: exerciseIds.length,
+                    completedAt: templateExercisesCompleted === exerciseIds.length ?
+                        Timestamp.now() : null
+                });
+            }
+
+            console.log(`Updated template progress: ${templateExercisesCompleted}/${exerciseIds.length} exercises completed`);
+
+        } catch (error) {
+            console.error('Error updating template progress:', error);
+            // Don't throw the error to avoid breaking the main completion flow
         }
     }
 }

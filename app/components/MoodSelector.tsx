@@ -32,12 +32,15 @@ export type IconName =
 
 type MoodType = {
   label: string;
-  icon: IconName; // Keep IconName for now, assuming DB values match
-  key: string; // Change to string to accept any key from DB
+  icon: IconName;
+  key: string;
   value: number;
   duration: number;
   isSelected: boolean;
-  count?: number; // Optional bubble count
+  count?: number;
+  // Consciousness fields (optional for backward compatibility)
+  consciousnessValue?: number;
+  consciousnessLevel?: string;
 };
 
 type Props = {
@@ -117,6 +120,12 @@ function MoodSelector({
     }
   };
 
+  // Mood grouping by consciousness level removed
+
+  // Consciousness-related code removed
+
+  // Hawkins scale visualization removed
+
   return (
     <ScreenLayout
       title="Mood Tracker"
@@ -128,8 +137,8 @@ function MoodSelector({
           localStyles.mood_buttonContainer,
           isSmallScreen && { flexDirection: 'column' }
         ]}>
-          <View style={{ 
-            flex: 1, 
+          <View style={{
+            flex: 1,
             marginRight: isSmallScreen ? 0 : theme.spacing.small,
             marginBottom: isSmallScreen ? theme.spacing.small : 0
           }}>
@@ -143,9 +152,9 @@ function MoodSelector({
               NEXT
             </EnhancedButton>
           </View>
-          <View style={{ 
-            flex: 1, 
-            marginLeft: isSmallScreen ? 0 : theme.spacing.small 
+          <View style={{
+            flex: 1,
+            marginLeft: isSmallScreen ? 0 : theme.spacing.small
           }}>
             <EnhancedButton
               mode="contained"
@@ -175,126 +184,89 @@ function MoodSelector({
       >
         How are you feeling?
       </Text>
-
-      {/* Mood Grid */}
-      <View style={{ 
-        paddingHorizontal: 16, 
-        marginBottom: 20,
-        height: Dimensions.get('window').height * 0.33, // Ekranın 1/3'ünü kaplasın
-      }}>
-        <View style={[
-          localStyles.mood_gridContainer,
-          { 
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignContent: 'flex-start',
+      <ScrollView style={{ marginBottom: 20 }}>
+        {/* Chunk all moods into rows of 3 for a flat grid */}
+        {(() => {
+          const chunks: MoodType[][] = [];
+          for (let i = 0; i < moods.length; i += 3) {
+            chunks.push(moods.slice(i, i + 3));
           }
-        ]}>
-          {moods.map((item, index) => {
-            const isSelected = selectedMood?.label === item.label;
-            // Safely access mood color with a fallback
-            const moodColor = theme.moodColors[item.key as keyof AppTheme['moodColors']] || theme.colors.primary; // Fallback to primary color
+          return chunks.map((row, rowIdx) => (
+            <View key={rowIdx} style={{ flexDirection: 'row', justifyContent: 'flex-start', marginBottom: 12 }}>
+              {row.map((item, colIdx) => {
+                const isSelected = selectedMood?.label === item.label;
+                const moodColor = theme.moodColors[item.key as keyof AppTheme['moodColors']] || theme.colors.primary;
+                return (
+                  <View key={item.label} style={{ flex: 1, alignItems: 'center', maxWidth: '33%' }}>
+                    <Pressable
+                      onPress={() => {
+                        console.log('Mood selected:', item);
+                        onMoodSelect(moods.findIndex(m => m.label === item.label));
+                      }}
+                      style={({ pressed }) => [
+                        {
+                          width: '100%',
+                          aspectRatio: 1,
+                          marginHorizontal: 4,
+                          alignItems: 'center', justifyContent: 'center',
+                          borderRadius: theme.shape.borderRadius,
+                          backgroundColor: theme.colors.surface,
+                          borderWidth: isSelected ? 2 : 1,
+                          borderColor: isSelected ? moodColor : theme.colors.surfaceVariant,
+                          shadowColor: theme.colors.shadow,
+                          shadowOffset: { width: 0, height: 1 },
+                          shadowOpacity: 0.1, shadowRadius: 2, elevation: 1,
+                        },
+                        pressed && { opacity: 0.8 },
+                      ]}
+                      accessibilityLabel={`Select mood ${item.label}`}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: isSelected }}
+                    >
+                      <MaterialCommunityIcons
+                        name={item.icon}
+                        size={28}
+                        color={moodColor}
+                      />
+                      <Text style={{ fontWeight: isSelected ? '700' : '400', color: isSelected ? moodColor : theme.colors.onSurfaceVariant, fontSize: 13, marginTop: 2 }}>
+                        {item.label}
+                      </Text>
+                      {/* Consciousness badge removed */}
+                    </Pressable>
+                  </View>
+                );
+              })}
+              {/* Fill empty columns if less than 3 moods in this row */}
+              {row.length < 3 && Array.from({ length: 3 - row.length }).map((_, i) => (
+                <View key={`empty-${i}`} style={{ flex: 1, maxWidth: '33%' }} />
+              ))}
+            </View>
+          ));
+        })()}
 
-            return (
-              <Pressable
-                key={item.label}
-                onPress={() => onMoodSelect(index)}
-                style={({ pressed }) => [
-                  {
-                    width: '30%', // 3 sütun için
-                    aspectRatio: 1, // Kare şeklinde
-                    margin: '1.5%', // Aralarında boşluk
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: theme.shape.borderRadius,
-                    backgroundColor: theme.colors.surface,
-                    // Tüm butonlara hafif gölge ekleyelim
-                    shadowColor: theme.colors.shadow,
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 2,
-                    elevation: 1,
-                  },
-                  pressed && { opacity: 0.8 }, // Basıldığında hafif opaklık
-                  isSelected && {
-                    // Seçildiğinde daha belirgin gölge
-                    shadowColor: moodColor,
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
-                    shadowRadius: 4,
-                    elevation: 3,
-                  },
-                ]}
-                accessibilityLabel={`Select mood ${item.label}`}
-                accessibilityRole="button"
-                accessibilityState={{ selected: isSelected }}
-              >
-                {/* Seçim göstergesi olarak ince bir çerçeve ekleyelim */}
-                {isSelected && (
-                  <View 
-                    style={{
-                      position: 'absolute',
-                      top: 0, left: 0, right: 0, bottom: 0,
-                      borderRadius: theme.shape.borderRadius,
-                      borderWidth: 1.5,
-                      borderColor: moodColor,
-                    }}
-                  />
-                )}
-                
-                <MaterialCommunityIcons 
-                  name={item.icon} 
-                  size={28}
-                  color={moodColor} // Use the potentially fallback color
-                />
-                
-                <Text
-                  style={[
-                    typographyStyles.text_caption,
-                    theme.fonts.labelMedium,
-                    { 
-                      marginTop: theme.spacing.tiny,
-                      color: isSelected ? moodColor : theme.colors.onSurfaceVariant,
-                      fontWeight: isSelected ? '600' : '400',
-                      textAlign: 'center',
-                      fontSize: theme.scaleFont(12),
-                    },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {item.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      </View>
-
-      {/* Duration Slider */}
-      {selectedMood && (
-        <View style={{ marginTop: 20, paddingHorizontal: 16 }}>
-          <SliderCard
-            variant="duration"
-            icon="clock-outline"
-            label="How long have you felt this way?"
-            value={selectedMood.duration || 0}
-            onSlidingComplete={onDurationChange}
-            labels={['< 3 months', '6 months', '> 1 year']}
-            steps={33}
-          />
-
-          {/* Emot Slider */}
-          <SliderCard
-            variant="emotion"
-            icon={selectedMood.icon}
-            label={selectedMood.label}
-            value={selectedMood.value}
-            moodKey={selectedMood.key as keyof typeof theme.moodColors} // Add type assertion here
-            onSlidingComplete={(val) => handleSliderComplete(val, selectedMood.label)}
-          />
-        </View>
-      )}
+        {/* Show sliders when a mood is selected */}
+        {selectedMood && (
+          <>
+            <SliderCard
+              variant="emotion"
+              label={selectedMood.label}
+              moodKey={selectedMood.key as keyof AppTheme['moodColors']}
+              icon={selectedMood.icon}
+              value={slidersState[selectedMood.label]?.value ?? selectedMood.value}
+              onSlidingComplete={value => handleSliderComplete(value, selectedMood.label)}
+            />
+            <SliderCard
+              variant="duration"
+              label="How long have you felt this way?"
+              icon="clock-outline"
+              value={selectedMood.duration ?? 0}
+              onSlidingComplete={onDurationChange}
+              labels={["< 3 months", "6 months", "> 1 year"]}
+              steps={2}
+            />
+          </>
+        )}
+      </ScrollView>
     </ScreenLayout>
   );
 }
