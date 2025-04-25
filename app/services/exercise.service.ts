@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, doc, getDoc, orderBy, limit, setDoc, updateDoc, increment } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc, orderBy, limit, setDoc, updateDoc, increment, addDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Timestamp } from 'firebase/firestore';
 import { safeStringify, validateRadarData, validateRadarLabels, DataPoint } from '../lib/debug-utils';
@@ -62,6 +62,30 @@ export class ExerciseService {
         }
     }
 
+    /**
+     * Get completed exercise IDs for a user
+     */
+    static async getCompletedExerciseIds(userId: string): Promise<string[]> {
+        try {
+            if (!userId) {
+                console.error('User ID is required to fetch completed exercises');
+                return [];
+            }
+
+            const userExercisesQuery = query(
+                collection(db, 'users', userId, 'progress'),
+                where('type', '==', 'exercise'),
+                where('completed', '==', true)
+            );
+
+            const snapshot = await getDocs(userExercisesQuery);
+            return snapshot.docs.map(doc => doc.id);
+        } catch (error) {
+            console.error('Error fetching completed exercises:', error);
+            return [];
+        }
+    }
+
   /**
    * Get all exercises
    */
@@ -80,6 +104,81 @@ export class ExerciseService {
       } catch (error) {
         console.error('Error fetching exercises:', error);
         throw error;
+      }
+    }
+
+    /**
+     * Get user's assigned template and its exercises in order
+     */
+    static async getUserTemplateExercises(userId: string): Promise<any[]> {
+      try {
+        if (!userId) {
+          console.error('User ID is required to fetch template exercises');
+          return [];
+        }
+
+        // 1. Get user's assigned template ID
+        const userRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userRef);
+
+        if (!userDoc.exists()) {
+          console.error('User document not found');
+          return [];
+        }
+
+        const assignedTemplateId = userDoc.data()?.assignedTemplateId;
+        if (!assignedTemplateId) {
+          console.error('No template assigned to user');
+          return [];
+        }
+
+        // 2. Get template's exercise IDs
+        const templateRef = doc(db, 'exerciseTemplates', assignedTemplateId);
+        const templateDoc = await getDoc(templateRef);
+
+        if (!templateDoc.exists()) {
+          console.error('Template document not found');
+          return [];
+        }
+
+        // Parse the exerciseIds string into an array
+        let exerciseIds: string[] = [];
+        const exerciseIdsData = templateDoc.data()?.exerciseIds;
+
+        if (typeof exerciseIdsData === 'string') {
+          // Handle string format like "[exercise-1, exercise-2, exercise-3]"
+          exerciseIds = exerciseIdsData
+            .replace('[', '')
+            .replace(']', '')
+            .split(',')
+            .map(id => id.trim());
+        } else if (Array.isArray(exerciseIdsData)) {
+          // Handle array format
+          exerciseIds = exerciseIdsData;
+        }
+
+        if (exerciseIds.length === 0) {
+          console.error('No exercises found in template');
+          return [];
+        }
+
+        // 3. Fetch all exercises in the template
+        const exercises: any[] = [];
+        for (const exId of exerciseIds) {
+          const exDoc = await getDoc(doc(db, 'exercises', exId));
+          if (exDoc.exists()) {
+            exercises.push({
+              id: exDoc.id,
+              ...exDoc.data()
+            });
+          }
+        }
+
+        // 4. Sort exercises by order field
+        return exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
+      } catch (error) {
+        console.error('Error fetching user template exercises:', error);
+        return [];
       }
     }
 
@@ -205,7 +304,7 @@ export class ExerciseService {
      */
     static async completeExercise(userId: string, exerciseId: string): Promise<void> {
         try {
-            // Get exercise details (for )
+            // Get exercise details
             const exercise = await this.getExerciseById(exerciseId);
             const userRef = doc(db, 'users', userId); // Reference to the main user document
 
@@ -263,9 +362,106 @@ export class ExerciseService {
               }
             });
 
+            // Update template completion progress
+            await this.updateTemplateProgress(userId, exerciseId);
+
         } catch (error) {
             console.error('Error completing exercise:', error);
             throw error; // Re-throw to handle upstream
+        }
+    }
+
+    /**
+     * Updates the user's template completion progress when an exercise is completed
+     */
+    private static async updateTemplateProgress(userId: string, completedExerciseId: string): Promise<void> {
+        try {
+            // 1. Get user's assigned template
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            if (!userDoc.exists()) {
+                console.error('User document not found');
+                return;
+            }
+
+            const assignedTemplateId = userDoc.data()?.assignedTemplateId;
+            if (!assignedTemplateId) {
+                console.error('No template assigned to user');
+                return;
+            }
+
+            // 2. Get template details
+            const templateDoc = await getDoc(doc(db, 'exerciseTemplates', assignedTemplateId));
+            if (!templateDoc.exists()) {
+                console.error('Template document not found');
+                return;
+            }
+
+            // Parse the exerciseIds string into an array
+            let exerciseIds: string[] = [];
+            const exerciseIdsData = templateDoc.data()?.exerciseIds;
+
+            if (typeof exerciseIdsData === 'string') {
+                // Handle string format like "[exercise-1, exercise-2, exercise-3]"
+                exerciseIds = exerciseIdsData
+                    .replace('[', '')
+                    .replace(']', '')
+                    .split(',')
+                    .map(id => id.trim());
+            } else if (Array.isArray(exerciseIdsData)) {
+                // Handle array format
+                exerciseIds = exerciseIdsData;
+            }
+
+            if (exerciseIds.length === 0) {
+                console.error('No exercises found in template');
+                return;
+            }
+
+            // 3. Get all completed exercises for this user
+            const completedExerciseIds = await this.getCompletedExerciseIds(userId);
+
+            // 4. Count how many template exercises are completed
+            const templateExercisesCompleted = exerciseIds.filter(id =>
+                completedExerciseIds.includes(id)
+            ).length;
+
+            // 5. Update or create the userTemplateCompletions document
+            // First check if there's an existing document for this user and template
+            const templateCompletionsQuery = query(
+                collection(db, 'userTemplateCompletions'),
+                where('userId', '==', userId),
+                where('templateId', '==', assignedTemplateId),
+                limit(1)
+            );
+
+            const existingDocs = await getDocs(templateCompletionsQuery);
+
+            if (!existingDocs.empty) {
+                // Update existing document
+                const docId = existingDocs.docs[0].id;
+                await updateDoc(doc(db, 'userTemplateCompletions', docId), {
+                    exercisesCompleted: templateExercisesCompleted,
+                    totalExercises: exerciseIds.length,
+                    completedAt: templateExercisesCompleted === exerciseIds.length ?
+                        Timestamp.now() : existingDocs.docs[0].data().completedAt || null
+                });
+            } else {
+                // Create new document
+                await addDoc(collection(db, 'userTemplateCompletions'), {
+                    userId: userId,
+                    templateId: assignedTemplateId,
+                    exercisesCompleted: templateExercisesCompleted,
+                    totalExercises: exerciseIds.length,
+                    completedAt: templateExercisesCompleted === exerciseIds.length ?
+                        Timestamp.now() : null
+                });
+            }
+
+            console.log(`Updated template progress: ${templateExercisesCompleted}/${exerciseIds.length} exercises completed`);
+
+        } catch (error) {
+            console.error('Error updating template progress:', error);
+            // Don't throw the error to avoid breaking the main completion flow
         }
     }
 }

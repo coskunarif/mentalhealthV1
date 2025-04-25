@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View, ActivityIndicator } from 'react-native';
 import { Text, Button, Surface, useTheme } from 'react-native-paper';
 import { router } from 'expo-router';
 import { typographyStyles } from '../config';
@@ -9,6 +9,7 @@ import type { AppTheme } from '../types/theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import EnhancedButton from '../components/EnhancedButton';
 import { ExerciseService } from '../services/exercise.service';
+import { useAuth } from '../context/auth';
 
 interface Exercise {
   id: string;
@@ -19,34 +20,50 @@ interface Exercise {
 }
 
 export default function ExercisesScreen() {
-  const [breathExercises, setBreathExercises] = useState<Exercise[]>([]);
-  // Track completed exercise IDs in state
-const [completedExerciseIds, setCompletedExerciseIds] = useState<string[]>([]);
+  const [templateExercises, setTemplateExercises] = useState<Exercise[]>([]);
+  const [completedExerciseIds, setCompletedExerciseIds] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-const nextExercise = breathExercises.find((exercise) => !completedExerciseIds.includes(exercise.id));
   const theme = useTheme<AppTheme>();
-  const userId = 'user-id'; // Replace with actual user ID
+  const { user } = useAuth();
+  const userId = user?.uid || '';
+
+  // Find the next uncompleted exercise in the template
+  const nextExercise = templateExercises.find((exercise) => !completedExerciseIds.includes(exercise.id));
 
   useEffect(() => {
-  const fetchExercises = async () => {
-    try {
-      const exercises: Exercise[] = await ExerciseService.getExercises(userId);
-      // Sort exercises by the 'order' field before setting state
-      const sortedExercises = exercises.sort((a, b) => (a.order || 0) - (b.order || 0));
-      setBreathExercises(sortedExercises);
-
-      // Fetch completions (simulate or fetch from service as needed)
-      // For now, assume completedExerciseIds are a subset of exercise IDs (mocked)
-      // TODO: Replace with real fetch from userExerciseCompletions
-      const completions: string[] = []; // Replace with actual fetching logic
-      setCompletedExerciseIds(completions);
-    } catch (error) {
-      console.error('Error fetching exercises:', error);
+    // Skip if no user ID is available
+    if (!userId) {
+      setError('Please sign in to view your exercises');
+      setIsLoading(false);
+      return;
     }
-  };
 
-  fetchExercises();
-}, [userId]);
+    const fetchUserExercises = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // 1. Get the user's template exercises in order
+        const exercises = await ExerciseService.getUserTemplateExercises(userId);
+        setTemplateExercises(exercises);
+
+        // 2. Get the user's completed exercise IDs
+        const completedIds = await ExerciseService.getCompletedExerciseIds(userId);
+        setCompletedExerciseIds(completedIds);
+
+        console.log(`Loaded ${exercises.length} exercises, ${completedIds.length} completed`);
+      } catch (error) {
+        console.error('Error fetching user exercises:', error);
+        setError('Failed to load exercises. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserExercises();
+  }, [userId]);
 
   const styles = React.useMemo(() => StyleSheet.create({
     container: {
@@ -100,9 +117,53 @@ const nextExercise = breathExercises.find((exercise) => !completedExerciseIds.in
     }
   };
 
-  const completedExercises = breathExercises.filter(ex => completedExerciseIds.includes(ex.id)).length;
-  const totalExercises = breathExercises.length;
-  const completionRate = totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0;
+  const completedExercisesCount = completedExerciseIds.length;
+  const totalExercises = templateExercises.length;
+  const completionRate = totalExercises > 0 ? Math.round((completedExercisesCount / totalExercises) * 100) : 0;
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.background }}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={{ marginTop: 16, color: theme.colors.onSurfaceVariant }}>Loading your exercises...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: theme.colors.background }}>
+        <MaterialCommunityIcons name="alert-circle-outline" size={48} color={theme.colors.error} />
+        <Text style={{ marginTop: 16, color: theme.colors.onSurface, fontSize: 18, textAlign: 'center' }}>{error}</Text>
+        {userId && (
+          <Button
+            mode="contained"
+            onPress={() => {
+              setIsLoading(true);
+              setError(null);
+              ExerciseService.getUserTemplateExercises(userId)
+                .then(exercises => {
+                  setTemplateExercises(exercises);
+                  return ExerciseService.getCompletedExerciseIds(userId);
+                })
+                .then(completedIds => {
+                  setCompletedExerciseIds(completedIds);
+                  setIsLoading(false);
+                })
+                .catch(err => {
+                  console.error('Error retrying fetch:', err);
+                  setError('Failed to load exercises. Please try again.');
+                  setIsLoading(false);
+                });
+            }}
+            style={{ marginTop: 24 }}
+          >
+            Retry
+          </Button>
+        )}
+      </View>
+    );
+  }
 
   return (
     <ScrollView
@@ -136,11 +197,11 @@ const nextExercise = breathExercises.find((exercise) => !completedExerciseIds.in
         </Text>
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{completedExercises}</Text>
+            <Text style={styles.statValue}>{completedExercisesCount}</Text>
             <Text style={styles.statLabel}>Completed</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{totalExercises - completedExercises}</Text>
+            <Text style={styles.statValue}>{totalExercises - completedExercisesCount}</Text>
             <Text style={styles.statLabel}>Remaining</Text>
           </View>
           <View style={styles.statItem}>
@@ -155,7 +216,11 @@ const nextExercise = breathExercises.find((exercise) => !completedExerciseIds.in
         <Text variant="headlineMedium" style={styles.sectionTitle}>
           Exercise Progress
         </Text>
-        <ExerciseProgress exercises={breathExercises} currentStep={nextExercise?.id} completedExerciseIds={completedExerciseIds} />
+        <ExerciseProgress
+          exercises={templateExercises}
+          currentStep={nextExercise?.id}
+          completedExerciseIds={completedExerciseIds}
+        />
         {nextExercise && (
           <EnhancedButton
             mode="contained"
@@ -178,9 +243,9 @@ const nextExercise = breathExercises.find((exercise) => !completedExerciseIds.in
         <Text variant="headlineMedium" style={styles.sectionTitle}>
           Completed Exercises
         </Text>
-        {completedExercises > 0 ? (
-          <ExerciseProgress 
-            exercises={breathExercises.filter(ex => completedExerciseIds.includes(ex.id))}
+        {completedExercisesCount > 0 ? (
+          <ExerciseProgress
+            exercises={templateExercises.filter(ex => completedExerciseIds.includes(ex.id))}
             currentStep={undefined}
             completedExerciseIds={completedExerciseIds}
           />
