@@ -18,6 +18,7 @@ export const onUserCreate = functions
         photoURL: user.photoURL || '',
         createdAt: timestamp,
         updatedAt: timestamp,
+        initialSurveyCompleted: false, // <-- Add this line
         settings: {
           notifications: {
             reminders: true,

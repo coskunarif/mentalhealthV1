@@ -28,7 +28,7 @@ export default function SignUpScreen() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      router.replace('/tabs/home');
+      router.replace('/survey');
     } catch (err) {
       setError('Failed to create account. Please try again.');
       console.error('Sign up error:', err);

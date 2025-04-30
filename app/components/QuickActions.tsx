@@ -10,15 +10,14 @@ import styles from '../config/quickActions.styles';
 type MaterialIconName = keyof typeof MaterialIcons.glyphMap;
 
 const actions: {
-  title: string;
+  title?: string; // Make title optional
   icon: MaterialIconName;
-  href: string;
+  href?: string; // Make href optional
   color: string;
 }[] = [
   {
-    title: 'Take Survey',
+    // No title, no href: placeholder button
     icon: 'assignment',
-    href: '/survey',
     color: '#5DA47A',
   },
   {
@@ -55,11 +54,52 @@ export default function QuickActions({ sectionStyle }: QuickActionsProps) {
       </Text>
       <View style={styles.fabContainer}>
         {actions.map((action, index) => (
-          <Link key={index} href={action.href} asChild>
+          action.href ? (
+            <Link key={index} href={action.href} asChild>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={{
+                  transform: [{ scale: buttonScales[index] }],
+                }}
+                onPressIn={() => {
+                  Animated.timing(buttonScales[index], {
+                    toValue: 0.95,
+                    duration: 100,
+                    useNativeDriver: true,
+                  }).start();
+                }}
+                onPressOut={() => {
+                  Animated.timing(buttonScales[index], {
+                    toValue: 1,
+                    duration: 100,
+                    useNativeDriver: true,
+                  }).start();
+                }}
+              >
+                <View>
+                  <View style={[styles.fabButton, { backgroundColor: theme.colors.primary }]}>
+                    <MaterialIcons
+                      name={action.icon}
+                      size={32}
+                      color={theme.colors.onPrimary}
+                    />
+                  </View>
+                  <View style={styles.labelContainer}>
+                    {action.title && (
+                      <Text style={styles.labelText}>
+                        {action.title}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </Link>
+          ) : (
             <TouchableOpacity
+              key={index}
               activeOpacity={0.7}
               style={{
-                transform: [{ scale: buttonScales[index] }], // Use the right scale for this button
+                transform: [{ scale: buttonScales[index] }],
               }}
               onPressIn={() => {
                 Animated.timing(buttonScales[index], {
@@ -75,23 +115,22 @@ export default function QuickActions({ sectionStyle }: QuickActionsProps) {
                   useNativeDriver: true,
                 }).start();
               }}
+              // No onPress for placeholder
             >
               <View>
                 <View style={[styles.fabButton, { backgroundColor: theme.colors.primary }]}>
                   <MaterialIcons
                     name={action.icon}
-                    size={32} // Increased from 28
+                    size={32}
                     color={theme.colors.onPrimary}
                   />
                 </View>
                 <View style={styles.labelContainer}>
-                  <Text style={styles.labelText}>
-                    {action.title}
-                  </Text>
+                  {/* No label for placeholder */}
                 </View>
               </View>
             </TouchableOpacity>
-          </Link>
+          )
         ))}
       </View>
     </Surface>
