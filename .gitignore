@@ -91,3 +91,5 @@ config/firebase.ts
 # (Optional) Ignore any other generated or temp files below
 # tmp/
 # temp/
+# Prevent accidental commit of Firestore data exports
+firestore-export.csv
