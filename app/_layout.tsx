@@ -121,7 +121,12 @@ function ThemedApp() {
     // and the auth state is settled (!loading)
     if (loaded && initialized && !loading) {
       if (user) {
-        router.replace('/tabs/home');
+        // Check if the initial survey has been completed
+        if (user.initialSurveyCompleted) {
+          router.replace('/tabs/home');
+        } else {
+          router.replace('/survey');
+        }
       } else {
         router.replace('/auth/sign-in');
       }

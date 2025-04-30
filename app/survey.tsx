@@ -9,6 +9,8 @@ import { useAuth } from './context/auth';
 import { useSurvey } from './hooks/useSurvey';
 import { useSurveyTemplate } from './hooks/useSurveyTemplate';
 
+import { UserService } from './services/user.service';
+
 const SurveyScreen = () => {
   const theme = useTheme();
   const { user } = useAuth();
@@ -65,6 +67,12 @@ const SurveyScreen = () => {
       ); 
       
       if (success) {
+        try {
+          await UserService.markInitialSurveyComplete(userId);
+        } catch (err) {
+          console.error('Failed to mark initial survey as complete:', err);
+          // Optionally, show a message to the user or log for analytics
+        }
         router.replace('/tabs/home');
       }
     } else {

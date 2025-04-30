@@ -503,6 +503,22 @@ export class UserService {
       return [];
     }
   }
+  /**
+   * Mark the initial survey as complete for a user
+   */
+  static async markInitialSurveyComplete(userId: string): Promise<void> {
+    try {
+      if (!userId) throw new Error('User ID is required');
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, {
+        initialSurveyCompleted: true,
+        updatedAt: new Date()
+      });
+    } catch (error) {
+      console.error('Error marking initial survey as complete:', error);
+      throw error;
+    }
+  }
 }
 
 export default UserService;

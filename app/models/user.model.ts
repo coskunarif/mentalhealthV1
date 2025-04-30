@@ -27,6 +27,7 @@ export interface UserModel {
   updatedAt: Date;
   settings: UserSettings;
   stats: UserStats;
+  initialSurveyCompleted: boolean; // Indicates if the user has completed the initial registration survey
   phoneNumber?: string;
   dateOfBirth?: string;
   // Remove sessions field
